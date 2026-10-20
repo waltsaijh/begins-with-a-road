@@ -47,7 +47,8 @@ func health_sample(camera: Camera3D, head: Vector3, bar_size: Vector2) -> Vector
 
 func is_health_pixel(image: Image, point: Vector2i, color: Color) -> bool:
 	if not Rect2i(Vector2i.ZERO, image.get_size()).has_point(point): return false
-	return image.get_pixelv(point).is_equal_approx(color)
+	var pixel := image.get_pixelv(point)
+	return absf(pixel.r-color.r) < 0.01 and absf(pixel.g-color.g) < 0.01 and absf(pixel.b-color.b) < 0.01
 
 func verify() -> void:
 	_viewport = TestViewport.new()
@@ -90,6 +91,11 @@ func verify() -> void:
 		check(intermediate and milliseconds >= 210.0 and milliseconds < 450.0, "Pause did not decelerate over 0.25 real seconds independently of speed")
 		check(get_tree().paused and Engine.time_scale == 0.0 and scene.preparation_remaining < remaining, "Pause did not allow the slow-down then freeze at zero delta")
 		check(is_equal_approx(hud.pause_menu.modulate.a, 1.0), "Pause menu did not fade in while simulation slowed to zero")
+		check(is_equal_approx(cards._pause_retraction, 1.0), "Cards did not finish retracting within the pause ramp")
+		for view: Control in cards.hand.views:
+			check(view.get_global_transform_with_canvas().origin.y > _viewport.size.y, "Paused hand remained visible")
+		var veil: ColorRect = hud.pause_menu.get_node("WhiteVeil")
+		check(veil.color == Color(1, 1, 1, 0.14) and veil.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Pause veil is not a subtle non-interactive white overlay")
 		var frozen: float = scene.preparation_remaining
 		var size_before := camera.size
 		var wheel := InputEventMouseButton.new()
@@ -117,6 +123,7 @@ func verify() -> void:
 		check(hud.pause_menu.modulate.a > 0.0 and hud.pause_menu.modulate.a < 1.0, "Menu fade-out snapped or used scaled game time")
 		if hud._pause_menu_motion.is_running(): await hud._pause_menu_motion.finished
 		check(not hud.pause_menu.visible and is_zero_approx(hud.pause_menu.modulate.a), "Pause menu did not hide at the end of its fade-out")
+		check(is_zero_approx(cards._pause_retraction) and is_zero_approx(cards.hand.get_node("Cards").position.y), "Resume did not restore hand position")
 	# Build an affordable shop state so transaction rejection exercises the pause lock.
 	shop.available = shop._deal()
 	shop.coins = 1000
@@ -130,12 +137,14 @@ func verify() -> void:
 	check(not shop.buy(0) and not shop.reroll() and shop.coins == coins and shop.deals == deals, "Shop changed during the pause ramp")
 	await finish_pause(hud)
 	check(not shop.buy(0) and not shop.reroll() and shop.view.opened, "Paused shop allowed transactions or lost its open state")
+	for slot: Control in shop.view.slots:
+		check(slot.get_global_transform_with_canvas().origin.y > _viewport.size.y, "Paused shop remained visible")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		_viewport.get_texture().get_image().save_png("res://reports/levels/pause_navigation.png")
 	var chosen: int = hud.speed_index
 	hud.cycle_speed()
-	check(Engine.time_scale == 0.0 and get_tree().paused and hud.speed_index != chosen, "Changing selected speed restarted paused simulation")
+	check(Engine.time_scale == 0.0 and get_tree().paused and hud.speed_index == chosen, "Paused speed selection was not locked")
 	key(KEY_ESCAPE)
 	check(not hud.pause_requested and not get_tree().paused and Engine.time_scale == hud.SPEEDS[hud.speed_index], "Escape failed to resume from zero delta")
 	shop.close_shop()
@@ -164,6 +173,7 @@ func verify() -> void:
 	check(overlay.can_process(), "Health overlay stopped projecting while gameplay was paused")
 	var bar_size: Vector2 = overlay.appearance.size
 	var health_color: Color = overlay.appearance.get_node("Health").color
+	health_color = health_color.lerp(Color.WHITE, hud.pause_menu.get_node("WhiteVeil").color.a)
 	await frames(3)
 	var old_pixel := health_sample(camera, head, bar_size)
 	if DisplayServer.get_name() != "headless":

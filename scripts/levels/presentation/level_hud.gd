@@ -4,7 +4,6 @@ signal exit_requested
 @export var early_reward_scene: PackedScene = preload("res://scenes/levels/components/early_start_reward.tscn")
 const SPEEDS := [1.0, 2.0, 4.0]
 const PauseIcon = preload("res://assets/sprites/interface/pause.png")
-const PlayIcon = preload("res://assets/sprites/interface/play.png")
 const SPEED_ICONS: Array[Texture2D] = [
 	preload("res://assets/sprites/interface/speed_1x.png"),
 	preload("res://assets/sprites/interface/speed_2x.png"),
@@ -113,11 +112,12 @@ func _notification(what: int) -> void:
 func _update_labels() -> void:
 	speed_button.text = ""
 	speed_button.icon = SPEED_ICONS[speed_index]
-	pause_button.icon = PlayIcon if pause_requested else PauseIcon
+	pause_button.icon = PauseIcon
 	resume_button.text = tr("ui.pause.resume")
 	exit_button.text = tr("ui.pause.exit")
 
 func cycle_speed() -> void:
+	if pause_requested: return
 	speed_index = (speed_index+1)%SPEEDS.size()
 	if not pause_requested: Engine.time_scale = SPEEDS[speed_index]
 	_update_labels()
@@ -129,7 +129,10 @@ func set_paused(value: bool) -> void:
 	if value:
 		_start_was_disabled = early_start.disabled
 		early_start.disabled = true
-	if _cards != null: _cards.set_pause_locked(value)
+	if _cards != null: _cards.set_pause_locked(value, pause_seconds)
+	for button: Button in [speed_button, pause_button]:
+		button.disabled = value
+		button.mouse_filter = Control.MOUSE_FILTER_IGNORE if value else Control.MOUSE_FILTER_STOP
 	_fade_pause_menu(value)
 	pause_button.set_pressed_no_signal(value)
 	_update_labels()
@@ -178,7 +181,7 @@ func _input(event: InputEvent) -> void:
 		elif key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in [resume_button, exit_button]:
 			return
 	elif event is InputEventMouse:
-		for button: Button in [resume_button, exit_button, speed_button, pause_button]:
+		for button: Button in [resume_button, exit_button]:
 			if button.is_visible_in_tree() and button.get_global_rect().has_point(event.position): return
 		# Deliver release events so dragging out of a menu button clears its press.
 		if event is InputEventMouseButton and not event.pressed: return

@@ -14,7 +14,7 @@
 | 波次圓點與 ACT 分隔線 | `levels/components/wave_timeline_marker.tscn` | `Dot/Fill`、`Dot/Outline`、`Divider` |
 | ACT 文字 | `levels/components/wave_timeline_act.tscn` | Label 的高度、對齊；目前 ACT 的字型與整體字級／顏色由時間線根節點指定 |
 | 放置旋轉提示 | `cards/components/rotation_key_hint.tscn` | `Key` 底框、`Key/Letter`、`ClockwiseArrow/Curve`、`Head`；根節點可調 0.5 秒停留、淡入時間與浮起距離 |
-| 手牌容器 | `cards/card_hand.tscn` | `Cards`；根節點 `vertical_offset` 調整手牌高度，扇形布局由 CardFanLayout 計算；`card_placement.tscn` 的 `paused_cards_opacity` 控制暫停時卡牌透明度 |
+| 手牌容器 | `cards/card_hand.tscn` | `Cards`；根節點 `vertical_offset` 調整手牌高度，扇形布局由 CardFanLayout 計算；暫停時手牌與商店隨 LevelHUD 的 `pause_seconds` 滑出，白色遮罩由 `levels/level_hud.tscn` 的 `PauseBlocker/WhiteVeil` 調整 |
 | 正面卡牌 | `cards/components/card_view.tscn` | 背景、外框、捷徑、塔圖示、標題、價格與地塊圖容器 |
 | 卡名、價格、牌背 | `cards/components/card_title.tscn`、`cards/components/card_price.tscn`、`cards/components/card_back.tscn` | 各子節點 |
 | 地塊圖的一格 | `cards/components/card_diagram_cell.tscn` | 根 ColorRect 是道路顏色；`Tower` 是塔格顏色，`Tower/Accent` 是塔色圓點 |

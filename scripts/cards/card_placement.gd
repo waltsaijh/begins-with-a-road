@@ -4,7 +4,6 @@ signal cards_changed
 @export var cards: Array[BuildCard] = []
 ## Used when no fixed starting cards are authored above.
 @export_range(0, 9, 1, "or_greater") var initial_card_count := 3
-@export_range(0.0, 1.0, 0.05) var paused_cards_opacity := 0.15
 @onready var placement: Node3D = $"../TilePlacement"
 @onready var towers: Node3D = $"../TowerMap"
 @onready var controller: Node = $"../PortalMap"
@@ -20,8 +19,13 @@ var _preview_error := ""
 var input_suspended := false
 var pause_locked := false
 var entry_selection_active := false
-var _hand_pause_color := Color.WHITE
-var _shop_pause_color := Color.WHITE
+var _pause_card_motion: Tween
+var _hand_rest_y := 0.0
+var _shop_rest_y := 0.0
+var _pause_retraction := 0.0:
+	set(value):
+		_pause_retraction = value
+		_position_paused_cards()
 var _wave_active := false
 var _wave_start_pending := false
 var _shop_open := false
@@ -41,6 +45,9 @@ func _ready() -> void:
 	$Shop.setup(self, wave)
 	if cards.is_empty(): cards.assign($Shop.roll_cards(initial_card_count))
 	hand.setup(cards)
+	_hand_rest_y = hand.get_node("Cards").position.y
+	_shop_rest_y = $Shop/View/Root.position.y
+	get_viewport().size_changed.connect(_position_paused_cards)
 	hand.card_selected.connect(select_card)
 	get_viewport().mouse_entered.connect(func(): _mouse_in_viewport = true)
 	get_viewport().mouse_exited.connect(func():
@@ -73,23 +80,26 @@ func set_entry_selection(value: bool) -> void:
 	$Shop/View.visible = not value
 	_refresh_input_state()
 
-func set_pause_locked(value: bool) -> void:
+func set_pause_locked(value: bool, seconds := 0.25) -> void:
 	if pause_locked == value: return
 	pause_locked = value
 	input_suspended = pause_locked or entry_selection_active or _wave_active or _wave_start_pending or _shop_open
 	towers.input_enabled = selected < 0 and not input_suspended
 	if value:
-		_hand_pause_color = hand.get_node("Cards").modulate
-		_shop_pause_color = $Shop/View/Root.modulate
-		hand.get_node("Cards").modulate = Color(_hand_pause_color, _hand_pause_color.a*paused_cards_opacity)
-		$Shop/View/Root.modulate = Color(_shop_pause_color, _shop_pause_color.a*paused_cards_opacity)
 		preview.hide()
 		_reset_rotation_hint()
-	else:
-		hand.get_node("Cards").modulate = _hand_pause_color
-		$Shop/View/Root.modulate = _shop_pause_color
+	if _pause_card_motion != null: _pause_card_motion.kill()
+	_pause_card_motion = create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_pause_card_motion.tween_property(self, "_pause_retraction", 1.0 if value else 0.0, seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_dirty = true
 	set_process(selected >= 0 and not input_suspended)
+
+func _position_paused_cards() -> void:
+	if not is_node_ready() or not is_inside_tree(): return
+	# Move the presentation roots without changing selection, offers or fan layout.
+	var offset := (get_viewport().get_visible_rect().size.y+32.0)*_pause_retraction
+	hand.get_node("Cards").position.y = _hand_rest_y+offset
+	$Shop/View/Root.position.y = _shop_rest_y+offset
 
 func _on_wave_started() -> void:
 	_wave_active = true
