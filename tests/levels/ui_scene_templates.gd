@@ -1,4 +1,5 @@
 extends Node
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 var failures := 0
 
 func _ready() -> void:
@@ -43,7 +44,7 @@ func verify() -> void:
 		var left := pixel_at(image, center-Vector2(2, 0))
 		var right := pixel_at(image, center+Vector2(2, 0))
 		check(left.r < 0.4 and left.g > 0.4 and right.r > 0.75, "Circle was not filled continuously from left to right")
-		image.save_png("res://reports/levels/timeline_partial_fill.png")
+		image.save_png(Artifacts.path("levels/timeline_partial_fill.png"))
 		timeline.set_state(0, 1.0, true)
 		await frames()
 		await RenderingServer.frame_post_draw

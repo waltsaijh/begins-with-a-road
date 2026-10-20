@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
 
@@ -167,6 +168,6 @@ func verify() -> void:
 	var report := {"platform": OS.get_name(), "failures": failures, "raw_signed_scoring": true, "stats_frozen": true, "safe_local_detour": true, "cases": cases}
 	print("TROOP_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		var file := FileAccess.open("res://reports/enemies/troop_profiles_windows.json", FileAccess.WRITE)
+		var file := FileAccess.open(Artifacts.path("enemies/troop_profiles_windows.json"), FileAccess.WRITE)
 		file.store_string(JSON.stringify(report, "  ")+"\n")
 		get_tree().quit(1 if failures else 0)

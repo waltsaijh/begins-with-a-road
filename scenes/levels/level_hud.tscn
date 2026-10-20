@@ -7,7 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://ddnap7ob7g2px" path="res://assets/sprites/interface/pause.png" id="5"]
 [ext_resource type="Theme" path="res://assets/themes/level_controls.tres" id="7"]
 [ext_resource type="Texture2D" uid="uid://ffwij66hhev7" path="res://assets/sprites/interface/speed_1x.png" id="8"]
-[ext_resource type="Theme" path="res://assets/themes/pause_controls.tres" id="9_pause"]
+[ext_resource type="Theme" uid="uid://2jxxonbusayy" path="res://assets/themes/pause_controls.tres" id="9_pause"]
+[ext_resource type="PackedScene" path="res://scenes/levels/components/pause_menu_item.tscn" id="10_menu_item"]
 
 [sub_resource type="StyleBoxEmpty" id="PauseMenuStyle"]
 
@@ -29,67 +30,6 @@ mouse_filter = 2
 visible = false
 layout_mode = 0
 
-[node name="PauseBlocker" type="Control" parent="." unique_id=94681098]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="WhiteVeil" type="ColorRect" parent="PauseBlocker"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(1, 1, 1, 0.14)
-
-[node name="Menu" type="PanelContainer" parent="PauseBlocker" unique_id=1860833669]
-mouse_filter = 2
-layout_mode = 0
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -112.0
-offset_right = -24.0
-offset_bottom = -24.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_styles/panel = SubResource("PauseMenuStyle")
-theme = ExtResource("9_pause")
-
-[node name="Margin" type="MarginContainer" parent="PauseBlocker/Menu" unique_id=711178783]
-mouse_filter = 2
-layout_mode = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="Actions" type="VBoxContainer" parent="PauseBlocker/Menu/Margin" unique_id=246740673]
-mouse_filter = 2
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="Resume" type="Button" parent="PauseBlocker/Menu/Margin/Actions" unique_id=438273176]
-custom_minimum_size = Vector2(148, 36)
-layout_mode = 2
-text = "繼續遊戲"
-alignment = 2
-
-[node name="Exit" type="Button" parent="PauseBlocker/Menu/Margin/Actions" unique_id=155820049]
-custom_minimum_size = Vector2(148, 36)
-layout_mode = 2
-text = "離開"
-alignment = 2
-
 [node name="Header" type="Control" parent="." unique_id=1027691164]
 layout_mode = 3
 anchors_preset = 15
@@ -109,7 +49,7 @@ anchor_left = 0.25
 anchor_right = 0.25
 offset_left = -116.0
 offset_top = 34.0
-offset_right = -16.0
+offset_right = -22.0
 offset_bottom = 72.0
 mouse_filter = 2
 theme_override_constants/separation = 0
@@ -125,7 +65,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Amount" type="Label" parent="Header/Balance" unique_id=1435221655]
-custom_minimum_size = Vector2(25, 0)
+custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.14117648, 0.29803923, 0.32156864, 1)
 text = "0"
@@ -159,3 +99,60 @@ focus_mode = 0
 theme_override_constants/icon_max_width = 24
 toggle_mode = true
 icon = ExtResource("5")
+
+[node name="PauseBlocker" type="Control" parent="." unique_id=94681098]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="WhiteVeil" type="ColorRect" parent="PauseBlocker" unique_id=1450518224]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.3137255)
+
+[node name="Menu" type="PanelContainer" parent="PauseBlocker" unique_id=1860833669]
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -212.0
+offset_top = -198.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme = ExtResource("9_pause")
+theme_override_styles/panel = SubResource("PauseMenuStyle")
+
+[node name="Margin" type="MarginContainer" parent="PauseBlocker/Menu" unique_id=711178783]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Actions" type="VBoxContainer" parent="PauseBlocker/Menu/Margin" unique_id=246740673]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Resume" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1171473691 instance=ExtResource("10_menu_item")]
+
+[node name="Restart" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1162389367 instance=ExtResource("10_menu_item")]
+
+[node name="Settings" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1202626757 instance=ExtResource("10_menu_item")]
+
+[node name="Exit" parent="PauseBlocker/Menu/Margin/Actions" unique_id=778682886 instance=ExtResource("10_menu_item")]

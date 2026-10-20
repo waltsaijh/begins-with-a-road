@@ -136,7 +136,9 @@ func remove_enemy(enemy: Node3D) -> void:
 	_appearances.resize(units.size())
 	head_positions.resize(units.size())
 	multimesh.visible_instance_count = units.size()
-	status_overlay.queue_redraw()
+	# Instance buffers persist without _draw; explicitly remove departed slots.
+	if units.is_empty(): status_overlay.clear()
+	else: status_overlay.request_update()
 	if units.is_empty():
 		set_process(false)
 		status_overlay.set_process(false)

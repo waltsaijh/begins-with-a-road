@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
 
@@ -92,7 +93,7 @@ func verify() -> void:
 	await frames(3)
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		get_viewport().get_texture().get_image().save_png("res://reports/combat/combat_bursts.png")
+		get_viewport().get_texture().get_image().save_png(Artifacts.path("combat/combat_bursts.png"))
 	combat.visuals._process(1.0)
 	check(combat.visuals.impacts.is_empty(), "AOE burst did not finish independently of projectile damage")
 	print("COMBAT_BURSTS_CHECK:"+JSON.stringify({"failures": failures, "exact_death": true, "visual_offset": true, "map_transform": true, "pooled_cap": true, "material_isolation": true, "aoe_shared_style": true, "compact_radius": true}))

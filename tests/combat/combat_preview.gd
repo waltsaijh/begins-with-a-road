@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 
 func _ready() -> void:
@@ -69,5 +70,5 @@ func verify() -> void:
 	print("COMBAT_RENDER_CHECK:"+JSON.stringify({"single_attack_surface": true, "arrow": true, "trail": true, "projectile": true, "live_enemies": wave.alive}))
 	if not OS.has_feature("web"):
 		await RenderingServer.frame_post_draw
-		get_viewport().get_texture().get_image().save_png("res://reports/combat/combat.png")
+		get_viewport().get_texture().get_image().save_png(Artifacts.path("combat/combat.png"))
 		get_tree().quit()

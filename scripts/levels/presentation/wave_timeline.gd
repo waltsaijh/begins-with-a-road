@@ -1,7 +1,7 @@
 @tool
 class_name WaveTimeline
 extends Control
-## Every marker ends one preparation interval; ACT-ending waves use a divider.
+## Every marker represents one wave; ACT-ending waves use a divider.
 const NODE_RADIUS := 4.0
 const NODE_OUTLINE_WIDTH := 1.5
 const DIVIDER_WIDTH := 2.0

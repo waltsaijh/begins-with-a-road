@@ -1,10 +1,6 @@
 @tool
 extends Button
-## Speech-bubble start action; its border follows the authoritative preparation clock.
-@export_range(0.0, 1.0, 0.01) var border_fraction := 1.0:
-	set(value):
-		border_fraction = clampf(value, 0.0, 1.0)
-		_update_visuals()
+## Speech-bubble action for manually starting the next wave.
 var hover_amount := 0.0:
 	set(value):
 		hover_amount = value
@@ -21,8 +17,8 @@ var _border_width: float
 
 func _ready() -> void:
 	_background = $Shape/Background.color
-	_border = $Shape/Countdown.default_color
-	_border_width = $Shape/Countdown.width
+	_border = $Shape/Border.default_color
+	_border_width = $Shape/Border.width
 	mouse_entered.connect(_set_hover.bind(true))
 	mouse_exited.connect(_set_hover.bind(false))
 	resized.connect(_update_visuals)
@@ -33,9 +29,6 @@ func _ready() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh_labels()
-
-func set_preparation(remaining: float, duration: float) -> void:
-	border_fraction = remaining/maxf(duration, 0.001)
 
 func clear_hover() -> void:
 	_set_hover(false)
@@ -48,7 +41,7 @@ func _set_hover(hovered: bool) -> void:
 func _refresh_labels() -> void:
 	var title := get_node_or_null("Title") as Label
 	if title != null:
-		title.text = tr("ui.wave.start_now")
+		title.text = tr("ui.wave.start_next")
 
 func _outline() -> PackedVector2Array:
 	return $Shape/Background.polygon
@@ -61,20 +54,9 @@ func _update_visuals() -> void:
 	$Shape.scale = size/design_size.max(Vector2.ONE)
 	var edge := _outline()
 	$Shape/Background.color = _background.lerp(Color(hover_background, _background.a), hover_amount)
-	$Shape/Outline.points = edge
 	var color := _border.lerp(hover_border, hover_amount)
 	if disabled: color.a = 0.35
 	elif is_pressed(): color = pressed_border
-	var perimeter := 0.0
-	for i in edge.size()-1: perimeter += edge[i].distance_to(edge[i+1])
-	var remaining := perimeter*border_fraction
-	var points := PackedVector2Array()
-	if not edge.is_empty(): points.append(edge[0])
-	for i in edge.size()-1:
-		if remaining <= 0.0: break
-		var length := edge[i].distance_to(edge[i+1])
-		points.append(edge[i].lerp(edge[i+1], minf(1.0, remaining/maxf(0.001, length))))
-		remaining -= length
-	$Shape/Countdown.points = points
-	$Shape/Countdown.default_color = color
-	$Shape/Countdown.width = _border_width*lerpf(1.0, hover_width_multiplier, hover_amount)
+	$Shape/Border.points = edge
+	$Shape/Border.default_color = color
+	$Shape/Border.width = _border_width*lerpf(1.0, hover_width_multiplier, hover_amount)

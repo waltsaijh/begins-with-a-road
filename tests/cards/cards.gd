@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 const TestCards = preload("res://tests/fixtures/card_fixture.gd")
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
@@ -205,6 +206,6 @@ func verify() -> void:
 	var report := {"failures": failures, "rotations": 4, "atomic_tile_events": events, "sampled_routes": samples, "single_rebuild": true, "stale_preview_rejected": true, "scene_ui": true, "tower_artwork_and_tint": true}
 	print("CARD_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		var file := FileAccess.open("res://reports/cards/cards.json", FileAccess.WRITE)
+		var file := FileAccess.open(Artifacts.path("cards/cards.json"), FileAccess.WRITE)
 		file.store_string(JSON.stringify(report, "  ")+"\n")
 	get_tree().quit(1 if failures else 0)

@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
@@ -260,5 +261,5 @@ func verify() -> void:
 	var report := {"platform": OS.get_name(), "failures": failures, "uniform": true, "mode_switch": true, "stable_softmax": true, "deterministic_quotas": true, "shuffled_departures": true, "uniform_three_routes_five_enemies": [2, 2, 1], "hard_threshold": true, "histogram10000": Array(histogram), "cases": cases}
 	print("ROUTE_DISTRIBUTION_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		FileAccess.open("res://reports/navigation/route_distribution_windows.json", FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
+		FileAccess.open(Artifacts.path("navigation/route_distribution_windows.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
 		get_tree().quit(1 if failures else 0)

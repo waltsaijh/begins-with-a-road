@@ -12,17 +12,8 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var goal := Vector2i(23, 0)
 @export var marker_height := 0.0305
 @export var acts: Array[ActDefinition] = []
-@export var auto_start := false
 ## Between ACTs, choose a direction and extend the road to one new entrance.
 @export var expand_starts_after_act := true
-@export_range(1.0, 300.0, 1.0) var preparation_seconds := 60.0
-## Maximum extra coins for manually calling a wave at the start of preparation.
-## 0 disables the bonus; remaining-time rewards are rounded up to whole coins.
-@export_range(0, 1000, 1, "or_greater") var early_start_max_bonus := 10
-
-func early_start_bonus(remaining: float) -> int:
-	if remaining <= 0.0 or early_start_max_bonus <= 0: return 0
-	return mini(early_start_max_bonus, ceili(early_start_max_bonus*clampf(remaining/preparation_seconds, 0.0, 1.0)))
 
 func wave_count() -> int:
 	var count := 0
@@ -32,8 +23,6 @@ func wave_count() -> int:
 
 func configuration_error() -> String:
 	repair_missing_defaults()
-	if not is_finite(preparation_seconds) or preparation_seconds <= 0: return "Invalid preparation duration"
-	if early_start_max_bonus < 0: return "Early-start bonus cannot be negative"
 	if terrain == null: return "Level terrain is missing"
 	var layout := endpoint_layout()
 	var terrain_error: String = layout.get("error", "無法讀取地形端點")

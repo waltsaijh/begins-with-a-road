@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
 
@@ -132,7 +133,7 @@ func verify() -> void:
 	check(cards.hand._hovered == 1 and cards.hand.views[1].position.y < hand_positions[1].y, "Hand hover did not lift the card")
 	check(cards.hand.views[1].z_index == 1 and cards.hand.views[1].scale.is_equal_approx(cards.hand.views[0].scale), "Hand hover changed scale or draw order")
 	check(CardFanLayout.pick(cards.hand.views, hand_point, 0, 1) == 1, "Hovered hand card lost its activation point")
-	await screenshot("res://reports/cards/hand_hover.png")
+	await screenshot(Artifacts.path("cards/hand_hover.png"))
 	if DisplayServer.get_name() != "headless":
 		await click_at(hand_point)
 		check(cards.selected == 1, "Hover reflow changed the clicked hand card")
@@ -162,7 +163,7 @@ func verify() -> void:
 		var slot: Control = view.slots[i]
 		check(slot.get_node("Face/Back").visible and not slot.get_node("Face/Card").visible and not view.price_view(i).is_visible_in_tree(), "Collapsed shop exposed card fronts or prices")
 	check(view.slots[0].z_index > view.slots[4].z_index, "Shop icon is not on the top card")
-	await screenshot("res://reports/cards/shop_closed.png")
+	await screenshot(Artifacts.path("cards/shop_closed.png"))
 	await click_button(view.slots[0].get_node("Face/Back"))
 	settle(cards, shop)
 	check(view.opened and cards.hand.collapsed and cards.input_suspended, "Deck click did not open the shop and fold the hand")
@@ -248,7 +249,7 @@ func verify() -> void:
 	cards.hand._motion.custom_step(0.10)
 	check(arriving.position.y < arrival_y, "Purchased card did not move up into the hand")
 	for i in old_hand.size(): check(cards.hand.views[i] == old_hand[i], "Purchase rebuilt an existing hand card")
-	await screenshot("res://reports/cards/hand_purchase.png")
+	await screenshot(Artifacts.path("cards/hand_purchase.png"))
 	var interrupted_at: Vector2 = arriving.position
 	shop.close_shop()
 	shop.open_shop()
@@ -270,7 +271,7 @@ func verify() -> void:
 	check(arrival_checks == [true, true], "Second purchase did not insert from below")
 	check(view.active_indices() == PackedInt32Array([0, 2, 4]), "Sold slots remain in compact layout")
 	check_compact(view)
-	await screenshot("res://reports/cards/shop_sold.png")
+	await screenshot(Artifacts.path("cards/shop_sold.png"))
 	# Let both flips actually finish: snapping the layout or immediately
 	# reversing never reveals the sold card backs restored by the closed deck.
 	shop.close_shop()
@@ -285,7 +286,7 @@ func verify() -> void:
 		if i > 0 and stocked:
 			check(view.slots[i].get_node("Face/Card").visible and not view.slots[i].get_node("Face/Back").visible, "Reopened offer shows its back")
 	check_compact(view)
-	await screenshot("res://reports/cards/shop_reopened.png")
+	await screenshot(Artifacts.path("cards/shop_reopened.png"))
 	wallet = shop.coins
 	if DisplayServer.get_name() == "headless": await click_button(reroll_back)
 	else: await click_at(reroll_price.get_global_transform()*(reroll_price.size*0.5))
@@ -302,7 +303,7 @@ func verify() -> void:
 	var reroll_y: float = view.slots[4].position.y
 	view._motion.custom_step(0.08)
 	check(view.slots[4].position.y < reroll_y, "Rerolled cards did not rise from below")
-	await screenshot("res://reports/cards/shop_reroll.png")
+	await screenshot(Artifacts.path("cards/shop_reroll.png"))
 	spin.custom_step(0.125)
 	check(absf(reroll_icon.rotation-PI) < 0.02, "Reroll did not reach half a turn halfway through 0.5 seconds")
 	spin.custom_step(0.125)
@@ -369,14 +370,14 @@ func verify() -> void:
 			check(shop_bounds.has_point(slot.get_global_transform()*corner), "Open shop card corner falls outside the lowered row bounds")
 	scene.get_node("TileVisuals").finish()
 	scene.get_node("CloudLayer").set_process(false)
-	await screenshot("res://reports/cards/shop_open.png")
+	await screenshot(Artifacts.path("cards/shop_open.png"))
 	await hover_at(view.slots[2].get_global_transform()*(view.slots[2].size*0.5))
 	view.finish_animation()
-	await screenshot("res://reports/cards/shop_hover.png")
+	await screenshot(Artifacts.path("cards/shop_hover.png"))
 	for control: Control in scene.find_children("*", "Control", true, false):
 		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
 	var report := {"failures": failures, "five_back_cards": true, "four_offers_and_reroll": true, "prices": true, "purchase_and_reroll": true, "outside_click_no_world_edit": true, "hand_fold_restore": true, "successful_placement_consumes": true, "wave_start_hides": true, "arrival_and_kill_rewards": true, "duplicate_reward_guard": true, "animation_reversal": true, "no_modal_overlay": true, "shallow_overlapping_fan": true, "gold_icons": true, "sold_card_hidden": true, "smaller_cards": true, "mirrored_outer_arc": true, "hover_focus": true, "stable_hover": true, "hover_keeps_neighbours": true, "hover_lift_only": true, "continuous_top_edge": true, "hand_insert_from_below": true, "persistent_hand_views": true, "compact_shop": true, "reroll_insert_from_below": true, "minimal_hud": true}
 	print("CARD_SHOP_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		FileAccess.open("res://reports/cards/shop_windows.json", FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
+		FileAccess.open(Artifacts.path("cards/shop_windows.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
 		get_tree().quit(1 if failures else 0)

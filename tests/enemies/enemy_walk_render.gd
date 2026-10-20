@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 ## Render both a neutral and walking pose. This catches shader and palette failures.
 const Batch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
 const Enemy = preload("res://scenes/enemies/enemy.tscn")
@@ -65,7 +66,7 @@ func verify() -> void:
 			get_tree().quit(1)
 		return
 	if not OS.has_feature("web"):
-		walking.save_png("res://reports/enemies/enemy_walk.png")
+		walking.save_png(Artifacts.path("enemies/enemy_walk.png"))
 	print("ENEMY_WALK_RENDER_CHECK:" + JSON.stringify({"palette_visible": true, "poses_differ": true, "shared_instances": batch.multimesh.visible_instance_count}))
 	if not OS.has_feature("web"):
 		get_tree().quit()

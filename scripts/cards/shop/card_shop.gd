@@ -55,11 +55,6 @@ func _on_wave_finished() -> void:
 	view.set_available(available)
 	if is_instance_valid(_wave.controls): _wave.controls.set_shop_present(available)
 
-func grant_bonus(amount: int) -> void:
-	if amount <= 0: return
-	coins += amount
-	_refresh()
-
 func roll_cards(count: int) -> Array[BuildCard]:
 	var result: Array[BuildCard] = []
 	var valid: Array[TowerDefinition] = []

@@ -9,8 +9,7 @@
 [sub_resource type="Resource" id="Group1"]
 script = ExtResource("8")
 troop_path = "res://assets/data/troops/soldier.tres"
-enemy_count = 4
-interval_ticks = 2
+enemy_count = 40
 
 [sub_resource type="Resource" id="Wave1"]
 script = ExtResource("3")

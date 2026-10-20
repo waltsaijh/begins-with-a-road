@@ -204,7 +204,7 @@ func _notification(what: int) -> void:
 func _update_labels() -> void:
 	var placing := selected_direction >= 0
 	heading.text = tr("ui.expansion.choose_position") if placing else tr("ui.expansion.choose_direction")
-	$Interface/Root/Panel/Margin/Content/Note.text = tr("ui.expansion.countdown_held")
+	$Interface/Root/Panel/Margin/Content/Note.text = tr("ui.expansion.placement_disabled")
 	buttons.visible = not placing
 	back.visible = placing
 	back.text = tr("ui.expansion.back")

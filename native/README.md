@@ -51,7 +51,7 @@ plan 欄位：valid/error/reachable、score（原圖最佳）、routes（門檻�
 
 區塊局部場及 first-contact 選項建構沿用 BFS／Dijkstra，遇其他入口停止穿越，保留每對全部同分走法。全域 R 次搜尋約 O(R(V+E) log V)，工作量受預算控制；若補路目標有 U 個有向選項，補路額外共用 2 次搜尋；有衝突時每個選項最多 4 次修補搜尋，最壞 O(U(V+E) log V)。補路路線不占一般搜尋預算，常駐路線池 O((R+U)V)，無 simple-path 全列舉。prepare.geometry_bytes 與 plan_bytes 是主要 C++ vector capacity 估算，排除 Godot Variant／摘要／Resource／配置器／暫存／程序峰值，不能當作整個遊戲記憶體用量。
 
-tests/native/diverse_routes.cpp 的 25,600 組小圖起終點對照 simple-path oracle。Godot 的 route_planner／tile_costs／troop_profiles／multiple_starts 測試涵蓋兩張實際場景、局部同分與多起點。tests/navigation/diverse_benchmark.tscn 同時用於 Windows／Web，報告見 reports/navigation/diverse_routes.md。舊 ST／detour 核心與失效測試已移除；加權地塊測試直接使用現行 diverse_routes_core.hpp。
+tests/native/diverse_routes.cpp 的 25,600 組小圖起終點對照 simple-path oracle。Godot 的 route_planner／tile_costs／troop_profiles／multiple_starts 測試涵蓋兩張實際場景、局部同分與多起點。跨平台功能比對使用 tools/web/verify_enemy_web.cjs；一次性效能量測場景已清除。舊 ST／detour 核心與失效測試已移除；加權地塊測試直接使用現行 diverse_routes_core.hpp。
 
 ## 除錯資料
 

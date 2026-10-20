@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const TestCards = preload("res://tests/fixtures/card_fixture.gd")
 ## Reproducible UI/footprint rendering fixture, also used by the Web verifier.
 func _ready() -> void:
@@ -68,7 +69,7 @@ func verify() -> void:
 	var report := {"selected": cards.selected, "turns": cards.turns, "cards": cards.hand.views.size(), "towers": towers.towers.size(), "tiles": map.get_used_cells().size(), "preview_valid": true, "input_propagation": true}
 	if not OS.has_feature("web"):
 		await RenderingServer.frame_post_draw
-		get_viewport().get_texture().get_image().save_png("res://reports/cards/cards.png")
+		get_viewport().get_texture().get_image().save_png(Artifacts.path("cards/cards.png"))
 		print("CARD_RENDER_CHECK:"+JSON.stringify(report))
 		get_tree().quit()
 	else:

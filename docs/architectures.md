@@ -12,8 +12,8 @@
 | `native/` | C++ 道路圖、局部搜尋、路線池與編輯檢查核心；`godot-cpp/` 是固定版本 SDK |
 | `addons/` | Godot 編輯器工具，目前包含波次編輯器 |
 | `tests/` | 依功能分類的 Godot／C++ 測試，以及共用測試資料 |
-| `tools/` | 原生建置、離線素材產生、Web 服務與效能彙整工具 |
-| `reports/` | 依功能分類的歷史驗證結果、量測與截圖 |
+| `tools/` | 原生建置、離線素材產生、Web 測試匯出與驗證工具 |
+| `reports/` | 精簡保留的歷史效能結論，不存例行測試產物 |
 | `docs/` | 架構導覽與詳細系統說明 |
 | `bin/` | 遊戲執行需要的原生擴充建置產物 |
 | `build/`、`.godot/` | 匯出成品與本機快取，不是遊戲設定來源 |
@@ -54,7 +54,7 @@ scripts/
 ├── levels/                  關卡階段與 ACT／波次進度
 │   ├── definitions/         Level／ACT／Wave／SpawnGroup 設定
 │   ├── expansion/           ACT 之間的新入口候選與提交
-│   └── presentation/        HUD、時間線、提前開始與暫停介面
+│   └── presentation/        HUD、時間線、手動開波與暫停介面
 ├── map/
 │   ├── terrain/             地形場景端點、貼齊與配置驗證
 │   └── tile/                道路接口、批次地塊與每格資料集合
@@ -106,7 +106,7 @@ scripts/
 | `combat/effects/` | 描述命中後對敵人施加的規則效果，例如減速的倍率、期限及對應狀態圖示 |
 | `combat/rendering/` | 把已存在的飛行／命中資料轉成軌跡、箭矢、AOE 與死亡爆散，管理特效回收及動畫 |
 | `enemies/rendering/` | 把邏輯位置轉成模型姿態、GPU 步態、側向避讓與 MultiMesh instance 資料；外部模型在此管理骨架／動畫及顯示轉換 |
-| `enemies/presentation/` | 依 renderer 提供的頭頂世界座標繪製血條、護盾與效果圖示；另提供獨立場景的開波按鈕。UI 意圖及螢幕投影與 3D 模型渲染各自維護 |
+| `enemies/presentation/` | 依 renderer 提供的頭頂世界座標投影血條、護盾、技能與效果圖示；管理共用圖集、可重用 instance buffer 與單一 2D MultiMesh 提交。另提供獨立場景的開波按鈕。螢幕投影與 3D 模型渲染各自維護 |
 | `camera/`、`environment/` | 分別管理平移／縮放／鏡頭邊界，以及雲海材質和範圍；維持獨立的小型功能目錄 |
 
 `presentation/` 集中螢幕介面與玩家操作回饋；`rendering/` 集中模型、幾何、姿態與世界特效。敵人的狀態顯示會讀取模型層提供的避讓後座標，因此兩者透過顯示資料協作。
@@ -129,6 +129,6 @@ scripts/
 
 ## 開發支援
 
-測試與報告使用相同功能分類，方便從系統找到相關驗證。素材工具產生可編輯的遊戲資產，原生工具將 C++ 核心建置到 `bin/`。正式匯出排除測試、工具、報告、技術文件與原生 SDK。
+測試依功能分類；JSON、截圖與 log 放在已忽略的 `.godot/`，`reports/` 只保存需要長期參考的摘要。一次性壓測與重複純預覽場景已清除，保留功能與實際繪製回歸。素材工具產生可編輯的遊戲資產，原生工具將 C++ 核心建置到 `bin/`。正式匯出排除測試、工具、報告、技術文件與原生 SDK。
 
 更細的操作入口見 [場景導覽](../scenes/README.md)、[測試說明](../tests/README.md)、[工具說明](../tools/README.md)與 [原生核心](../native/README.md)。

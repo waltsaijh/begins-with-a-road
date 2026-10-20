@@ -13,7 +13,6 @@ func check(ok: bool, message: String) -> void:
 
 func definition() -> LevelDefinition:
 	var level := LevelDefinition.new()
-	level.auto_start = false
 	level.expand_starts_after_act = false
 	level.use_terrain_endpoints = false
 	var terrain := GridMap.new()
@@ -38,7 +37,7 @@ func definition() -> LevelDefinition:
 	level.acts = [act]
 	return level
 
-func setup_case(speed: float, early: bool, phase: String) -> Node3D:
+func setup_case(speed: float, via_button: bool, phase: String) -> Node3D:
 	var scene := load("res://scenes/level.tscn").instantiate() as Node3D
 	scene.level = definition()
 	add_child(scene)
@@ -52,11 +51,10 @@ func setup_case(speed: float, early: bool, phase: String) -> Node3D:
 	wave.enemy_spawned.connect(func(enemy: Node3D): enemy.set_process(false))
 	scene.get_node("TowerMap").combat.enabled = false
 	Engine.time_scale = speed
-	if early:
-		scene._on_early_start_requested()
+	if via_button:
+		scene._on_start_requested()
 	else:
-		scene.preparation_remaining = 0.0
-		scene._begin_wave_start(false)
+		scene._begin_wave_start()
 	scene.set_process(false)
 	check(scene._wave_starting and not wave.active, "Wave skipped its start delay")
 	if phase != "start_delay":
@@ -70,9 +68,9 @@ func setup_case(speed: float, early: bool, phase: String) -> Node3D:
 func verify() -> void:
 	var arguments := OS.get_cmdline_user_args()
 	if "--window-close" in arguments:
-		var scene := await setup_case(4.0 if "--4x" in arguments else 2.0, not "--normal" in arguments, "live")
+		var scene := await setup_case(4.0 if "--4x" in arguments else 2.0, not "--direct" in arguments, "live")
 		check(scene.get_node("EnemyWave").alive == 3, "Close-window fixture has no live wave")
-		print("LEVEL_TEARDOWN_WINDOW_READY:"+JSON.stringify({"speed": Engine.time_scale, "early": not "--normal" in arguments, "alive": 3}))
+		print("LEVEL_TEARDOWN_WINDOW_READY:"+JSON.stringify({"speed": Engine.time_scale, "via_button": not "--direct" in arguments, "alive": 3}))
 		return # Host closes the real window after this marker.
 	if "--repro" in arguments:
 		var scene := await setup_case(2.0, true, "live")
@@ -83,13 +81,13 @@ func verify() -> void:
 		get_tree().quit(1 if failures else 0)
 		return
 	for speed: float in [1.0, 2.0, 3.0, 4.0]:
-		for early: bool in [false, true]:
+		for via_button: bool in [false, true]:
 			for phase: String in ["start_delay", "pending", "live"]:
 				for disposal: String in ["remove", "queue_free"]:
-					var scene := await setup_case(speed, early, phase)
+					var scene := await setup_case(speed, via_button, phase)
 					if disposal == "remove":
 						remove_child(scene)
-						check(scene.current_wave == 0 and not scene.finished, "Teardown advanced the level: %s/%s/%s" % [speed, early, phase])
+						check(scene.current_wave == 0 and not scene.finished, "Teardown advanced the level: %s/%s/%s" % [speed, via_button, phase])
 						scene.free()
 					else:
 						scene.queue_free()
@@ -99,7 +97,7 @@ func verify() -> void:
 	var scene := await setup_case(2.0, true, "live")
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
 	scene.remove_child(hud)
-	hud.set_preparation(60.0, 60.0, true)
+	hud.set_start_available(true)
 	hud._position_callout()
 	for enemy: Node3D in scene.get_node("EnemyWave").living_enemies(): enemy.free()
 	check(scene.current_wave == 0, "Detached HUD still allowed a next-wave transition")
@@ -116,5 +114,5 @@ func verify() -> void:
 	check(shop.coins == before+reward, "Normal completion lost or duplicated its reward")
 	scene.queue_free()
 	await get_tree().process_frame
-	print("LEVEL_TEARDOWN_CHECK:"+JSON.stringify({"failures": failures, "cases": cases, "speeds": [1, 2, 3, 4], "early_and_normal": true, "delay_pending_live": true, "remove_and_queue_free": true, "detached_hud": true, "normal_completion": true}))
+	print("LEVEL_TEARDOWN_CHECK:"+JSON.stringify({"failures": failures, "cases": cases, "speeds": [1, 2, 3, 4], "button_and_internal_start": true, "delay_pending_live": true, "remove_and_queue_free": true, "detached_hud": true, "normal_completion": true}))
 	get_tree().quit(1 if failures else 0)

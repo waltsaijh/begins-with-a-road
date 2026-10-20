@@ -1,19 +1,21 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://d1c3w87aaxpk"]
 
-[ext_resource type="PackedScene" path="res://scenes/main.tscn" id="1"]
-[ext_resource type="Script" path="res://scripts/levels/level_session.gd" id="2"]
-[ext_resource type="Resource" path="res://assets/data/levels/frontier.tres" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/levels/level_hud.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://dbkrgalhoe4uj" path="res://scenes/main.tscn" id="1"]
+[ext_resource type="Script" uid="uid://d3cpmfntijfqp" path="res://scripts/levels/level_session.gd" id="2"]
+[ext_resource type="Resource" uid="uid://crw7gsg3jk7ae" path="res://assets/data/levels/frontier.tres" id="3"]
+[ext_resource type="PackedScene" uid="uid://dr7kbk0oo8hxt" path="res://scenes/levels/level_hud.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/levels/spawn_expansion.tscn" id="5"]
 
-[node name="Level" instance=ExtResource("1")]
+[node name="Level" unique_id=25821600 instance=ExtResource("1")]
 process_mode = 1
 script = ExtResource("2")
 level = ExtResource("3")
 
-[node name="EnemyWave" parent="." node_paths=PackedStringArray("start_button")]
+[node name="EnemyWave" parent="." index="9" unique_id=1124581691 node_paths=PackedStringArray("start_button")]
 start_button = NodePath("../LevelHUD/WorldActions/EarlyStart")
 
-[node name="LevelHUD" parent="." instance=ExtResource("4")]
+[node name="LevelHUD" parent="." index="15" unique_id=1558118680 instance=ExtResource("4")]
 
-[node name="SpawnExpansion" parent="." instance=ExtResource("5")]
+[node name="SpawnExpansion" parent="." index="16" unique_id=40484197 instance=ExtResource("5")]
+
+[editable path="TileMap"]

@@ -1,11 +1,11 @@
 extends Node
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 class TestViewport extends SubViewport:
 	signal mouse_entered
 	signal mouse_exited
 
 var failures := 0
 var _viewport: SubViewport
-var timings: Array[float] = []
 
 func _ready() -> void:
 	verify.call_deferred()
@@ -38,7 +38,9 @@ func click_at(point: Vector2) -> void:
 	_viewport.push_input(click, true)
 
 func finish_pause(hud: CanvasLayer) -> void:
-	if hud._pause_motion != null and hud._pause_motion.is_running(): await hud._pause_motion.finished
+	check(get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation")
+	if hud._pause_menu_motion != null and hud._pause_menu_motion.is_running(): await hud._pause_menu_motion.finished
+	if hud._cards._pause_card_motion != null and hud._cards._pause_card_motion.is_running(): await hud._cards._pause_card_motion.finished
 	await frames(1)
 
 func health_sample(camera: Camera3D, head: Vector3, bar_size: Vector2) -> Vector2i:
@@ -57,7 +59,6 @@ func verify() -> void:
 	add_child(_viewport)
 	var scene := load("res://scenes/level.tscn").instantiate() as Node3D
 	scene.level = scene.level.duplicate(true)
-	scene.level.auto_start = false
 	_viewport.add_child(scene)
 	await frames(15)
 	while scene.get_node("PortalMap").computing: await frames(1)
@@ -71,32 +72,24 @@ func verify() -> void:
 	var original_hand_color: Color = cards.hand.get_node("Cards").modulate
 	for speed: float in [1.0, 2.0, 4.0]:
 		while hud.SPEEDS[hud.speed_index] != speed: hud.cycle_speed()
-		var remaining: float = scene.preparation_remaining
-		var started := Time.get_ticks_usec()
+		var remaining: float = scene.timeline.progress
 		hud.set_paused(true)
-		check(hud.pause_requested and cards.pause_locked and not cards.towers.input_enabled and not get_tree().paused, "Pause did not lock input before starting the ramp")
+		check(hud.pause_requested and cards.pause_locked and not cards.towers.input_enabled and get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation and lock input")
 		key(KEY_R)
 		key(KEY_2)
-		check(cards.selected == selected and cards.turns == 0, "Gameplay keys changed selection during deceleration")
-		check(cards.place_selected(Vector3i(5, 0, 2)) == null, "Placement was allowed during deceleration")
-		var last := speed
-		var intermediate := false
-		while not get_tree().paused and Time.get_ticks_usec()-started < 1000000:
-			await frames(1)
-			check(Engine.time_scale <= last+0.00001, "Pause ramp increased simulation speed")
-			intermediate = intermediate or (Engine.time_scale > 0 and Engine.time_scale < speed)
-			last = Engine.time_scale
-		var milliseconds := float(Time.get_ticks_usec()-started)/1000.0
-		timings.append(milliseconds)
-		check(intermediate and milliseconds >= 210.0 and milliseconds < 450.0, "Pause did not decelerate over 0.25 real seconds independently of speed")
-		check(get_tree().paused and Engine.time_scale == 0.0 and scene.preparation_remaining < remaining, "Pause did not allow the slow-down then freeze at zero delta")
-		check(is_equal_approx(hud.pause_menu.modulate.a, 1.0), "Pause menu did not fade in while simulation slowed to zero")
-		check(is_equal_approx(cards._pause_retraction, 1.0), "Cards did not finish retracting within the pause ramp")
+		check(cards.selected == selected and cards.turns == 0, "Gameplay keys changed selection while paused")
+		check(cards.place_selected(Vector3i(5, 0, 2)) == null, "Placement was allowed while paused")
+		await frames(3)
+		check(hud.pause_menu.modulate.a > 0.0 and hud.pause_menu.modulate.a < 1.0 and cards._pause_retraction > 0.0 and cards._pause_retraction < 1.0, "Pause presentation snapped instead of animating while simulation was frozen")
+		await finish_pause(hud)
+		check(get_tree().paused and Engine.time_scale == 0.0 and scene.timeline.progress == remaining, "Pause did not freeze at zero delta while preserving manual preparation")
+		check(is_equal_approx(hud.pause_menu.modulate.a, 1.0), "Pause menu did not fade in while simulation was frozen")
+		check(is_equal_approx(cards._pause_retraction, 1.0), "Cards did not finish retracting while paused")
 		for view: Control in cards.hand.views:
 			check(view.get_global_transform_with_canvas().origin.y > _viewport.size.y, "Paused hand remained visible")
 		var veil: ColorRect = hud.pause_menu.get_node("WhiteVeil")
-		check(veil.color == Color(1, 1, 1, 0.14) and veil.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Pause veil is not a subtle non-interactive white overlay")
-		var frozen: float = scene.preparation_remaining
+		check(veil.color.r == 1.0 and veil.color.g == 1.0 and veil.color.b == 1.0 and veil.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Authored pause veil is not a non-interactive white overlay")
+		var frozen: float = scene.timeline.progress
 		var size_before := camera.size
 		var wheel := InputEventMouseButton.new()
 		wheel.position = Vector2(500, 300)
@@ -114,7 +107,7 @@ func verify() -> void:
 		click_at(cards.hand.views[1].get_global_transform_with_canvas()*(cards.hand.views[1].size*0.5))
 		wave.controls.spawn_requested.emit()
 		await frames(3)
-		check(scene.preparation_remaining == frozen and cards.selected == selected and not scene._wave_starting, "Camera/input during pause changed gameplay")
+		check(scene.timeline.progress == frozen and cards.selected == selected and not scene._wave_starting, "Camera/input during pause changed gameplay")
 		hud.set_paused(false)
 		check(not get_tree().paused and Engine.time_scale == speed and not cards.pause_locked and cards.selected == selected, "Resume did not restore speed and the previous card selection")
 		check(cards.hand.get_node("Cards").modulate == original_hand_color, "Resume did not restore card opacity")
@@ -134,36 +127,39 @@ func verify() -> void:
 	var coins: int = shop.coins
 	var deals: int = shop.deals
 	hud.set_paused(true)
-	check(not shop.buy(0) and not shop.reroll() and shop.coins == coins and shop.deals == deals, "Shop changed during the pause ramp")
+	check(not shop.buy(0) and not shop.reroll() and shop.coins == coins and shop.deals == deals, "Shop changed immediately after pausing")
 	await finish_pause(hud)
 	check(not shop.buy(0) and not shop.reroll() and shop.view.opened, "Paused shop allowed transactions or lost its open state")
 	for slot: Control in shop.view.slots:
 		check(slot.get_global_transform_with_canvas().origin.y > _viewport.size.y, "Paused shop remained visible")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		_viewport.get_texture().get_image().save_png("res://reports/levels/pause_navigation.png")
+		_viewport.get_texture().get_image().save_png(Artifacts.path("levels/pause_navigation.png"))
 	var chosen: int = hud.speed_index
 	hud.cycle_speed()
 	check(Engine.time_scale == 0.0 and get_tree().paused and hud.speed_index == chosen, "Paused speed selection was not locked")
 	key(KEY_ESCAPE)
 	check(not hud.pause_requested and not get_tree().paused and Engine.time_scale == hud.SPEEDS[hud.speed_index], "Escape failed to resume from zero delta")
 	shop.close_shop()
-	# Resuming mid-ramp must cancel the pending freeze, even after its old deadline.
+	# Resuming during the presentation transition must stay resumed afterwards.
 	hud.set_paused(true)
 	await frames(1)
 	hud.set_paused(false)
-	await get_tree().create_timer(0.35, true, false, true).timeout
-	check(not get_tree().paused and not hud.pause_requested and Engine.time_scale == hud.SPEEDS[hud.speed_index], "Cancelled pause tween froze a resumed game")
+	await get_tree().create_timer(0.45, true, false, true).timeout
+	check(not get_tree().paused and not hud.pause_requested and Engine.time_scale == hud.SPEEDS[hud.speed_index], "Presentation transition froze a resumed game")
 	# Freeze real enemies, then inspect rendered health pixels after actual navigation.
 	scene.get_node("TowerMap").combat.enabled = false
-	scene._begin_wave_start(false)
+	scene._begin_wave_start()
 	scene._process(2.0)
 	wave._process(0.0)
 	check(wave.active and not wave.living_enemies().is_empty(), "Could not prepare enemies for paused health projection")
-	hud.set_paused(true)
-	await finish_pause(hud)
 	var unit: Node3D = wave.living_enemies()[0]
 	var frozen_position := unit.global_position
+	var spawned: int = wave.spawned
+	var walk_phase: float = wave.visuals._poses[0].walk_phase
+	hud.set_paused(true)
+	await finish_pause(hud)
+	check(wave.spawned == spawned and unit.global_position == frozen_position and wave.visuals._poses[0].walk_phase == walk_phase, "Spawning, movement or animation advanced after the pause request")
 	var slot: int = wave.visuals._slots[unit]
 	var head: Vector3 = wave.visuals.head_positions[slot]
 	camera.focus = head
@@ -201,8 +197,8 @@ func verify() -> void:
 		await RenderingServer.frame_post_draw
 		var image := _viewport.get_texture().get_image()
 		check(is_health_pixel(image, health_sample(camera, head, bar_size), health_color), "Paused health bar did not follow zoom")
-		image.save_png("res://reports/levels/paused_enemy_navigation.png")
+		image.save_png(Artifacts.path("levels/paused_enemy_navigation.png"))
 	check(unit.global_position == frozen_position and get_tree().paused and Engine.time_scale == 0, "Reprojecting health bars advanced gameplay")
 	hud.set_paused(false)
-	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "ramp_ms_at_1x_2x_4x": timings, "immediate_input_lock": true, "paused_zoom_and_pan": true, "paused_health_projection": true, "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
+	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "immediate_pause_at_1x_2x_4x": true, "immediate_input_lock": true, "paused_zoom_and_pan": true, "paused_health_projection": true, "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
 	get_tree().quit(1 if failures else 0)

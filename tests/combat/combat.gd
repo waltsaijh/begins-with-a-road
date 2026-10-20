@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 const Index = preload("res://scripts/combat/enemy_spatial_index.gd")
 var failures := 0
@@ -159,7 +160,7 @@ func verify() -> void:
 	combat._process(0.5)
 	check(combat.projectiles.is_empty(), "Completed projectile retained its state")
 	check(units[0].health == 100 and units[1].health == 60 and units[2].health == 60, "Splash failed to use landing tile/current occupants/frozen damage")
-	check(units[2]._slows.size() == 1 and units[2]._slows[0] == Vector2(0.5, 2), "On-hit effect was not snapshotted/applied")
+	check(units[2]._slow_multiplier == 0.5 and units[2]._slow_remaining == 2, "On-hit effect was not snapshotted/applied")
 	units[2].move_speed = 2
 	units[2]._process(0.5)
 	check(is_equal_approx(units[2].travelled_distance, 0.5), "Slow did not affect logical movement")
@@ -176,7 +177,7 @@ func verify() -> void:
 	var report := {"failures": failures, "continuous_tracking": true, "one_tile_lookahead": true, "smooth_first_aim": true, "flying_arrow": true, "arrow_trail": true, "arrow_target_cleanup": true, "instant_beam": true, "arrow_tip_origin": true, "fixed_base": true, "aim_alignment": true, "tile_range": true, "cooldown": true, "kill_cleanup": true, "tower_destruction": true, "delayed_splash": true, "movable_targets": true, "source_independent": true, "payload_snapshot": true, "slow_and_expiry": true, "visual_cleanup": true}
 	print("COMBAT_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		FileAccess.open("res://reports/combat/combat_windows.json", FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
+		FileAccess.open(Artifacts.path("combat/combat_windows.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")
 		get_tree().quit(1 if failures else 0)
 
 func verify_tracking() -> void:

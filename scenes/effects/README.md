@@ -12,4 +12,4 @@
 
 只在 `enemy.died` 觸發死亡特效，抵達終點與外部清除不觸發；死亡時取最後的視覺避讓偏移。最後一隻敵人死亡後，特效仍會完成並回收，不延遲死亡、結算或下一波流程。暫停會一起停止特效，倍速沿用遊戲時間。
 
-`tests/combat/combat_bursts.tscn` 驗證單次死亡、顯示位置、變換後地圖、材質獨立、回收與上限、AOE 共用樣式，並輸出 `reports/combat/combat_bursts.png`。`tests/combat/combat.tscn` 驗證 AOE 的落點、實際傷害與狀態效果維持原規則。
+`tests/combat/combat_bursts.tscn` 驗證單次死亡、顯示位置、變換後地圖、材質獨立、回收與上限、AOE 共用樣式，並輸出 `.godot/test-results/combat/combat_bursts.png`。`tests/combat/combat.tscn` 驗證 AOE 的落點、實際傷害與狀態效果維持原規則。

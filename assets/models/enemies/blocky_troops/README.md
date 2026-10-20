@@ -10,6 +10,6 @@
 
 每個模型都是 5 個網格、1 個材質，內嵌 64×64 調色盤貼圖。`Walk-loop` 是一秒循環，Godot 可自動辨識並播放。Quickfeet 步幅較大，Heavy 的步幅與手臂擺動較小。模型面向 Godot -Z，原點位於腳底。各兵種的 icon 與能力數值由原有 `.tres` 設定。
 
-`source/blocky_troops.blend` 保留三個 Editable 場景與三個合併後的 Game Export 場景；`Troops - Lineup` 是並排預覽。原始 grunt 參考場景也一併保存在 Blender 檔內。專案根目錄的 `reports/assets/blocky_troops.png` 是預覽圖。
+`source/blocky_troops.blend` 保留三個 Editable 場景與三個合併後的 Game Export 場景；`Troops - Lineup` 是並排預覽。原始 grunt 參考場景也一併保存在 Blender 檔內。專案根目錄的 `.godot/test-results/assets/blocky_troops.png` 是預覽圖。
 
 修改外觀時使用各兵種的 Editable 場景，零件按 Soldier、Quickfeet、Heavy 前綴命名。重建工具為 `tools/assets/blender/build_blocky_troops.py`，需要 Blender 中已有 `Blocky Grunt - Character` 參考集合；它會呼叫共用的 `tools/assets/blender/export_blocky_grunt.py` 匯出。`tools/assets/blender/preview_blocky_troops.py` 製作預覽並儲存原檔。

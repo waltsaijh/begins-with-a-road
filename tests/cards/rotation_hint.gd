@@ -1,4 +1,5 @@
 extends Node
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 class TestViewport extends SubViewport:
 	signal mouse_entered
 	signal mouse_exited
@@ -90,7 +91,7 @@ func verify() -> void:
 	cards._process(0.01)
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		_viewport.get_texture().get_image().save_png("res://reports/cards/rotation_key_hint.png")
+		_viewport.get_texture().get_image().save_png(Artifacts.path("cards/rotation_key_hint.png"))
 	await move_to(camera.unproject_position(map.to_global(map.map_to_local(cell+Vector3i(1, 0, 0)))))
 	cards._process(0.01)
 	check(not cards.rotation_hint.visible, "Changing tile did not reset the hint")

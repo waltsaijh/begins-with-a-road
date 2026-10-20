@@ -32,6 +32,6 @@ TilePreset 的 Prefix Key 與塔的 Name Key 分別使用 `tile_preset.corner`�
 
 商店牌背可在 `scenes/cards/components/card_back.tscn` 調整 Artwork／Icon；展開與收回時，Icon 會切換商店／重刷圖片。卡背預設 144 × 208，Artwork 的 NinePatch 四邊切片各 12 px；金幣建議正方形透明 PNG，預設 32 × 32，保留長寬比縮放至價格 14 px／餘額 30 px。共用價格列在 `card_price.tscn`，放於商品 Header，以及重刷卡背內的上方中央（數字白色）；卡位在 `shop_slot.tscn`，整體介面與餘額在 `card_shop_view.tscn`，實際使用圖片由商店根節點的 Artwork 統一設定。`tools/assets/build_shop_art.gd` 是可選的離線重建工具，不會在遊戲中執行；手動執行會覆寫所選預設素材，加上 `-- gold` 可只重建金幣圖示。
 
-- `effects/slow.png`：32 × 32 透明底減速圖示；可自行替換 PNG，或修改 SlowEffect 的 icon。離線重建工具為 `tools/assets/build_effect_icons.gd`。
+- `effects/slowness.png`：透明底減速圖示；可自行替換 PNG，或修改 SlowEffect 的 icon。離線重建工具為 `tools/assets/build_effect_icons.gd`，手動執行會覆寫圖示。
 
 卡片以 0.82 倍搭配小角度旋轉呈現；預設框線／底紙裝飾線至少 2 px，避免縮成不足一個像素。快捷鍵、價格與中文卡名為 16 px；英文卡名前綴 12 px、塔名 16 px。前綴與時間線目前 ACT 使用 `assets/fonts/NotoSansTC-Medium.ttf`（weight 500），塔名與一般介面使用 `NotoSansTC-Light.ttf`（weight 300）。分隔線保留 3 px 高度並以 ui_soft_edges.gdshader 柔化旋轉邊緣。新增素材時避免恢復 1 px 裝飾線。

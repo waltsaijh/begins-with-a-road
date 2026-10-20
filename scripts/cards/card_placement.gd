@@ -80,7 +80,7 @@ func set_entry_selection(value: bool) -> void:
 	$Shop/View.visible = not value
 	_refresh_input_state()
 
-func set_pause_locked(value: bool, seconds := 0.25) -> void:
+func set_pause_locked(value: bool, seconds := 0.35) -> void:
 	if pause_locked == value: return
 	pause_locked = value
 	input_suspended = pause_locked or entry_selection_active or _wave_active or _wave_start_pending or _shop_open

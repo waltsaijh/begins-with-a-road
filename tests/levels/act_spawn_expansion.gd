@@ -1,4 +1,5 @@
 extends Node
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 class TestViewport extends SubViewport:
 	signal mouse_entered
 	signal mouse_exited
@@ -43,7 +44,7 @@ func save_frame(path: String) -> void:
 
 func finish_wave(scene: Node) -> void:
 	scene.set_process(false)
-	scene._begin_wave_start(false)
+	scene._begin_wave_start()
 	scene.set_process(false)
 	scene._advance_wave_start(1.5)
 	var wave: Node = scene.get_node("EnemyWave")
@@ -115,16 +116,16 @@ func verify() -> void:
 	var progress: float = scene.timeline.progress
 	var coins: int = shop.coins
 	scene._process(120)
-	scene._on_early_start_requested()
+	scene._on_start_requested()
 	wave.controls.spawn_button.pressed.emit()
-	check(is_equal_approx(scene.preparation_remaining, 60) and is_equal_approx(scene.timeline.progress, progress) and not wave.active and not scene._wave_starting and shop.coins == coins and not wave.start_wave(), "ACT choice advanced the timer or allowed early attack/rewards")
+	check(is_equal_approx(scene.timeline.progress, progress) and not wave.active and not scene._wave_starting and shop.coins == coins and not wave.start_wave(), "ACT choice advanced the timeline or allowed attack/rewards")
 	shop.open_shop()
 	shop.close_shop()
 	cards.select_card(0)
 	check(cards.selected == -1 and cards.input_suspended and cards.hand.stowed and not shop.view.opened and cards.place_selected(Vector3i(5, 0, 1)) == null, "Closing the shop released the ACT placement lock")
 	check(not expansion.commit(Vector3i(0, 0, -6)), "Position chosen before selecting a direction")
 	await frames(5)
-	await save_frame("res://reports/levels/act_expansion_directions.png")
+	await save_frame(Artifacts.path("levels/act_expansion_directions.png"))
 	var ui_button: Button = expansion.buttons.get_child(1)
 	click(ui_button.get_global_rect().get_center())
 	check(expansion.selected_direction == 1, "Direction button did not enter placement mode")
@@ -147,7 +148,7 @@ func verify() -> void:
 	check(not expansion.commit(Vector3i(0, 0, 0)) and not expansion.commit(Vector3i(picked.x, 1, picked.y)), "Invalid endpoint changed terrain")
 	# Pause and resume cannot release the separate ACT lock.
 	hud.set_paused(true)
-	check(not expansion.commit(cell), "Pause deceleration still allowed an entrance commit")
+	check(not expansion.commit(cell), "Pause still allowed an entrance commit")
 	hud.set_paused(false)
 	check(cards.input_suspended and cards.entry_selection_active and cards.hand.stowed and not scene.get_node("TowerMap").input_enabled, "Resume released the ACT lock")
 	await frames(3)
@@ -155,7 +156,7 @@ func verify() -> void:
 	expansion.show_hover(cell)
 	check(expansion.hovered_cell == cell and expansion.get_node("World/EntrancePreview").visible and expansion.get_node("World/PathPreview").multimesh.instance_count == paths[picked].size(), "Hover did not preview the road and entrance")
 	await frames(2)
-	await save_frame("res://reports/levels/act_expansion_position.png")
+	await save_frame(Artifacts.path("levels/act_expansion_position.png"))
 	TranslationServer.set_locale("en")
 	check(expansion.heading.text == "Choose a highlighted tile", "Expansion UI did not switch to English")
 	TranslationServer.set_locale("zh_TW")
@@ -168,7 +169,7 @@ func verify() -> void:
 	await wait_map(scene)
 	check(completions[0] == 1 and not scene.choosing_start and not expansion.active and controller.start_paths.size() == 2 and controller.start_nodes.size() == 2, "New protected entrance was not added exactly once")
 	check(map.get_used_cells().size() == old_count+paths[picked].size(), "Extension did not preserve old terrain/add its exact road")
-	check(not cards.input_suspended and not cards.hand.stowed and shop.view.visible and shop.available and wave.start_allowed and is_equal_approx(scene.preparation_remaining, 60), "Build phase did not resume with the full countdown and shop reward")
+	check(not cards.input_suspended and not cards.hand.stowed and shop.view.visible and shop.available and wave.start_allowed, "Build phase did not resume with manual start and shop reward")
 	var marker: Node3D = controller.get_node(controller.start_paths[1])
 	check(map.local_to_map(map.to_local(marker.global_position)) == cell, "Entrance animation changed the logical graph marker")
 	var schedule := WaveSpawnSchedule.build(wave.definition, controller, 0, false, wave.additional_start_indices)
@@ -188,7 +189,7 @@ func verify() -> void:
 	for entry: Dictionary in repeat.pending:
 		check(assignments[entry.wave_index] == [entry.start_index, entry.route.route_index], "Global enemy ID changed entrance/route quotas")
 	scene._process(15)
-	check(is_equal_approx(scene.preparation_remaining, 45), "Countdown did not resume after committing")
+	check(not scene._wave_starting and not wave.active and is_zero_approx(scene.timeline.progress), "Preparation did not wait for a manual start after committing")
 	finish_wave(scene)
 	check(scene.choosing_start and expansion.active and expansion.choices.size() == 3, "Second ACT did not offer another expansion")
 	expansion.choose_direction(2)
@@ -205,5 +206,5 @@ func verify() -> void:
 	check(level.starts.size() == 1 and level.acts[1].waves[0].groups[0].enemy_count == 8, "Runtime expansion modified authored level data")
 	scene.queue_free()
 	await frames(2)
-	print("ACT_SPAWN_EXPANSION_CHECK:"+JSON.stringify({"failures": failures, "two_stage_ui": true, "frozen_countdown": true, "placement_lock": true, "pause_lock": true, "road_preview": true, "actual_new_spawns": true, "deterministic_quotas": true, "integer_quarter_ticks": true, "two_act_expansions": true, "final_act": true}))
+	print("ACT_SPAWN_EXPANSION_CHECK:"+JSON.stringify({"failures": failures, "two_stage_ui": true, "manual_start_only": true, "placement_lock": true, "pause_lock": true, "road_preview": true, "actual_new_spawns": true, "deterministic_quotas": true, "integer_quarter_ticks": true, "two_act_expansions": true, "final_act": true}))
 	get_tree().quit(1 if failures else 0)

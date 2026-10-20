@@ -265,7 +265,7 @@ func _watch(resource: Resource) -> void:
 	resource.changed.connect(_refresh)
 
 func _signature(document: LevelDefinition) -> String:
-	var data := [document.title, document.terrain_endpoints_enabled(), document.starts, document.goal, document.marker_height, document.preparation_seconds, document.auto_start, document.expand_starts_after_act, document.early_start_max_bonus, document.terrain.resource_path if document.terrain != null else ""]
+	var data := [document.title, document.terrain_endpoints_enabled(), document.starts, document.goal, document.marker_height, document.expand_starts_after_act, document.terrain.resource_path if document.terrain != null else ""]
 	for act in document.acts:
 		if act == null: data.append(null); continue
 		data.append(act.title)

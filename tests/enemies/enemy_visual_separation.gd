@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Solver = preload("res://scripts/enemies/rendering/enemy_visual_separation.gd")
 const Batch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
 const Enemy = preload("res://scenes/enemies/enemy.tscn")
@@ -187,6 +188,6 @@ func verify() -> void:
 	var report := {"platform": OS.get_name(), "failures": failures, "boundary_pairs": 5, "turns_ignore_contacts": true, "straight_neighbor_unchanged": true, "separation_resumes": true, "logical_motion_unchanged": true, "smooth_longer_transition": true, "no_return_to_center": true, "frame_rate_independent": true, "cases": cases}
 	print("ENEMY_SEPARATION_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
-		var file := FileAccess.open("res://reports/enemies/enemy_visual_separation_windows.json", FileAccess.WRITE)
+		var file := FileAccess.open(Artifacts.path("enemies/enemy_visual_separation_windows.json"), FileAccess.WRITE)
 		file.store_string(JSON.stringify(report, "  ")+"\n")
 		get_tree().quit(1 if failures else 0)

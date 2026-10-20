@@ -77,7 +77,7 @@ scene.render.resolution_x = 1600
 scene.render.resolution_y = 850
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = next(i.identifier for i in scene.render.image_settings.bl_rna.properties['file_format'].enum_items if i.identifier.casefold() == 'png')
-scene.render.filepath = str(ROOT/'reports/assets/blocky_troops.png')
+scene.render.filepath = str(ROOT/'.godot/test-results/assets/blocky_troops.png')
 scene.render.film_transparent = False
 for screen in bpy.data.screens:
     for area in screen.areas:
@@ -87,6 +87,7 @@ for screen in bpy.data.screens:
             space.region_3d.view_rotation = cam.rotation_euler.to_quaternion()
             space.region_3d.view_location = (0.02, 0, 0.31)
             space.region_3d.view_distance = 3.3
+Path(scene.render.filepath).parent.mkdir(parents=True, exist_ok=True)
 bpy.ops.render.render(write_still=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(DEST/'source/blocky_troops.blend'), copy=True)
 print('TROOP_PREVIEW_READY', scene.render.filepath)

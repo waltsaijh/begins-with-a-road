@@ -1,7 +1,7 @@
 @tool
 class_name SlowEffect
 extends HitEffect
-@export var icon: Texture2D = preload("res://assets/sprites/effects/slow.png")
+@export var icon: Texture2D = preload("res://assets/sprites/effects/slowness.png")
 @export_range(0.05, 1.0, 0.05) var speed_multiplier := 0.5
 @export_range(0.05, 30.0, 0.05) var duration := 2.0
 

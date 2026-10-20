@@ -1,7 +1,7 @@
 extends Node3D
 ## Loads terrain before gameplay children become ready; owns finite progression.
 signal level_finished
-const EARLY_START_SECONDS := 1.0
+const TIMELINE_ADVANCE_SECONDS := 1.0
 const WAVE_START_SECONDS := 1.5
 @export var level: LevelDefinition
 var current_wave := 0
@@ -10,12 +10,8 @@ var timeline: WaveTimeline
 var _waves: Array[WaveDefinition] = []
 var _valid := false
 var _wave: Node
-var preparation_remaining := 60.0
 var _wave_starting := false
 var _wave_start_elapsed := 0.0
-var _fast_forwarding := false
-var _start_initial_remaining := 0.0
-var _auto_start_pending := false
 var _balance: Label
 var _hud: CanvasLayer
 var choosing_start := false
@@ -98,14 +94,10 @@ func _ready() -> void:
 	_wave.wave_finished.connect(_on_wave_finished)
 	expansion.completed.connect(_on_start_added)
 	if _wave.controls != null:
-		# The level schedule owns early starts; standalone maps start immediately.
+		# Formal levels own the opening transition; standalone maps start immediately.
 		_wave.controls.spawn_requested.disconnect(_wave.start_wave)
-		_wave.controls.spawn_requested.connect(_on_early_start_requested)
+		_wave.controls.spawn_requested.connect(_on_start_requested)
 	_prepare_wave()
-	# All level starts, including auto-start, pass through the same delay.
-	_auto_start_pending = level.auto_start
-	_wave.controller.plan_changed.connect(_try_auto_start)
-	_try_auto_start()
 
 func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
@@ -113,49 +105,30 @@ func _on_balance_changed(coins: int) -> void:
 func _prepare_wave() -> void:
 	_wave_starting = false
 	_wave_start_elapsed = 0.0
-	_fast_forwarding = false
 	if _wave.controls != null: _wave.controls.start_pending = false
 	_wave.apply_definition(_waves[current_wave])
 	get_node("CardPlacement/Shop").wave_reward = _waves[current_wave].reward
 	timeline.set_state(current_wave, 0.0, false)
-	preparation_remaining = level.preparation_seconds
 	_update_start_callout()
-	set_process(true)
+	set_process(false)
 
 func _update_start_callout() -> void:
-	_hud.set_preparation(preparation_remaining, level.preparation_seconds, not finished and not choosing_start and not _wave.active and not _wave_starting)
+	_hud.set_start_available(not finished and not choosing_start and not _wave.active and not _wave_starting)
 
-func _on_early_start_requested() -> void:
+func _on_start_requested() -> void:
 	if choosing_start or get_tree().paused or _hud.pause_requested: return
-	if preparation_remaining <= 0.0: return
-	_begin_wave_start(true)
+	_begin_wave_start()
 
-func _try_auto_start() -> void:
-	if not _auto_start_pending or _wave.controller.computing: return
-	if _wave.controller.plan.get("routes", 0) > 0: _begin_wave_start(false)
-
-func _begin_wave_start(early: bool) -> void:
+func _begin_wave_start() -> void:
 	if finished or choosing_start or _wave.active or _wave_starting or not _wave.start_allowed: return
 	_wave_starting = true
-	# Lock the request before awarding coins; repeated clicks cannot pay twice.
-	if early:
-		var bonus := level.early_start_bonus(preparation_remaining)
-		get_node("CardPlacement/Shop").grant_bonus(bonus)
-		_hud.show_early_reward(bonus)
 	_wave_start_elapsed = 0.0
-	_fast_forwarding = early
-	_auto_start_pending = false
-	_start_initial_remaining = preparation_remaining
-	if not early:
-		preparation_remaining = 0.0
-		timeline.set_state(current_wave, 1.0, false)
 	if _wave.controls != null: _wave.controls.start_pending = true
 	get_node("CardPlacement").prepare_wave_start()
 	_update_start_callout()
 	set_process(true)
 
 func _on_wave_started() -> void:
-	preparation_remaining = 0.0
 	_wave_starting = false
 	if _wave.controls != null: _wave.controls.start_pending = false
 	timeline.set_state(current_wave, 1.0, true)
@@ -166,22 +139,11 @@ func _process(delta: float) -> void:
 	if not _valid or finished or choosing_start or _wave.active: return
 	if _wave_starting:
 		_advance_wave_start(maxf(0.0, delta))
-		return
-	var before := preparation_remaining
-	preparation_remaining = maxf(0.0, before-maxf(0.0, delta))
-	_update_start_callout()
-	timeline.set_state(current_wave, 1.0-preparation_remaining/level.preparation_seconds, false)
-	if preparation_remaining <= 0.0:
-		_begin_wave_start(false)
-		# Preserve elapsed time when one slow frame crosses both phases.
-		_advance_wave_start(maxf(0.0, delta-before))
 
 func _advance_wave_start(delta: float) -> void:
 	_wave_start_elapsed = minf(WAVE_START_SECONDS, _wave_start_elapsed+delta)
-	if _fast_forwarding:
-		var progress: float = Tween.interpolate_value(0.0, 1.0, minf(_wave_start_elapsed, EARLY_START_SECONDS), EARLY_START_SECONDS, Tween.TRANS_QUAD, Tween.EASE_IN_OUT)
-		preparation_remaining = _start_initial_remaining*(1.0-progress)
-		timeline.set_state(current_wave, 1.0-preparation_remaining/level.preparation_seconds, false)
+	var progress: float = Tween.interpolate_value(0.0, 1.0, minf(_wave_start_elapsed, TIMELINE_ADVANCE_SECONDS), TIMELINE_ADVANCE_SECONDS, Tween.TRANS_QUAD, Tween.EASE_IN_OUT)
+	timeline.set_state(current_wave, progress, false)
 	if _wave_start_elapsed >= WAVE_START_SECONDS:
 		_wave.start_wave()
 
@@ -227,4 +189,4 @@ func _on_start_added(index: int) -> void:
 	get_node("CardPlacement").set_entry_selection(false)
 	_wave._update_button()
 	_update_start_callout()
-	set_process(true)
+	set_process(false)

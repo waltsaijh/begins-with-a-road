@@ -70,7 +70,7 @@ scene.render.resolution_x = 1000
 scene.render.resolution_y = 1000
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = choose(scene.render.image_settings, 'file_format', 'png')
-scene.render.filepath = str(ROOT/'reports/assets/blocky_grunt.png')
+scene.render.filepath = str(ROOT/'.godot/test-results/assets/blocky_grunt.png')
 scene.render.film_transparent = False
 (ROOT/'reports').mkdir(exist_ok=True)
 
@@ -89,5 +89,6 @@ for screen in bpy.data.screens:
             editor.spaces.active.region_3d.view_location = (-0.045, 0.025, 0.328)
             editor.spaces.active.overlay.show_overlays = False
 bpy.ops.wm.save_as_mainfile(filepath=str(ASSET/'source/blocky_grunt.blend'), copy=True)
+Path(scene.render.filepath).parent.mkdir(parents=True, exist_ok=True)
 bpy.ops.render.render(write_still=True)
 print('PREVIEW_READY', scene.render.filepath)

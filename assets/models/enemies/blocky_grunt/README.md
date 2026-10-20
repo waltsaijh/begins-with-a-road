@@ -5,7 +5,7 @@
 - `blocky_grunt.glb`：遊戲用模型，5 個網格、1 個材質、6,398 個三角形。64×64 調色盤貼圖已內嵌，無外部貼圖依賴。
 - `palette.png`：可編輯的調色盤備份。
 - `source/blocky_grunt.blend`：Blender 原檔，保留各部件、肢體動畫、燈光與預覽相機。`Blocky Grunt Studio` 用於編輯；`Blocky Grunt - Game Export` 為合併後的遊戲版本。
-- `reports/assets/blocky_grunt.png`（專案根目錄）：正交相機預覽。
+- `.godot/test-results/assets/blocky_grunt.png`（專案根目錄）：正交相機預覽。
 
 在 `assets/data/troops/*.tres` 的 **Model** 欄位指定 `blocky_grunt.glb` 即可使用。自動辨識走路動畫，也可明確填入 `Walk-loop`；它是 1 秒的循環，包含雙腿、雙臂及身體起伏。原點在雙腳底部，面向 Godot -Z，旋轉可保持 `(0, 0, 0)`。含長矛總高約 0.678、冠頂約 0.644 世界單位；若希望接近原 grunt 的高度，可將 Model Scale 設為 `(0.9, 0.9, 0.9)`。
 

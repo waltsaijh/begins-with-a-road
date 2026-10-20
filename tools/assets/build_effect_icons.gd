@@ -6,5 +6,5 @@ func _initialize() -> void:
 	var error := image.load_svg_from_string(svg)
 	if error == OK:
 		DirAccess.make_dir_recursive_absolute("res://assets/sprites/effects")
-		error = image.save_png("res://assets/sprites/effects/slow.png")
+	error = image.save_png("res://assets/sprites/effects/slowness.png")
 	quit(0 if error == OK else 1)

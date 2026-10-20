@@ -19,13 +19,7 @@ color = Color(0.953, 0.969, 0.953, 0.96)
 polygon = PackedVector2Array(64, 1.5, 122.5, 1.5, 126.5, 5.5, 126.5, 32.5, 122.5, 36.5, 69, 36.5, 64, 44.5, 59, 36.5, 5.5, 36.5, 1.5, 32.5, 1.5, 5.5, 5.5, 1.5, 64, 1.5)
 antialiased = true
 
-[node name="Outline" type="Line2D" parent="Shape"]
-points = PackedVector2Array(64, 1.5, 122.5, 1.5, 126.5, 5.5, 126.5, 32.5, 122.5, 36.5, 69, 36.5, 64, 44.5, 59, 36.5, 5.5, 36.5, 1.5, 32.5, 1.5, 5.5, 5.5, 1.5, 64, 1.5)
-width = 1.0
-default_color = Color(0.31, 0.45, 0.46, 0.22)
-antialiased = true
-
-[node name="Countdown" type="Line2D" parent="Shape"]
+[node name="Border" type="Line2D" parent="Shape"]
 points = PackedVector2Array(64, 1.5, 122.5, 1.5, 126.5, 5.5, 126.5, 32.5, 122.5, 36.5, 69, 36.5, 64, 44.5, 59, 36.5, 5.5, 36.5, 1.5, 32.5, 1.5, 5.5, 5.5, 1.5, 64, 1.5)
 width = 1.7
 default_color = Color(0.392, 0.545, 0.553, 1)
@@ -40,7 +34,7 @@ mouse_filter = 2
 theme_override_colors/font_color = Color(0.2, 0.36, 0.38, 1)
 theme_override_fonts/font = ExtResource("2")
 theme_override_font_sizes/font_size = 13
-text = "Start Now?"
+text = "Start next wave"
 horizontal_alignment = 1
 vertical_alignment = 1
 
