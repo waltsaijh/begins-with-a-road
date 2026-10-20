@@ -32,7 +32,7 @@ func verify() -> void:
 	# Its methods must read missing values as defaults rather than pass Nil
 	# into the typed terrain reader, even before the editor has reloaded it.
 	var legacy_script := GDScript.new()
-	legacy_script.source_code = FileAccess.get_file_as_string("res://scripts/levels/level_definition.gd").replace("class_name LevelDefinition\n", "").replace("@export var use_terrain_endpoints := true\n", "").replace("@export var expand_starts_after_act := true\n", "")
+	legacy_script.source_code = FileAccess.get_file_as_string("res://scripts/levels/definitions/level_definition.gd").replace("class_name LevelDefinition\n", "").replace("@export var use_terrain_endpoints := true\n", "").replace("@export var expand_starts_after_act := true\n", "")
 	check(legacy_script.reload() == OK, "Legacy resource fixture did not compile")
 	var legacy: Resource = legacy_script.new()
 	legacy.terrain = document.terrain
@@ -42,7 +42,7 @@ func verify() -> void:
 	check(legacy_layout.has("error") and legacy_layout.error.is_empty() and not legacy_layout.start_cells.is_empty(), "Editor terrain read still fails when an export is missing")
 	check(legacy.configuration_error().is_empty(), "Validation still accesses an absent layout error key")
 	# Reload the script while keeping the old instance, as the real editor does.
-	legacy_script.source_code = FileAccess.get_file_as_string("res://scripts/levels/level_definition.gd").replace("class_name LevelDefinition\n", "")
+	legacy_script.source_code = FileAccess.get_file_as_string("res://scripts/levels/definitions/level_definition.gd").replace("class_name LevelDefinition\n", "")
 	check(legacy_script.reload(true) == OK, "Hot reload fixture failed")
 	legacy.repair_missing_defaults()
 	check(legacy.get("use_terrain_endpoints") is bool and legacy.get("expand_starts_after_act") is bool, "Hot reload left new boolean exports as Nil")

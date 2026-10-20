@@ -3,7 +3,7 @@ class TestViewport extends SubViewport:
 	signal mouse_entered
 	signal mouse_exited
 
-const Planner = preload("res://scripts/levels/spawn_expansion_planner.gd")
+const Planner = preload("res://scripts/levels/expansion/spawn_expansion_planner.gd")
 var failures := 0
 var _viewport: SubViewport
 

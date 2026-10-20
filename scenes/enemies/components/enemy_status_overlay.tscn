@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/enemies/rendering/enemy_status_overlay.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/enemies/presentation/enemy_status_overlay.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/components/enemy_status_appearance.tscn" id="2"]
 
 [node name="StatusLayer" type="CanvasLayer"]

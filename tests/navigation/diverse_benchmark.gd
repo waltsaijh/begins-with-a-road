@@ -1,7 +1,7 @@
 extends Node3D
 ## Same real scenes and seeds on native and single-thread Web; no rendering timed.
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
-const Parameters = preload("res://scripts/navigation/tile_parameter_store.gd")
+const Parameters = preload("res://scripts/map/tile/tile_parameter_store.gd")
 const Profile = preload("res://scripts/enemies/troops/troop.gd")
 
 func _ready() -> void:

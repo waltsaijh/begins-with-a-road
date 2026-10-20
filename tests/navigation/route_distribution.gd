@@ -1,5 +1,5 @@
 extends Node3D
-const Distribution = preload("res://scripts/navigation/route_distribution.gd")
+const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
 

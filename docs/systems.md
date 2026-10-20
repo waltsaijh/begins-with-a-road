@@ -13,27 +13,27 @@
 | `map/tile/appearance/tile_appearance_constants.gd` | `TileAppearanceConstants`：柱距、木橋配置與地塊動畫預設值 |
 | `map/tile/tile_placement.gd` | 卡牌地塊批次變更、鄰格模型刷新與座標拾取 |
 | `map/tile/tile_parameters.gd` | 每格資料與變更通知 |
-| `navigation/tile_parameter_store.gd` | 依座標保留每格資料、每兵種成本陣列快取 |
+| `map/tile/tile_parameter_store.gd` | 依座標保留每格資料、每兵種成本陣列快取 |
 | `navigation/road_graph_snapshot.gd` | GridMap → C++ 用的整數座標／接口陣列 |
 | `navigation/portal_map.gd` | 重建、評分失效、原生／候選池規劃與抽樣 API |
-| `navigation/candidate_routes.gd` | 共用有限代表路線池、原始 signed 評分與 threshold 篩選 |
+| `navigation/routes/candidate_routes.gd` | 共用有限代表路線池、原始 signed 評分與 threshold 篩選 |
 | `navigation/visualization/region_paths.gd` | 從距離表還原供預覽的同成本方向 |
 | `navigation/visualization/portal_overlay.gd` | F1 兵種路徑／F2 威脅、地塊參數查看與切換列 |
 | `enemies/enemy.gd` | 沿出生時固定的逐格行程移動，抵達後刪除 |
-| `enemies/enemy_wave.gd` | 每波 64 隻、每次 1 隻、間隔、重播與人數 |
+| `enemies/spawning/enemy_wave.gd` | 每波 64 隻、每次 1 隻、間隔、重播與人數 |
 | `enemies/rendering/enemy_visual_separation.gd` | 依 tile 分群、固定取樣上限的 O(N) 左右視覺分離 |
 | `enemies/rendering/enemy_multimesh.gd` | 共用 mesh／走路 shader、密集 instance slot 與批次顯示 |
 | `enemies/enemy_constants.gd` | 全域 `EnemyConstants`：波次、移動與候選搜尋預設值 |
 | `enemies/rendering/enemy_render_constants.gd` | 全域 `EnemyRenderConstants`：步態、轉向與視覺分離常數 |
 | `enemies/rendering/enemy_pose.gd` | 每隻敵人的顯示朝向、步態與動畫進度，不回寫邏輯狀態 |
-| `enemies/rendering/enemy_wave_controls.gd` | 開始波次意圖與可用狀態，不負責尋路或生成 |
+| `enemies/presentation/enemy_wave_controls.gd` | 開始波次意圖與可用狀態，不負責尋路或生成 |
 | `towers/tower_constants.gd` | 全域 `TowerConstants`：防禦塔共用預設值 |
 | `towers/tower_definition.gd` | `TowerDefinition`：塔種名稱、模型、佔格、範圍與威脅 |
 | `towers/tower.gd` | `DefenseTower`：共用實例基底、位置／佔格與可變影響資料 |
 | `towers/tower_map.gd` | 右鍵放置／移除、佔格驗證、路網與局部影響更新 |
-| `cards/build_card.gd` | `BuildCard` Resource：塔與 TilePreset 的配對、價格、卡面資料與旋轉配置 |
-| `cards/tile_preset.gd` | 獨立的名稱前綴與道路偏移 Resource |
-| `cards/tile_preset_candidate.gd` | 每種塔的地塊候選檔案與相對權重 |
+| `cards/definitions/build_card.gd` | `BuildCard` Resource：塔與 TilePreset 的配對、價格、卡面資料與旋轉配置 |
+| `cards/definitions/tile_preset.gd` | 獨立的名稱前綴與道路偏移 Resource |
+| `cards/definitions/tile_preset_candidate.gd` | 每種塔的地塊候選檔案與相對權重 |
 | `cards/card_placement.gd` | 手牌庫存、選卡、旋轉、預覽失效與成功放置後消耗 |
 | `cards/presentation/card_view.gd` | 編輯器可預覽的場景 UI、卡面材質與塔圖示染色 |
 | `cards/presentation/card_tile_diagram.gd` | 依配置複用可編輯的地塊格子場景 |
@@ -184,7 +184,7 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 
 ## 敵人頭頂狀態
 
-頭頂狀態使用 `scripts/enemies/rendering/enemy_status_overlay.gd`，整批敵人共用一個 CanvasLayer／Control，沒有逐隻 UI 節點；位置跟隨 MultiMesh 的避讓後位置，不讀回 GPU buffer。每幀成本為 O(敵人數＋效果圖示數)，敵人全數離場後停止更新，並隨批次釋放。
+頭頂狀態使用 `scripts/enemies/presentation/enemy_status_overlay.gd`，整批敵人共用一個 CanvasLayer／Control，沒有逐隻 UI 節點；位置跟隨 MultiMesh 的避讓後位置，不讀回 GPU buffer。每幀成本為 O(敵人數＋效果圖示數)，敵人全數離場後停止更新，並隨批次釋放。
 
 - 綠色血量＋右側淺藍護盾共用一條狀態條，依 `max_health + max_shield` 比例顯示，未填部分保留深色底。兵種設定 `max_shield`（預設 0），出生時複製護盾上限與目前值；傷害先扣護盾，再扣血。執行時 `enemy.add_shield(amount)` 可增加護盾與必要的上限。
 - `enemy.skill_progress` 預設 -1，隱藏下方黃色技能條；設為 0～1 顯示進度，設回 -1 隱藏。僅提供顯示資料，沒有額外實作敵人技能。
@@ -271,7 +271,7 @@ var route = controller.sample_for(profile, enemy_id, 1)
 
 ## Tile 參數與兵種評分
 
-`scripts/map/tile/tile_parameters.gd` 是每格獨立的 Resource 資料紀錄，包含 terrain_id、movement_multiplier、damage_per_second、cover、num_towers_around、threat，以及 set_parameter/get_parameter 的擴充欄位。集中由`scripts/navigation/tile_parameter_store.gd` 以座標維護，不新增逐格 Node。暫緩建圖的死路地塊仍立即建立資料；all_tiles() 供 F2 查看所有實體地塊，ordered 僅對應目前原生圖的成本欄位。重建入口圖會保留仍存在地塊的參數；目前屬於遊戲執行期間的資料，沒有新增存檔格式。
+`scripts/map/tile/tile_parameters.gd` 是每格獨立的 Resource 資料紀錄，包含 terrain_id、movement_multiplier、damage_per_second、cover、num_towers_around、threat，以及 set_parameter/get_parameter 的擴充欄位。集中由`scripts/map/tile/tile_parameter_store.gd` 以座標維護，不新增逐格 Node。暫緩建圖的死路地塊仍立即建立資料；all_tiles() 供 F2 查看所有實體地塊，ordered 僅對應目前原生圖的成本欄位。重建入口圖會保留仍存在地塊的參數；目前屬於遊戲執行期間的資料，沒有新增存檔格式。
 
 兩者的數量與責任不同：**每格一份 tile_parameters；每張地圖一份 tile_parameter_store**。前者只描述該格的資料並在修改後通知；後者保存「座標 → 該格資料」，同步新增／移除的地塊，並依兵種 evaluation 產生成本陣列、快取及處理失效。兵種的 evaluation 收到的是單格 tile_parameters。store 本身不尋路。
 
@@ -329,7 +329,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 
 頂部時間線寬度為畫面的 50%，水平置中；每波佔一個等長區間，圓點代表一般波次，ACT 的最後一波由分隔直線表示（取代圓點），起點另有直線；不再保留額外的尾端間隔，目前 ACT 使用 Noto Sans TC Medium。金幣在時間線左側，右側只有倍速與暫停，商店不再另外顯示重複餘額。沒有獨立位置游標。準備期的線段從前一節點花 60 秒走到下一節點，時間到後停在節點等待 1.5 秒才進攻。按提前開始後，同樣等待總共 1.5 秒：時間線從目前位置以二次 ease-in-out（慢起、加速、慢停）於前 1 秒走完剩餘線段，到達下一節點後停留 0.5 秒；動畫包含在等待時間內。第一波自動開始也會在已填滿的節點等待 1.5 秒。等待期間停用按鈕以避免重複觸發。戰鬥期間線段固定在該波節點，直到所有敵人抵達或被擊殺才開始下一段 60 秒準備期。
 
-頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、準備倒數、出生、移動與動畫。按暫停立即鎖住選牌、旋轉、放置、商店與提早開始，並將當前倍速於實際 0.25 秒內以二次 ease-out 降至 0，再暫停 SceneTree；時長可在 LevelHUD 的 `pause_seconds` 調整。暫停時仍可滾輪縮放與中鍵平移鏡頭，其他遊戲輸入由 HUD 攔截。倍速按鈕仍能更改恢復後使用的速度，但不會啟動已停止的模擬。右下選單使用右對齊的細字、透明底與淡色 hover／focus 底線，暫停／繼續時皆以實際 0.25 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；卡牌會暫時淡化，透明度由 CardPlacement 的 `paused_cards_opacity` 控制。繼續遊戲、頂部播放圖示或 Esc 會還原卡牌顏色／選取及選定速度，未完成的提早開始過渡也會接續；減速途中恢復會取消尚未完成的暫停。離開關閉遊戲。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的實際減速時間、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換、繼續與離開。
+頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、準備倒數、出生、移動與動畫。按暫停立即鎖住選牌、旋轉、放置、商店與提早開始，並將當前倍速於實際 0.25 秒內以二次 ease-out 降至 0，再暫停 SceneTree；時長可在 LevelHUD 的 `pause_seconds` 調整。暫停時仍可滾輪縮放與中鍵平移鏡頭，其他遊戲輸入由 HUD 攔截。倍速按鈕仍能更改恢復後使用的速度，但不會啟動已停止的模擬。右下選單使用右對齊的細字、透明底與淡色 hover／focus 底線，暫停／繼續時皆以實際 0.25 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；卡牌會暫時淡化，透明度由 CardPlacement 的 `paused_cards_opacity` 控制。繼續遊戲、頂部播放圖示或 Esc 會還原卡牌顏色／選取及選定速度，未完成的提早開始過渡也會接續；減速途中恢復會取消尚未完成的暫停。離開關閉遊戲。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的實際減速時間、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換、繼續與離開。
 
 提早開始對話框位於 `scenes/levels/components/start_wave_callout.tscn`，大小為 128×46，文字依語言顯示「提早開始?」／「Start Now?」，不預覽可得獎勵。它投影到第一個 `Start` 上方，向下尖角指向入口，隨相機平移／縮放更新；部分超出視窗仍保留顯示，由視窗自然裁切，完全離開畫面才隱藏。邊框沿周長依「剩餘準備時間／準備總時間」縮短，暫停時保持進度。Hover 以 0.15 秒過渡到淡青底色與較深邊框，略為放大並上浮。開波時以 0.24 秒二次 ease-in 縮小、移入起點塔；下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的對話框。
 
@@ -340,6 +340,8 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 每波進入開場等待時立即取消選卡、旋轉狀態及卡片／地塊放置預覽，手牌滑到畫面下方，建造輸入暫停；提前開始也立即執行，不等時間線動畫結束。等待期間商店會隱藏且不能重新開啟或交易。關閉商店不會解除等待／戰鬥鎖定；波次結束才恢復手牌與建造。商店仍於每波完成後發放該波獎勵。關卡使用各波指定配方，兵種與分配方式從 Resource 設定，不再顯示下拉選單。金幣顯示會同步獎勵、購買與重刷。
 
 `tests/levels/level_flow.tscn` 驗證地形載入、ACT 切換、60 秒計時／自動開波／提前開始／每波 1.5 秒開場等待／慢幀跨越倒數邊界／戰鬥停留、半寬置中佈局與餘額同步、手牌收回與 hovering 取消、不同波次獎勵、完成後禁止多開波次，以及多起點。已用實際畫面檢查建造／ACT II 戰鬥時的時間線及手牌狀態。
+
+關卡清理與正常清場分開處理：關閉視窗時 HUD 可能先離開場景樹，之後最後一隻敵人的 `tree_exiting` 仍會觸發波次完成。LevelSession 在進入下一波前確認自身未排程刪除且 HUD 仍在場景樹；HUD 對離場後的準備期通知與投影呼叫直接返回，使用 viewport 前再次檢查有效性。`tests/levels/level_teardown.tscn` 覆蓋倍速、正常／提前開波、不同出生階段、場景移除與延後刪除，也保留正常完成及獎勵的正向驗證。
 
 ## 建置與驗證
 

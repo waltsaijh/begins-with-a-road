@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="TilePreset" format=3 uid="uid://crrthlynabrbd"]
 
-[ext_resource type="Script" uid="uid://coq3kloaafuew" path="res://scripts/cards/tile_preset.gd" id="1_mc56o"]
+[ext_resource type="Script" uid="uid://coq3kloaafuew" path="res://scripts/cards/definitions/tile_preset.gd" id="1_mc56o"]
 
 [resource]
 script = ExtResource("1_mc56o")

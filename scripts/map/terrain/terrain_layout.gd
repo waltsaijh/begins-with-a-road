@@ -1,7 +1,7 @@
 @tool
 extends RefCounted
 ## Read scene-local endpoint transforms without entering the SceneTree.
-const Endpoint = preload("res://scripts/levels/terrain_endpoint.gd")
+const Endpoint = preload("res://scripts/map/terrain/terrain_endpoint.gd")
 
 static func empty(error: String) -> Dictionary:
 	return {"error": error, "from_scene": false, "starts": [], "goal": {}, "start_cells": [], "goal_cell": Vector2i.ZERO}

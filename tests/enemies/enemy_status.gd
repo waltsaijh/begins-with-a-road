@@ -1,7 +1,7 @@
 extends Node3D
 const Enemy = preload("res://scenes/enemies/enemy.tscn")
 const Batch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
-const Overlay = preload("res://scripts/enemies/rendering/enemy_status_overlay.gd")
+const Overlay = preload("res://scripts/enemies/presentation/enemy_status_overlay.gd")
 var failures := 0
 
 func _ready() -> void:

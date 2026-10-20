@@ -3,8 +3,8 @@ extends Node
 signal graph_changed
 signal plan_changed
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
-const Parameters = preload("res://scripts/navigation/tile_parameter_store.gd")
-const CandidateRoutes = preload("res://scripts/navigation/candidate_routes.gd")
+const Parameters = preload("res://scripts/map/tile/tile_parameter_store.gd")
+const CandidateRoutes = preload("res://scripts/navigation/routes/candidate_routes.gd")
 @export var troop: Troop = TroopCatalog.default_troop()
 ## Every marker becomes a protected graph vertex, even inside a wide region.
 @export var start_paths: Array[NodePath] = [^"../Start"]

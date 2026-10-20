@@ -1,7 +1,7 @@
 extends Node3D
 ## Two-stage ACT transition. UI and world artwork live in editable scene nodes.
 signal completed(start_index: int)
-const Planner = preload("res://scripts/levels/spawn_expansion_planner.gd")
+const Planner = preload("res://scripts/levels/expansion/spawn_expansion_planner.gd")
 @export_range(6, 24, 1) var search_depth := 8
 @export_range(2, 6, 1) var frontier_band := 3
 @export var start_scene: PackedScene = preload("res://scenes/levels/components/expansion_start.tscn")

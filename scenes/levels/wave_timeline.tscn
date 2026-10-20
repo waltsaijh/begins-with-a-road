@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bj3647jcs1ljw"]
 
-[ext_resource type="Script" uid="uid://cy7pwiirhuh4u" path="res://scripts/levels/wave_timeline.gd" id="1"]
+[ext_resource type="Script" uid="uid://cy7pwiirhuh4u" path="res://scripts/levels/presentation/wave_timeline.gd" id="1"]
 [ext_resource type="Resource" uid="uid://crw7gsg3jk7ae" path="res://assets/data/levels/frontier.tres" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/levels/components/wave_timeline_track.tscn" id="3"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Medium.ttf" id="3_vikn2"]

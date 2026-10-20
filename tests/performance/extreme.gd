@@ -1,6 +1,6 @@
 extends Node3D
 ## Reproducible stress workloads; production defaults remain untouched.
-const Candidates = preload("res://scripts/navigation/candidate_routes.gd")
+const Candidates = preload("res://scripts/navigation/routes/candidate_routes.gd")
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var report := {"navigation": [], "runtime": [], "failures": []}

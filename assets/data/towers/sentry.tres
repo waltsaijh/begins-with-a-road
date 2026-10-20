@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d267iu2yunnih" path="res://assets/sprites/towers/sentry.png" id="1_yfivi"]
 [ext_resource type="PackedScene" uid="uid://c3ps5lqrpn65o" path="res://assets/models/towers/sentry.tscn" id="2"]
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/sentry_arrow.tres" id="3_attack"]
-[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/tile_preset_candidate.gd" id="4_candidate"]
+[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="4_candidate"]
 
 [sub_resource type="Resource" id="corner_candidate"]
 script = ExtResource("4_candidate")

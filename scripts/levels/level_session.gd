@@ -186,6 +186,10 @@ func _advance_wave_start(delta: float) -> void:
 		_wave.start_wave()
 
 func _on_wave_finished() -> void:
+	# Enemy tree_exiting callbacks also run while the level is being removed,
+	# after later siblings such as the HUD have already left the tree.
+	if not is_inside_tree() or is_queued_for_deletion(): return
+	if not is_instance_valid(_hud) or not _hud.is_inside_tree(): return
 	set_process(false)
 	current_wave += 1
 	if current_wave == _waves.size():

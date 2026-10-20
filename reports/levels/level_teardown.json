@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-20",
+  "platform": "Windows",
+  "engine": "Godot 4.7.2 Compatibility",
+  "reproduced_before_fix": "Cannot call method get_camera_3d on a null value during last-enemy tree_exiting; removing the level also incorrectly advanced current_wave",
+  "matrix": {
+    "cases": 48,
+    "delay_pending_live": true,
+    "detached_hud": true,
+    "early_and_normal": true,
+    "failures": 0,
+    "normal_completion": true,
+    "remove_and_queue_free": true,
+    "speeds": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "real_window_close": [
+    {
+      "stderr": "",
+      "exit": 0,
+      "wm_close": true,
+      "name": "2x_early"
+    },
+    {
+      "stderr": "",
+      "exit": 0,
+      "wm_close": true,
+      "name": "4x_early"
+    },
+    {
+      "stderr": "",
+      "exit": 0,
+      "wm_close": true,
+      "name": "2x_normal"
+    },
+    {
+      "stderr": "",
+      "exit": 0,
+      "wm_close": true,
+      "name": "4x_normal"
+    }
+  ],
+  "level_flow": {
+    "acts": true,
+    "authored_terrain": true,
+    "cancelled_hover": true,
+    "early_start_ease_in_out_1_second_hold_0_5_seconds": true,
+    "every_wave_start_delay_1_5_seconds": true,
+    "failures": 0,
+    "finite_waves": true,
+    "multiple_starts": true,
+    "rewards": true,
+    "slow_frame_overflow": true,
+    "stowed_hand": true,
+    "timeline": true
+  },
+  "pause_navigation": {
+    "failures": 0,
+    "immediate_input_lock": true,
+    "menu_fades": true,
+    "paused_health_projection": true,
+    "paused_zoom_and_pan": true,
+    "ramp_ms_at_1x_2x_4x": [
+      258.202,
+      255.697,
+      261.158
+    ],
+    "rapid_toggle": true,
+    "resume_selection": true,
+    "shop_locked": true
+  },
+  "notes": [
+    "UI speeds stay 1x/2x/4x; the deterministic matrix additionally exercises time_scale 3.",
+    "WM_CLOSE sent only to the task-created test-game process windows.",
+    "No existing gameplay configuration, map, balance value, or prior report was replaced."
+  ],
+  "runtime_errors": []
+}

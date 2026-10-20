@@ -21,11 +21,14 @@
 godot --headless --path . res://tests/levels/level_flow.tscn
 godot --headless --path . res://tests/levels/terrain_endpoints.tscn
 godot --headless --path . res://tests/levels/wave_spawn_groups.tscn
+godot --headless --path . res://tests/levels/level_teardown.tscn
 godot --path . res://tests/cards/card_shop.tscn
 godot --path . res://tests/levels/act_spawn_expansion.tscn
 godot --editor --path . -- --test-wave-editor
 ```
 
 滑鼠 hover、像素取樣與動畫截圖測試需要實際渲染，請使用一般執行模式；`--headless` 適合資料與排程驗證。截圖及歷史結果寫入 `reports/` 對應功能目錄；暫時產物放 `.godot/`。Web 驗證工具見 [tools](../tools/README.md)。
+
+`level_teardown` 驗證不同倍速、正常／提前開始，以及開場等待、尚未出生與存活敵人的關卡清理。另可用一般渲染模式加 `-- --window-close` 啟動一個 2x 提前開波的測試視窗，手動關閉檢查退出錯誤；加 `--4x`／`--normal` 可切換其他關閉情境。結果見 [關卡清理回歸](../reports/levels/level_teardown.json)。
 
 跨平台壓力測試使用 `performance/extreme.tscn`，需要實際渲染。執行方法、量測限制及結果見 [效能報告](../reports/performance/extreme_2026-10-20.md)。這是獨立負載場景，使用固定種子及合成地形，不修改正式關卡或兵種數值。

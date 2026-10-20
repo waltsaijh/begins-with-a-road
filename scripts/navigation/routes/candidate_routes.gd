@@ -1,5 +1,5 @@
 extends RefCounted
-const Distribution = preload("res://scripts/navigation/route_distribution.gd")
+const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
 ## All troops rank a FINITE set of complete routes using raw tile scores.
 ## Geometry/local representatives are shared across troops with the same search settings.
 var _cell_indices := {}

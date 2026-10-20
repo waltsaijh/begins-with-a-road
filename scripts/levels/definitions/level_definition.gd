@@ -1,7 +1,7 @@
 @tool
 class_name LevelDefinition
 extends Resource
-const TerrainLayout = preload("res://scripts/levels/terrain_layout.gd")
+const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 ## One level file references its editable GridMap scene and complete ACT schedule.
 @export var title := "Begins With a Road"
 @export var terrain: PackedScene

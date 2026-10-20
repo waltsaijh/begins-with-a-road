@@ -53,6 +53,7 @@ func _process(_delta: float) -> void:
 	_position_callout()
 
 func set_preparation(remaining: float, duration: float, available: bool) -> void:
+	if not is_inside_tree(): return
 	early_start.mouse_filter = Control.MOUSE_FILTER_STOP if available else Control.MOUSE_FILTER_IGNORE
 	if _callout_available != available:
 		_callout_available = available
@@ -69,9 +70,12 @@ func _animate_callout(reveal: bool) -> void:
 	_callout_motion.tween_property(self, "_callout_reveal", target, start_reveal_seconds if reveal else start_retract_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT if reveal else Tween.EASE_IN)
 
 func _position_callout() -> void:
+	if not is_inside_tree(): return
+	var viewport := get_viewport()
+	if viewport == null or not is_instance_valid(early_start): return
 	if pause_requested: early_start.disabled = true
-	var camera := get_viewport().get_camera_3d()
-	if _callout_reveal <= 0.001 or start_marker == null or camera == null:
+	var camera := viewport.get_camera_3d()
+	if _callout_reveal <= 0.001 or not is_instance_valid(start_marker) or camera == null:
 		early_start.hide()
 		return
 	var anchor := start_marker.global_position+Vector3.UP*start_anchor_height
@@ -88,7 +92,7 @@ func _position_callout() -> void:
 	early_start.scale = Vector2.ONE*maxf(0.001, _callout_reveal)*lerpf(1.0, 1.035, hover)
 	early_start.modulate.a = minf(1.0, _callout_reveal*2.0)
 	# Let the viewport clip partial bubbles instead of hiding the whole control.
-	early_start.visible = get_viewport().get_visible_rect().intersects(early_start.get_global_rect())
+	early_start.visible = viewport.get_visible_rect().intersects(early_start.get_global_rect())
 
 func show_early_reward(amount: int) -> void:
 	if amount <= 0 or not early_start.visible: return

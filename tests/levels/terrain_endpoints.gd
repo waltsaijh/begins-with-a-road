@@ -1,6 +1,6 @@
 extends Node
-const Layout = preload("res://scripts/levels/terrain_layout.gd")
-const Endpoint = preload("res://scripts/levels/terrain_endpoint.gd")
+const Layout = preload("res://scripts/map/terrain/terrain_layout.gd")
+const Endpoint = preload("res://scripts/map/terrain/terrain_endpoint.gd")
 const Start = preload("res://scenes/maps/components/start_point.tscn")
 const Goal = preload("res://scenes/maps/components/goal_point.tscn")
 var failures := 0

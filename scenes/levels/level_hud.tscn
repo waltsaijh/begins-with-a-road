@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bj3647jcs1ljw" path="res://scenes/levels/wave_timeline.tscn" id="1"]
 [ext_resource type="Texture2D" uid="uid://dh38d3ihtyldi" path="res://assets/sprites/cards/gold.png" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/levels/components/start_wave_callout.tscn" id="3"]
-[ext_resource type="Script" uid="uid://qxb7frtch4wd" path="res://scripts/levels/level_hud.gd" id="4"]
+[ext_resource type="Script" uid="uid://qxb7frtch4wd" path="res://scripts/levels/presentation/level_hud.gd" id="4"]
 [ext_resource type="Texture2D" uid="uid://ddnap7ob7g2px" path="res://assets/sprites/interface/pause.png" id="5"]
 [ext_resource type="Theme" path="res://assets/themes/level_controls.tres" id="7"]
 [ext_resource type="Texture2D" uid="uid://ffwij66hhev7" path="res://assets/sprites/interface/speed_1x.png" id="8"]

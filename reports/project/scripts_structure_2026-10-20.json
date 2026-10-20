@@ -1,0 +1,770 @@
+{
+  "moved_scripts": 24,
+  "unique_script_uids": 74,
+  "resolvable_script_references": 189,
+  "path_only_comparison_files": 252,
+  "native": [
+    {
+      "name": "resources",
+      "result": {
+        "failures": 0,
+        "resources": 216
+      }
+    },
+    {
+      "name": "level_flow",
+      "result": {
+        "acts": true,
+        "authored_terrain": true,
+        "cancelled_hover": true,
+        "early_start_ease_in_out_1_second_hold_0_5_seconds": true,
+        "every_wave_start_delay_1_5_seconds": true,
+        "failures": 0,
+        "finite_waves": true,
+        "multiple_starts": true,
+        "rewards": true,
+        "slow_frame_overflow": true,
+        "stowed_hand": true,
+        "timeline": true
+      }
+    },
+    {
+      "name": "terrain_endpoints",
+      "result": {
+        "actual_routes": true,
+        "failures": 0,
+        "legacy": true,
+        "model_overrides": true,
+        "nested_transforms": true,
+        "save_reload": true,
+        "scene_placement": true,
+        "snap": true,
+        "two_starts": true,
+        "validation": true,
+        "visible_models": true
+      }
+    },
+    {
+      "name": "wave_groups",
+      "result": {
+        "absolute_schedule": true,
+        "failures": 0,
+        "future_gap": true,
+        "multiple_entrances": true,
+        "overlap": true,
+        "pooled_quotas": true,
+        "quarter_ticks": true,
+        "snapshot": true
+      }
+    },
+    {
+      "name": "route_distribution",
+      "result": {
+        "cases": [
+          {
+            "distribution_build_us": 3,
+            "old_shuffle64": {
+              "branched_side": 64,
+              "mean_score": 14.6875,
+              "straight": 0,
+              "unique_routes": 3
+            },
+            "old_shuffle64_us": 28,
+            "origin": 0,
+            "routes": 3,
+            "scene": "three_corridors",
+            "temperatures": [
+              {
+                "expected_branch_probability": 1.0,
+                "expected_score": 12.141347,
+                "observed64": {
+                  "branched_side": 64,
+                  "mean_score": 12.25,
+                  "straight": 0,
+                  "unique_routes": 3
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_branch_probability": 1.0,
+                "expected_score": 13.695532,
+                "observed64": {
+                  "branched_side": 64,
+                  "mean_score": 14.0625,
+                  "straight": 0,
+                  "unique_routes": 3
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_branch_probability": 1.0,
+                "expected_score": 14.436035,
+                "observed64": {
+                  "branched_side": 64,
+                  "mean_score": 14.875,
+                  "straight": 0,
+                  "unique_routes": 3
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_branch_probability": 1.0,
+                "expected_score": 14.666667,
+                "observed64": {
+                  "branched_side": 64,
+                  "mean_score": 14.875,
+                  "straight": 0,
+                  "unique_routes": 3
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 89
+          },
+          {
+            "distribution_build_us": 3,
+            "old_shuffle64": {
+              "branched_side": 32,
+              "mean_score": 14.0,
+              "straight": 32,
+              "unique_routes": 2
+            },
+            "old_shuffle64_us": 33,
+            "origin": 0,
+            "routes": 2,
+            "scene": "two_corridors",
+            "temperatures": [
+              {
+                "expected_branch_probability": 0.01798621,
+                "expected_score": 12.071945,
+                "observed64": {
+                  "branched_side": 2,
+                  "mean_score": 12.125,
+                  "straight": 62,
+                  "unique_routes": 2
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_branch_probability": 0.268941421,
+                "expected_score": 13.075766,
+                "observed64": {
+                  "branched_side": 20,
+                  "mean_score": 13.25,
+                  "straight": 44,
+                  "unique_routes": 2
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_branch_probability": 0.437823499,
+                "expected_score": 13.751294,
+                "observed64": {
+                  "branched_side": 34,
+                  "mean_score": 14.125,
+                  "straight": 30,
+                  "unique_routes": 2
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_branch_probability": 0.5,
+                "expected_score": 14.0,
+                "observed64": {
+                  "branched_side": 38,
+                  "mean_score": 14.375,
+                  "straight": 26,
+                  "unique_routes": 2
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 89
+          },
+          {
+            "distribution_build_us": 5,
+            "old_shuffle64": {
+              "branched_side": 57,
+              "mean_score": 18.6875,
+              "straight": 7,
+              "unique_routes": 9
+            },
+            "old_shuffle64_us": 20,
+            "origin": 0,
+            "routes": 9,
+            "scene": "upper_ladder",
+            "temperatures": [
+              {
+                "expected_branch_probability": 0.020245526,
+                "expected_score": 12.090185,
+                "observed64": {
+                  "branched_side": 2,
+                  "mean_score": 12.125,
+                  "straight": 62,
+                  "unique_routes": 2
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_branch_probability": 0.568076802,
+                "expected_score": 15.909032,
+                "observed64": {
+                  "branched_side": 43,
+                  "mean_score": 16.6875,
+                  "straight": 21,
+                  "unique_routes": 9
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_branch_probability": 0.834011546,
+                "expected_score": 18.155005,
+                "observed64": {
+                  "branched_side": 55,
+                  "mean_score": 18.4375,
+                  "straight": 9,
+                  "unique_routes": 9
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_branch_probability": 0.888888889,
+                "expected_score": 18.666667,
+                "observed64": {
+                  "branched_side": 58,
+                  "mean_score": 18.875,
+                  "straight": 6,
+                  "unique_routes": 9
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 102
+          },
+          {
+            "distribution_build_us": 5,
+            "old_shuffle64": {
+              "branched_side": 57,
+              "mean_score": 18.6875,
+              "straight": 7,
+              "unique_routes": 9
+            },
+            "old_shuffle64_us": 19,
+            "origin": 0,
+            "routes": 9,
+            "scene": "lower_ladder",
+            "temperatures": [
+              {
+                "expected_branch_probability": 0.020245526,
+                "expected_score": 12.090185,
+                "observed64": {
+                  "branched_side": 2,
+                  "mean_score": 12.125,
+                  "straight": 62,
+                  "unique_routes": 2
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_branch_probability": 0.568076802,
+                "expected_score": 15.909032,
+                "observed64": {
+                  "branched_side": 43,
+                  "mean_score": 16.6875,
+                  "straight": 21,
+                  "unique_routes": 9
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_branch_probability": 0.834011546,
+                "expected_score": 18.155005,
+                "observed64": {
+                  "branched_side": 55,
+                  "mean_score": 18.4375,
+                  "straight": 9,
+                  "unique_routes": 9
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_branch_probability": 0.888888889,
+                "expected_score": 18.666667,
+                "observed64": {
+                  "branched_side": 58,
+                  "mean_score": 18.875,
+                  "straight": 6,
+                  "unique_routes": 9
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 95
+          },
+          {
+            "distribution_build_us": 56,
+            "old_shuffle64": {
+              "mean_score": 36.28125,
+              "unique_routes": 64
+            },
+            "old_shuffle64_us": 28,
+            "origin": 0,
+            "routes": 219,
+            "scene": "9x9",
+            "temperatures": [
+              {
+                "expected_score": 23.845677,
+                "observed64": {
+                  "mean_score": 24.0625,
+                  "unique_routes": 10
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_score": 30.784249,
+                "observed64": {
+                  "mean_score": 31.4375,
+                  "unique_routes": 47
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_score": 34.807703,
+                "observed64": {
+                  "mean_score": 34.59375,
+                  "unique_routes": 50
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_score": 36.579909,
+                "observed64": {
+                  "mean_score": 36.25,
+                  "unique_routes": 57
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 114
+          },
+          {
+            "distribution_build_us": 7,
+            "old_shuffle64": {
+              "mean_score": 39.34375,
+              "unique_routes": 20
+            },
+            "old_shuffle64_us": 17,
+            "origin": 0,
+            "routes": 20,
+            "scene": "11x11big",
+            "temperatures": [
+              {
+                "expected_score": 33.239577,
+                "observed64": {
+                  "mean_score": 33.34375,
+                  "unique_routes": 7
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_score": 34.98383,
+                "observed64": {
+                  "mean_score": 35.625,
+                  "unique_routes": 15
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_score": 38.109346,
+                "observed64": {
+                  "mean_score": 38.1875,
+                  "unique_routes": 19
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_score": 39.4,
+                "observed64": {
+                  "mean_score": 39.28125,
+                  "unique_routes": 20
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 100
+          },
+          {
+            "distribution_build_us": 6,
+            "old_shuffle64": {
+              "mean_score": 38.5,
+              "unique_routes": 16
+            },
+            "old_shuffle64_us": 15,
+            "origin": 1,
+            "routes": 16,
+            "scene": "11x11big",
+            "temperatures": [
+              {
+                "expected_score": 38.086329,
+                "observed64": {
+                  "mean_score": 38.15625,
+                  "unique_routes": 15
+                },
+                "temperature": "1.0"
+              },
+              {
+                "expected_score": 38.336351,
+                "observed64": {
+                  "mean_score": 38.40625,
+                  "unique_routes": 15
+                },
+                "temperature": "4.0"
+              },
+              {
+                "expected_score": 38.454603,
+                "observed64": {
+                  "mean_score": 38.59375,
+                  "unique_routes": 16
+                },
+                "temperature": "16.0"
+              },
+              {
+                "expected_score": 38.5,
+                "observed64": {
+                  "mean_score": 38.625,
+                  "unique_routes": 16
+                },
+                "temperature": "inf"
+              }
+            ],
+            "weighted64_us": 99
+          }
+        ],
+        "deterministic_quotas": true,
+        "failures": 0,
+        "hard_threshold": true,
+        "histogram10000": [
+          6643,
+          2446,
+          911
+        ],
+        "mode_switch": true,
+        "platform": "Windows",
+        "shuffled_departures": true,
+        "stable_softmax": true,
+        "uniform": true,
+        "uniform_three_routes_five_enemies": [
+          2,
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "name": "troop_resources",
+      "result": {
+        "authored_heavy_stats": true,
+        "catalog_discovery": true,
+        "editable_costs": true,
+        "failures": 0,
+        "icons": true,
+        "imported_model_animation": true,
+        "level_references": true,
+        "mixed_renderers": true,
+        "save_reload_delete": true
+      }
+    },
+    {
+      "name": "tower_obstacles",
+      "result": {
+        "disconnect_rejected": true,
+        "footprints": true,
+        "multi_origin": true,
+        "parameter_identity": true,
+        "passed_cells_released": true,
+        "pending_and_live_protected": true,
+        "removal_restores_road": true,
+        "sampled_routes": 488,
+        "sentry_model": true,
+        "shortest_detour": true
+      }
+    },
+    {
+      "name": "combat",
+      "result": {
+        "aim_alignment": true,
+        "arrow_target_cleanup": true,
+        "arrow_tip_origin": true,
+        "arrow_trail": true,
+        "continuous_tracking": true,
+        "cooldown": true,
+        "delayed_splash": true,
+        "failures": 0,
+        "fixed_base": true,
+        "flying_arrow": true,
+        "instant_beam": true,
+        "kill_cleanup": true,
+        "movable_targets": true,
+        "one_tile_lookahead": true,
+        "payload_snapshot": true,
+        "slow_and_expiry": true,
+        "smooth_first_aim": true,
+        "source_independent": true,
+        "tile_range": true,
+        "tower_destruction": true,
+        "visual_cleanup": true
+      }
+    },
+    {
+      "name": "tile_presets",
+      "result": {
+        "empty_pool": true,
+        "failures": 0,
+        "live_edits": true,
+        "save_and_delete": true,
+        "starting_hand": true,
+        "tower_candidates": true,
+        "weighted_rolls": true
+      }
+    },
+    {
+      "name": "card_names",
+      "result": {
+        "failures": 0,
+        "live_edits": true,
+        "localized_headers": true,
+        "offer_prices": true,
+        "separate_names": true
+      }
+    },
+    {
+      "name": "card_shop",
+      "result": {
+        "animation_reversal": true,
+        "arrival_and_kill_rewards": true,
+        "compact_shop": true,
+        "continuous_top_edge": true,
+        "duplicate_reward_guard": true,
+        "failures": 11,
+        "five_back_cards": true,
+        "four_offers_and_reroll": true,
+        "gold_icons": true,
+        "hand_fold_restore": true,
+        "hand_insert_from_below": true,
+        "hover_focus": true,
+        "hover_keeps_neighbours": true,
+        "hover_lift_only": true,
+        "minimal_hud": true,
+        "mirrored_outer_arc": true,
+        "no_modal_overlay": true,
+        "outside_click_no_world_edit": true,
+        "persistent_hand_views": true,
+        "prices": true,
+        "purchase_and_reroll": true,
+        "reroll_insert_from_below": true,
+        "shallow_overlapping_fan": true,
+        "smaller_cards": true,
+        "sold_card_hidden": true,
+        "stable_hover": true,
+        "successful_placement_consumes": true,
+        "wave_start_hides": true
+      },
+      "baseline_identical": true
+    },
+    {
+      "name": "enemy_status",
+      "result": {
+        "effect_refresh_and_expiry": true,
+        "failures": 0,
+        "optional_skill": true,
+        "shared_overlay": true,
+        "shield_absorption": true,
+        "slot_cleanup": true,
+        "visual_offset_anchor": true
+      }
+    },
+    {
+      "name": "debug_overlay",
+      "result": {
+        "f1_all_troops": true,
+        "f3_removed": true,
+        "failures": 4,
+        "multiple_entrances": true,
+        "next_wave_reset": true,
+        "no_per_frame_rebuild": true,
+        "pending_routes": true,
+        "preview_matches_combat": true,
+        "separate_colors": true,
+        "shared_segments": true
+      },
+      "baseline_identical": true
+    },
+    {
+      "name": "act_expansion",
+      "result": {
+        "actual_new_spawns": true,
+        "deterministic_quotas": true,
+        "failures": 0,
+        "final_act": true,
+        "frozen_countdown": true,
+        "integer_quarter_ticks": true,
+        "pause_lock": true,
+        "placement_lock": true,
+        "road_preview": true,
+        "two_act_expansions": true,
+        "two_stage_ui": true
+      }
+    },
+    {
+      "name": "ui_templates",
+      "result": {
+        "batched_status_template": true,
+        "continuous_fill": true,
+        "failures": 2,
+        "stable_nodes": true
+      },
+      "baseline_identical": true
+    },
+    {
+      "name": "pause_navigation",
+      "result": {
+        "failures": 0,
+        "immediate_input_lock": true,
+        "menu_fades": true,
+        "paused_health_projection": true,
+        "paused_zoom_and_pan": true,
+        "ramp_ms_at_1x_2x_4x": [
+          255.523,
+          256.493,
+          256.764
+        ],
+        "rapid_toggle": true,
+        "resume_selection": true,
+        "shop_locked": true
+      }
+    },
+    {
+      "name": "wave_editor",
+      "result": {
+        "edit_groups": true,
+        "failures": 0,
+        "hot_reload_defaults": true,
+        "integer_drag": true,
+        "legacy_nil_exports": true,
+        "native_undo_redo": true,
+        "preview": true,
+        "real_plugin": true,
+        "refresh_recovery": true,
+        "save_reload": true
+      }
+    }
+  ],
+  "web": {
+    "browser": "155.0.4283.62",
+    "cases": [
+      {
+        "name": "level_flow",
+        "result": {
+          "acts": true,
+          "authored_terrain": true,
+          "cancelled_hover": true,
+          "early_start_ease_in_out_1_second_hold_0_5_seconds": true,
+          "every_wave_start_delay_1_5_seconds": true,
+          "failures": 0,
+          "finite_waves": true,
+          "multiple_starts": true,
+          "rewards": true,
+          "slow_frame_overflow": true,
+          "stowed_hand": true,
+          "timeline": true
+        },
+        "errors": [],
+        "exitErrors": [
+          "ERROR: Pages in use exist at exit in PagedAllocator: N16WorkerThreadPool5GroupE",
+          "   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)"
+        ],
+        "warnings": [
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer",
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer",
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer",
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer",
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer",
+          "WebGL: INVALID_OPERATION: bindBuffer: element array buffers can not be bound to a different target",
+          "WebGL: INVALID_OPERATION: bufferSubData: no buffer"
+        ]
+      },
+      {
+        "name": "wave_groups",
+        "result": {
+          "absolute_schedule": true,
+          "failures": 0,
+          "future_gap": true,
+          "multiple_entrances": true,
+          "overlap": true,
+          "pooled_quotas": true,
+          "quarter_ticks": true,
+          "snapshot": true
+        },
+        "errors": [],
+        "exitErrors": [],
+        "warnings": []
+      },
+      {
+        "name": "combat",
+        "result": {
+          "aim_alignment": true,
+          "arrow_target_cleanup": true,
+          "arrow_tip_origin": true,
+          "arrow_trail": true,
+          "continuous_tracking": true,
+          "cooldown": true,
+          "delayed_splash": true,
+          "failures": 0,
+          "fixed_base": true,
+          "flying_arrow": true,
+          "instant_beam": true,
+          "kill_cleanup": true,
+          "movable_targets": true,
+          "one_tile_lookahead": true,
+          "payload_snapshot": true,
+          "slow_and_expiry": true,
+          "smooth_first_aim": true,
+          "source_independent": true,
+          "tile_range": true,
+          "tower_destruction": true,
+          "visual_cleanup": true
+        },
+        "errors": [],
+        "exitErrors": [],
+        "warnings": []
+      },
+      {
+        "name": "enemy_status",
+        "result": {
+          "effect_refresh_and_expiry": true,
+          "failures": 0,
+          "optional_skill": true,
+          "shared_overlay": true,
+          "shield_absorption": true,
+          "slot_cleanup": true,
+          "visual_offset_anchor": true
+        },
+        "errors": [],
+        "exitErrors": [],
+        "warnings": []
+      }
+    ]
+  },
+  "notes": [
+    "Native card_shop in a hidden rendered window also timed out; not counted as passed.",
+    "Web terrain_endpoints roundtrip cannot save res://.godot files; kept as a native check.",
+    "Web act_expansion screenshot cannot save res://reports/levels in the test export; not counted as passed.",
+    "Web card_names RuntimeError: null function reproduced in both committed baseline and reorganized build.",
+    "Web tests that call SceneTree.quit may emit engine cleanup errors after passing assertions."
+  ]
+}

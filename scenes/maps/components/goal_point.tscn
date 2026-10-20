@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/levels/terrain_endpoint.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/map/terrain/terrain_endpoint.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/endpoints/goal.tscn" id="2"]
 
 [node name="Goal" type="Marker3D"]
