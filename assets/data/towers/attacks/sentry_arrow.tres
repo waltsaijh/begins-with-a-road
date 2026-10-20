@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ArrowAttack" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/combat/attacks/arrow_attack.gd" id="1"]
+[resource]
+script = ExtResource("1")
+color = Color(0.55, 0.55, 0.55, 1)
+speed = 24.0
+arrow_length = 0.36
+arrow_width = 0.025
+trail_length = 0.8
+trail_width = 0.035

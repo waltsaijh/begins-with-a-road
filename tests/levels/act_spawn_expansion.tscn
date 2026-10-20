@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/levels/act_spawn_expansion.gd" id="1"]
+
+[node name="ActSpawnExpansionCheck" type="Node"]
+script = ExtResource("1")

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b2an8chu8du5r"]
+
+[ext_resource type="Script" uid="uid://bxpjtyihfpp5r" path="res://scripts/cards/shop/card_shop.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dgsr4e3yjcfiv" path="res://scenes/cards/card_shop_view.tscn" id="2"]
+[ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="3"]
+[ext_resource type="Resource" uid="uid://ctxkqyv56ojbu" path="res://assets/data/towers/sentry.tres" id="4"]
+
+[node name="Shop" type="Node" unique_id=391105648]
+script = ExtResource("1")
+catalog = Array[ExtResource("3")]([ExtResource("4")])
+
+[node name="View" parent="." unique_id=2045110041 instance=ExtResource("2")]
+offset = Vector2(0, 5)
+transform = Transform2D(1, 0, 0, 1, 0, 5)

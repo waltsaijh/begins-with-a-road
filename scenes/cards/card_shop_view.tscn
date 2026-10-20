@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://dgsr4e3yjcfiv"]
+
+[ext_resource type="Script" uid="uid://b1pa6xeukhdxb" path="res://scripts/cards/presentation/card_shop_view.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://c1o8o7wh4ookp" path="res://scenes/cards/components/shop_slot.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://dh38d3ihtyldi" path="res://assets/sprites/cards/gold.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://vbfxygxc14ys" path="res://assets/sprites/cards/card_back.png" id="5"]
+
+[node name="ShopView" type="CanvasLayer" unique_id=1885429936]
+layer = 4
+script = ExtResource("1")
+vertical_offset = 2.5
+coin_texture = ExtResource("4")
+card_back_texture = ExtResource("5")
+
+[node name="Root" type="Control" parent="." unique_id=2008890693]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ShopArea" type="Control" parent="Root" unique_id=66467908]
+anchors_preset = 0
+offset_left = 683.84
+offset_top = 507.863
+offset_right = 1280.0
+offset_bottom = 792.423
+
+[node name="Slots" type="Control" parent="Root" unique_id=1990872882]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Reroll" parent="Root/Slots" unique_id=2060660074 instance=ExtResource("2")]
+layout_mode = 0
+offset_left = 698.778
+offset_top = 567.585
+offset_right = 842.778
+offset_bottom = 775.585
+rotation = -0.06981317
+scale = Vector2(0.82, 0.82)
+pivot_offset = Vector2(72, 208)
+
+[node name="Offer0" parent="Root/Slots" unique_id=810678076 instance=ExtResource("2")]
+layout_mode = 0
+offset_left = 807.323
+offset_top = 560.947
+offset_right = 951.323
+offset_bottom = 768.947
+rotation = -0.052341253
+scale = Vector2(0.82, 0.82)
+pivot_offset = Vector2(72, 208)
+
+[node name="Offer1" parent="Root/Slots" unique_id=290294050 instance=ExtResource("2")]
+layout_mode = 0
+offset_left = 915.869
+offset_top = 556.21
+offset_right = 1059.869
+offset_bottom = 764.21
+rotation = -0.034885313
+scale = Vector2(0.82, 0.82)
+pivot_offset = Vector2(72, 208)
+
+[node name="Offer2" parent="Root/Slots" unique_id=1570559849 instance=ExtResource("2")]
+layout_mode = 0
+offset_left = 1024.414
+offset_top = 553.369
+offset_right = 1168.414
+offset_bottom = 761.369
+rotation = -0.017440002
+scale = Vector2(0.82, 0.82)
+pivot_offset = Vector2(72, 208)
+
+[node name="Offer3" parent="Root/Slots" unique_id=1148582324 instance=ExtResource("2")]
+layout_mode = 0
+offset_left = 1132.96
+offset_top = 552.423
+offset_right = 1276.96
+offset_bottom = 760.423
+scale = Vector2(0.82, 0.82)
+pivot_offset = Vector2(72, 208)

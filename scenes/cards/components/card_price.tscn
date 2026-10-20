@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/cards/gold.png" id="1"]
+
+[node name="Price" type="HBoxContainer"]
+mouse_filter = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 3
+alignment = 2
+
+[node name="Gold" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Number" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.125, 0.243, 0.278, 1)
+theme_override_font_sizes/font_size = 16
+text = "3"
+horizontal_alignment = 2
+vertical_alignment = 1

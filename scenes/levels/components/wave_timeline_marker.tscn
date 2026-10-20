@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[node name="WaveMarker" type="Node2D"]
+
+[node name="Dot" type="Node2D" parent="."]
+
+[node name="Fill" type="Polygon2D" parent="Dot"]
+color = Color(0.953, 0.973, 0.969, 1)
+polygon = PackedVector2Array(4, 0, 3.864, 1.035, 3.464, 2, 2.828, 2.828, 2, 3.464, 1.035, 3.864, 0, 4, -1.035, 3.864, -2, 3.464, -2.828, 2.828, -3.464, 2, -3.864, 1.035, -4, 0, -3.864, -1.035, -3.464, -2, -2.828, -2.828, -2, -3.464, -1.035, -3.864, 0, -4, 1.035, -3.864, 2, -3.464, 2.828, -2.828, 3.464, -2, 3.864, -1.035)
+antialiased = true
+
+[node name="Outline" type="Line2D" parent="Dot"]
+points = PackedVector2Array(4, 0, 3.864, 1.035, 3.464, 2, 2.828, 2.828, 2, 3.464, 1.035, 3.864, 0, 4, -1.035, 3.864, -2, 3.464, -2.828, 2.828, -3.464, 2, -3.864, 1.035, -4, 0, -3.864, -1.035, -3.464, -2, -2.828, -2.828, -2, -3.464, -1.035, -3.864, 0, -4, 1.035, -3.864, 2, -3.464, 2.828, -2.828, 3.464, -2, 3.864, -1.035, 4, 0)
+width = 1.5
+default_color = Color(0.42, 0.522, 0.533, 1)
+antialiased = true
+
+[node name="Divider" type="Line2D" parent="."]
+visible = false
+points = PackedVector2Array(0, -10, 0, 10)
+width = 2.0
+default_color = Color(0.42, 0.522, 0.533, 1)
+antialiased = true

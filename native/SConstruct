@@ -1,0 +1,11 @@
+import os
+toolset = ['gcc', 'g++', 'ar', 'gnulink'] if ARGUMENTS.get('platform') == 'web' else []
+env = Environment(tools=toolset, MSVC_USE_SCRIPT=False)
+env['ENV'] = dict(os.environ)
+env = SConscript('godot-cpp/SConstruct', exports={'env': env})
+if env['platform'] == 'windows' and not env.get('MSVS_VERSION'):
+    env['MSVS_VERSION'] = '14.3'
+env.Append(CPPPATH=['src'])
+env['SHLIBPREFIX'] = ''
+library = env.SharedLibrary('../bin/road_graph.editguard' + env['suffix'] + env['SHLIBSUFFIX'],source=Glob('src/*.cpp'))
+Default(library)

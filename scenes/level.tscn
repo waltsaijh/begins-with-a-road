@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/main.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/levels/level_session.gd" id="2"]
+[ext_resource type="Resource" path="res://assets/data/levels/frontier.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_hud.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/levels/spawn_expansion.tscn" id="5"]
+
+[node name="Level" instance=ExtResource("1")]
+process_mode = 1
+script = ExtResource("2")
+level = ExtResource("3")
+
+[node name="EnemyWave" parent="." node_paths=PackedStringArray("start_button")]
+start_button = NodePath("../LevelHUD/WorldActions/EarlyStart")
+
+[node name="LevelHUD" parent="." instance=ExtResource("4")]
+
+[node name="SpawnExpansion" parent="." instance=ExtResource("5")]

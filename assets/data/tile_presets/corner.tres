@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TilePreset" format=3 uid="uid://cyyhsj83f12en"]
+
+[ext_resource type="Script" uid="uid://coq3kloaafuew" path="res://scripts/cards/tile_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+prefix_key = "tile_preset.corner"
+road_offsets = Array[Vector2i]([Vector2i(0, -1), Vector2i(-1, 0)])

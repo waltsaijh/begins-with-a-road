@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://csex2qffft4qt"]
+
+[ext_resource type="Script" uid="uid://dy2v46kj0opkt" path="res://scripts/cards/presentation/rotation_key_hint.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="KeyStyle"]
+bg_color = Color(0.96, 0.98, 0.96, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.44, 0.45, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="RotationKeyHint" type="Control" unique_id=1482104903]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 25.0
+offset_bottom = 26.0
+mouse_filter = 2
+script = ExtResource("1")
+rise_pixels = null
+
+[node name="Key" type="Panel" parent="." unique_id=1378988734]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 24.0
+offset_bottom = 25.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("KeyStyle")
+
+[node name="Letter" type="Label" parent="Key" unique_id=726621162]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.278, 0.435, 0.451, 1)
+theme_override_font_sizes/font_size = 14
+text = "R"
+horizontal_alignment = 1
+vertical_alignment = 1

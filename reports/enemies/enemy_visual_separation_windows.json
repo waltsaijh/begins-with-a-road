@@ -1,0 +1,34 @@
+{
+  "boundary_pairs": 5,
+  "cases": [
+    {
+      "candidate_checks": 256,
+      "solve_us": 544,
+      "units": 64
+    },
+    {
+      "candidate_checks": 1024,
+      "solve_us": 2870,
+      "units": 256
+    },
+    {
+      "candidate_checks": 4096,
+      "solve_us": 11716,
+      "units": 1024
+    },
+    {
+      "candidate_checks": 16384,
+      "solve_us": 46532,
+      "units": 4096
+    }
+  ],
+  "failures": 0,
+  "frame_rate_independent": true,
+  "logical_motion_unchanged": true,
+  "no_return_to_center": true,
+  "platform": "Windows",
+  "separation_resumes": true,
+  "smooth_longer_transition": true,
+  "straight_neighbor_unchanged": true,
+  "turns_ignore_contacts": true
+}

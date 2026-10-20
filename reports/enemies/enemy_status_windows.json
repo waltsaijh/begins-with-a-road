@@ -1,0 +1,9 @@
+{
+  "effect_refresh_and_expiry": true,
+  "failures": 0,
+  "optional_skill": true,
+  "shared_overlay": true,
+  "shield_absorption": true,
+  "slot_cleanup": true,
+  "visual_offset_anchor": true
+}

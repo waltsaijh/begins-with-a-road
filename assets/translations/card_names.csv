@@ -1,0 +1,24 @@
+keys,en,zh_TW
+tower.generic.name,Tower,防禦塔
+tower.sentry.name,Sentry,哨塔
+tower.crossfire.name,Crossfire,交叉火力
+tile_preset.corner,Corner,轉角
+tile_preset.bridge,Bridge,跨橋
+tile_preset.flank,Flank,側翼
+tile_preset.blasting,Blasting,爆響
+card.name_format,{prefix} {tower},{prefix}{tower}
+card.unassigned,Unassigned card,未設定卡片
+troop.soldier.name,Soldier,士兵
+troop.quickfeet.name,Quickfeet,疾行兵
+troop.heavy.name,Heavy,重裝兵
+ui.pause.resume,Resume game,繼續遊戲
+ui.pause.exit,Exit,離開
+ui.wave.start_now,Start Now?,提早開始?
+ui.expansion.choose_direction,Choose a direction for the new entrance,選擇新入口的方向
+ui.expansion.choose_position,Choose a highlighted tile,選擇一個標示的候選位置
+ui.expansion.countdown_held,Countdown paused · Tower placement disabled,進攻倒數已暫停 · 選擇期間無法放置防禦塔
+ui.expansion.back,← Change direction,← 重選方向
+ui.expansion.north,↑ North,↑ 北方
+ui.expansion.west,← West,← 西方
+ui.expansion.south,↓ South,↓ 南方
+ui.expansion.east,→ East,→ 東方

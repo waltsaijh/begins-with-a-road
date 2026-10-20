@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://cc6yfyktiuffn"]
+
+[ext_resource type="Material" path="res://assets/materials/stone_top.tres" id="1_top"]
+[ext_resource type="Material" path="res://assets/materials/stone_side.tres" id="2_side"]
+[ext_resource type="Material" uid="uid://biovm5d44t5ei" path="res://assets/materials/road.tres" id="3_road"]
+
+[sub_resource type="BoxMesh" id="Top"]
+material = ExtResource("1_top")
+size = Vector3(1, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="Foundation"]
+material = ExtResource("2_side")
+size = Vector3(0.995, 0.27, 0.995)
+
+[sub_resource type="BoxMesh" id="Center"]
+material = ExtResource("3_road")
+size = Vector3(0.671875, 0.025, 0.671875)
+
+[sub_resource type="BoxMesh" id="North"]
+material = ExtResource("3_road")
+size = Vector3(0.671875, 0.025, 0.1640625)
+
+[sub_resource type="BoxMesh" id="East"]
+material = ExtResource("3_road")
+size = Vector3(0.1640625, 0.025, 0.671875)
+
+[node name="road_corner" type="Node3D" unique_id=727570135]
+
+[node name="Top" type="MeshInstance3D" parent="." unique_id=1392184868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+mesh = SubResource("Top")
+
+[node name="Foundation" type="MeshInstance3D" parent="." unique_id=1572084504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.235, 0)
+mesh = SubResource("Foundation")
+
+[node name="Center" type="MeshInstance3D" parent="." unique_id=1851061420]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0)
+cast_shadow = 0
+mesh = SubResource("Center")
+
+[node name="North" type="MeshInstance3D" parent="." unique_id=594530823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, -0.418)
+cast_shadow = 0
+mesh = SubResource("North")
+
+[node name="East" type="MeshInstance3D" parent="." unique_id=322301672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.417, 0.01, 0)
+cast_shadow = 0
+mesh = SubResource("East")

@@ -1,0 +1,34 @@
+# Godot cache and generated platform files.
+# Keep source-side *.import, *.uid, Resource files and baked game assets.
+/.godot/
+/android/
+/export_credentials.cfg
+
+# Exported games and native extension binaries.
+/build/
+/bin/
+
+# Pinned external SDK and local native build state (see native/README.md).
+/native/godot-cpp/
+/native/.sconsign.*
+/native/.scons_cache/
+/native/compile_commands.json
+/native/src/*.obj
+/native/src/*.o
+/native/src/*.pdb
+
+# Local Python / Node dependencies and caches.
+__pycache__/
+*.py[cod]
+node_modules/
+
+# Local credentials; sample configuration may be committed.
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# OS-generated metadata.
+.DS_Store
+Thumbs.db
+Desktop.ini

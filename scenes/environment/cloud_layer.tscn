@@ -1,0 +1,46 @@
+[gd_scene format=3 uid="uid://b0gq3nwbo4yuh"]
+
+[ext_resource type="Script" uid="uid://25vq28ti3fe2" path="res://scripts/environment/cloud_layer.gd" id="1"]
+[ext_resource type="Shader" uid="uid://bxji4fku757fk" path="res://assets/shaders/cloud_layer.gdshader" id="2"]
+[ext_resource type="Shader" uid="uid://cdwr6o5iwsbt4" path="res://assets/shaders/cloud_mist.gdshader" id="3"]
+[ext_resource type="Texture2D" uid="uid://brr4vnqu0hri4" path="res://assets/materials/cloud_noise.tres" id="4"]
+
+[sub_resource type="ShaderMaterial" id="Material"]
+render_priority = 0
+shader = ExtResource("2")
+shader_parameter/cloud_noise_texture = ExtResource("4")
+shader_parameter/cloud_drift = Vector2(0.012, 0.005)
+shader_parameter/cloud_scale = 0.035
+
+[sub_resource type="ShaderMaterial" id="Mid"]
+render_priority = -100
+shader = ExtResource("3")
+shader_parameter/opacity = 0.55
+shader_parameter/coverage = 0.3
+shader_parameter/noise_offset = Vector2(7, 19)
+shader_parameter/cloud_noise_texture = ExtResource("4")
+shader_parameter/cloud_drift = Vector2(-0.009, 0.008)
+shader_parameter/cloud_scale = 0.045
+
+[sub_resource type="ShaderMaterial" id="High"]
+render_priority = -99
+shader = ExtResource("3")
+shader_parameter/opacity = 0.72
+shader_parameter/coverage = 0.44
+shader_parameter/noise_offset = Vector2(31, 5)
+shader_parameter/cloud_noise_texture = ExtResource("4")
+shader_parameter/cloud_drift = Vector2(0.019, -0.005)
+shader_parameter/cloud_scale = 0.055
+
+[node name="CloudLayer" type="MeshInstance3D" unique_id=1358762264]
+material_override = SubResource("Material")
+cast_shadow = 0
+script = ExtResource("1")
+
+[node name="MidMist" type="MeshInstance3D" parent="." unique_id=2019116841]
+material_override = SubResource("Mid")
+cast_shadow = 0
+
+[node name="HighWisps" type="MeshInstance3D" parent="." unique_id=2003626770]
+material_override = SubResource("High")
+cast_shadow = 0

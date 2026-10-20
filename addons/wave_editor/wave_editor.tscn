@@ -1,0 +1,281 @@
+[gd_scene format=3 uid="uid://icb45j3uf8f0"]
+
+[ext_resource type="Script" uid="uid://3btmmevx0ius" path="res://addons/wave_editor/wave_editor.gd" id="1"]
+[ext_resource type="Script" uid="uid://b4qcgdlju6iwg" path="res://addons/wave_editor/spawn_timeline.gd" id="2"]
+
+[node name="WaveEditor" type="VBoxContainer" unique_id=1724981974]
+custom_minimum_size = Vector2(650, 430)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+script = ExtResource("1")
+
+[node name="Toolbar" type="HBoxContainer" parent="." unique_id=2068606904]
+layout_mode = 2
+
+[node name="LevelPath" type="Label" parent="Toolbar" unique_id=1645441999]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "請開啟關卡資源"
+text = "請開啟關卡資源"
+text_overrun_behavior = 3
+
+[node name="Open" type="Button" parent="Toolbar" unique_id=100051153]
+unique_name_in_owner = true
+layout_mode = 2
+text = "開啟關卡…"
+
+[node name="Save" type="Button" parent="Toolbar" unique_id=1309329076]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "儲存關卡"
+
+[node name="Navigation" type="HFlowContainer" parent="." unique_id=580754942]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+
+[node name="WavePicker" type="OptionButton" parent="Navigation" unique_id=231142822]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+
+[node name="RewardLabel" type="Label" parent="Navigation" unique_id=91242071]
+layout_mode = 2
+text = "獎勵"
+
+[node name="Reward" type="SpinBox" parent="Navigation" unique_id=1588399618]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 10000.0
+rounded = true
+allow_greater = true
+editable = false
+
+[node name="SpeedLabel" type="Label" parent="Navigation" unique_id=1508249731]
+layout_mode = 2
+text = "移動速度"
+
+[node name="Speed" type="SpinBox" parent="Navigation" unique_id=1115474868]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.1
+max_value = 20.0
+step = 0.1
+value = 2.5
+allow_greater = true
+editable = false
+
+[node name="Add" type="Button" parent="Navigation" unique_id=1610535112]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "＋ 新增群組"
+
+[node name="Duplicate" type="Button" parent="Navigation" unique_id=69713535]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "複製"
+
+[node name="Delete" type="Button" parent="Navigation" unique_id=234008808]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "刪除"
+
+[node name="Summary" type="Label" parent="." unique_id=1815395346]
+unique_name_in_owner = true
+layout_mode = 2
+text = "請選擇有波次的關卡。"
+
+[node name="TimelineScroll" type="ScrollContainer" parent="." unique_id=339386488]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Schedule" type="Control" parent="TimelineScroll" unique_id=1144948315]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2")
+
+[node name="Separator" type="HSeparator" parent="." unique_id=1365050283]
+layout_mode = 2
+
+[node name="GroupTitle" type="Label" parent="." unique_id=636365815]
+unique_name_in_owner = true
+layout_mode = 2
+text = "尚無出生群組"
+
+[node name="Fields" type="HFlowContainer" parent="." unique_id=1785901010]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+
+[node name="TroopField" type="VBoxContainer" parent="Fields" unique_id=1800397213]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/TroopField" unique_id=278051532]
+layout_mode = 2
+text = "兵種"
+
+[node name="TroopPicker" type="OptionButton" parent="Fields/TroopField" unique_id=1883187962]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(125, 0)
+layout_mode = 2
+disabled = true
+selected = 0
+item_count = 3
+popup/item_0/text = "soldier"
+popup/item_0/id = 0
+popup/item_1/text = "quickfeet"
+popup/item_1/id = 1
+popup/item_2/text = "heavy"
+popup/item_2/id = 2
+
+[node name="StartField" type="VBoxContainer" parent="Fields" unique_id=1493100568]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/StartField" unique_id=884025822]
+layout_mode = 2
+text = "開始（格）"
+
+[node name="StartTick" type="SpinBox" parent="Fields/StartField" unique_id=1548655738]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "整數刻度；1 格 = 0.25 秒，以開波為 0。"
+max_value = 14400.0
+rounded = true
+allow_greater = true
+editable = false
+
+[node name="StartSeconds" type="Label" parent="Fields/StartField" unique_id=786840221]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.00 秒"
+
+[node name="CountField" type="VBoxContainer" parent="Fields" unique_id=142310884]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/CountField" unique_id=1506098396]
+layout_mode = 2
+text = "總數"
+
+[node name="Count" type="SpinBox" parent="Fields/CountField" unique_id=1866503609]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 500.0
+value = 10.0
+rounded = true
+allow_greater = true
+editable = false
+
+[node name="IntervalField" type="VBoxContainer" parent="Fields" unique_id=1544475269]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/IntervalField" unique_id=1342175034]
+layout_mode = 2
+text = "批次間隔（格）"
+
+[node name="IntervalTicks" type="SpinBox" parent="Fields/IntervalField" unique_id=1014605953]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "1 格 = 0.25 秒；0 為同時出生。"
+max_value = 240.0
+value = 1.0
+rounded = true
+allow_greater = true
+editable = false
+
+[node name="IntervalSeconds" type="Label" parent="Fields/IntervalField" unique_id=767053571]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0.25 秒"
+
+[node name="BatchField" type="VBoxContainer" parent="Fields" unique_id=1357619725]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/BatchField" unique_id=1116993676]
+layout_mode = 2
+text = "每批隻數"
+
+[node name="Batch" type="SpinBox" parent="Fields/BatchField" unique_id=624371845]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+allow_greater = true
+editable = false
+
+[node name="EntranceField" type="VBoxContainer" parent="Fields" unique_id=1451019661]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Fields/EntranceField" unique_id=140891308]
+layout_mode = 2
+text = "出生入口"
+
+[node name="EntrancePicker" type="OptionButton" parent="Fields/EntranceField" unique_id=1999041375]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+disabled = true
+
+[node name="RangeLabel" type="Label" parent="." unique_id=961642073]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PreviewRow" type="HBoxContainer" parent="." unique_id=333371146]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PreviewRow" unique_id=1765292936]
+layout_mode = 2
+text = "預覽（格）"
+
+[node name="PreviewTick" type="SpinBox" parent="PreviewRow" unique_id=381830549]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 120.0
+rounded = true
+
+[node name="PreviewSlider" type="HSlider" parent="PreviewRow" unique_id=141936116]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 120.0
+
+[node name="PreviewLabel" type="Label" parent="PreviewRow" unique_id=1171630008]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 格 = 0.00 秒"
+
+[node name="PreviewCounts" type="Label" parent="." unique_id=257030439]
+unique_name_in_owner = true
+layout_mode = 2
+text = "預覽已出生："
+
+[node name="Status" type="Label" parent="." unique_id=1888617116]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1 格 = 0.25 秒；間隔 0 為同時出生。所有群組出生並清場後結束本波。"
+autowrap_mode = 3
+
+[node name="OpenDialog" type="FileDialog" parent="." unique_id=1626063213]
+unique_name_in_owner = true
+title = "Open a File"
+file_mode = 0
+filters = PackedStringArray("*.tres ; 關卡資源")
+
+[node name="SaveDialog" type="FileDialog" parent="." unique_id=1529171641]
+unique_name_in_owner = true
+title = "儲存關卡"
+filters = PackedStringArray("*.tres ; 關卡資源")
+
+[node name="SwitchDialog" type="ConfirmationDialog" parent="." unique_id=1465740242]
+unique_name_in_owner = true
+title = "切換關卡"
+ok_button_text = "儲存並切換"
+dialog_text = "目前關卡尚未儲存，要先儲存再切換嗎？"

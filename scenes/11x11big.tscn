@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://bm66n3riekqww"]
+
+[ext_resource type="Script" uid="uid://6btc5i4706gg" path="res://scripts/map/tile/tile_placement.gd" id="1_itje7"]
+[ext_resource type="PackedScene" path="res://scenes/maps/tile_map.tscn" id="2_toai5"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/start.tscn" id="3_gm22y"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/goal.tscn" id="4_dyecw"]
+[ext_resource type="Script" uid="uid://c5foy8gfrlhxt" path="res://scripts/camera/map_camera.gd" id="5_r1kr4"]
+[ext_resource type="Script" uid="uid://vnb6qoh4omdt" path="res://scripts/navigation/portal_map.gd" id="6_l1fnt"]
+[ext_resource type="Script" uid="uid://c3tgj2k50kp8j" path="res://scripts/navigation/visualization/portal_overlay.gd" id="7_mwmim"]
+
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_wave.tscn" id="22_enemy_wave"]
+
+[ext_resource type="Script" path="res://scripts/towers/tower_map.gd" id="23_tower_map"]
+
+[ext_resource type="Script" path="res://scripts/map/tile/appearance/tile_appearance.gd" id="24_appearance"]
+[ext_resource type="PackedScene" path="res://scenes/environment/cloud_layer.tscn" id="25_cloud"]
+
+[ext_resource type="Script" path="res://scripts/map/tile/appearance/tile_visuals.gd" id="26_visuals"]
+
+[ext_resource type="PackedScene" path="res://scenes/cards/card_placement.tscn" id="27_cards"]
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.90, 0.925, 0.94, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.6352941, 0.7215686, 0.8196078, 1)
+ambient_light_energy = 0.23
+reflected_light_source = 2
+
+[node name="Main" type="Node3D" unique_id=262629719]
+
+[node name="TilePlacement" type="Node3D" parent="." unique_id=1974282630]
+script = ExtResource("1_itje7")
+
+[node name="TileMap" parent="." unique_id=507222948 instance=ExtResource("2_toai5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -0.5)
+data = {
+"cells": PackedInt32Array(0, 0, 1048577, 1, 0, 1048577, 2, 0, 1048577, 3, 0, 1048577, 4, 0, 1048577, 5, 0, 1048577, 6, 0, 1048577, 7, 0, 1048577, 8, 0, 1048577, 9, 0, 1048577, 10, 0, 1048577, 11, 0, 1048577, 12, 0, 1048577, 13, 0, 1048577, 14, 0, 1048577, 15, 0, 2, 16, 0, 2, 17, 0, 2, 23, 0, 2, 7, 65535, 2, 8, 65535, 2, 9, 65535, 2, 10, 65535, 2, 11, 65535, 2, 12, 65535, 2, 13, 65535, 2, 14, 65535, 2, 15, 65535, 2, 16, 65535, 2, 17, 65535, 2, 16, 1, 2, 16, 2, 2, 17, 1, 2, 17, 2, 2, 17, 3, 2, 17, 4, 2, 17, 5, 2, 16, 5, 2, 15, 5, 2, 14, 5, 2, 13, 5, 2, 12, 5, 2, 11, 5, 2, 10, 5, 2, 9, 5, 2, 8, 5, 2, 7, 5, 2, 7, 4, 2, 7, 3, 2, 7, 2, 2, 7, 1, 2, 8, 1, 2, 9, 1, 2, 10, 1, 2, 11, 1, 2, 12, 1, 2, 13, 1, 2, 14, 1, 2, 14, 2, 2, 15, 2, 2, 15, 3, 2, 14, 3, 2, 13, 2, 2, 12, 2, 2, 11, 2, 2, 10, 2, 2, 9, 2, 2, 8, 3, 2, 9, 3, 2, 10, 3, 2, 11, 3, 2, 12, 3, 2, 13, 3, 2, 16, 3, 2, 16, 4, 2, 15, 4, 2, 14, 4, 2, 13, 4, 2, 12, 4, 2, 11, 4, 2, 10, 4, 2, 9, 4, 2, 8, 4, 2, 8, 2, 2, 15, 1, 2, 16, 65534, 2, 17, 65534, 2, 17, 65533, 2, 17, 65532, 2, 16, 65532, 2, 15, 65532, 2, 14, 65532, 2, 13, 65532, 2, 12, 65532, 2, 11, 65532, 2, 10, 65532, 2, 9, 65532, 2, 8, 65532, 2, 7, 65532, 2, 13, 65534, 2, 14, 65534, 2, 15, 65534, 2, 15, 65533, 2, 16, 65533, 2, 14, 65533, 2, 13, 65533, 2, 12, 65533, 2, 11, 65533, 2, 10, 65533, 2, 9, 65533, 2, 8, 65533, 2, 7, 65533, 2, 7, 65534, 2, 8, 65534, 2, 9, 65534, 2, 10, 65534, 2, 11, 65534, 2, 12, 65534, 2, 7, 65531, 2, 8, 65531, 2, 9, 65531, 2, 10, 65531, 2, 11, 65531, 2, 12, 65531, 2, 13, 65531, 2, 14, 65531, 2, 15, 65531, 2, 16, 65531, 2, 17, 65531, 2, 23, 1, 2, 23, 2, 2, 23, 3, 2, 23, 4, 2, 23, 5, 2, 22, 5, 2, 21, 5, 2, 20, 5, 2, 19, 5, 2, 18, 5, 2, 5, 65535, 2, 4, 65535, 2, 5, 65534, 2, 5, 65533, 2, 5, 65532, 2, 5, 65531, 2, 6, 65531, 2, 0, 65531, 3, 1, 65531, 3, 2, 65531, 3, 3, 65531, 3, 4, 65531, 3)
+}
+
+[node name="Endpoints" parent="TileMap" index="0"]
+visible = false
+
+[node name="Start" parent="." unique_id=691362858 instance=ExtResource("3_gm22y")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -11.5, 0.0305, 0)
+
+[node name="Start2" parent="." instance=ExtResource("3_gm22y")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -11.5, 0.0305, -5)
+
+[node name="Goal" parent="." unique_id=991612823 instance=ExtResource("4_dyecw")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0.0305, 0)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=937784338]
+transform = Transform3D(0.78935224, -0.33743185, 0.5128964, 0, 0.8354171, 0.5496165, -0.61394054, -0.43384102, 0.6594384, 14, 15, 18)
+projection = 1
+current = true
+size = 18.5
+near = 0.1
+far = 100.0
+script = ExtResource("5_r1kr4")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1504596655]
+transform = Transform3D(0.90630776, 0.34618863, -0.24240388, 0, 0.57357645, 0.81915206, 0.42261827, -0.74240386, 0.5198368, 0, 0, 0)
+light_color = Color(1, 0.9411765, 0.8470588, 1)
+light_energy = 1.12
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=637674091]
+environment = SubResource("Environment")
+
+[node name="PortalMap" type="Node" parent="." unique_id=803858483]
+script = ExtResource("6_l1fnt")
+start_paths = Array[NodePath]([NodePath("../Start"), NodePath("../Start2")])
+
+[node name="PortalOverlay" type="Node3D" parent="." unique_id=564592366]
+script = ExtResource("7_mwmim")
+
+[node name="EnemyWave" parent="." instance=ExtResource("22_enemy_wave")]
+
+[node name="TowerMap" type="Node3D" parent="."]
+script = ExtResource("23_tower_map")
+
+[node name="TileAppearance" type="Node" parent="."]
+script = ExtResource("24_appearance")
+
+[node name="CloudLayer" parent="." instance=ExtResource("25_cloud")]
+
+[node name="TileVisuals" type="Node3D" parent="."]
+script = ExtResource("26_visuals")
+
+[node name="CardPlacement" parent="." instance=ExtResource("27_cards")]
+
+[editable path="TileMap"]

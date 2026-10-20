@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://c3ps5lqrpn65o"]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/sentry_base_mesh.res" id="1"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/sentry_weapon_mesh.res" id="2"]
+
+[node name="SentryModel" type="Node3D" unique_id=797537160]
+
+[node name="Base" type="MeshInstance3D" parent="." unique_id=1027423668]
+mesh = ExtResource("1")
+
+[node name="AimPivot" type="Node3D" parent="." unique_id=409789651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.89, 0)
+
+[node name="Weapon" type="MeshInstance3D" parent="AimPivot" unique_id=287847997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17, 0)
+mesh = ExtResource("2")
+
+[node name="ArrowRelease" type="Marker3D" parent="AimPivot" unique_id=1872371664]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.63)

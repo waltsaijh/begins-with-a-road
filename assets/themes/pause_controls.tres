@@ -1,0 +1,36 @@
+[gd_resource type="Theme" format=3 uid="uid://2jxxonbusayy"]
+
+[ext_resource type="FontFile" uid="uid://b0uneetxvpb70" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+bg_color = Color(0, 0, 0, 0)
+border_width_bottom = 1
+border_color = Color(0.22, 0.38, 0.4, 0.4)
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0, 0, 0, 0)
+border_width_bottom = 1
+border_color = Color(0.22, 0.38, 0.4, 0.25)
+
+[sub_resource type="StyleBoxEmpty" id="Plain"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[resource]
+default_font = ExtResource("1")
+default_font_size = 15
+Button/colors/font_color = Color(0.2, 0.36, 0.38, 0.8)
+Button/colors/font_focus_color = Color(0.14, 0.29, 0.32, 1)
+Button/colors/font_hover_color = Color(0.14, 0.29, 0.32, 1)
+Button/colors/font_pressed_color = Color(0.2, 0.36, 0.38, 0.5)
+Button/styles/focus = SubResource("Focus")
+Button/styles/hover = SubResource("Hover")
+Button/styles/hover_pressed = SubResource("Hover")
+Button/styles/normal = SubResource("Plain")
+Button/styles/pressed = SubResource("Plain")

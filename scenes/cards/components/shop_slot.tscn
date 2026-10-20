@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c1o8o7wh4ookp"]
+
+[ext_resource type="PackedScene" uid="uid://b2x706dnf62j5" path="res://scenes/cards/components/card_back.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://dibxnfo1vewh0" path="res://scenes/cards/components/card_view.tscn" id="2"]
+
+[node name="ShopSlot" type="Control" unique_id=223260049]
+custom_minimum_size = Vector2(144, 208)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 144.0
+offset_bottom = 208.0
+mouse_filter = 2
+
+[node name="Face" type="Control" parent="." unique_id=504455842]
+anchors_preset = 0
+offset_right = 144.0
+offset_bottom = 208.0
+pivot_offset = Vector2(72, 104)
+mouse_filter = 2
+
+[node name="Back" parent="Face" unique_id=788871609 instance=ExtResource("1")]
+layout_mode = 0
+
+[node name="Card" parent="Face" unique_id=343928768 instance=ExtResource("2")]
+layout_mode = 0
+presentation = 1
+

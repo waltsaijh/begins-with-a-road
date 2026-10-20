@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://7huddgyinw6h"
+
+[deps]
+
+files=["res://assets/translations/card_names.en.translation", "res://assets/translations/card_names.zh_TW.translation"]
+
+source_file="res://assets/translations/card_names.csv"
+dest_files=["res://assets/translations/card_names.en.translation", "res://assets/translations/card_names.zh_TW.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

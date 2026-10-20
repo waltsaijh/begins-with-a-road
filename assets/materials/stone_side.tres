@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "Stone foundation"
+albedo_color = Color(0.3764706, 0.4627451, 0.5450980, 1)
+roughness = 0.98
+metallic_specular = 0.12

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://tests/levels/ui_scene_templates.gd" id="1"]
+
+[node name="UISceneTemplatesTest" type="Node"]
+script = ExtResource("1")

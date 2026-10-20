@@ -1,0 +1,99 @@
+{
+  "cases": [
+    {
+      "candidates": 219,
+      "origin": 0,
+      "routes": 219,
+      "scene": "9x9",
+      "score": 23,
+      "solve_us": 165,
+      "troop": "soldier"
+    },
+    {
+      "candidates": 269,
+      "origin": 0,
+      "routes": 35,
+      "scene": "9x9",
+      "score": 96,
+      "solve_us": 11290,
+      "troop": "quickfeet"
+    },
+    {
+      "candidates": 278,
+      "origin": 0,
+      "routes": 4,
+      "scene": "9x9",
+      "score": -228,
+      "solve_us": 9080,
+      "troop": "heavy"
+    },
+    {
+      "candidates": 20,
+      "origin": 0,
+      "routes": 20,
+      "scene": "11x11big",
+      "score": 33,
+      "solve_us": 160,
+      "troop": "soldier"
+    },
+    {
+      "candidates": 31,
+      "origin": 0,
+      "routes": 2,
+      "scene": "11x11big",
+      "score": 108,
+      "solve_us": 2255,
+      "troop": "quickfeet"
+    },
+    {
+      "candidates": 31,
+      "origin": 0,
+      "routes": 9,
+      "scene": "11x11big",
+      "score": -222,
+      "solve_us": 2240,
+      "troop": "heavy"
+    },
+    {
+      "candidates": 16,
+      "origin": 1,
+      "routes": 16,
+      "scene": "11x11big",
+      "score": 38,
+      "solve_us": 1720,
+      "troop": "soldier"
+    },
+    {
+      "candidates": 21,
+      "origin": 1,
+      "routes": 6,
+      "scene": "11x11big",
+      "score": 119,
+      "solve_us": 1115,
+      "troop": "quickfeet"
+    },
+    {
+      "candidates": 22,
+      "origin": 1,
+      "routes": 6,
+      "scene": "11x11big",
+      "score": -197,
+      "solve_us": 1425,
+      "troop": "heavy"
+    }
+  ],
+  "failures": 0,
+  "platform": "Web",
+  "raw_signed_scoring": true,
+  "safe_local_detour": true,
+  "stats_frozen": true,
+  "platforms": [
+    "Windows",
+    "Web"
+  ],
+  "compatibility": true,
+  "threads": false,
+  "browser": "155.0.4283.45",
+  "build": "release",
+  "errors": []
+}

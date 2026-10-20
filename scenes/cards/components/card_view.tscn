@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://dibxnfo1vewh0"]
+
+[ext_resource type="Script" uid="uid://elw5voboyeba" path="res://scripts/cards/presentation/card_view.gd" id="1"]
+[ext_resource type="Script" uid="uid://bsy83v6o27dce" path="res://scripts/cards/presentation/card_tile_diagram.gd" id="2"]
+[ext_resource type="FontFile" uid="uid://b0uneetxvpb70" path="res://assets/fonts/NotoSansTC-Light.ttf" id="3"]
+[ext_resource type="Texture2D" uid="uid://cuyvyg51s5fs6" path="res://assets/sprites/cards/card_background.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://j2uc2yfdbau3" path="res://assets/sprites/cards/card_frame.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://d267iu2yunnih" path="res://assets/sprites/towers/sentry.png" id="6"]
+[ext_resource type="Resource" uid="uid://ctxkqyv56ojbu" path="res://assets/data/towers/sentry.tres" id="7"]
+[ext_resource type="Shader" uid="uid://b4mw3euisvpk5" path="res://assets/shaders/ui_icon_mask.gdshader" id="8"]
+[ext_resource type="Shader" uid="uid://dkfcea4h7555k" path="res://assets/shaders/ui_soft_edges.gdshader" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/cards/components/card_price.tscn" id="10"]
+[ext_resource type="Texture2D" uid="uid://dh38d3ihtyldi" path="res://assets/sprites/cards/gold.png" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/cards/components/card_title.tscn" id="12"]
+
+[sub_resource type="Theme" id="Theme"]
+default_font = ExtResource("3")
+default_font_size = 16
+Label/colors/font_color = Color(0.125, 0.243, 0.278, 1)
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[sub_resource type="ShaderMaterial" id="DividerMaterial"]
+shader = ExtResource("9")
+
+[sub_resource type="ShaderMaterial" id="IconMaterial"]
+shader = ExtResource("8")
+
+[node name="CardView" type="Button" unique_id=1963922226]
+custom_minimum_size = Vector2(144, 208)
+offset_right = 144.0
+offset_bottom = 208.0
+focus_mode = 0
+theme = SubResource("Theme")
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+script = ExtResource("1")
+coin_texture = ExtResource("11")
+preview_tower = ExtResource("7")
+default_background = ExtResource("4")
+default_frame = ExtResource("5")
+default_icon = ExtResource("6")
+
+[node name="Background" type="NinePatchRect" parent="." unique_id=1390445369]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Selection" type="NinePatchRect" parent="." unique_id=1114006737]
+visible = false
+self_modulate = Color(0.664, 0.86, 0.881, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5")
+draw_center = false
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Accent" type="NinePatchRect" parent="." unique_id=837016352]
+self_modulate = Color(0.52, 0.8, 0.83, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5")
+draw_center = false
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Content" type="MarginContainer" parent="." unique_id=2096828162]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Layout" type="VBoxContainer" parent="Content" unique_id=170196940]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Header" type="HBoxContainer" parent="Content/Layout" unique_id=1909053935]
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position = Vector2(0, 4)
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Shortcut" type="Label" parent="Content/Layout/Header" unique_id=700101014]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "1"
+vertical_alignment = 1
+
+[node name="CardTitle" parent="Content/Layout/Header" unique_id=2029611028 instance=ExtResource("12")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Price" parent="Content/Layout/Header" unique_id=627171248 instance=ExtResource("10")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Divider" type="ColorRect" parent="Content/Layout" unique_id=1237173868]
+unique_name_in_owner = true
+material = SubResource("DividerMaterial")
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.52, 0.8, 0.83, 1)
+
+[node name="TowerIcon" type="TextureRect" parent="Content/Layout" unique_id=786712855]
+unique_name_in_owner = true
+self_modulate = Color(0.28599998, 0.44000003, 0.4565, 1)
+material = SubResource("IconMaterial")
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TileDiagram" type="Control" parent="Content/Layout" unique_id=1889486113]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+script = ExtResource("2")

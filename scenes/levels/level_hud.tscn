@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://dr7kbk0oo8hxt"]
+
+[ext_resource type="PackedScene" uid="uid://bj3647jcs1ljw" path="res://scenes/levels/wave_timeline.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://dh38d3ihtyldi" path="res://assets/sprites/cards/gold.png" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/levels/components/start_wave_callout.tscn" id="3"]
+[ext_resource type="Script" uid="uid://qxb7frtch4wd" path="res://scripts/levels/level_hud.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://ddnap7ob7g2px" path="res://assets/sprites/interface/pause.png" id="5"]
+[ext_resource type="Theme" path="res://assets/themes/level_controls.tres" id="7"]
+[ext_resource type="Texture2D" uid="uid://ffwij66hhev7" path="res://assets/sprites/interface/speed_1x.png" id="8"]
+[ext_resource type="Theme" path="res://assets/themes/pause_controls.tres" id="9_pause"]
+
+[sub_resource type="StyleBoxEmpty" id="PauseMenuStyle"]
+
+[node name="LevelHUD" type="CanvasLayer" unique_id=1975385923]
+process_mode = 3
+layer = 6
+script = ExtResource("4")
+
+[node name="WorldActions" type="Control" parent="." unique_id=1265644877]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="EarlyStart" parent="WorldActions" unique_id=260539987 instance=ExtResource("3")]
+visible = false
+layout_mode = 0
+
+[node name="PauseBlocker" type="Control" parent="." unique_id=94681098]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Menu" type="PanelContainer" parent="PauseBlocker" unique_id=1860833669]
+mouse_filter = 2
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -112.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("PauseMenuStyle")
+theme = ExtResource("9_pause")
+
+[node name="Margin" type="MarginContainer" parent="PauseBlocker/Menu" unique_id=711178783]
+mouse_filter = 2
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="Actions" type="VBoxContainer" parent="PauseBlocker/Menu/Margin" unique_id=246740673]
+mouse_filter = 2
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Resume" type="Button" parent="PauseBlocker/Menu/Margin/Actions" unique_id=438273176]
+custom_minimum_size = Vector2(148, 36)
+layout_mode = 2
+text = "繼續遊戲"
+alignment = 2
+
+[node name="Exit" type="Button" parent="PauseBlocker/Menu/Margin/Actions" unique_id=155820049]
+custom_minimum_size = Vector2(148, 36)
+layout_mode = 2
+text = "離開"
+alignment = 2
+
+[node name="Header" type="Control" parent="." unique_id=1027691164]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="WaveTimeline" parent="Header" unique_id=1449927566 instance=ExtResource("1")]
+layout_mode = 1
+
+[node name="Balance" type="HBoxContainer" parent="Header" unique_id=1541689674]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25
+anchor_right = 0.25
+offset_left = -116.0
+offset_top = 34.0
+offset_right = -16.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 2
+
+[node name="Gold" type="TextureRect" parent="Header/Balance" unique_id=990606578]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="Header/Balance" unique_id=1435221655]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.14117648, 0.29803923, 0.32156864, 1)
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="Header" unique_id=1092782050]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 0.75
+offset_left = 16.0
+offset_top = 37.0
+offset_right = 88.0
+offset_bottom = 69.0
+mouse_filter = 2
+theme = ExtResource("7")
+theme_override_constants/separation = 8
+
+[node name="Speed" type="Button" parent="Header/Actions" unique_id=1488310822]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+focus_mode = 0
+theme_override_constants/icon_max_width = 24
+icon = ExtResource("8")
+
+[node name="Pause" type="Button" parent="Header/Actions" unique_id=2109865260]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+focus_mode = 0
+theme_override_constants/icon_max_width = 24
+toggle_mode = true
+icon = ExtResource("5")

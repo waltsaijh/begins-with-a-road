@@ -1,0 +1,19 @@
+[gd_resource type="Theme" load_steps=3 format=3]
+
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
+
+[sub_resource type="StyleBoxEmpty" id="Transparent"]
+
+[resource]
+default_font = ExtResource("1")
+default_font_size = 16
+Button/colors/icon_normal_color = Color(0.22, 0.38, 0.4, 0.72)
+Button/colors/icon_hover_color = Color(0.16, 0.32, 0.35, 1)
+Button/colors/icon_pressed_color = Color(0.16, 0.32, 0.35, 0.48)
+Button/colors/icon_disabled_color = Color(0.37, 0.49, 0.5, 0.25)
+Button/styles/normal = SubResource("Transparent")
+Button/styles/hover = SubResource("Transparent")
+Button/styles/pressed = SubResource("Transparent")
+Button/styles/hover_pressed = SubResource("Transparent")
+Button/styles/disabled = SubResource("Transparent")
+Button/styles/focus = SubResource("Transparent")

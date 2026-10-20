@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="StyleBoxFlat" id="Frame"]
+bg_color = Color(0.153, 0.212, 0.231, 0.851)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.094, 0.161, 0.184, 0.933)
+expand_margin_left = 1.0
+expand_margin_top = 1.0
+expand_margin_right = 1.0
+expand_margin_bottom = 1.0
+
+[node name="StatusAppearance" type="Control"]
+offset_right = 32.0
+offset_bottom = 4.0
+mouse_filter = 2
+
+[node name="Background" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Health" type="ColorRect" parent="."]
+offset_right = 24.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.34901962, 0.8392157, 0.48235294, 1)
+
+[node name="Shield" type="ColorRect" parent="."]
+offset_left = 24.0
+offset_right = 32.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.60784316, 0.8862745, 0.9607843, 1)
+
+[node name="Skill" type="ColorRect" parent="."]
+offset_top = 7.0
+offset_right = 32.0
+offset_bottom = 10.0
+mouse_filter = 2
+color = Color(0.95686275, 0.827451, 0.36862746, 1)
+
+[node name="Icon" type="Control" parent="."]
+offset_left = 10.5
+offset_top = -14.0
+offset_right = 21.5
+offset_bottom = -3.0
+mouse_filter = 2
+
+[node name="Background" type="Panel" parent="Icon"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Texture" type="TextureRect" parent="Icon"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

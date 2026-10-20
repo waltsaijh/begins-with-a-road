@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/tiles/stone.tscn" id="1_base"]
+[ext_resource type="Material" path="res://assets/materials/road.tres" id="2_road"]
+
+[sub_resource type="BoxMesh" id="Center"]
+material = ExtResource("2_road")
+size = Vector3(0.671875, 0.025, 0.671875)
+
+[sub_resource type="BoxMesh" id="Vertical"]
+material = ExtResource("2_road")
+size = Vector3(0.671875, 0.025, 0.1640625)
+
+[sub_resource type="BoxMesh" id="Horizontal"]
+material = ExtResource("2_road")
+size = Vector3(0.1640625, 0.025, 0.671875)
+
+[node name="road_cross" instance=ExtResource("1_base")]
+
+[node name="Center" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.01, 0)
+mesh = SubResource("Center")
+cast_shadow = 0
+
+[node name="North" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.01, -0.41796875)
+mesh = SubResource("Vertical")
+cast_shadow = 0
+
+[node name="East" type="MeshInstance3D" parent="."]
+position = Vector3(0.41796875, 0.01, 0)
+mesh = SubResource("Horizontal")
+cast_shadow = 0
+
+[node name="South" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.01, 0.41796875)
+mesh = SubResource("Vertical")
+cast_shadow = 0
+
+[node name="West" type="MeshInstance3D" parent="."]
+position = Vector3(-0.41796875, 0.01, 0)
+mesh = SubResource("Horizontal")
+cast_shadow = 0

@@ -1,0 +1,172 @@
+[gd_resource type="Resource" script_class="LevelDefinition" format=3 uid="uid://crw7gsg3jk7ae"]
+
+[ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/level_definition.gd" id="1"]
+[ext_resource type="Script" uid="uid://cfka2isrnffdy" path="res://scripts/levels/act_definition.gd" id="2"]
+[ext_resource type="Script" uid="uid://cvef4d4fr1kg7" path="res://scripts/levels/wave_definition.gd" id="3"]
+[ext_resource type="PackedScene" uid="uid://catog0p872s0v" path="res://scenes/maps/tile_map.tscn" id="7"]
+[ext_resource type="Script" uid="uid://cahlwhgvymd6c" path="res://scripts/levels/wave_spawn_group.gd" id="8"]
+
+[sub_resource type="Resource" id="Group1"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 4
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave1"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group1")])
+
+[sub_resource type="Resource" id="Group2"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 12
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave2"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group2")])
+
+[sub_resource type="Resource" id="Group3"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+start_tick = 4
+enemy_count = 4
+interval_ticks = 6
+
+[sub_resource type="Resource" id="Resource_edcdy"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 12
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave3"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group3"), SubResource("Resource_edcdy")])
+
+[sub_resource type="Resource" id="Act1"]
+script = ExtResource("2")
+waves = Array[ExtResource("3")]([SubResource("Wave1"), SubResource("Wave2"), SubResource("Wave3")])
+
+[sub_resource type="Resource" id="Group4"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+enemy_count = 8
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave4"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group4")])
+
+[sub_resource type="Resource" id="Group5"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+enemy_count = 4
+
+[sub_resource type="Resource" id="Resource_imq3y"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+start_tick = 10
+enemy_count = 4
+
+[sub_resource type="Resource" id="Resource_621k4"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 20
+enemy_count = 12
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave5"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group5"), SubResource("Resource_imq3y"), SubResource("Resource_621k4")])
+
+[sub_resource type="Resource" id="Group6"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+start_tick = 2
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Resource_2s5pg"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 6
+interval_ticks = 4
+
+[sub_resource type="Resource" id="Resource_egch0"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/heavy.tres"
+start_tick = 8
+enemy_count = 2
+interval_ticks = 12
+
+[sub_resource type="Resource" id="Wave6"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group6"), SubResource("Resource_2s5pg"), SubResource("Resource_egch0")])
+
+[sub_resource type="Resource" id="Act2"]
+script = ExtResource("2")
+title = "ACT II"
+waves = Array[ExtResource("3")]([SubResource("Wave4"), SubResource("Wave5"), SubResource("Wave6")])
+
+[sub_resource type="Resource" id="Group7"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/heavy.tres"
+enemy_count = 4
+interval_ticks = 8
+
+[sub_resource type="Resource" id="Wave7"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group7")])
+
+[sub_resource type="Resource" id="Group8"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/heavy.tres"
+enemy_count = 2
+batch_size = 2
+
+[sub_resource type="Resource" id="Resource_7oiqu"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 3
+enemy_count = 12
+batch_size = 2
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave8"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group8"), SubResource("Resource_7oiqu")])
+
+[sub_resource type="Resource" id="Group9"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/heavy.tres"
+enemy_count = 2
+batch_size = 2
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Resource_1sxa2"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+enemy_count = 4
+batch_size = 2
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Resource_p5dvb"]
+script = ExtResource("8")
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 4
+enemy_count = 12
+interval_ticks = 2
+
+[sub_resource type="Resource" id="Wave9"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group9"), SubResource("Resource_1sxa2"), SubResource("Resource_p5dvb")])
+
+[sub_resource type="Resource" id="Act3"]
+script = ExtResource("2")
+title = "ACT III"
+waves = Array[ExtResource("3")]([SubResource("Wave7"), SubResource("Wave8"), SubResource("Wave9")])
+
+[resource]
+script = ExtResource("1")
+title = "Frontier"
+terrain = ExtResource("7")
+acts = Array[ExtResource("2")]([SubResource("Act1"), SubResource("Act2"), SubResource("Act3")])

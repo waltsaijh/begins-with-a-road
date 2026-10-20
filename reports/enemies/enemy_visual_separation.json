@@ -1,0 +1,37 @@
+{
+  "boundary_pairs": 5,
+  "cases": [
+    {
+      "candidate_checks": 256,
+      "solve_us": 2016,
+      "units": 64
+    },
+    {
+      "candidate_checks": 1024,
+      "solve_us": 8118,
+      "units": 256
+    },
+    {
+      "candidate_checks": 4096,
+      "solve_us": 24471,
+      "units": 1024
+    },
+    {
+      "candidate_checks": 16384,
+      "solve_us": 62241,
+      "units": 4096
+    }
+  ],
+  "failures": 0,
+  "logical_motion_unchanged": true,
+  "platform": "Web",
+  "platforms": [
+    "Windows",
+    "Web"
+  ],
+  "compatibility": true,
+  "threads": false,
+  "browser": "155.0.4283.45",
+  "build": "release",
+  "errors": []
+}

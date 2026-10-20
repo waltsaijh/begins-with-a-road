@@ -1,0 +1,119 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/materials/wood_light.tres" id="1_l5uc7"]
+[ext_resource type="Material" path="res://assets/materials/wood.tres" id="2_ewd3p"]
+[ext_resource type="Material" path="res://assets/materials/wood_dark.tres" id="3_oqrw8"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_jt5hk"]
+material = ExtResource("1_l5uc7")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yv8wi"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h6y2v"]
+material = ExtResource("1_l5uc7")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_28u6k"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_26mj8"]
+material = ExtResource("1_l5uc7")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gayom"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.63, 0.022, 0.15)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fxp8o"]
+material = ExtResource("3_oqrw8")
+size = Vector3(0.035, 0.035, 0.98)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bb502"]
+material = ExtResource("3_oqrw8")
+size = Vector3(0.075, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_k8dyh"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.04, 0.26, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_jgpnw"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.04, 0.26, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b5k20"]
+material = ExtResource("3_oqrw8")
+size = Vector3(0.035, 0.035, 0.98)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ccxv2"]
+material = ExtResource("3_oqrw8")
+size = Vector3(0.075, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_m82py"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.04, 0.26, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pw7dl"]
+material = ExtResource("2_ewd3p")
+size = Vector3(0.04, 0.26, 0.04)
+
+[node name="WoodStraight" type="Node3D" unique_id=1084315505]
+
+[node name="Plank0" type="MeshInstance3D" parent="." unique_id=157241989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.42)
+mesh = SubResource("BoxMesh_jt5hk")
+
+[node name="Plank1" type="MeshInstance3D" parent="." unique_id=1919599925]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.253)
+mesh = SubResource("BoxMesh_yv8wi")
+
+[node name="Plank2" type="MeshInstance3D" parent="." unique_id=1979214891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.086)
+mesh = SubResource("BoxMesh_h6y2v")
+
+[node name="Plank3" type="MeshInstance3D" parent="." unique_id=1806467044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.081)
+mesh = SubResource("BoxMesh_28u6k")
+
+[node name="Plank4" type="MeshInstance3D" parent="." unique_id=527049889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.248)
+mesh = SubResource("BoxMesh_26mj8")
+
+[node name="Plank5" type="MeshInstance3D" parent="." unique_id=670287507]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0.415)
+mesh = SubResource("BoxMesh_gayom")
+
+[node name="Handrail" type="MeshInstance3D" parent="." unique_id=2014529633]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43, 0.23, 0)
+mesh = SubResource("BoxMesh_fxp8o")
+
+[node name="Beam" type="MeshInstance3D" parent="." unique_id=380787182]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.245, -0.04, 0)
+mesh = SubResource("BoxMesh_bb502")
+
+[node name="Post" type="MeshInstance3D" parent="." unique_id=1183773543]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43, 0.1, -0.39)
+mesh = SubResource("BoxMesh_k8dyh")
+
+[node name="Post2" type="MeshInstance3D" parent="." unique_id=131472423]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43, 0.1, 0.39)
+mesh = SubResource("BoxMesh_jgpnw")
+
+[node name="Handrail2" type="MeshInstance3D" parent="." unique_id=462470572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43, 0.23, 0)
+mesh = SubResource("BoxMesh_b5k20")
+
+[node name="Beam2" type="MeshInstance3D" parent="." unique_id=1745686081]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.245, -0.04, 0)
+mesh = SubResource("BoxMesh_ccxv2")
+
+[node name="Post3" type="MeshInstance3D" parent="." unique_id=853748647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43, 0.1, -0.39)
+mesh = SubResource("BoxMesh_m82py")
+
+[node name="Post4" type="MeshInstance3D" parent="." unique_id=1951630451]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43, 0.1, 0.39)
+mesh = SubResource("BoxMesh_pw7dl")

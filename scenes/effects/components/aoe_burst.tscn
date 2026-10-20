@@ -1,0 +1,55 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/effects/components/death_burst.tscn" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="RingMaterial"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+albedo_color = Color(0.929412, 0.756863, 0.517647, 1)
+
+[sub_resource type="StandardMaterial3D" id="ShardMaterial"]
+resource_local_to_scene = true
+transparency = 1
+albedo_color = Color(0.698039, 0.666667, 0.588235, 1)
+roughness = 0.98
+
+[sub_resource type="StandardMaterial3D" id="CoreMaterial"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.929412, 0.756863, 0.517647, 1)
+
+[node name="AOEBurst" instance=ExtResource("1")]
+duration = 0.4
+radius = 0.65
+radius_scale = 0.65
+start_radius_fraction = 0.0
+hop_height = 0.24
+
+[node name="Ring" parent="." index="0"]
+scale = Vector3(0.65, 1, 0.65)
+material_override = SubResource("RingMaterial")
+
+[node name="Core" parent="." index="1"]
+visible = true
+material_override = SubResource("CoreMaterial")
+
+[node name="Shard1" parent="Shards" index="0"]
+material_override = SubResource("ShardMaterial")
+
+[node name="Shard2" parent="Shards" index="1"]
+material_override = SubResource("ShardMaterial")
+
+[node name="Shard3" parent="Shards" index="2"]
+material_override = SubResource("ShardMaterial")
+
+[node name="Shard4" parent="Shards" index="3"]
+material_override = SubResource("ShardMaterial")
+
+[node name="Shard5" parent="Shards" index="4"]
+material_override = SubResource("ShardMaterial")
+
+[node name="Shard6" parent="Shards" index="5"]
+material_override = SubResource("ShardMaterial")

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bcgdadxut7267"]
+
+[ext_resource type="Script" uid="uid://ivu5l8sngiee" path="res://scripts/cards/presentation/card_title.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://w02ofyx2a7bl" path="res://assets/fonts/NotoSansTC-Medium.ttf" id="2"]
+[ext_resource type="FontFile" uid="uid://b0uneetxvpb70" path="res://assets/fonts/NotoSansTC-Light.ttf" id="3"]
+
+[node name="CardTitle" type="Control" unique_id=134296945]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 100.0
+offset_bottom = 24.0
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="Prefix" type="Label" parent="." unique_id=844820725]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 68.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("2")
+theme_override_font_sizes/font_size = 16
+text = "轉角"
+horizontal_alignment = 2
+vertical_alignment = 1
+text_overrun_behavior = 1
+
+[node name="TowerName" type="Label" parent="." unique_id=1220810257]
+layout_mode = 0
+offset_left = 68.0
+offset_right = 100.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("3")
+theme_override_font_sizes/font_size = 16
+text = "哨塔"
+horizontal_alignment = 2
+vertical_alignment = 1
+text_overrun_behavior = 3

@@ -1,0 +1,32 @@
+{
+  "aim_alignment": true,
+  "arrow_target_cleanup": true,
+  "arrow_tip_origin": true,
+  "arrow_trail": true,
+  "continuous_tracking": true,
+  "cooldown": true,
+  "delayed_splash": true,
+  "failures": 0,
+  "fixed_base": true,
+  "flying_arrow": true,
+  "instant_beam": true,
+  "kill_cleanup": true,
+  "movable_targets": true,
+  "one_tile_lookahead": true,
+  "payload_snapshot": true,
+  "slow_and_expiry": true,
+  "smooth_first_aim": true,
+  "source_independent": true,
+  "tile_range": true,
+  "tower_destruction": true,
+  "visual_cleanup": true,
+  "platforms": [
+    "Windows",
+    "Web"
+  ],
+  "compatibility": true,
+  "threads": false,
+  "browser": "155.0.4283.45",
+  "build": "release",
+  "errors": []
+}

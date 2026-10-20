@@ -1,0 +1,10 @@
+{
+  "atomic_tile_events": 3,
+  "failures": 0,
+  "rotations": 4,
+  "sampled_routes": 16,
+  "scene_ui": true,
+  "single_rebuild": true,
+  "stale_preview_rejected": true,
+  "tower_artwork_and_tint": true
+}

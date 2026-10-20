@@ -1,0 +1,77 @@
+[gd_scene format=3 uid="uid://dbkrgalhoe4uj"]
+
+[ext_resource type="PackedScene" uid="uid://catog0p872s0v" path="res://scenes/maps/tile_map.tscn" id="1_map"]
+[ext_resource type="Script" uid="uid://c5foy8gfrlhxt" path="res://scripts/camera/map_camera.gd" id="2_camera"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/start.tscn" id="3_start"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/goal.tscn" id="4_goal"]
+[ext_resource type="Script" uid="uid://6btc5i4706gg" path="res://scripts/map/tile/tile_placement.gd" id="5_placement"]
+[ext_resource type="Script" uid="uid://vnb6qoh4omdt" path="res://scripts/navigation/portal_map.gd" id="20_portal_map"]
+[ext_resource type="Script" uid="uid://c3tgj2k50kp8j" path="res://scripts/navigation/visualization/portal_overlay.gd" id="21_portal_overlay"]
+[ext_resource type="PackedScene" uid="uid://c6cfeoqg4614g" path="res://scenes/enemies/enemy_wave.tscn" id="22_enemy_wave"]
+[ext_resource type="Script" uid="uid://le4hl53pancn" path="res://scripts/towers/tower_map.gd" id="23_tower_map"]
+[ext_resource type="Script" uid="uid://4y6nl0mlbobf" path="res://scripts/map/tile/appearance/tile_appearance.gd" id="24_appearance"]
+[ext_resource type="PackedScene" uid="uid://b0gq3nwbo4yuh" path="res://scenes/environment/cloud_layer.tscn" id="25_cloud"]
+[ext_resource type="Script" uid="uid://bx26rxhfw34rv" path="res://scripts/map/tile/appearance/tile_visuals.gd" id="26_visuals"]
+[ext_resource type="PackedScene" path="res://scenes/cards/card_placement.tscn" id="27_cards"]
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.9, 0.925, 0.94, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.6352941, 0.7215686, 0.8196078, 1)
+ambient_light_energy = 0.23
+reflected_light_source = 2
+
+[node name="Main" type="Node3D" unique_id=262629719]
+
+[node name="TilePlacement" type="Node3D" parent="." unique_id=1974282630]
+script = ExtResource("5_placement")
+
+[node name="TileMap" parent="." unique_id=507222948 instance=ExtResource("1_map")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0, -0.5)
+
+[node name="Start" parent="." unique_id=691362858 instance=ExtResource("3_start")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -11.5, 0.0305, 0)
+
+[node name="Goal" parent="." unique_id=991612823 instance=ExtResource("4_goal")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.5, 0.0305, 0)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=937784338]
+transform = Transform3D(0.78935224, -0.33743185, 0.5128964, 0, 0.8354171, 0.5496165, -0.61394054, -0.43384102, 0.6594384, 14, 15, 18)
+projection = 1
+current = true
+size = 18.5
+near = 0.1
+far = 100.0
+script = ExtResource("2_camera")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1504596655]
+transform = Transform3D(0.90630776, 0.34618863, -0.24240388, 0, 0.57357645, 0.81915206, 0.42261827, -0.74240386, 0.5198368, 0, 0, 0)
+light_color = Color(1, 0.9411765, 0.8470588, 1)
+light_energy = 1.12
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=637674091]
+environment = SubResource("Environment")
+
+[node name="PortalMap" type="Node" parent="." unique_id=1234077156]
+script = ExtResource("20_portal_map")
+
+[node name="PortalOverlay" type="Node3D" parent="." unique_id=1792517961]
+script = ExtResource("21_portal_overlay")
+
+[node name="EnemyWave" parent="." unique_id=1124581691 instance=ExtResource("22_enemy_wave")]
+
+[node name="TowerMap" type="Node3D" parent="." unique_id=1710015666]
+script = ExtResource("23_tower_map")
+
+[node name="TileAppearance" type="Node" parent="." unique_id=1262725731]
+script = ExtResource("24_appearance")
+
+[node name="CloudLayer" parent="." unique_id=1114086148 instance=ExtResource("25_cloud")]
+
+[node name="TileVisuals" type="Node3D" parent="." unique_id=1803695921]
+script = ExtResource("26_visuals")
+
+[node name="CardPlacement" parent="." unique_id=1621845042 instance=ExtResource("27_cards")]
+
+[editable path="TileMap"]

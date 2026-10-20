@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/enemy_status_overlay.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/components/enemy_status_appearance.tscn" id="2"]
+
+[node name="StatusLayer" type="CanvasLayer"]
+layer = 0
+
+[node name="EnemyStatusOverlay" type="Control" parent="."]
+process_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="Appearance" parent="EnemyStatusOverlay" instance=ExtResource("2")]
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 96.0
+offset_bottom = 68.0

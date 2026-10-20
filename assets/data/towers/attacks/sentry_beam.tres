@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="BeamAttack" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/combat/attacks/beam_attack.gd" id="1"]
+[resource]
+script = ExtResource("1")
+color = Color(0.55, 0.55, 0.55, 1)
+trail_duration = 0.12
+trail_width = 0.035

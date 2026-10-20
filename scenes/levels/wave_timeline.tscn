@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://bj3647jcs1ljw"]
+
+[ext_resource type="Script" uid="uid://cy7pwiirhuh4u" path="res://scripts/levels/wave_timeline.gd" id="1"]
+[ext_resource type="Resource" uid="uid://crw7gsg3jk7ae" path="res://assets/data/levels/frontier.tres" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/levels/components/wave_timeline_track.tscn" id="3"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Medium.ttf" id="3_vikn2"]
+
+[node name="WaveTimeline" type="Control" unique_id=1119920192]
+layout_mode = 3
+anchor_left = 0.25
+anchor_right = 0.75
+offset_top = 10.0
+offset_bottom = 80.0
+grow_horizontal = 2
+mouse_filter = 2
+script = ExtResource("1")
+level = ExtResource("2")
+current_act_font = ExtResource("3_vikn2")
+
+[node name="Track" parent="." instance=ExtResource("3")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Progress" type="Control" parent="." unique_id=552541413]
+layout_mode = 0
+offset_bottom = 70.0
+mouse_filter = 2
+clip_contents = true
+
+[node name="Fill" parent="Progress" instance=ExtResource("3")]
+filled = true
+
+[node name="Acts" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2

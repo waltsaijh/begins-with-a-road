@@ -1,0 +1,131 @@
+{
+  "baseline": false,
+  "cases": [
+    {
+      "attempts": 10,
+      "best": 14,
+      "check": {
+        "maximum_score": 22,
+        "middle_routes": 2,
+        "simple_connected_samples": true
+      },
+      "raw_plan_us": [
+        260,
+        235,
+        280,
+        210,
+        240,
+        350,
+        235,
+        260,
+        320,
+        195,
+        200,
+        305,
+        265,
+        185,
+        230,
+        1170,
+        210,
+        200,
+        180,
+        325
+      ],
+      "routes": 4,
+      "scene": "double_loop",
+      "stop": "waypoint_completion",
+      "used_edges": 8,
+      "waypoint_added": 2,
+      "waypoint_attempts": 2,
+      "waypoint_searches": 2
+    },
+    {
+      "attempts": 64,
+      "best": 23,
+      "check": {
+        "maximum_score": 55,
+        "middle_routes": 0,
+        "simple_connected_samples": true
+      },
+      "raw_plan_us": [
+        2915,
+        2135,
+        2745,
+        3055,
+        3245,
+        2400,
+        1860,
+        2175,
+        1795,
+        1880,
+        1970,
+        1765,
+        1755,
+        1850,
+        1830,
+        1675,
+        1740,
+        1700,
+        1725,
+        1725
+      ],
+      "routes": 63,
+      "scene": "9x9",
+      "stop": "search_budget",
+      "used_edges": 240,
+      "waypoint_added": 0,
+      "waypoint_attempts": 0,
+      "waypoint_searches": 0
+    },
+    {
+      "attempts": 15,
+      "best": 33,
+      "check": {
+        "maximum_score": 43,
+        "middle_routes": 0,
+        "simple_connected_samples": true
+      },
+      "raw_plan_us": [
+        305,
+        285,
+        305,
+        335,
+        315,
+        305,
+        345,
+        355,
+        375,
+        235,
+        325,
+        315,
+        250,
+        275,
+        285,
+        275,
+        270,
+        345,
+        290,
+        345
+      ],
+      "routes": 5,
+      "scene": "11x11big",
+      "stop": "waypoint_completion",
+      "used_edges": 12,
+      "waypoint_added": 2,
+      "waypoint_attempts": 4,
+      "waypoint_searches": 9
+    }
+  ],
+  "platform": "Web",
+  "rounds": 20,
+  "warmup": 3,
+  "platforms": [
+    "Windows",
+    "Web"
+  ],
+  "compatibility": true,
+  "threads": false,
+  "browser": "155.0.4283.45",
+  "build": "release",
+  "errors": []
+}

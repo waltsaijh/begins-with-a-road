@@ -1,0 +1,166 @@
+{
+  "cases": [
+    {
+      "fixture": "annotated_external_branch",
+      "exact_parity": true,
+      "stats": {
+        "components": 1,
+        "corridors": 4,
+        "cycles": 1,
+        "divided_components": 0,
+        "faces": 8,
+        "local_routes": 3,
+        "logical_cycles": 1,
+        "nodes": 6,
+        "physical_edges": 47,
+        "regions": 1,
+        "tiles": 39
+      },
+      "local_routes": [
+        {
+          "count": 1,
+          "count_capped": false,
+          "from": 1,
+          "id": 0,
+          "length": 4,
+          "region": 0,
+          "source_field": 0,
+          "target_field": 1,
+          "to": 2
+        },
+        {
+          "count": 3,
+          "count_capped": false,
+          "from": 1,
+          "id": 1,
+          "length": 3,
+          "region": 0,
+          "source_field": 0,
+          "target_field": 2,
+          "to": 5
+        },
+        {
+          "count": 10,
+          "count_capped": false,
+          "from": 2,
+          "id": 2,
+          "length": 5,
+          "region": 0,
+          "source_field": 1,
+          "target_field": 2,
+          "to": 5
+        }
+      ]
+    },
+    {
+      "fixture": "internal_obstacle",
+      "exact_parity": true,
+      "stats": {
+        "components": 1,
+        "corridors": 2,
+        "cycles": 1,
+        "divided_components": 1,
+        "faces": 76,
+        "local_routes": 8,
+        "logical_cycles": 1,
+        "nodes": 8,
+        "physical_edges": 188,
+        "regions": 4,
+        "tiles": 112
+      },
+      "local_routes": [
+        {
+          "count": 1,
+          "count_capped": false,
+          "from": 0,
+          "id": 0,
+          "length": 8,
+          "region": 0,
+          "source_field": 0,
+          "target_field": 1,
+          "to": 2
+        },
+        {
+          "count": 35,
+          "count_capped": false,
+          "from": 0,
+          "id": 1,
+          "length": 7,
+          "region": 0,
+          "source_field": 0,
+          "target_field": 2,
+          "to": 5
+        },
+        {
+          "count": 35,
+          "count_capped": false,
+          "from": 2,
+          "id": 2,
+          "length": 7,
+          "region": 0,
+          "source_field": 1,
+          "target_field": 2,
+          "to": 5
+        },
+        {
+          "count": 1,
+          "count_capped": false,
+          "from": 0,
+          "id": 3,
+          "length": 4,
+          "region": 1,
+          "source_field": 0,
+          "target_field": 1,
+          "to": 1
+        },
+        {
+          "count": 1,
+          "count_capped": false,
+          "from": 2,
+          "id": 4,
+          "length": 4,
+          "region": 2,
+          "source_field": 0,
+          "target_field": 1,
+          "to": 3
+        },
+        {
+          "count": 1,
+          "count_capped": false,
+          "from": 1,
+          "id": 5,
+          "length": 8,
+          "region": 3,
+          "source_field": 0,
+          "target_field": 1,
+          "to": 3
+        },
+        {
+          "count": 35,
+          "count_capped": false,
+          "from": 1,
+          "id": 6,
+          "length": 7,
+          "region": 3,
+          "source_field": 0,
+          "target_field": 2,
+          "to": 6
+        },
+        {
+          "count": 35,
+          "count_capped": false,
+          "from": 3,
+          "id": 7,
+          "length": 7,
+          "region": 3,
+          "source_field": 1,
+          "target_field": 2,
+          "to": 6
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "compatibility": true,
+  "threads": false
+}

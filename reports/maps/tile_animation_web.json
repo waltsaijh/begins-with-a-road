@@ -1,0 +1,8 @@
+{
+  "platform": "Web",
+  "browser": "155.0.4283.45",
+  "renderer": "Compatibility / WebGL2",
+  "checks": "stable layouts, selective repair, quota growth, upward replacement and pillar extension/retraction, rapid retarget, unchanged navigation, cleanup",
+  "result": "TILE_ANIMATION_CHECK: PASS",
+  "errors": []
+}
