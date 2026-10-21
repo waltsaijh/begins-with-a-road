@@ -25,6 +25,7 @@ godot --headless --path . --script res://tests/navigation/portal_graph.gd
 godot --path . res://tests/cards/card_shop.tscn
 godot --path . res://tests/levels/act_spawn_expansion.tscn
 godot --path . res://tests/levels/pause_menu.tscn
+godot --path . res://tests/levels/camera_orbit.tscn
 godot --path . res://tests/enemies/enemy_status.tscn
 godot --editor --path . -- --test-wave-editor
 ```
@@ -38,3 +39,5 @@ godot --editor --path . -- --test-wave-editor
 `enemies/enemy_status` 驗證同類減速取最佳強度與最長剩餘時間合併，涵蓋兩種施加順序、到期、短／長刷新及敵人重用；另使用 fixtures 內的舊版繪製進行像素比較，包含分散與重疊順序、不同圖示、圖集／容量成長、樣式烘焙、移除與重用；headless 會略過像素比較。`cards/card_preview` 與 `combat/combat_preview` 雖名為 preview，仍驗證實際輸入提交及攻擊繪製，供 Web 比對使用。
 
 過去的壓測數字僅保留於 [歷史摘要](../reports/performance_2026-10-20.md)，不代表本次回歸結果。未來若需要新的負載量測，依當時問題建立測試並保存當次方法與樣本。
+
+`camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、中心死區、跨 UI 捕捉／放開、卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。

@@ -128,12 +128,14 @@ func verify() -> void:
 	await save_frame(Artifacts.path("levels/act_expansion_directions.png"))
 	var ui_button: Button = expansion.buttons.get_child(1)
 	click(ui_button.get_global_rect().get_center())
+	await frames(2)
 	check(expansion.selected_direction == 1, "Direction button did not enter placement mode")
 	check(expansion.back.visible and not expansion.buttons.visible, "Placement mode did not expose the change-direction action")
 	var original_focus: Vector3 = scene.get_node("Camera3D")._initial_focus
 	expansion.back_to_directions()
 	check(expansion.selected_direction == -1 and not expansion.back.visible and scene.get_node("Camera3D").focus.is_equal_approx(original_focus), "Change direction did not restore the overview")
 	click(ui_button.get_global_rect().get_center())
+	await frames(2)
 	var paths: Dictionary = expansion.choices[1].paths
 	var picked: Vector2i = paths.keys()[paths.size()/2]
 	var cell := Vector3i(picked.x, 0, picked.y)
@@ -163,9 +165,34 @@ func verify() -> void:
 	var old_count := map.get_used_cells().size()
 	var camera: Camera3D = scene.get_node("Camera3D")
 	var point := camera.unproject_position(map.to_global(map.map_to_local(cell)))
+	var press := InputEventMouseButton.new()
+	press.position = point
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.button_mask = MOUSE_BUTTON_MASK_LEFT
+	_viewport.push_input(press, true)
+	var drag := InputEventMouseMotion.new()
+	drag.position = point+Vector2(50, 40)
+	drag.relative = Vector2(50, 40)
+	drag.button_mask = MOUSE_BUTTON_MASK_LEFT
+	_viewport.push_input(drag, true)
+	press.position = drag.position
+	press.pressed = false
+	press.button_mask = 0
+	_viewport.push_input(press, true)
+	await frames(2)
+	check(expansion.active and not expansion.committing and controller.start_paths.size() == 1, "Dragging a candidate committed an entrance")
+	point = camera.unproject_position(map.to_global(map.map_to_local(cell)))
+	# Observe the commit lock at the rebuild signal: clicks are now dispatched
+	# after release to distinguish them from camera drags.
+	var commit_observed := [false]
+	controller.graph_changed.connect(func():
+		commit_observed[0] = true
+		check(expansion.committing and scene.choosing_start and not wave.start_allowed and cards.input_suspended, "Commit unlocked gameplay before graph rebuild")
+		check(not expansion.commit(cell), "A repeated click committed a second entrance"), CONNECT_ONE_SHOT)
 	click(point)
-	check(expansion.committing and scene.choosing_start and not wave.start_allowed and cards.input_suspended, "Commit unlocked gameplay before graph rebuild")
-	check(not expansion.commit(cell), "A repeated click committed a second entrance")
+	await frames(2)
+	check(commit_observed[0], "Candidate click did not commit an entrance")
 	await wait_map(scene)
 	check(completions[0] == 1 and not scene.choosing_start and not expansion.active and controller.start_paths.size() == 2 and controller.start_nodes.size() == 2, "New protected entrance was not added exactly once")
 	check(map.get_used_cells().size() == old_count+paths[picked].size(), "Extension did not preserve old terrain/add its exact road")

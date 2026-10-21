@@ -152,6 +152,11 @@ func _fade_pause_menu(reveal: bool) -> void:
 func _input(event: InputEvent) -> void:
 	if not pause_requested: return
 	var camera := get_viewport().get_camera_3d()
+	if event is InputEventMouse:
+		# Menu input reaches the camera's click/drag arbitration before GUI.
+		# The camera delivers ordinary menu clicks without changing gameplay.
+		for button in _menu_buttons:
+			if button.is_visible_in_tree() and button.call("accepts_pointer", event.position): return
 	if camera != null and camera.has_method("handle_navigation_input") and camera.handle_navigation_input(event):
 		get_viewport().set_input_as_handled()
 		return
@@ -162,8 +167,6 @@ func _input(event: InputEvent) -> void:
 		elif key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in _menu_buttons:
 			return
 	elif event is InputEventMouse:
-		for button in _menu_buttons:
-			if button.is_visible_in_tree() and button.call("accepts_pointer", event.position): return
 		# Deliver release events so dragging out of a menu button clears its press.
 		if event is InputEventMouseButton and not event.pressed: return
 	get_viewport().set_input_as_handled()
