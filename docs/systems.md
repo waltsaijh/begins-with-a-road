@@ -147,6 +147,8 @@ F3 與獨立流量圖層已移除。每個圖層各用一個 mesh，資料修改
 
 ## 簡易敵人
 
+正式 Soldier／Quickfeet／Heavy 分別使用 `assets/models/enemies/grunt.tscn`、`runner.tscn` 與 `brute.tscn`，模型、武器與配色沿用原型。Soldier 使用共用 GPU 步態；Runner 與 Brute 以場景實例播放循環 Walk，Quickfeet 動畫播放倍率為 3.0。模型動畫不改變既定路線或邏輯移速；資料仍由 Troop Resource 設定。模型說明與重建入口見 [模型說明](../assets/models/enemies/README.md)。
+
 避讓採平滑阻尼，約 0.8 秒到位，鄰兵離開後保留側向位置，不回彈到中央；轉彎時仍忽略接觸。內建 grunt 使用 MultiMesh，兵種可指定匯入的 GLB／glTF／TSCN 模型、動畫與 PNG 圖示；匯入模型保留自己的材質與骨架。
 
 main、9x9、11x11big 三張場景都包含 EnemyWave。入口圖準備完成後自動生成 64 隻紅衣步兵，每次 1 隻、間隔 0.2 秒，速度 2.5 世界單位／秒；抵達終點即 queue_free。右下角顯示生成／存活數，全數抵達後可按「生成 64 隻敵人」再次生成。Inspector 可修改 EnemyWave 的 enemy_count（預設 64）、batch_size（預設 1）、spawn_interval、速度、auto_start、兵種與起點；尾批不足 batch_size 時只生成剩餘數量。慢幀不會同幀補生多批，下一批從此次生成後重新等待間隔；間隔設 0 也至多每幀一批。null 兵種沿用 PortalMap，start_index=-1 使用目前 R 選取的起點。

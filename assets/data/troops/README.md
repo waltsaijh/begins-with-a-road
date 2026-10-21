@@ -9,13 +9,13 @@
 3. 設定 **Max Health**、**Max Shield**、**Speed Multiplier**。實際速度為波次 Move Speed × Speed Multiplier。
 4. 在波次編輯器的兵種選單選取它。選單與時間軸會顯示資源的 icon，時間軸色彩與 F1 路徑使用 Debug Color。
 
-| 資源 | HP | 速度倍率 | 配額分配 | 每格評分 |
-| --- | ---: | ---: | --- | --- |
-| soldier.tres | 100 | 1.0 | Uniform | 1 |
-| quickfeet.tres | 50 | 1.5 | Softmax | threat |
-| heavy.tres | 250 | 0.4 | Softmax | −threat |
+| 資源 | 配額分配 | 每格評分 |
+| --- | --- | --- |
+| soldier.tres | Uniform | 1 |
+| quickfeet.tres | Softmax | threat |
+| heavy.tres | Softmax | −threat |
 
-關卡內的 Heavy 已統一使用本資源，沒有另外覆寫成 500 HP／0.5 倍速。
+血量、護盾與移速以各 `.tres` 當前值為準；波次共用該資源，不從歷史說明恢復數值。
 
 ## 尋路
 
@@ -29,7 +29,7 @@
 
 ## 匯入模型
 
-目前三種兵種使用從 `card-tower-defense` 直接匯入的模型：Soldier → `grunt.tscn`、Quickfeet → `runner.tscn`、Heavy → `brute.tscn`，皆位於 `assets/models/enemies/`，Model Scale 為 1。原始外觀與配色由 `tools/assets/build_enemy.gd` 匯入；遊戲執行不依賴原專案。
+目前 Soldier 使用 `assets/models/enemies/grunt.tscn`，Quickfeet 使用 `runner.tscn`，Heavy 使用 `brute.tscn`；三者的 Model Scale 為 1。Quickfeet 的 Animation Speed 為 3.0。詳見 [模型說明](../../models/enemies/README.md)。
 
 將 `.glb`／`.gltf` 及貼圖放入專案，等待 Godot 匯入，再把匯入場景拖到 **Model**。也可使用自己建立的 `.tscn`；根節點須為 Node3D 或其子類別。
 
@@ -40,7 +40,7 @@
 - **Animation Speed**：動畫播放倍率。
 - **Head Height**：0 依 mesh 範圍估算血條高度，也可手動覆寫。
 
-預設 `grunt.tscn` 保留 MultiMesh 與 GPU 步態；其他模型以場景實例顯示，保留匯入材質、Skeleton3D 與 AnimationPlayer。不同模型可以出現在同一波。自訂場景各自產生繪製成本，適合保留完整的匯入模型／骨架動畫。
+Soldier 的 `grunt.tscn` 使用 MultiMesh 與 GPU 步態；Quickfeet／Heavy 的場景以實例顯示並保留自己的材質與 AnimationPlayer。不同模型可以出現在同一波。自訂場景各自產生繪製成本，適合保留完整的匯入模型／骨架動畫。
 
 Icon 是獨立 Texture2D，直接選取 PNG 即可，不受模型匯入方式影響。
 

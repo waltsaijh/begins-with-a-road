@@ -6,7 +6,6 @@
 | --- | --- |
 | `build/` | Windows／Web GDExtension 建置 |
 | `assets/` | Godot 離線重建地塊庫、敵人、塔、端點、介面圖示與卡牌圖片 |
-| `assets/blender/` | 方塊角色原型的 Blender 建模、匯出與預覽腳本 |
 | `web/` | 測試場景匯出、本機伺服器及 Playwright 功能驗證 |
 
 ```powershell
@@ -22,4 +21,4 @@ Web 功能驗證可使用 `web/export_test.ps1 -Godot <Godot執行檔>`，預設
 
 `web/verify_enemy_web.cjs` 讀取已匯出的測試與對應原生 log，比對 Windows／Web 結果。設定 `PLAYWRIGHT_MODULE`、`BENCHMARK_PYTHON`、`BENCHMARK_BROWSER` 後執行；`--directory=<匯出目錄>` 可指定服務位置。預設比對 enemies，原生輸出需存為 `.godot/enemy_tests.out`。其他選項與檔名見該腳本的 suites 表；多場景驗證需先將各測試以對應 HTML 名稱匯出至同一目錄。JSON、截圖寫入 `.godot/test-results/<功能>/`，log 放 `.godot/`。
 
-Blender 腳本需要 `bpy`，其中 `ROOT` 是本機專案位置，搬移專案時需更新。預覽圖片寫入 `.godot/test-results/assets/`；遊戲不會載入工具腳本。已完成的一次性 benchmark 收集與彙整工具已清除，歷史結論見 [效能摘要](../reports/performance_2026-10-20.md)。
+已完成的一次性 benchmark 收集與彙整工具已清除，歷史結論見 [效能摘要](../reports/performance_2026-10-20.md)。
