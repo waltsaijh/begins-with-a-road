@@ -49,6 +49,8 @@ func _ready() -> void:
 	_shop_rest_y = $Shop/View/Root.position.y
 	get_viewport().size_changed.connect(_position_paused_cards)
 	hand.card_selected.connect(select_card)
+	hand.card_drag_started.connect(_on_card_drag_started)
+	hand.card_dropped.connect(_on_card_dropped)
 	get_viewport().mouse_entered.connect(func(): _mouse_in_viewport = true)
 	get_viewport().mouse_exited.connect(func():
 		_mouse_in_viewport = false
@@ -58,10 +60,11 @@ func _ready() -> void:
 		_on_wave_started()
 	set_process(false)
 
-func select_card(index: int) -> void:
+func select_card(index: int, toggle := true) -> void:
 	if input_suspended and index >= 0:
 		return
-	selected = index if index >= 0 and index < cards.size() and cards[index] != null and index != selected else -1
+	if toggle: hand.cancel_drag()
+	selected = index if index >= 0 and index < cards.size() and cards[index] != null and (not toggle or index != selected) else -1
 	turns = 0
 	towers.input_enabled = selected < 0 and not input_suspended
 	preview.visible = false
@@ -69,6 +72,22 @@ func select_card(index: int) -> void:
 	_dirty = true
 	hand.show_selection(selected, turns)
 	set_process(selected >= 0)
+
+func _on_card_drag_started(index: int) -> void:
+	if input_suspended:
+		hand.cancel_drag()
+		return
+	# Dragging the selected card preserves its current rotation.
+	if selected != index: select_card(index, false)
+
+func _on_card_dropped(index: int, point: Vector2) -> void:
+	if input_suspended or selected != index or not _mouse_in_viewport: return
+	if not get_viewport().get_visible_rect().has_point(point): return
+	if CardButton.has_card_at(get_viewport(), point):
+		select_card(-1)
+		return
+	if get_viewport().gui_get_hovered_control() != null: return
+	place_selected(placement.pick_cell(point))
 
 func set_shop_open(value: bool) -> void:
 	_shop_open = value
@@ -84,6 +103,7 @@ func set_pause_locked(value: bool, seconds := 0.35) -> void:
 	if pause_locked == value: return
 	pause_locked = value
 	input_suspended = pause_locked or entry_selection_active or _wave_active or _wave_start_pending or _shop_open
+	hand.set_interaction_enabled(not input_suspended)
 	towers.input_enabled = selected < 0 and not input_suspended
 	if value:
 		preview.hide()
@@ -117,6 +137,7 @@ func prepare_wave_start() -> void:
 
 func _refresh_input_state() -> void:
 	input_suspended = pause_locked or entry_selection_active or _wave_active or _wave_start_pending or _shop_open
+	hand.set_interaction_enabled(not input_suspended)
 	select_card(-1)
 	hand.set_collapsed(_shop_open)
 	hand.set_stowed(entry_selection_active or _wave_active or _wave_start_pending)

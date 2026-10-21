@@ -44,7 +44,16 @@ default_background = ExtResource("4")
 default_frame = ExtResource("5")
 default_icon = ExtResource("6")
 
-[node name="Background" type="NinePatchRect" parent="." unique_id=1390445369]
+[node name="Visuals" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Background" type="NinePatchRect" parent="Visuals" unique_id=1390445369]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -57,7 +66,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Selection" type="NinePatchRect" parent="." unique_id=1114006737]
+[node name="Selection" type="NinePatchRect" parent="Visuals" unique_id=1114006737]
 visible = false
 self_modulate = Color(0.664, 0.86, 0.881, 1)
 layout_mode = 1
@@ -77,7 +86,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Accent" type="NinePatchRect" parent="." unique_id=837016352]
+[node name="Accent" type="NinePatchRect" parent="Visuals" unique_id=837016352]
 self_modulate = Color(0.52, 0.8, 0.83, 1)
 layout_mode = 1
 anchors_preset = 15
@@ -92,7 +101,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Content" type="MarginContainer" parent="." unique_id=2096828162]
+[node name="Content" type="MarginContainer" parent="Visuals" unique_id=2096828162]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -105,19 +114,19 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="Layout" type="VBoxContainer" parent="Content" unique_id=170196940]
+[node name="Layout" type="VBoxContainer" parent="Visuals/Content" unique_id=170196940]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 7
 
-[node name="Header" type="HBoxContainer" parent="Content/Layout" unique_id=1909053935]
+[node name="Header" type="HBoxContainer" parent="Visuals/Content/Layout" unique_id=1909053935]
 layout_mode = 2
 offset_transform_enabled = true
 offset_transform_position = Vector2(0, 4)
 mouse_filter = 2
 theme_override_constants/separation = 4
 
-[node name="Shortcut" type="Label" parent="Content/Layout/Header" unique_id=700101014]
+[node name="Shortcut" type="Label" parent="Visuals/Content/Layout/Header" unique_id=700101014]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 0)
 layout_mode = 2
@@ -125,17 +134,17 @@ theme_override_font_sizes/font_size = 16
 text = "1"
 vertical_alignment = 1
 
-[node name="CardTitle" parent="Content/Layout/Header" unique_id=2029611028 instance=ExtResource("12")]
+[node name="CardTitle" parent="Visuals/Content/Layout/Header" unique_id=2029611028 instance=ExtResource("12")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Price" parent="Content/Layout/Header" unique_id=627171248 instance=ExtResource("10")]
+[node name="Price" parent="Visuals/Content/Layout/Header" unique_id=627171248 instance=ExtResource("10")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Divider" type="ColorRect" parent="Content/Layout" unique_id=1237173868]
+[node name="Divider" type="ColorRect" parent="Visuals/Content/Layout" unique_id=1237173868]
 unique_name_in_owner = true
 material = SubResource("DividerMaterial")
 custom_minimum_size = Vector2(0, 3)
@@ -143,7 +152,7 @@ layout_mode = 2
 mouse_filter = 2
 color = Color(0.52, 0.8, 0.83, 1)
 
-[node name="TowerIcon" type="TextureRect" parent="Content/Layout" unique_id=786712855]
+[node name="TowerIcon" type="TextureRect" parent="Visuals/Content/Layout" unique_id=786712855]
 unique_name_in_owner = true
 self_modulate = Color(0.28599998, 0.44000003, 0.4565, 1)
 material = SubResource("IconMaterial")
@@ -154,7 +163,7 @@ texture = ExtResource("6")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TileDiagram" type="Control" parent="Content/Layout" unique_id=1889486113]
+[node name="TileDiagram" type="Control" parent="Visuals/Content/Layout" unique_id=1889486113]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2

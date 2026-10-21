@@ -65,6 +65,13 @@ var hovered := false
 		show_shortcut = value
 		_refresh()
 var _tower: TowerDefinition
+@export_group("Selection Motion")
+@export_range(0.0, 2.0, 0.05) var selected_sway_degrees := 0.6
+@export_range(1.0, 8.0, 0.1) var selected_sway_period := 3.6
+@export_range(0.05, 0.6, 0.01) var selected_sway_blend_seconds := 0.22
+var _sway_phase := 0.0
+var _sway_amount := 0.0
+var _sway_last_usec := 0
 @export_group("Editor Preview")
 @export var preview_tower: TowerDefinition
 
@@ -75,16 +82,34 @@ func _ready() -> void:
 	mouse_exited.connect(_on_hover.bind(false))
 	_refresh()
 
+func _process(_delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	var real_delta := (now-_sway_last_usec)/1000000.0
+	_sway_last_usec = now
+	_sway_amount = move_toward(_sway_amount, 1.0 if selected else 0.0, real_delta/maxf(0.01, selected_sway_blend_seconds))
+	_sway_phase = fmod(_sway_phase+TAU*real_delta/maxf(0.1, selected_sway_period), TAU)
+	# Artwork moves inside a stable button, independent of fan/lift tweens.
+	$Visuals.pivot_offset = Vector2(size.x*0.5, size.y)
+	$Visuals.rotation_degrees = sin(_sway_phase)*selected_sway_degrees*_sway_amount
+	if not selected and is_zero_approx(_sway_amount):
+		$Visuals.rotation = 0.0
+		_sway_phase = 0.0
+		set_process(false)
+
 func _on_hover(value: bool) -> void:
 	hovered = value
 	_refresh()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED: _refresh()
+	elif what == NOTIFICATION_UNPAUSED: _sway_last_usec = Time.get_ticks_usec()
 
 func _refresh() -> void:
 	if not is_node_ready():
 		return
+	var animate := not Engine.is_editor_hint() and (selected or _sway_amount > 0.0)
+	if animate and not is_processing(): _sway_last_usec = Time.get_ticks_usec()
+	set_process(animate)
 	var definition := card.tower if card != null else null
 	if _tower != definition:
 		if is_instance_valid(_tower) and _tower.changed.is_connected(_refresh):
@@ -93,12 +118,12 @@ func _refresh() -> void:
 		if _tower != null:
 			_tower.changed.connect(_refresh)
 	var accent := _tower.accent_color if _tower != null else Color.WHITE
-	$Background.texture = card.background_texture if card != null and card.background_texture != null else default_background
-	$Accent.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
-	$Accent.self_modulate = accent.lightened(0.15) if hovered else accent
-	$Selection.texture = $Accent.texture
-	$Selection.self_modulate = accent.lightened(0.3)
-	$Selection.visible = selected
+	$Visuals/Background.texture = card.background_texture if card != null and card.background_texture != null else default_background
+	$Visuals/Accent.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
+	$Visuals/Accent.self_modulate = accent.lightened(0.15) if hovered else accent
+	$Visuals/Selection.texture = $Visuals/Accent.texture
+	$Visuals/Selection.self_modulate = accent.lightened(0.3)
+	$Visuals/Selection.visible = selected
 	%TowerIcon.texture = _tower.icon if _tower != null and _tower.icon != null else default_icon
 	%TowerIcon.self_modulate = accent.darkened(icon_darkening)
 	%Divider.color = accent

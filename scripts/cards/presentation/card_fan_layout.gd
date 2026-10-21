@@ -4,7 +4,7 @@ extends RefCounted
 const CARD_SCALE := 0.82
 const OVERLAP := 8.0
 const MAX_ANGLE := 4.0
-const HOVER_LIFT := 12.0
+const HOVER_LIFT := 6.0
 const HOVER_TIME := 0.14
 const INSERT_TIME := 0.28
 const SHIFT_TIME := 0.22
@@ -43,7 +43,10 @@ static func pick(items: Array, point: Vector2, extra_top := 0.0, hovered := -1) 
 		var item: Control = items[i]
 		if not item.is_visible_in_tree(): continue
 		var rect := Rect2(Vector2(0, -extra_top), item.size+Vector2(0, extra_top))
-		if i == hovered: rect.size.y += HOVER_LIFT
+		if item is CardButton:
+			rect.size.y += item.hover_lift
+		elif i == hovered:
+			rect.size.y += HOVER_LIFT
 		if item.z_index >= depth and rect.has_point(item.get_global_transform().affine_inverse()*point):
 			picked = i
 			depth = item.z_index

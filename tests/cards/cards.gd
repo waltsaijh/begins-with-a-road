@@ -44,7 +44,7 @@ func verify_card_ui() -> void:
 	view.card = card
 	add_child(view)
 	var icon: TextureRect = view.get_node("%TowerIcon")
-	var frame: NinePatchRect = view.get_node("Accent")
+	var frame: NinePatchRect = view.get_node("Visuals/Accent")
 	var diagram: Control = view.get_node("%TileDiagram")
 	check(icon.texture == card.tower.icon and icon.self_modulate == card.tower.accent_color.darkened(view.icon_darkening), "Tower artwork/color not sourced from tower")
 	card.tower.accent_color = Color("dd8855")
@@ -55,17 +55,17 @@ func verify_card_ui() -> void:
 	card.tower.icon = texture
 	card.frame_texture = texture
 	card.background_texture = texture
-	check(icon.texture == texture and frame.texture == texture and view.get_node("Background").texture == texture, "Custom PNG-like textures did not replace artwork")
+	check(icon.texture == texture and frame.texture == texture and view.get_node("Visuals/Background").texture == texture, "Custom PNG-like textures did not replace artwork")
 	card.frame_texture = null
 	card.background_texture = null
 	card.tower.icon = null
-	check(frame.texture == view.default_frame and icon.texture == view.default_icon and view.get_node("Background").texture == view.default_background, "Default artwork fallback failed")
+	check(frame.texture == view.default_frame and icon.texture == view.default_icon and view.get_node("Visuals/Background").texture == view.default_background, "Default artwork fallback failed")
 	view.selected = true
 	view.turns = 1
 	view.key_number = 3
 	card.tile_preset = card.tile_preset.duplicate()
 	card.tile_preset.prefix_key = "tile_preset.test_custom.prefix"
-	check(view.get_node("Selection").visible and diagram.turns == 1 and view.get_node("%Shortcut").text == "3" and view.get_node("%CardTitle/Prefix").text == card.localized_prefix() and view.get_node("%CardTitle/TowerName").text == card.tower.localized_name(), "Scene UI did not track card state")
+	check(view.get_node("Visuals/Selection").visible and diagram.turns == 1 and view.get_node("%Shortcut").text == "3" and view.get_node("%CardTitle/Prefix").text == card.localized_prefix() and view.get_node("%CardTitle/TowerName").text == card.tower.localized_name(), "Scene UI did not track card state")
 	for node: Node in view.find_children("*", "Control", true, false):
 		check(node.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Child UI intercepts card clicks")
 	view.queue_free()

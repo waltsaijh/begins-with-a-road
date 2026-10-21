@@ -75,7 +75,11 @@ func _advance_orbit(real_delta: float) -> void:
 func _input(event: InputEvent) -> void:
 	# Decide click versus drag before GUI/gameplay can act on the press. Cards
 	# retain their normal input; non-card clicks are delivered on release.
-	if _orbit_press != null or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
+	# Middle-button navigation must reach the camera before cards consume GUI
+	# motion, including when the pointer crosses a shop slot or its price.
+	var middle_drag: bool = event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_MIDDLE) != 0
+	var middle_button: bool = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE
+	if middle_drag or middle_button or _orbit_press != null or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
 		if handle_navigation_input(event): get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -152,11 +156,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT: _stop_orbit()
 
 func _over_card(point: Vector2) -> bool:
-	for card: Control in get_tree().get_nodes_in_group("camera_drag_blockers"):
-		if card.get_viewport() != get_viewport() or not card.is_visible_in_tree(): continue
-		var local := card.get_global_transform_with_canvas().affine_inverse()*point
-		if card._has_point(local): return true
-	return false
+	return CardButton.has_card_at(get_viewport(), point)
 
 func pan(previous: Vector2, current: Vector2) -> void:
 	# Ray/plane intersection keeps dragging aligned with the cursor at any angle/zoom.

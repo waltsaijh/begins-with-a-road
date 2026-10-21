@@ -191,7 +191,7 @@ func verify() -> void:
 		if i != 2: check(view.slots[i].position.distance_to(original_positions[i]) < 0.01, "Hover moved a neighbouring card")
 		check(view.slots[i].z_index == i+1 and view.slots[i].scale.is_equal_approx(view.slots[0].scale), "Shop hover changed scale or draw order")
 	var relative_lift: Vector2 = (view.slots[2].position-original_positions[2]).rotated(-view.slots[2].rotation)
-	check(absf(relative_lift.x) < 0.01 and relative_lift.y < -5.0, "Hover did not move along the card's own up direction")
+	check(absf(relative_lift.x) < 0.01 and is_equal_approx(relative_lift.y, -CardFanLayout.HOVER_LIFT*CardFanLayout.CARD_SCALE), "Hover did not move along the card's own up direction")
 	for i in 12: await get_tree().process_frame
 	check(view._hovered == 2 and CardFanLayout.pick(view.slots, focus_point, 0, 2) == 2, "Stationary hover oscillated or moved away from its activation point")
 	# Reach overlapping cards through their exposed outside edge, including both ends.
@@ -324,6 +324,9 @@ func verify() -> void:
 		view._unhandled_input(outside)
 	else:
 		await click_at(Vector2(400, 200))
+		# Non-card clicks are delivered after release by camera click/drag arbitration.
+		await get_tree().process_frame
+		await get_tree().process_frame
 	settle(cards, shop)
 	check(not view.opened and not cards.hand.collapsed and not cards.input_suspended and wave.controls.visible, "Outside click did not restore the hand/tools")
 	check(map.get_used_cells().size() == tiles, "Closing click also placed a world tile")

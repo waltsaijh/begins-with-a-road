@@ -34,6 +34,14 @@ func left(point: Vector2, pressed: bool) -> void:
 	event.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
 	_viewport.push_input(event, true)
 
+func middle(point: Vector2, pressed: bool) -> void:
+	var event := InputEventMouseButton.new()
+	event.position = point
+	event.button_index = MOUSE_BUTTON_MIDDLE
+	event.pressed = pressed
+	event.button_mask = MOUSE_BUTTON_MASK_MIDDLE if pressed else 0
+	_viewport.push_input(event, true)
+
 func click(button: Button) -> void:
 	var point := button.get_global_transform_with_canvas()*(button.size*0.5)
 	motion(point)
@@ -281,6 +289,30 @@ func verify() -> void:
 	var reroll: Button = shop.view.slots[0].get_node("Face/Back")
 	var reroll_point := reroll.get_global_transform_with_canvas()*(reroll.size*0.5)
 	var coins: int = shop.coins
+	# Pan through actual GUI cards: both the first crossing and motion within
+	# the shop must reach camera input before the GUI can swallow them.
+	camera.focus = camera._initial_focus
+	camera.update_pose()
+	var pan_start := reroll_point-Vector2(0, 120)
+	motion(pan_start)
+	middle(pan_start, true)
+	var before_pan: Vector3 = camera.focus
+	motion(reroll_point, Vector2(0, 120), MOUSE_BUTTON_MASK_MIDDLE)
+	check(not camera.focus.is_equal_approx(before_pan), "Middle drag stopped when entering the shop cards")
+	var inside_pan: Vector3 = camera.focus
+	motion(reroll_point+Vector2(20, 0), Vector2(20, 0), MOUSE_BUTTON_MASK_MIDDLE)
+	check(not camera.focus.is_equal_approx(inside_pan), "Middle drag stopped while moving across a shop card")
+	middle(reroll_point+Vector2(20, 0), false)
+	var released_pan: Vector3 = camera.focus
+	motion(reroll_point+Vector2(40, 0), Vector2(20, 0))
+	check(camera.focus.is_equal_approx(released_pan) and shop.coins == coins and shop.view.opened, "Middle release kept panning or activated a shop card")
+	# Starting a middle drag on a card also remains available.
+	middle(reroll_point, true)
+	motion(reroll_point+Vector2(0, -20), Vector2(0, -20), MOUSE_BUTTON_MASK_MIDDLE)
+	middle(reroll_point+Vector2(0, -20), false)
+	check(not camera.focus.is_equal_approx(released_pan), "Shop card intercepted the initial middle press")
+	camera.focus = camera._initial_focus
+	camera.update_pose()
 	motion(reroll_point)
 	left(reroll_point, true)
 	motion(reroll_point+Vector2(180, -100), Vector2(180, -100), MOUSE_BUTTON_MASK_LEFT)
@@ -304,7 +336,7 @@ func verify() -> void:
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		_viewport.get_texture().get_image().save_png(Artifacts.path("levels/camera_orbit.png"))
-	var report := {"failures": failures, "maximum_speed": true, "velocity_smoothing": true, "smooth_bounded_stop": true, "full_circle": true, "reverse_circle": true, "non_card_drag": true, "center_dead_zone": true, "fixed_pivot": true, "yaw_only": true, "ui_priority": true, "click_vs_drag": true, "card_exclusion": true, "capture_and_release": true, "paused": true, "terrain_unchanged": true}
+	var report := {"failures": failures, "maximum_speed": true, "middle_pan_over_shop": true, "velocity_smoothing": true, "smooth_bounded_stop": true, "full_circle": true, "reverse_circle": true, "non_card_drag": true, "center_dead_zone": true, "fixed_pivot": true, "yaw_only": true, "ui_priority": true, "click_vs_drag": true, "card_exclusion": true, "capture_and_release": true, "paused": true, "terrain_unchanged": true}
 	FileAccess.open(Artifacts.path("levels/camera_orbit.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("CAMERA_ORBIT_CHECK:"+JSON.stringify(report))
 	get_tree().quit(1 if failures else 0)
