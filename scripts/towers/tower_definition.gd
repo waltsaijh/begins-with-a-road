@@ -27,13 +27,22 @@ extends Resource
 	set(value):
 		footprint = value
 		emit_changed()
+## Null uses the circular attack_radius; set a Resource for arbitrary tile shapes.
+@export var attack_area: TowerAttackArea:
+	set(value):
+		if attack_area == value: return
+		if is_instance_valid(attack_area) and attack_area.changed.is_connected(emit_changed):
+			attack_area.changed.disconnect(emit_changed)
+		attack_area = value
+		if attack_area != null: attack_area.changed.connect(emit_changed)
+		emit_changed()
 @export_range(0.0, 10.0, 0.5, "or_greater") var attack_radius := TowerConstants.ATTACK_RADIUS
 @export_range(0.0, 10.0, 0.1, "or_greater") var threat := TowerConstants.THREAT
 @export_group("Combat")
 @export_range(1.0, 10000.0, 1.0, "or_greater") var max_health := TowerConstants.MAX_HEALTH
 @export_range(0.0, 1000.0, 1.0, "or_greater") var default_damage := TowerConstants.DEFAULT_DAMAGE
 @export_range(0.05, 10.0, 0.05, "or_greater") var attack_interval := TowerConstants.ATTACK_INTERVAL
-## attack_radius above is measured between tile coordinates, including whole tiles.
+## Attack geometry and threat use the same whole-tile attack area.
 @export var attack: TowerAttack
 ## Paths relative to the model root. AimPivot faces local -Z; the base stays fixed.
 @export_node_path("Node3D") var aim_pivot_path: NodePath
@@ -77,6 +86,8 @@ func configuration_error() -> String:
 		return "防禦塔血量／傷害設定無效"
 	if not is_finite(attack_interval) or attack_interval <= 0 or not is_finite(attack_radius) or attack_radius < 0 or not is_finite(threat) or threat < 0:
 		return "防禦塔攻擊間隔／地塊範圍／威脅設定無效"
+	if attack_area != null and not attack_area.configuration_error().is_empty():
+		return attack_area.configuration_error()
 	return attack.configuration_error() if attack != null else ""
 
 func cells_at(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
@@ -88,3 +99,7 @@ func cells_at(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 		if not cell in result:
 			result.append(cell)
 	return result
+
+func attack_cells_at(anchor: Vector2i, turns := 0, radius_override := -1.0) -> Array[Vector2i]:
+	if attack_area != null: return attack_area.cells_at(anchor, turns)
+	return TowerAttackArea.circle_cells(anchor, attack_radius if radius_override < 0 else radius_override)

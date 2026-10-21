@@ -17,6 +17,13 @@ func verify() -> void:
 		for x in 9:
 			cells.append(Vector2i(x, y))
 	var scene := Fixture.scene_for(cells, Vector2i.ZERO, Vector2i(8, 8))
+	var template: DefenseTower = load("res://scenes/towers/sentry.tscn").instantiate()
+	template.definition = template.definition.duplicate(true)
+	template.definition.attack_area = null
+	var circular_scene := PackedScene.new()
+	circular_scene.pack(template)
+	template.free()
+	scene.get_node("TowerMap").tower_scene = circular_scene
 	scene.get_node("EnemyWave").auto_start = false
 	add_child(scene)
 	var controller: Node = scene.get_node("PortalMap")

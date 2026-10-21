@@ -16,6 +16,7 @@ var _last_cell := TileConstants.INVALID_CELL
 var _dirty := true
 var _retry := 0.0
 var _preview_error := ""
+var _preview_definition: TowerDefinition
 var input_suspended := false
 var pause_locked := false
 var entry_selection_active := false
@@ -65,6 +66,12 @@ func select_card(index: int, toggle := true) -> void:
 		return
 	if toggle: hand.cancel_drag()
 	selected = index if index >= 0 and index < cards.size() and cards[index] != null and (not toggle or index != selected) else -1
+	var next_definition: TowerDefinition = cards[selected].tower if selected >= 0 else null
+	if _preview_definition != next_definition:
+		if is_instance_valid(_preview_definition) and _preview_definition.changed.is_connected(_invalidate):
+			_preview_definition.changed.disconnect(_invalidate)
+		_preview_definition = next_definition
+		if _preview_definition != null: _preview_definition.changed.connect(_invalidate)
 	turns = 0
 	towers.input_enabled = selected < 0 and not input_suspended
 	preview.visible = false
@@ -237,5 +244,7 @@ func _reset_rotation_hint() -> void:
 	rotation_hint.reset()
 
 func _exit_tree() -> void:
+	if is_instance_valid(_preview_definition) and _preview_definition.changed.is_connected(_invalidate):
+		_preview_definition.changed.disconnect(_invalidate)
 	if is_instance_valid(towers):
 		towers.input_enabled = true

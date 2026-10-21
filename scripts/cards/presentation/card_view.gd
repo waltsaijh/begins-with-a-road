@@ -72,6 +72,8 @@ var _tower: TowerDefinition
 var _sway_phase := 0.0
 var _sway_amount := 0.0
 var _sway_last_usec := 0
+var _editor_refresh_queued := false
+var _editor_refreshing := false
 @export_group("Editor Preview")
 @export var preview_tower: TowerDefinition
 
@@ -83,16 +85,20 @@ func _ready() -> void:
 	_refresh()
 
 func _process(_delta: float) -> void:
+	var visuals := get_node_or_null("Visuals") as Control
+	if visuals == null:
+		set_process(false)
+		return
 	var now := Time.get_ticks_usec()
 	var real_delta := (now-_sway_last_usec)/1000000.0
 	_sway_last_usec = now
 	_sway_amount = move_toward(_sway_amount, 1.0 if selected else 0.0, real_delta/maxf(0.01, selected_sway_blend_seconds))
 	_sway_phase = fmod(_sway_phase+TAU*real_delta/maxf(0.1, selected_sway_period), TAU)
 	# Artwork moves inside a stable button, independent of fan/lift tweens.
-	$Visuals.pivot_offset = Vector2(size.x*0.5, size.y)
-	$Visuals.rotation_degrees = sin(_sway_phase)*selected_sway_degrees*_sway_amount
+	visuals.pivot_offset = Vector2(size.x*0.5, size.y)
+	visuals.rotation_degrees = sin(_sway_phase)*selected_sway_degrees*_sway_amount
 	if not selected and is_zero_approx(_sway_amount):
-		$Visuals.rotation = 0.0
+		visuals.rotation = 0.0
 		_sway_phase = 0.0
 		set_process(false)
 
@@ -104,10 +110,48 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED: _refresh()
 	elif what == NOTIFICATION_UNPAUSED: _sway_last_usec = Time.get_ticks_usec()
 
+func _queue_editor_refresh(_child: Node = null) -> void:
+	if _editor_refresh_queued or not is_inside_tree(): return
+	_editor_refresh_queued = true
+	_refresh_after_editor_changes.call_deferred()
+
+func _refresh_after_editor_changes() -> void:
+	_editor_refresh_queued = false
+	_editor_refreshing = true
+	_refresh()
+	_editor_refreshing = false
+
 func _refresh() -> void:
-	if not is_node_ready():
+	if not is_inside_tree() or not is_node_ready(): return
+	if Engine.is_editor_hint():
+		if not child_entered_tree.is_connected(_queue_editor_refresh):
+			child_entered_tree.connect(_queue_editor_refresh)
+		# Resources can emit changed while the editor is rebuilding an instance.
+		if not _editor_refreshing:
+			_queue_editor_refresh()
+			return
+	var visuals := get_node_or_null("Visuals") as Control
+	var artwork: Node = visuals if visuals != null else self
+	if Engine.is_editor_hint() and visuals != null and not visuals.child_entered_tree.is_connected(_queue_editor_refresh):
+		visuals.child_entered_tree.connect(_queue_editor_refresh)
+	# A scene already open before Visuals was introduced retains root artwork
+	# until Godot replaces the instance. Resolve both layouts without modifying it.
+	var background := artwork.get_node_or_null("Background") as NinePatchRect
+	var frame := artwork.get_node_or_null("Accent") as NinePatchRect
+	var selection := artwork.get_node_or_null("Selection") as NinePatchRect
+	var icon := get_node_or_null("%TowerIcon") as TextureRect
+	var divider := get_node_or_null("%Divider") as ColorRect
+	var shortcut := get_node_or_null("%Shortcut") as Label
+	var title := get_node_or_null("%CardTitle") as Control
+	var price := get_node_or_null("%Price") as HBoxContainer
+	var diagram := get_node_or_null("%TileDiagram") as Control
+	if background == null or frame == null or selection == null or icon == null or divider == null or shortcut == null or title == null or price == null or diagram == null:
+		set_process(false)
 		return
-	var animate := not Engine.is_editor_hint() and (selected or _sway_amount > 0.0)
+	var gold := price.get_node_or_null("Gold") as TextureRect
+	var number := price.get_node_or_null("Number") as Label
+	if gold == null or number == null: return
+	var animate := not Engine.is_editor_hint() and visuals != null and (selected or _sway_amount > 0.0)
 	if animate and not is_processing(): _sway_last_usec = Time.get_ticks_usec()
 	set_process(animate)
 	var definition := card.tower if card != null else null
@@ -118,24 +162,24 @@ func _refresh() -> void:
 		if _tower != null:
 			_tower.changed.connect(_refresh)
 	var accent := _tower.accent_color if _tower != null else Color.WHITE
-	$Visuals/Background.texture = card.background_texture if card != null and card.background_texture != null else default_background
-	$Visuals/Accent.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
-	$Visuals/Accent.self_modulate = accent.lightened(0.15) if hovered else accent
-	$Visuals/Selection.texture = $Visuals/Accent.texture
-	$Visuals/Selection.self_modulate = accent.lightened(0.3)
-	$Visuals/Selection.visible = selected
-	%TowerIcon.texture = _tower.icon if _tower != null and _tower.icon != null else default_icon
-	%TowerIcon.self_modulate = accent.darkened(icon_darkening)
-	%Divider.color = accent
-	%Shortcut.text = str(key_number)
+	background.texture = card.background_texture if card != null and card.background_texture != null else default_background
+	frame.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
+	frame.self_modulate = accent.lightened(0.15) if hovered else accent
+	selection.texture = frame.texture
+	selection.self_modulate = accent.lightened(0.3)
+	selection.visible = selected
+	icon.texture = _tower.icon if _tower != null and _tower.icon != null else default_icon
+	icon.self_modulate = accent.darkened(icon_darkening)
+	divider.color = accent
+	shortcut.text = str(key_number)
 	var shop := presentation == Presentation.SHOP
-	%Shortcut.visible = not shop and show_shortcut
+	shortcut.visible = not shop and show_shortcut
 	var prefix := card.localized_prefix() if card != null and not shop else ""
 	var tower_name := _tower.localized_name() if _tower != null else tr("card.unassigned")
-	%CardTitle.show_name_parts(prefix, tower_name, TranslationServer.get_locale().get_slice("_", 0) == "en", shop)
-	%Price.visible = shop and card != null
-	%Price.get_node("Gold").texture = coin_texture
-	%Price.get_node("Number").text = str(price_override if price_override >= 0 else (card.price if card != null else 0))
-	%Price.get_node("Number").add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
-	%TileDiagram.show_recipe(card, turns, accent)
+	title.show_name_parts(prefix, tower_name, TranslationServer.get_locale().get_slice("_", 0) == "en", shop)
+	price.visible = shop and card != null
+	gold.texture = coin_texture
+	number.text = str(price_override if price_override >= 0 else (card.price if card != null else 0))
+	number.add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
+	diagram.show_recipe(card, turns, accent)
 	disabled = card == null or (shop and not can_afford)

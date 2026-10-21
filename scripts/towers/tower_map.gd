@@ -146,7 +146,7 @@ func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> Defens
 	towers[at] = tower
 	for pos in footprint:
 		occupied[pos] = tower
-	var values := [tower.attack_radius, tower.threat]
+	var values := [tower.attack_offsets().duplicate(), tower.threat]
 	_settings[at] = values
 	tower.influence_changed.connect(_on_influence_changed.bind(at))
 	tower.died.connect(_on_tower_died)
@@ -182,23 +182,29 @@ func remove_tower(cell: Vector3i) -> bool:
 
 func _on_influence_changed(at: Vector2i) -> void:
 	var tower: Node3D = towers[at]
-	var values := [tower.attack_radius, tower.threat]
+	var values := [tower.attack_offsets().duplicate(), tower.threat]
 	_apply_change(at, _settings[at], values)
 	_settings[at] = values
 
 func _apply_change(at: Vector2i, before: Array, after: Array) -> void:
-	var old_radius: float = before[0] if not before.is_empty() else 0.0
-	var new_radius: float = after[0] if not after.is_empty() else 0.0
-	var extent := ceili(maxf(1.0, maxf(old_radius, new_radius)))
+	var old_cells := {}
+	var new_cells := {}
+	if not before.is_empty():
+		for offset: Vector2i in before[0]: old_cells[offset] = true
+	if not after.is_empty():
+		for offset: Vector2i in after[0]: new_cells[offset] = true
+	var affected := old_cells.duplicate()
+	affected.merge(new_cells)
+	for y in range(-1, 2):
+		for x in range(-1, 2):
+			if x != 0 or y != 0: affected[Vector2i(x, y)] = true
 	var neighbor_delta := int(not after.is_empty())-int(not before.is_empty())
 	var records: RefCounted = controller.tile_parameters
 	records.begin_update()
-	for y in range(-extent, extent+1):
-		for x in range(-extent, extent+1):
-			var distance_squared := x*x+y*y
-			var old_amount: float = before[1] if not before.is_empty() and distance_squared <= old_radius*old_radius else 0.0
-			var new_amount: float = after[1] if not after.is_empty() and distance_squared <= new_radius*new_radius else 0.0
-			var nearby := neighbor_delta if absi(x) <= 1 and absi(y) <= 1 and distance_squared > 0 else 0
-			if nearby != 0 or old_amount != new_amount:
-				records.change_tower_influence(at+Vector2i(x, y), nearby, new_amount-old_amount)
+	for offset: Vector2i in affected:
+		var old_amount: float = before[1] if old_cells.has(offset) else 0.0
+		var new_amount: float = after[1] if new_cells.has(offset) else 0.0
+		var nearby := neighbor_delta if absi(offset.x) <= 1 and absi(offset.y) <= 1 and offset != Vector2i.ZERO else 0
+		if nearby != 0 or old_amount != new_amount:
+			records.change_tower_influence(at+offset, nearby, new_amount-old_amount)
 	records.end_update()

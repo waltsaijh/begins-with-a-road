@@ -47,16 +47,19 @@ func _process(delta: float) -> void:
 	for tower: DefenseTower in tower_map.towers.values():
 		if tower.is_queued_for_deletion() or tower.health <= 0 or tower.attack == null:
 			continue
-		# One extended query: its nearest enemy is necessarily in attack range
-		# whenever any attackable enemy exists, so lookahead cannot steal a shot.
-		var target := _index.target_for(tower.grid_cell, tower.attack_radius+TowerConstants.AIM_LOOKAHEAD_TILES)
+		var target: Node3D
+		if tower.definition != null and tower.definition.attack_area != null:
+			# An outside tile must never steal a shot from an asymmetric shape.
+			target = _index.target_in_offsets(tower.grid_cell, tower.attack_offsets())
+		else:
+			# Circular lookahead preserves nearest-first priority in one query.
+			target = _index.target_for(tower.grid_cell, tower.attack_radius+TowerConstants.AIM_LOOKAHEAD_TILES)
 		if target == null:
 			continue
 		var aligned := tower.aim_at(aim_position(target, tower.attack), step)
 		if elapsed < tower.next_attack_time or not aligned:
 			continue
-		var offset := _index.cell_for(target.global_position)-tower.grid_cell
-		if float(offset.length_squared()) > tower.attack_radius*tower.attack_radius:
+		if not tower.covers_cell(_index.cell_for(target.global_position)):
 			continue
 		if not tower.attack.configuration_error().is_empty() or not is_finite(tower.attack_interval) or tower.attack_interval <= 0:
 			continue

@@ -25,6 +25,7 @@ func fixture() -> Node3D:
 	# Freeze balance/delivery for these checks, independently of designer edits.
 	var test_tower: DefenseTower = load("res://scenes/towers/sentry.tscn").instantiate()
 	test_tower.definition = test_tower.definition.duplicate(true)
+	test_tower.definition.attack_area = null
 	test_tower.definition.default_damage = 20.0
 	test_tower.definition.max_health = 200.0
 	test_tower.definition.attack_interval = 1.0

@@ -124,6 +124,10 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 驗證入口為 `tests/cards/cards.tscn` 與 `tests/cards/card_preview.tscn`。
 
+### 卡面資源編輯與熱更新
+
+修改 TowerAttackArea.offsets 會經 TowerDefinition.changed 通知手牌及商店卡面。CardView 在編輯器合併延後更新，確認卡面、文字及價格子節點可用後才套用；節點重建完成時補上更新，離場實例忽略通知。已開啟場景若仍保存舊版根層 artwork，亦可正常更新，不需要為此修改 offsets 或重建資源；新場景仍使用 Visuals 作為選牌搖動的顯示層。`tests/editor/card_resource_refresh.gd` 在實際編輯器驗證新舊卡面、腳本熱更新、範圍資源變更、部分節點重建與離場通知。
+
 ### 回合商店
 
 每波敵人全數抵達或被擊殺後，右下升起五張背面牌，最上方顯示商店圖示。點擊展開時，左下手牌疊起並暫停建造工具；商品標題列左側顯示塔名，右側靠右顯示金幣與價格，最左側背面牌用於重刷，其價格放在卡片內的上方並水平置中，數字固定白色。購買後商品與價格立即移除，其餘商品連同重刷牌向右靠攏，不留空洞；買入卡從畫面下方滑入疊起手牌的最上方。重刷保留重刷牌，圖示以二次 ease-in-out 在 0.5 秒內旋轉 360 度，四張新商品從畫面下方插入；旋轉期間不會重複扣款。金錢不足時，重刷牌與商品一樣淡灰且不可購買。點商店外的空白處或 Esc 收回，恢復手牌與建造。開始下一波時，商店自動收回並隱藏。每波只發一次獎勵，開關商店不會重抽商品。
@@ -210,12 +214,14 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 
 `TowerDefinition` 是共用塔種 Resource，`DefenseTower` 是可繼承的實例基底，`TowerMap` 管理放置、佔格與影響提交。`assets/data/towers/sentry.tres` 定義哨塔，`scenes/towers/sentry.tscn` 繼承共用 tower.tscn。模型取自原型 art/towers/skybridge_towers.gd 的木架弩哨塔，由 tools/assets/build_tower.gd 離線烘焙成固定底座與可瞄準弩機兩份共用 mesh（各一個 surface，合計 265 三角形），正式執行不需原型。
 
-哨塔預設一格、attack_radius=3、threat=1、血量 200、傷害 20、攻擊間隔 1 秒，使用帶漸淡短拖尾的高速灰色箭矢，命中才扣血。可在 sentry.tres Inspector 調整塔種數值，實例的 attack_radius／threat setter 仍會更新影響；射程以 anchor 格為圓心。新增塔種時建立自己的 TowerDefinition 與繼承塔場景，再設定 TowerMap.tower_scene，或使用 `place_tower(cell, custom_scene)`；多格 footprint 沿用相同佔格／驗證流程，不需複製管理器。共同預設值直接使用 TowerConstants，不需 preload。按 F2 後指向地塊，可查看鄰塔數與威脅值。
+哨塔占一格，攻擊區域引用 `assets/data/towers/ranges/sentry_forward.tres`，形狀以目前 offsets 為準，可直接在 Inspector 修改。最初設計圖的 3×5 格（X=-1..1、Z=-3..1）僅保留在獨立回歸範例，不能據此還原使用者修改的資料。其他血量、傷害、冷卻與威脅以目前 sentry.tres 為準。使用帶漸淡短拖尾的高速灰色箭矢，命中才扣血。可在 sentry.tres Inspector 調整塔種數值，實例的 attack_radius／threat setter 仍會更新影響；attack_radius 僅在 attack_area 空引用時提供圓形範圍。新增塔種時建立自己的 TowerDefinition 與繼承塔場景，再設定 TowerMap.tower_scene，或使用 `place_tower(cell, custom_scene)`；多格 footprint 沿用相同佔格／驗證流程，不需複製管理器。共同預設值直接使用 TowerConstants，不需 preload。按 F2 後指向地塊，可查看鄰塔數與威脅值。
 
 - `tile.num_towers_around`：周圍上下左右與對角共八格的塔數，不含本格的塔。
-- `tile.threat`：所有能瞄準本格的塔之 threat 加總（不額外擴張投射物的範圍傷害外溢）。使用格中心的圓形距離，含本格與半徑邊界，`dx²+dy² <= radius²`；半徑 3 在完整網格覆蓋 29 格。
+- `tile.threat`：所有攻擊區域包含本格的塔之 threat 加總（不額外擴張投射物的範圍傷害外溢）。自訂 TowerAttackArea 對 offsets 去重後依 rotation_steps 轉向；attack_area 空引用則使用圓形距離 `dx²+dy² <= radius²`，含本格與半徑邊界，半徑 3 仍覆蓋 29 格。
 
-重疊塔會相加；移除、修改範圍／威脅值會更新影響。僅修改暫緩地塊時發出參數顯示通知，不使現有路線成本快取失效。每次只處理前後範圍聯集內的座標，整批更新僅發出一次成本失效通知，不重建道路幾何。空格也保留稀疏覆蓋資料，因此之後新增道路時立即繼承數值。已經為本波固定的敵人行程保持不變。
+TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色填色與細框顯示完整攻擊格（包含空地）；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都呼叫 TowerDefinition.attack_cells_at，不在每幀重建 mesh。
+
+重疊塔會相加；移除、修改範圍／威脅值會更新影響。僅修改暫緩地塊時發出參數顯示通知，不使現有路線成本快取失效。每次只處理前後範圍格子聯集與八鄰格，整批更新僅發出一次成本失效通知，不重建道路幾何。空格也保留稀疏覆蓋資料，因此之後新增道路時立即繼承數值。已經為本波固定的敵人行程保持不變。
 
 soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互相獨立。自訂兵種若要評估塔威脅，可使用 `1.0 + risk_weight * tile.threat`，或讀取 `tile.num_towers_around`；不會自動修改 damage_per_second。
 
@@ -223,7 +229,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 攻擊與效果
 
-在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。attack_radius 以塔 anchor 與敵人所在格的座標計算整格覆蓋，規則和 threat 一致；不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。攻擊範圍內沒有敵人時，預先看向射程＋1 格內最近的敵人，但不擴大實際射程；無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
+在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。攻擊區域以塔 anchor 與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
 
 - `ArrowAttack`：快速單體箭矢，只追蹤原先鎖定者，抵達後扣血；目標已死亡或抵達終點時飛至最後位置後消失，不轉移目標或造成範圍傷害。sentry_arrow.tres 可調 speed（世界單位／秒，預設 24）、arrow_length／arrow_width、trail_length／trail_width／color。
 - `BeamAttack`：立即對目標扣血，再顯示短暫灰色軌跡。sentry_beam.tres 可調 trail_duration／trail_width／color。
@@ -232,7 +238,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 攻擊發射時保存當次傷害與效果數值；塔被移除後，已發射投射物仍會命中。`DefenseTower.damage_against(target)` 可覆寫特定傷害規則；其他發射機制可繼承 TowerAttack.fire()。Attack 留空時只當障礙塔。塔／敵人透過 take_damage(amount) 扣血；塔死亡會釋放障礙並更新地圖。敵人死亡立即退出 Wave 與 MultiMesh，killed 與到達終點的 completed 分別計數；全數死亡也能結束波次，目前敵人不會反擊塔。
 
-每張地圖只有一個 CombatSystem，在敵人移動後建立一次地塊索引，再讓冷卻完成的塔查詢覆蓋格；覆蓋偏移依半徑快取。沒有逐塔掃描整張地圖、RayCast、PhysicsBody 或逐發 Timer。軌跡與投射物標記合併為一個 unshaded 透明 mesh，支援 Compatibility／Web。AOE 命中與敵人死亡改用可編輯且會回收的圓環／低多邊形碎片場景：死亡半徑 0.35 格、0.3 秒，AOE 視覺半徑為傷害半徑的 0.65 倍、0.4 秒，造型參考 card-tower-defense；實際傷害、死亡與波次結算不受特效影響。場景與參數見 [scenes/effects/README.md](../scenes/effects/README.md)。這是輕量固定落點投射物，沒有物理碰撞或自動追蹤。
+每張地圖只有一個 CombatSystem，在敵人移動後建立一次地塊索引，再讓冷卻完成的塔查詢覆蓋格；覆蓋偏移與命中查表依實例快取，半徑／方向／範圍 Resource 改變才失效。沒有逐塔掃描整張地圖、RayCast、PhysicsBody 或逐發 Timer。軌跡與投射物標記合併為一個 unshaded 透明 mesh，支援 Compatibility／Web。AOE 命中與敵人死亡改用可編輯且會回收的圓環／低多邊形碎片場景：死亡半徑 0.35 格、0.3 秒，AOE 視覺半徑為傷害半徑的 0.65 倍、0.4 秒，造型參考 card-tower-defense；實際傷害、死亡與波次結算不受特效影響。場景與參數見 [scenes/effects/README.md](../scenes/effects/README.md)。這是輕量固定落點投射物，沒有物理碰撞或自動追蹤。
 
 規則回歸入口為 `tests/combat/combat.tscn`；`tests/combat/combat_preview.tscn` 驗證兩種攻擊的實際繪製。Web 工具為 `tools/web/verify_enemy_web.cjs --combat`。
 

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="TowerAttackArea" format=3 uid="uid://doxum7q1mrfsw"]
+
+[ext_resource type="Script" uid="uid://c66um0n3p6qyf" path="res://scripts/towers/tower_attack_area.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+offsets = Array[Vector2i]([Vector2i(-1, -2), Vector2i(0, -2), Vector2i(1, -2), Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1), Vector2i(-1, 2), Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, -1), Vector2i(2, 0), Vector2i(2, 1), Vector2i(-2, -1), Vector2i(-2, 0), Vector2i(-2, 1)])

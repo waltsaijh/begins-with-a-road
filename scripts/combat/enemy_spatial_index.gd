@@ -23,9 +23,12 @@ func cell_for(position: Vector3) -> Vector2i:
 	return Vector2i(cell.x, cell.z)
 
 func target_for(center: Vector2i, radius: float) -> Node3D:
+	return target_in_offsets(center, _offsets(radius))
+
+func target_in_offsets(center: Vector2i, offsets: Array[Vector2i]) -> Node3D:
 	var best: Node3D
 	var best_distance := INF
-	for offset in _offsets(radius):
+	for offset in offsets:
 		var cell := center+offset
 		var distance := float(offset.length_squared())
 		if distance > best_distance or not buckets.has(cell):
@@ -49,12 +52,4 @@ func targets_in(center: Vector2i, radius: float) -> Array[Node3D]:
 	return result
 
 static func covered_cells(center: Vector2i, radius: float) -> Array[Vector2i]:
-	var result: Array[Vector2i] = []
-	if not is_finite(radius) or radius < 0:
-		return result
-	var extent := floori(radius)
-	for y in range(-extent, extent+1):
-		for x in range(-extent, extent+1):
-			if x*x+y*y <= radius*radius:
-				result.append(center+Vector2i(x, y))
-	return result
+	return TowerAttackArea.circle_cells(center, radius)

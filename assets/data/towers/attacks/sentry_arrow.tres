@@ -1,10 +1,8 @@
-[gd_resource type="Resource" script_class="ArrowAttack" load_steps=2 format=3]
-[ext_resource type="Script" path="res://scripts/combat/attacks/arrow_attack.gd" id="1"]
+[gd_resource type="Resource" script_class="ArrowAttack" format=3 uid="uid://cuw4f0ui2jsep"]
+
+[ext_resource type="Script" uid="uid://b03sqteamjmpe" path="res://scripts/combat/attacks/arrow_attack.gd" id="1"]
+[ext_resource type="Script" uid="uid://dnpi53c1lvtd0" path="res://scripts/combat/effects/hit_effect.gd" id="1_wicqp"]
+
 [resource]
 script = ExtResource("1")
 color = Color(0.55, 0.55, 0.55, 1)
-speed = 24.0
-arrow_length = 0.36
-arrow_width = 0.025
-trail_length = 0.8
-trail_width = 0.035

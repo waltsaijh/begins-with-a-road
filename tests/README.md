@@ -24,11 +24,13 @@ godot --headless --path . res://tests/levels/level_teardown.tscn
 godot --headless --path . --script res://tests/navigation/portal_graph.gd
 godot --path . res://tests/cards/card_shop.tscn
 godot --path . res://tests/cards/card_drag_placement.tscn
+godot --path . res://tests/combat/attack_area.tscn
 godot --path . res://tests/levels/act_spawn_expansion.tscn
 godot --path . res://tests/levels/pause_menu.tscn
 godot --path . res://tests/levels/camera_orbit.tscn
 godot --path . res://tests/enemies/enemy_status.tscn
 godot --editor --path . -- --test-wave-editor
+godot --editor --path . -- --test-card-resource-refresh
 ```
 
 滑鼠 hover、像素取樣與動畫截圖測試需要實際渲染；`--headless` 適合資料與排程驗證。JSON 與截圖由 `fixtures/test_artifacts.gd` 建立目錄，寫入 `.godot/test-results/<功能>/`；log 及其他暫存也放 `.godot/`。這些產物不進版本控制或遊戲匯出。Web 驗證見 [工具說明](../tools/README.md)。
@@ -44,3 +46,7 @@ godot --editor --path . -- --test-wave-editor
 `camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、中鍵跨過商店卡牌及卡牌上起拖／放開、中心死區、跨 UI 捕捉／放開、卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
 
 `cards/card_drag_placement` 使用獨立 viewport 與實際滑鼠輸入驗證較小的 hover 上提、選中上提與平滑切換、卡面搖動及穩定命中範圍，另驗證手牌拖放、點選後點地圖、有效／無效落點、拖到手牌或商店牌背時取消選取、UI 排除、保留旋轉、鏡頭不被起動，以及 Esc／暫停／開波／離開視窗取消。拖曳預覽截圖與結果寫入 `.godot/test-results/cards/`。
+
+`combat/attack_area` 驗證格子資源儲存重載、Sentry 例圖、四向旋轉、預覽／索敵／威脅一致、非圓形遠角目標、範圍外近敵不搶目標、Resource 修改失效、新道路稀疏影響與圓形備援。預覽截圖與結果寫入 `.godot/test-results/combat/`。原有 combat／towers 的圓形回歸使用獨立範本，避免設計師修改 Sentry 範圍影響測試。
+
+`--test-card-resource-refresh` 透過已啟用的編輯器外掛啟動測試，驗證修改塔範圍 offsets 時的新舊商店卡面、腳本熱更新、部分節點重建與離場通知。測試只修改複製的 Resource，不儲存正式塔資料；結果寫入 `.godot/test-results/editor/`。可使用 headless 編輯器驗證節點生命週期。若正式專案的 GDExtension 被另一個編輯器鎖住，使用預先完成匯入的隔離專案副本（保留 assets、scripts、scenes、addons、測試 fixtures 及本測試，啟用相同編輯器外掛），勿移除正式專案的擴充或關閉使用者的編輯器。

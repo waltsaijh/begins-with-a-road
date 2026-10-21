@@ -1,24 +1,25 @@
 extends Node3D
-## One flat footprint mesh plus the shared tower model. No physics or map edits.
-var ground := MeshInstance3D.new()
+## Placement and attack tiles share the definition used by real combat/threat.
+@export var valid_color := Color(0.35, 0.93, 0.75, 0.52)
+@export var invalid_color := Color(1.0, 0.3, 0.22, 0.56)
+@export var range_fill_color := Color(0.96, 0.68, 0.21, 0.18)
+@export var range_border_color := Color(0.85, 0.53, 0.12, 0.5)
+@onready var ground: MeshInstance3D = $Ground
+@onready var attack_area: MeshInstance3D = $AttackArea
+var range_cells: Array[Vector2i] = []
 var ghost: Node3D
 var _definition: TowerDefinition
-var _material := StandardMaterial3D.new()
+var _material: StandardMaterial3D
 var hint_anchor := Vector3.ZERO
 
 func _ready() -> void:
-	_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_material = ground.material_override.duplicate()
 	ground.material_override = _material
-	ground.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(ground)
-	visible = false
 
 func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: bool) -> void:
 	visible = true
 	global_transform = map.global_transform
-	_material.albedo_color = Color(0.35, 0.93, 0.75, 0.52) if valid else Color(1.0, 0.3, 0.22, 0.56)
+	_material.albedo_color = valid_color if valid else invalid_color
 	var mesh := ImmediateMesh.new()
 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	for pos in card.ground_cells(Vector2i(cell.x, cell.z), turns):
@@ -27,6 +28,7 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 			mesh.surface_add_vertex(center+corner)
 	mesh.surface_end()
 	ground.mesh = mesh
+	_show_attack_area(map, card.tower, cell, turns)
 	if _definition != card.tower:
 		if ghost != null:
 			ghost.free()
@@ -42,6 +44,26 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 	if ghost != null:
 		hint_anchor.y = _top_height(ghost, hint_anchor.y)
 	hint_anchor += Vector3.UP*0.12
+
+func _show_attack_area(map: GridMap, definition: TowerDefinition, cell: Vector3i, turns: int) -> void:
+	range_cells = definition.attack_cells_at(Vector2i(cell.x, cell.z), turns)
+	var mesh := ImmediateMesh.new()
+	if not range_cells.is_empty():
+		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+		for at in range_cells:
+			var center := map.map_to_local(Vector3i(at.x, 0, at.y))+Vector3.UP*0.035
+			_range_quad(mesh, center, -0.43, -0.43, 0.43, 0.43, range_fill_color)
+			_range_quad(mesh, center, -0.46, -0.46, 0.46, -0.43, range_border_color)
+			_range_quad(mesh, center, -0.46, 0.43, 0.46, 0.46, range_border_color)
+			_range_quad(mesh, center, -0.46, -0.43, -0.43, 0.43, range_border_color)
+			_range_quad(mesh, center, 0.43, -0.43, 0.46, 0.43, range_border_color)
+		mesh.surface_end()
+	attack_area.mesh = mesh
+
+func _range_quad(mesh: ImmediateMesh, center: Vector3, left: float, top: float, right: float, bottom: float, color: Color) -> void:
+	mesh.surface_set_color(color)
+	for point in [Vector3(left, 0, top), Vector3(right, 0, top), Vector3(right, 0, bottom), Vector3(left, 0, top), Vector3(right, 0, bottom), Vector3(left, 0, bottom)]:
+		mesh.surface_add_vertex(center+point)
 
 func _top_height(node: Node, height: float) -> float:
 	if node is MeshInstance3D and node.mesh != null:

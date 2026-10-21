@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/cards/card_placement.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/cards/card_hand.tscn" id="2"]
-[ext_resource type="Script" path="res://scripts/cards/presentation/card_preview.gd" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/cards/components/card_preview.tscn" id="3"]
 
 [ext_resource type="PackedScene" path="res://scenes/cards/card_shop.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/cards/components/rotation_key_hint.tscn" id="9_hint"]
@@ -10,8 +10,7 @@
 [node name="CardPlacement" type="Node3D"]
 script = ExtResource("1")
 
-[node name="Preview" type="Node3D" parent="."]
-script = ExtResource("3")
+[node name="Preview" parent="." instance=ExtResource("3")]
 
 [node name="Hints" type="CanvasLayer" parent="."]
 layer = 1

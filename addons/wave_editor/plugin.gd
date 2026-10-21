@@ -20,6 +20,8 @@ func _open_initial() -> void:
 		var runner: Node = load("res://tests/editor/wave_editor_check.gd").new()
 		runner.panel = panel
 		get_tree().root.add_child(runner)
+	elif "--test-card-resource-refresh" in OS.get_cmdline_user_args():
+		get_tree().root.add_child(load("res://tests/editor/card_resource_refresh.gd").new())
 
 func _scene_changed(scene: Node) -> void:
 	if scene == null or panel.has_unsaved_changes(): return
