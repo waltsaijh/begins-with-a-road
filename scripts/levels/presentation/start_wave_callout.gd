@@ -33,6 +33,12 @@ func _notification(what: int) -> void:
 func clear_hover() -> void:
 	_set_hover(false)
 
+func set_intel_height(height: float) -> void:
+	custom_minimum_size = Vector2(216, 44+height)
+	size = custom_minimum_size
+	$Title.offset_bottom = 31.0
+	_update_visuals()
+
 func _set_hover(hovered: bool) -> void:
 	if _hover_motion != null: _hover_motion.kill()
 	_hover_motion = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
@@ -51,8 +57,15 @@ func _has_point(point: Vector2) -> bool:
 
 func _update_visuals() -> void:
 	if not is_node_ready(): return
-	$Shape.scale = size/design_size.max(Vector2.ONE)
-	var edge := _outline()
+	$Shape.scale = Vector2.ONE
+	var w := size.x
+	var h := size.y-9.5
+	var edge := PackedVector2Array([
+		Vector2(w*0.5, 1.5), Vector2(w-5.5, 1.5), Vector2(w-1.5, 5.5),
+		Vector2(w-1.5, h-4), Vector2(w-5.5, h), Vector2(w*0.5+5, h),
+		Vector2(w*0.5, size.y-1.5), Vector2(w*0.5-5, h), Vector2(5.5, h),
+		Vector2(1.5, h-4), Vector2(1.5, 5.5), Vector2(5.5, 1.5), Vector2(w*0.5, 1.5)])
+	$Shape/Background.polygon = edge
 	$Shape/Background.color = _background.lerp(Color(hover_background, _background.a), hover_amount)
 	var color := _border.lerp(hover_border, hover_amount)
 	if disabled: color.a = 0.35

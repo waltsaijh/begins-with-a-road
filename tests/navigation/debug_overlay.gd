@@ -116,6 +116,11 @@ func verify() -> void:
 	await frames()
 	# Every troop may share the same bridge: all colors must remain visible.
 	scene = load("res://scenes/main.tscn").instantiate()
+	# The designer's shared terrain now contains branches; keep this 23-edge
+	# color regression independent of authored map edits.
+	var bridge: GridMap = scene.get_node("TileMap")
+	bridge.clear()
+	for x in 24: bridge.set_cell_item(Vector3i(x, 0, 0), 3)
 	wave = scene.get_node("EnemyWave")
 	wave.auto_start = false
 	add_child(scene)

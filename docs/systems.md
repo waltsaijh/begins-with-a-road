@@ -148,9 +148,25 @@ F1 直接繪製本波敵人完整行程中的相鄰格連線，不再從單一�
 
 F2 以固定的 threat 尺度加深紅色與不透明度，0 不覆蓋。游標資料包含 threat、num_towers_around、terrain_id、movement_multiplier、damage_per_second、cover。關閉 F2 就停止每幀的地塊查看。
 
-F3 與獨立流量圖層已移除。每個圖層各用一個 mesh，資料修改時才重建；敵人移動或出生不重畫，開波後塔／成本變更也不會把既有行程換成新候選池。F2 關閉時不進行每幀地塊查看。
+F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線見下節，無獨立模式切換。每個除錯圖層各用一個 mesh，資料修改時才重建；敵人移動或出生不重畫，開波後塔／成本變更也不會把既有行程換成新候選池。F2 關閉時不進行每幀地塊查看。
 
 `tests/navigation/debug_overlay.tscn` 驗證混合兵種、預覽與實際行程一致、共用線段的多色顯示、多入口、未出生敵人、下一波更新及圖層切換。
+
+### Routing Sandbox：下一波敵軍與道路流量
+
+正式關卡的 `LevelHUD/WorldActions/EarlyStart/NextWaveIntel` 使用 `scenes/levels/components/next_wave_intel.tscn`，按目前 WaveDefinition.groups 中的 Troop Resource 加總敵軍數量；名稱／圖示取自資源，不列舉固定兵種。情報嵌入開始下一波按鈕內：按鈕寬 216px、標題下方顯示最多三列，超出採垂直捲動；兵種列仍支援 hover 篩選，點擊會轉送開波動作。單項範本 `troop_intel_item.tscn` 分開顯示圖示、可截短名稱與固定數量，並保留預設隱藏的 Info 節點供未來首次登場入口使用；目前沒有圖鑑行為。
+
+`wave_flow_preview.gd` 監聽 LevelSession.preparation_changed、EnemyWave.routes_changed、PortalMap.graph_changed／plan_changed 與 tile_parameters.costs_changed（包含非目前選取兵種）。失效先清除舊 mesh，待導航不在 computing 時合併重算一次。直接呼叫 `WaveSpawnSchedule.build(definition, controller, first_id, false, additional_starts)`；與開波共用跨群組、跨入口的完整配額流程，僅略過出發洗牌，不使用 global RNG，也不修改 pending／committed routes。預測是當前有限候選池的分配結果，不是所有可能道路的機率。
+
+`RoadFlowForecast` 對每份完整行程的相鄰格以 Vector4i(from.x, from.y, to.x, to.y) 計數，保留 all、by_troop、by_origin、by_troop_origin 四種彙總；相反方向不合併，重訪區段計入實際通過次數，非四鄰步驟略過。無有效排程時只顯示兵種清單、中心線清空。Hover 只讀已快取的兵種彙總並重建顯示 mesh，不重新取得行程或消耗 RNG；移開恢復全體。
+
+`scenes/navigation/road_flow_renderer.tscn` 保留有向區段及雙向分線，每個道路格只建立一個不重疊的 quad，整批一份 mesh／ShaderMaterial。格內線形以 RGBAF ImageTexture 保存端點、流量強度、方向相位及固定半寬，最多 24 個 primitives；直段在格內完全筆直，無分岔轉角格以半徑 0.22 的局部四分之一圓角銜接，圓角離開後仍為直線，不再對整段道路作 Bezier 彎曲。雙向道路各向行進方向右側偏移 0.10 格，hover 保留相同側向位置。shader 對同一格內線形計算聯集，以最大覆蓋透明度而非 alpha-over 合成，岔路重合不會額外加深；跨格 quad 不重疊，端點相位銜接。只保留一小段米白筆觸，高流量較粗、較清楚，前後漸淡至透明；道路其他位置完全沒有固定底線，沒有箭頭、虛線、粒子、Bloom 或 emission。surface_height 預設 0.075，保留深度測試、不寫深度、不投影。
+
+準備期顯示；開場等待、戰鬥、最後完成與 ACT 新入口選擇立即清空中心線。暫停隱藏清單／中心線並清除 hover，恢復後顯示未選兵種的預測；重開或卸載由場景樹回收。F1／F2 開啟期間只暫時隱藏玩家中心線，避免與除錯線／威脅混淆，原功能完整保留。
+
+資料統計成本為已分配行程總步數，顯示重建依有流量道路格與有向區段，不每幀重算；shader 每格片元迭代實際 primitives，轉角最多 20，固定容量 24。此法增加少量片元距離計算以避免透明線段重疊加深。極大量群組仍可能造成同步預覽停頓，本階段沒有新增路線演算法或做容量上限宣稱。
+
+自動驗證 `tests/levels/road_flow_preview.tscn`；人工 F6 開啟 `tests/levels/road_flow_playground.tscn`，使用獨立雙入口、環路與三兵種資源，不改正式地形或波次。F5 仍進入原本 `scenes/level.tscn` 與 Frontier。截圖及原始測試 log 存 `.godot/`。
 
 ## 簡易敵人
 
@@ -350,7 +366,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 
 重新開始先解除暫停並還原 1x，再以 SceneTree.reload_current_scene() 重載目前場景，回到第一波準備，重置敵人、商店金幣及初始手牌；關閉舊場景沿用清理保護。設定目前不連接開啟視窗或更動狀態的動作，點擊後維持暫停。`tests/levels/pause_menu.tscn` 使用實際滑鼠及渲染檢查 hover 進出、原邊緣命中、無橫線、雙語與設定，再由 4x 戰鬥中暫停並點擊重新開始，檢查重載後狀態。
 
-開波對話框位於 `scenes/levels/components/start_wave_callout.tscn`，大小為 128×46，文字依語言顯示「開始下一波」／「Start next wave」，不加問號或顯示獎勵。它投影到第一個 `Start` 上方，向下尖角指向入口，隨相機平移／縮放更新；部分超出視窗仍保留顯示，由視窗自然裁切，完全離開畫面才隱藏。邊框為固定完整輪廓（Shape/Border），無倒數裁切。Hover 以 0.15 秒過渡到淡青底色與較深邊框，略為放大並上浮。開波時以 0.24 秒二次 ease-in 縮小、移入起點塔；下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的對話框。
+開波對話框位於 `scenes/levels/components/start_wave_callout.tscn`，無情報時大小為 128×46，有情報時寬 216px、高度依最多三列敵軍調整，文字依語言顯示「開始下一波」／「Start next wave」，不加問號或顯示獎勵。它投影到第一個 `Start` 上方，向下尖角指向入口，隨相機平移／縮放更新；部分超出視窗仍保留顯示，由視窗自然裁切，完全離開畫面才隱藏。邊框為固定完整輪廓（Shape/Border），無倒數裁切。Hover 以 0.15 秒過渡到淡青底色與較深邊框，略為放大並上浮。開波時以 0.24 秒二次 ease-in 縮小、移入起點塔；下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的對話框。
 
 開波不發金幣，只有清完每波時發放 WaveDefinition.reward。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
 
@@ -403,3 +419,20 @@ python tools/web/serve_web.py
 
 開啟 http://127.0.0.1:8765/index.html。伺服器提供 COOP／COEP 標頭，正式部署也需對應的跨來源隔離設定。
 
+
+### 手動調整流量中心線外觀
+
+在 Godot FileSystem 開啟 `scenes/navigation/road_flow_renderer.tscn`，選根節點 RoadFlow，Inspector 展開 **Flow Appearance**：
+
+| 欄位 | 預設 | 用途 |
+| --- | --- | --- |
+| Highlight Color | RGBA (0.953, 0.914, 0.804, 0.96) | 局部亮段顏色；RGB 改色，A 控制亮段對比與強度。 |
+| Highlight Length | 0.50 | 亮段長度（格）；越大亮段越長，間隔依現有流量網路長度配置，不會每兩格重複。 |
+| Line Width | 0.055 | 高流量線寬，單位為格；增大更粗，低流量自動較細。 |
+| Flow Speed | 0.28 | 筆觸滑行速率；0 停止筆觸，值越大越快。 |
+
+儲存場景後重新 F5／F6 即套用。這些 export 值會在每個 renderer 就緒時寫入其獨立 ShaderMaterial，請優先在根節點調整，不要只改 Material 的同名參數，否則開始遊戲時會被 export 值覆寫。Shader 原始碼位於 `assets/shaders/road_flow.gdshader`；phase_offset 供像素測試使用，不需手調。中心線的樣式改變不影響配額或實際敵人行程。
+
+米白筆觸不保留任何固定底線。只有有限長度的柔和細線沿道路前進，前後端以 smoothstep 完整漸淡至透明；不使用 glow／emission。渲染器只在現有有向流量網路上配置動畫時鐘，不修改路線、配額或 RNG；完整網路共用時鐘使 hover 不重置位置，間隔依顯示網路長度設定，避免每兩格重複一個亮段。Highlight Color／Highlight Length 控制筆觸外觀，Line Width／Flow Speed 的場景覆寫仍優先。
+
+Highlight Length 的 Inspector 滑桿範圍為 0.10～20.0，Flow Speed 為 0～10.0；兩者皆允許直接輸入更大的數值。增加長度時，筆觸週期至少為長度的兩倍，保留前後透明區間，避免長筆觸重疊成永久底線。這些範圍不會重設場景既有數值。

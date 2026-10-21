@@ -5,11 +5,20 @@
 [ext_resource type="Resource" uid="uid://crw7gsg3jk7ae" path="res://assets/data/levels/frontier.tres" id="3"]
 [ext_resource type="PackedScene" uid="uid://dr7kbk0oo8hxt" path="res://scenes/levels/level_hud.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/levels/spawn_expansion.tscn" id="5"]
+[ext_resource type="Script" uid="uid://kuhm0awd3o4l" path="res://scripts/levels/presentation/wave_flow_preview.gd" id="6_flow"]
 
 [node name="Level" unique_id=25821600 instance=ExtResource("1")]
 process_mode = 1
 script = ExtResource("2")
 level = ExtResource("3")
+
+[node name="TileMap" parent="." index="1" unique_id=507222948]
+data = {
+"cells": PackedInt32Array(0, 0, 1048577, 1, 0, 1048577, 2, 0, 1048577, 3, 0, 1048577, 4, 0, 1048577, 5, 0, 1048577, 6, 0, 1048577, 7, 0, 1048577, 8, 0, 1048577, 10, 0, 1048577, 11, 0, 1048577, 12, 0, 1048577, 13, 0, 1048577, 14, 0, 1048577, 15, 0, 1048577, 16, 0, 1048577, 17, 0, 1048577, 18, 0, 1048577, 19, 0, 1048577, 20, 0, 1048577, 21, 0, 1048577, 22, 0, 1048577, 23, 0, 1048577, 9, 0, 1048589, 5, 2, 1, 5, 3, 1, 6, 3, 1, 6, 4, 1, 7, 4, 1, 8, 4, 1, 9, 4, 1, 10, 4, 1, 10, 5, 1, 11, 5, 1, 12, 5, 1, 13, 5, 1, 14, 5, 1, 15, 5, 1, 16, 5, 1, 17, 5, 1, 18, 5, 1, 19, 5, 1, 20, 5, 1, 20, 6, 1, 21, 6, 1, 22, 6, 1, 23, 6, 1, 24, 6, 1, 25, 6, 1, 26, 6, 1, 26, 5, 1, 7, 65535, 1, 7, 65534, 1, 7, 65533, 1, 8, 65533, 1, 9, 65533, 1, 10, 65533, 1, 11, 65533, 1, 12, 65533, 1, 13, 65533, 1, 14, 65533, 1, 15, 65533, 1, 15, 65534, 1, 15, 65535, 1, 5, 1, 1)
+}
+
+[node name="Goal" parent="." index="3" unique_id=991612823]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10.097656, 0.36112744, 0.7344971)
 
 [node name="EnemyWave" parent="." index="9" unique_id=1124581691 node_paths=PackedStringArray("start_button")]
 start_button = NodePath("../LevelHUD/WorldActions/EarlyStart")
@@ -17,5 +26,8 @@ start_button = NodePath("../LevelHUD/WorldActions/EarlyStart")
 [node name="LevelHUD" parent="." index="15" unique_id=1558118680 instance=ExtResource("4")]
 
 [node name="SpawnExpansion" parent="." index="16" unique_id=40484197 instance=ExtResource("5")]
+
+[node name="WaveFlowPreview" type="Node3D" parent="." index="17" unique_id=85038146]
+script = ExtResource("6_flow")
 
 [editable path="TileMap"]
