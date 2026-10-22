@@ -92,7 +92,10 @@ func _set_step(step: Step) -> void:
 	$Footer/Column/Details/Divider.visible = options
 	start_button.text = "ui.maps.launch" if options else "ui.run.next"
 	_refresh()
-	start_button.grab_focus()
+	# Keep focus on the action the player used. Only replace hidden focus,
+	# such as Esc returning from an option that is no longer visible.
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus == null or not focus.is_visible_in_tree(): start_button.grab_focus()
 
 func _refresh() -> void:
 	previous_button.disabled = current_step != Step.MAP or maps.size() < 2

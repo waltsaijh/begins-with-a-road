@@ -346,7 +346,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 
 頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、開場等待、出生、移動與動畫。按暫停立即暫停 SceneTree 並將 Engine.time_scale 設為 0，同時鎖住選牌、旋轉、放置、商店與手動開波；1x／2x／4x 都不經過減速過渡。暫停時仍可滾輪縮放、中鍵平移與左鍵在卡牌以外拖曳旋轉鏡頭，其他遊戲輸入由 HUD 攔截。暫停請求接受後立即停用頂部倍速與暫停按鈕，同時忽略其 hover／點擊；暫停期間也不接受程式發起的倍速切換。恢復後才重新啟用。右下選單使用右對齊的細字與透明底，不使用 hover／focus 底線，暫停／繼續時皆以實際 0.35 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；手牌與商店的呈現根節點在實際 0.35 秒內一起滑至畫面下方，時長由 LevelHUD 的 `pause_seconds` 調整，僅控制介面收合，保留選牌、商品及展開狀態；恢復時反向滑回。背景使用 `PauseBlocker/WhiteVeil` 的白色 ColorRect（透明度以場景中的 color.a 為準），隨右下選單一起淡入／淡出，圖示與選單保留原色。繼續遊戲或 Esc 會還原卡牌位置／選取及選定速度，未完成的開波過渡也會接續；介面收合途中恢復會立即繼續模擬，並從當前位置與透明度反向還原。「回到主畫面」會結束目前關卡，白色過渡遮住畫面前保持暫停，返回後可重新開始全新進度。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的立即暫停、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換與繼續；返回主畫面的完整往返由 menus/main_menu 回歸驗證。
 
-暫停選單依序為「繼續遊戲／重新開始／設定／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px、放大至 108%；移開後反向還原。Button 的 Hover Shift／Hover Scale／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／4x 影響。鍵盤仍可切換四個選項，以文字顏色表示焦點。
+暫停選單依序為「繼續遊戲／重新開始／設定／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px，文字變黑但不縮放；移開後反向還原。Button 的 Hover Shift／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／4x 影響。鍵盤仍可切換四個選項，以文字顏色表示焦點。
 
 重新開始先解除暫停並還原 1x，再以 SceneTree.reload_current_scene() 重載目前場景，回到第一波準備，重置敵人、商店金幣及初始手牌；關閉舊場景沿用清理保護。設定會開啟 `scenes/settings/settings_page.tscn`，隱藏暫停選單文字但保留背景遮罩與暫停狀態。返回或 Esc 只關閉設定並將焦點還給設定按鈕。`tests/levels/pause_menu.tscn` 使用實際滑鼠及渲染檢查 hover 進出、原邊緣命中、無橫線、雙語與設定，再由 4x 戰鬥中暫停並點擊重新開始，檢查重載後狀態。
 
@@ -417,13 +417,13 @@ python tools/web/serve_web.py
 `tests/levels/pause_menu.tscn` 包含實際渲染／滑鼠操作，驗證分類、互斥、套用、翻譯更新、合成長清單、空白邊緣及清單上的點擊／拖曳／滾輪隔離、鍵盤啟用／焦點限制、返回／Esc 保持暫停，以及重新開啟與重開關卡。亦核對頁面與暫停選單的 viewport／canvas 相同，將設定文字與同位置、同字型／字級／顏色的主 HUD Label 逐像素比對。截圖放 `.godot/test-results/settings/`。
 設定頁面以 StyleBoxEmpty 保持背景透明，不建立子視窗或離屏渲染目標。LevelHUD 使用原本 WhiteVeil，在 0.2 實際秒內增加到 Settings Veil Alpha（預設 0.82，至少保留原場景透明度），返回時恢復原值；不另加白色面板。設定開啟時隱藏起點開波對話框，避免背景按鈕干擾文字。
 
-頁面內的分類、返回、radio 與 checkbox 共用 `scenes/settings/components/settings_button.tscn` 及 `scripts/settings/settings_button.gd`。透明 StyleBoxEmpty 保留命中尺寸，hover 保留 Noto Sans TC Light 字重與黑色文字，Hover Scale 預設 1.1、Hover Seconds 預設 0.2，依實際時間以 smoothstep 放大至 110%，移開反向還原。只改按鈕 scale，不改布局尺寸；縮放 pivot 對齊文字的左／中／右錨點，命中涵蓋原範圍及放大後範圍。共用場景啟用 oversampling_with_scale，讓字型採樣隨視覺縮放調整。一般按鈕焦點底線依實際時間以 smoothstep 由中心向兩側漸展，離焦反向收回，Focus Seconds 預設 0.2。分類、radio 與 checkbox 的底線只依 button_pressed 表示值；取消選中即收回，即使按鈕保留鍵盤焦點也不維持底線。radio 不使用圓點，checkbox 是純文字開關，不畫方框、勾或圖示，仍使用原生 Button 切換及 ButtonGroup 互斥。所有標籤與按鈕保存翻譯 key，由 Godot 原地更新翻譯；切換語言不重建列或分類、不搶回分類焦點，保留當前選項實例與底線動畫進度。白色遮罩與底線動畫皆不受暫停或倍速影響。右側捲軸採細線軌道與窄滑塊，hover 僅改色。主暫停選單維持既有動畫；上述樣式限定在設定頁面。
+頁面內的分類、返回、radio 與 checkbox 共用 `scenes/settings/components/settings_button.tscn` 及 `scripts/settings/settings_button.gd`。透明 StyleBoxEmpty 保留命中尺寸，hover 僅將文字變黑，保留 Noto Sans TC Light 字重、原尺寸、布局及命中範圍，移開恢復原字色，不縮放。共用場景與暫停文字按鈕均啟用 oversampling_with_scale，讓字型採樣隨視覺縮放調整；NotoSansTC-Light.ttf.import 的 oversampling 維持 0.0，恢復依 viewport 自動取樣。固定 4.0 的全域改動在實際介面造成一般文字過細與破碎邊緣，已撤回；hover 不再縮放文字，不改動全域字型匯入倍率。視覺改善需比較實際畫面，不能僅以功能回歸通過判定。維持原本 Light 字重、字級、實際 scale 與命中範圍，沒有新增子 viewport 或位圖文字快照。一般按鈕焦點底線依實際時間以 smoothstep 由中心向兩側漸展，離焦反向收回，Focus Seconds 預設 0.2。分類、radio 與 checkbox 的底線只依 button_pressed 表示值；取消選中即收回，即使按鈕保留鍵盤焦點也不維持底線。radio 不使用圓點，checkbox 是純文字開關，不畫方框、勾或圖示，仍使用原生 Button 切換及 ButtonGroup 互斥。所有標籤與按鈕保存翻譯 key，由 Godot 原地更新翻譯；切換語言不重建列或分類、不搶回分類焦點，保留當前選項實例與底線動畫進度。白色遮罩與底線動畫皆不受暫停或倍速影響。右側捲軸採細線軌道與窄滑塊，hover 僅改色。主暫停選單維持既有動畫；上述樣式限定在設定頁面。
 設定頁面顯示時攔截非 UI 鍵盤操作與未處理事件，Tab／Shift+Tab 在頁面可見、可用的控制項內循環，方向鍵也不能離開頁面；Esc 僅關閉設定並吞掉該次輸入。透明根 Control 用 GUI 事件攔截全畫面點擊，讓列元件、捲軸及 hover 仍可正常處理事件。
 
 鏡頭的 `set_navigation_locked(bool)` 是通用宿主介面，與設定頁面沒有直接引用。LevelHUD 監看頁面可見性，在開啟時鎖定鏡頭並清掉已有角速度／按下手勢；鎖定也拒絕延後重播點擊。HUD 在設定顯示期間不執行原暫停輸入路由，讓頁面先處理 GUI。返回、程式解除暫停或 HUD 離場時解除鎖定；既有卡牌／交易鎖定與 SceneTree 暫停持續生效。`camera_orbit` 覆蓋設定返回後的正常鏡頭、卡牌及商店操作；`level_teardown` 覆蓋設定開啟時移除 HUD 的鎖定清理。
 ## 開始選單
 
-F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題／操作與右側折線雲橋構圖，使用目前專案內素材與 Compatibility 渲染。Home 的 VBox、Label、開始／設定／離開按鈕、SettingsVeil 與共用 SettingsPage 均明確保存於場景，文字仍使用翻譯 key，透過主 CanvasLayer 繪製；按鈕沿用設定頁的 Light 字重、110% 放大 hover 與底線互動，開始／設定／離開使用相同的青灰色一般狀態、黑色 hover 與深青色焦點，不為開始按鈕單獨覆寫金色。
+F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題／操作與右側折線雲橋構圖，使用目前專案內素材與 Compatibility 渲染。Home 的 VBox、Label、開始／設定／離開按鈕、SettingsVeil 與共用 SettingsPage 均明確保存於場景，文字仍使用翻譯 key，透過主 CanvasLayer 繪製；按鈕沿用設定頁的 Light 字重、僅變黑、不縮放的 hover 與底線互動，開始／設定／離開使用相同的青灰色一般狀態、黑色 hover 與深青色焦點，不為開始按鈕單獨覆寫金色。
 
 `scenes/menus/components/menu_stage.tscn` 是純顯示場景，明確保存 58 個道路模型實例、固定石柱、起終點、Camera3D、光源、Environment 及三張雲層 PlaneMesh。沒有 GridMap、路網建圖或遊戲控制器，不依賴原型專案路徑。可直接在 3D 編輯器移動／替換模型；Bridge 的 0.8 秒浮起與 Home 的 0.6 秒淡入由場景 AnimationPlayer 保存。相機無遊戲鏡頭輸入腳本。專用 `assets/shaders/menu_cloud_layer.gdshader` 重用共用噪聲，降低透視遠景的高頻紋理並漸淡到 Environment 色；其他兩層雲採低透明度，沒有體積霧或 Forward+ 依賴。
 
@@ -434,7 +434,7 @@ F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題�
 `tests/menus/main_menu.gd` 以 SceneTree 測試實際選單、三種視窗尺寸、顯示橋景與按鈕取景、共用設定、雙語、開始遊戲的真實場景切換及進入後的暫停設定。截圖寫入 `.godot/test-results/menus/`。Web 測試匯出工具依目前 main_scene 欄位替換測試入口，不綁定舊關卡入口。
 ### 地圖選擇
 
-`scenes/menus/map_selection.tscn` 明確保存標題、徽記、地圖名稱、切換箭頭、索引、描述、關卡規模、固定本局選項與返回／下一步／開始作戰按鈕，使用主 CanvasLayer，不建立子 viewport。風格沿用透明背景、淡青文字、Light 字重、110% hover、底線與 0.35 秒淡入。返回／下一步／開始作戰均沿用共用按鈕的一般青灰色、黑色 hover 與深青色焦點，不設定金色的一般狀態覆寫；失焦及底線收回時回到一般青灰色。中間留給正交地形預覽；頁面沒有卡片填色或額外彈窗。單張地圖的左右箭頭使用透明停用樣式，只有多張時才啟用循環切換。
+`scenes/menus/map_selection.tscn` 明確保存標題、徽記、地圖名稱、切換箭頭、索引、描述、關卡規模、固定本局選項與返回／下一步／開始作戰按鈕，使用主 CanvasLayer，不建立子 viewport。風格沿用透明背景、淡青文字、Light 字重、僅變黑、不縮放的 hover、底線與 0.35 秒淡入。返回／下一步／開始作戰均沿用共用按鈕的一般青灰色、黑色 hover 與深青色焦點，不設定金色的一般狀態覆寫；失焦及底線收回時回到一般青灰色。中間留給正交地形預覽；頁面沒有卡片填色或額外彈窗。單張地圖的左右箭頭使用透明停用樣式，只有多張時才啟用循環切換。
 
 選圖資料為 `assets/data/menu_maps/*.tres` 的 MenuMapDefinition，保存名稱／描述翻譯 key、Level Resource 與可執行場景路徑。ACT／波次數直接由 Level 計算。現有唯一正式選項為 frontier；獨立測試地圖不列入。`scripts/menus/map_selection.gd` 只更新固定控制項、選擇索引及流程步驟，發出 map_changed／launch_requested(definition, run_options)／back_requested；主選單協調預覽顯示、相機與真正關卡切換。
 
@@ -446,9 +446,9 @@ F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題�
 
 ### 本局設定
 
-本局設定與選圖共用同一個 MapSelection、地形預覽與主畫布。頁面用 MAP／OPTIONS 兩個步驟，在 Footer/Column/Details 的固定 104px 高區域內切換 Info 與 RunOptions；前者保存索引、描述及 ACT／波次數，後者使用水平排列的兩個 CenterContainer，各自包住一個 VBoxContainer，形成兩欄、兩排，左上難度、右上起始手牌、左下額外事件、右下暫定提示，欄間距 64px、排間距 24px，兩欄各 418px；選項文字 18px，提示 12px。置中的是每欄完整的 VBox 內容，內部 HBox 與提示文字均左對齊；_align_option_keys() 在就緒與翻譯更新時依該欄最寬的標籤設定共用 Key 寬度，對齊選項起點。Key 的 OptionLabelPadding 保留左側 12px 透明內距。Details/Divider 在中央以 1px 淡青 ColorRect 分隔兩欄，只於選項步驟顯示且不攔截滑鼠。Heading 的標題與三段流程標示保持原樣。各單選列在頁面就緒時綁到同一個實例內 ButtonGroup，避免共用按鈕範本各自複製群組後失去互斥。操作沿用透明文字、hover 110% 與選中底線；不另外生成設定頁、對話框或視窗。
+本局設定與選圖共用同一個 MapSelection、地形預覽與主畫布。頁面用 MAP／OPTIONS 兩個步驟，在 Footer/Column/Details 的固定 104px 高區域內切換 Info 與 RunOptions；前者保存索引、描述及 ACT／波次數，後者使用水平排列的兩個 CenterContainer，各自包住一個 VBoxContainer，形成兩欄、兩排，左上難度、右上起始手牌、左下額外事件、右下暫定提示，欄間距 64px、排間距 24px，兩欄各 418px；選項文字 18px，提示 12px。置中的是每欄完整的 VBox 內容，內部 HBox 與提示文字均左對齊；_align_option_keys() 在就緒與翻譯更新時依該欄最寬的標籤設定共用 Key 寬度，對齊選項起點。Key 的 OptionLabelPadding 保留左側 12px 透明內距。Details/Divider 在中央以 1px 淡青 ColorRect 分隔兩欄，只於選項步驟顯示且不攔截滑鼠。Heading 的標題與三段流程標示保持原樣。各單選列在頁面就緒時綁到同一個實例內 ButtonGroup，避免共用按鈕範本各自複製群組後失去互斥。操作沿用透明文字、hover 僅變黑、不縮放與選中底線；不另外生成設定頁、對話框或視窗。
 
-第一步按下一步只展開本局設定，不載入關卡或使用全畫面過渡；返回／Esc 在設定步驟只回選圖，保留原控制項、地圖與值。切換時不調整 Footer 位置、相機、地圖倍率或頁面標題；地圖名稱與箭頭保留原位置，設定步驟只停用換圖操作。底部 Actions 使用場景中固定位置／尺寸的按鈕，只把下一步文字改成開始作戰，避免文字變長後推動返回按鈕。CompactOption 是共用 Theme 的 Button variation，使用 18px 字級、32px 最小高度及原本色彩／hover；選項底線的 Underline Inset 為 1px，其他共用按鈕仍為 5px。get_run_options() 每次回傳獨立字典，包含 difficulty、starting_hand、extra_events，最後按開始作戰才隨 launch_requested 發出。這些選項目前僅為可操作原型，頁面明示尚不影響戰局；主選單接受啟動意圖但不把暫定值套用到 Level、商店、波次或 GameSettings。新主畫面實例恢復標準／隨機／關閉事件的預設值。
+第一步按下一步只展開本局設定，不載入關卡或使用全畫面過渡；返回／Esc 在設定步驟只回選圖，保留原控制項、地圖與值。_set_step() 保留仍可見控制項的焦點，滑鼠點返回時讓返回底線持續展開，原開始按鈕正常收回；僅在焦點不存在或原選項已隱藏時才把焦點交給下一步，避免一次點擊造成焦點往返與底線反轉。切換時不調整 Footer 位置、相機、地圖倍率或頁面標題；地圖名稱與箭頭保留原位置，設定步驟只停用換圖操作。底部 Actions 使用場景中固定位置／尺寸的按鈕，只把下一步文字改成開始作戰，避免文字變長後推動返回按鈕。CompactOption 是共用 Theme 的 Button variation，使用 18px 字級、32px 最小高度及原本色彩／hover；選項底線的 Underline Inset 為 1px，其他共用按鈕仍為 5px。get_run_options() 每次回傳獨立字典，包含 difficulty、starting_hand、extra_events，最後按開始作戰才隨 launch_requested 發出。這些選項目前僅為可操作原型，頁面明示尚不影響戰局；主選單接受啟動意圖但不把暫定值套用到 Level、商店、波次或 GameSettings。新主畫面實例恢復標準／隨機／關閉事件的預設值。
 
 實際渲染回歸另比較切換前後固定節點的位置與尺寸、相機 transform／size／v_offset、描述區內容不溢出，並驗證同場景與 viewport、三種尺寸、單選互斥與文字開關、雙語切換、逐步返回並保留值、最後一次性啟動意圖與新局預設；截圖為 `.godot/test-results/menus/run_setup_*.png`。
 

@@ -110,7 +110,7 @@ func verify() -> void:
 		check(scene.get_instance_id() != previous.scene_id and scene.current_wave == 0 and not wave.active and wave.living_enemies().is_empty(), "Restart did not create a fresh level without old enemies")
 		check(shop.coins == shop.initial_coins and cards.cards.size() == cards.initial_card_count and cards.selected == -1, "Restart retained the old economy or hand selection")
 		check(not get_tree().paused and Engine.time_scale == 1.0 and hud.speed_index == 0 and not hud.pause_menu.visible and not cards.pause_locked, "Restart retained pause or speed state")
-		print("PAUSE_MENU_CHECK:"+JSON.stringify({"failures": failures, "hover_shift_scale": true, "stable_hit_area": true, "no_underline": true, "settings_page": true, "restart_live_level": true, "translations": true}))
+		print("PAUSE_MENU_CHECK:"+JSON.stringify({"failures": failures, "hover_shift_color": true, "stable_hit_area": true, "no_underline": true, "settings_page": true, "restart_live_level": true, "translations": true}))
 		get_tree().quit(1 if failures else 0)
 		return
 	hud.set_paused(true)
@@ -130,9 +130,9 @@ func verify() -> void:
 	var rest_point := button.get_global_transform_with_canvas()*Vector2(button.size.x-2.0, button.size.y*0.5)
 	await move_mouse(rest_point)
 	await frames(2)
-	check(button.scale.x > 1.0 and button.scale.x < button.hover_scale, "Hover movement snapped instead of transitioning")
+	check(button.position.x < 0.0 and button.position.x > -button.hover_shift and button.scale.is_equal_approx(Vector2.ONE), "Hover must slide smoothly without changing scale")
 	await get_tree().create_timer(0.25, true, false, true).timeout
-	check(button.is_hovered() and is_equal_approx(button.position.x, -button.hover_shift) and is_equal_approx(button.scale.x, button.hover_scale), "Paused hover did not slide left and enlarge while retaining its hit area")
+	check(button.is_hovered() and is_equal_approx(button.position.x, -button.hover_shift) and button.scale.is_equal_approx(Vector2.ONE) and button.get_theme_color("font_hover_color") == Color.BLACK and button.get_theme_color("font_focus_color") == Color.BLACK, "Paused hover must slide left and turn black without changing scale or losing its hit area")
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(Artifacts.path("levels/pause_menu_hover.png"))
 	await move_mouse(Vector2(10, 100))
@@ -174,7 +174,7 @@ func verify() -> void:
 	get_viewport().get_texture().get_image().save_png(Artifacts.path("settings/checkbox.png"))
 	check(checkbox.underline > 0.99, "Enabled boolean option must retain its underline")
 	var toggle_width := checkbox.size.x
-	check(checkbox.get_theme_font("font") == load("res://assets/fonts/NotoSansTC-Light.ttf") and checkbox.scale.is_equal_approx(Vector2.ONE*1.1) and checkbox.get_theme_color("font_hover_color") == Color.BLACK, "Hover must retain Light and smoothly enlarge to 110% in black")
+	check(checkbox.get_theme_font("font") == load("res://assets/fonts/NotoSansTC-Light.ttf") and checkbox.scale.is_equal_approx(Vector2.ONE) and checkbox.get_theme_color("font_hover_color") == Color.BLACK, "Hover must turn black while retaining Light and the original scale")
 	await click_setting(page, checkbox)
 	check(not AudioServer.is_bus_mute(0) and checkbox.has_focus(), "Clicking again must disable the value while retaining focus")
 	await get_tree().create_timer(0.25, true, false, true).timeout
@@ -194,7 +194,7 @@ func verify() -> void:
 	await frames(2)
 	await get_tree().create_timer(0.25, true, false, true).timeout
 	await frames(2)
-	check(checkbox.scale.is_equal_approx(Vector2.ONE) and is_equal_approx(checkbox.size.x, toggle_width), "Leaving hover must restore 100% without changing layout")
+	check(checkbox.scale.is_equal_approx(Vector2.ONE) and is_equal_approx(checkbox.size.x, toggle_width), "Leaving hover must retain the original scale and layout")
 	page.categories.get_child(0).pressed.emit()
 	await frames(2)
 	var language_buttons: Node = page.rows.get_child(0).get_node("Value")

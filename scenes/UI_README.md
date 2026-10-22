@@ -5,7 +5,7 @@
 | 要調整的內容 | 場景 | 編輯位置 |
 | --- | --- | --- |
 | 頂部金幣、倍速、暫停與暫停選單 | `levels/level_hud.tscn` | `Header`、`PauseBlocker/Menu`；按下即暫停模擬；根節點 `pause_seconds` 僅控制 0.35 秒手牌與商店收合，`pause_menu_fade_seconds` 控制 0.35 秒淡入淡出；文字選單樣式位於 `assets/themes/pause_controls.tres` |
-| 暫停選單項目 | `levels/components/pause_menu_item.tscn` | 固定根 Control 與子 Button；Button 的 Hover Shift／Hover Scale／Hover Seconds 控制左移、放大與 ease-in-out 時長；各選項文字與動作由 LevelHUD 指派 |
+| 暫停選單項目 | `levels/components/pause_menu_item.tscn` | 固定根 Control 與子 Button；Button 的 Hover Shift／Hover Seconds 控制左移距離與 ease-in-out 時長，hover 文字變黑但不縮放；各選項文字與動作由 LevelHUD 指派 |
 | 主畫面／選圖／遊戲切換 | `interface/screen_transition.tscn` | 根節點 Duration 預設 0.5 實際秒；`WhiteVeil` 全畫面變白後切換，再淡出；過渡期間攔截輸入 |
 | 開波對話框 | `levels/components/start_wave_callout.tscn` | `Shape/Background` 的多邊形、`Border`、`Title`；根節點可調 hover 顏色與邊框粗細倍率 |
 | ACT 結束後選擇新入口 | `levels/spawn_expansion.tscn` | `Interface/Root/Panel` 的標題、說明、三個方向按鈕與重選按鈕；`World` 的候選格、路徑與入口預覽；根節點可調搜尋距離與候選帶寬 |
@@ -31,7 +31,7 @@
 
 設定頁面：`scenes/settings/settings_page.tscn`（分類、可捲動 key/value 選項與右側捲軸），共用列為 `scenes/settings/components/setting_row.tscn`，樣式為 `assets/themes/settings.tres`。以 Control 與暫停選單共用主畫布，透明根節點攔截背景輸入；返回／Esc 保持暫停。
 設定頁面內的分類／返回／選項共用 `scenes/settings/components/settings_button.tscn`，Focus Seconds 控制底線漸展；背景透明，白色遮罩強度由 LevelHUD 的 Settings Veil Alpha 控制。
-SettingsButton 的 Hover Scale 預設為 1.1、Hover Seconds 為 0.2，hover 維持 Light 並平滑放大為 110%、文字為黑色；checkbox 現為無圖示文字開關，底線表示選中值。語言切換沿用原控制項，保留底線動畫。
+SettingsButton 的 hover 僅將文字變黑，維持 Light 字重、原尺寸與命中範圍，不縮放；checkbox 現為無圖示文字開關，底線表示選中值。語言切換沿用原控制項，保留底線動畫。
 
 開始選單：`scenes/menus/main_menu.tscn`。Interface/Home/Column 保存徽記、標題、說明及三個明確按鈕；Interface/Entry 調整淡入動畫，SettingsVeil／SettingsPage 與主畫布的設定頁共用宿主流程。`menus/components/menu_stage.tscn` 保存固定道路、柱子、端點、燈光、透視相機及雲材質，Entry 控制橋面浮起。`menus/components/menu_crest.tscn` 使用明確的 Line2D／Polygon2D 節點，沒有程式繪製或執行時生成。以上場景可直接在編輯器修改。
 選圖頁：`scenes/menus/map_selection.tscn` 的 Heading 與 Footer/Column 保存固定介面，Footer 可調名稱、索引、描述、關卡規模及按鈕排版，Entry 控制淡入。按下一步只在 Footer/Column/Details 的固定 104px 高區域內，把 Info 換成 RunOptions 的兩欄、兩排選項區（左上難度、右上起始手牌、左下額外事件、右下提示），RunOptions 的 Separation 調整欄間留白（64px），各欄 Group 的 Separation 調整排間留白（24px），Details/Divider 為中央 1px 淡青垂直線，僅在選項步驟顯示，最後按開始作戰；Heading/Step、地圖名稱／箭頭與相機保持原樣，Actions 的按鈕由場景保存固定位置及尺寸，不隨文案長度移動。LeftColumn／RightColumn 以 CenterContainer 置中整欄 Group，Group 內各列與 Hint 均左對齊，同欄 Key 依語言共用寬度；OptionLabelPadding 保留左側透明內距；CompactOption 調整選項字級／留白，Underline Inset 控制底線與底緣距離。選項為流程原型，尚不影響戰局。`scenes/menus/components/frontier_preview.tscn` 保存實際地形引用、石柱及 Camera3D；預覽根節點的 Top Clearance／Bottom Clearance／Horizontal Fraction 調整標題與下方操作的取景留白，Zoom 控制視覺倍率（目前 1.0，Bottom Clearance 為 280px）；Camera3D 的水平旋轉為 0°，保留 45° 俯角。選圖資料見 `assets/data/menu_maps/README.md`。

@@ -16,7 +16,7 @@ func frames(count := 2) -> void:
 	for i in count: await process_frame
 
 func layout_rect(control: Control) -> Rect2:
-	# The shared hover scales visuals; compare the layout independently.
+	# Compare each control's position and size within its layout container.
 	return Rect2(control.position, control.size)
 
 func click(button: Control, settle_transition := true) -> void:
@@ -65,7 +65,7 @@ func verify() -> void:
 	root.push_input(hover, true)
 	await create_timer(0.25).timeout
 	await frames(2)
-	check(menu.start_button.scale.is_equal_approx(Vector2.ONE*1.1) and menu.start_button.get_theme_font("font") == load("res://assets/fonts/NotoSansTC-Light.ttf"), "Start menu hover must enlarge to 110% without changing font weight")
+	check(menu.start_button.scale.is_equal_approx(Vector2.ONE) and menu.start_button.get_theme_font("font") == load("res://assets/fonts/NotoSansTC-Light.ttf") and menu.start_button.get_theme_color("font_hover_color") == Color.BLACK and menu.start_button.get_theme_color("font_focus_color") == Color.BLACK, "Start menu hover must turn black without changing scale or font weight")
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(Artifacts.path("menus/main_menu.png"))
 	for extent in [Vector2i(1000, 750), Vector2i(1600, 900)]:
@@ -163,16 +163,26 @@ func verify() -> void:
 	root.get_texture().get_image().save_png(Artifacts.path("menus/run_setup_en.png"))
 	TranslationServer.set_locale("zh_TW")
 	await frames(2)
+	options.get_node("LeftColumn/Group/Difficulty/Choices/Challenge").grab_focus()
 	var step_back := InputEventKey.new()
 	step_back.keycode = KEY_ESCAPE
 	step_back.pressed = true
 	root.push_input(step_back, true)
 	await frames(2)
 	check(selection.current_step == 0 and selection.visible and current_scene == menu and not transition.active, "Esc from run settings should return one step without leaving selection")
+	check(selection.start_button.has_focus(), "Esc left keyboard focus on a hidden option")
 	await click(selection.start_button)
 	check(selection.get_run_options() == selected_options and selection.current_step == 1, "Back and Next lost run settings")
 	await click(selection.back_button)
 	check(selection.current_step == 0 and selection.get_instance_id() == selection_id, "Back from run settings replaced the scene")
+	check(selection.back_button.has_focus() and not selection.start_button.has_focus(), "Back stole focus for Next and reversed the underline animation")
+	var returning_underline: float = selection.back_button.underline
+	await create_timer(0.08).timeout
+	check(selection.back_button.underline > returning_underline, "Back underline reversed while the same button remained focused")
+	await create_timer(0.2).timeout
+	check(selection.back_button.underline > 0.99 and selection.start_button.underline < 0.01, "Back did not finish with the focused underline on the clicked action")
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png(Artifacts.path("menus/back_focus_underline.png"))
 	var go_back := InputEventKey.new()
 	go_back.keycode = KEY_ESCAPE
 	go_back.pressed = true
