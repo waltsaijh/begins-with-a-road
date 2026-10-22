@@ -41,7 +41,7 @@ tile_costs 是與 graph.tiles 同序的 PackedFloat64Array，空陣列為全 1�
 
 中繼補路以一般探索次數為 0 的實體道路為目標，各方向分別嘗試。先建立共用起點正向／終點反向樹，拼接兩段原始成本最短路與指定 edge；若重複節點，嘗試固定前段重搜後段、固定後段重搜前段，取合法且較便宜者。只執行一輪、去除相同 edge 序列，不列舉 simple path。獨立兩段無衝突時達到該中繼的最短成本下界；修補有衝突的情況不保證全域最優或完整覆蓋。只達 budget 上限而未連續停滯 8 次時不觸發。
 
-原生正成本最短路不會重複 vertex，但其展開樣本仍可重訪同一寬區或重用其他路段已經走過的地塊。正式 PortalMap 的 candidate_routes 在建池時以 candidate_walk 做 O(L) 去環，重新建立完整路線與分段、去重及原始評分後才建立配額；原生 sample_route API 保留探索來源的語意，不直接當作正式敵人的最終行程。方向聯集可能有環；已移除 choose_next，敵人須出生時抽取完整路線，而非在聯集中任意選邊。
+原生正成本最短路不會重複 vertex，但其展開樣本仍可重訪同一寬區或重用其他路段已經走過的地塊。正式 PortalMap 的 candidate_routes 委派原生批次核心，在建池時以 candidate_walk_core 做 O(L) 去環，重新建立完整路線與分段、去重及原始評分後才建立配額；原生 sample_route API 保留探索來源的語意，不直接當作正式敵人的最終行程。方向聯集可能有環；已移除 choose_next，敵人須出生時抽取完整路線，而非在聯集中任意選邊。
 
 sample_route 的 route_index=-1 先以 seed 從池條目偽隨機選擇；非負值指定池索引，越界或小於 -1 回傳空。兩種模式都再從區塊內全部同成本走法抽樣，原二參數呼叫的 seed 結果保持一致。回傳 nodes/edges/cells/length/score/best_score/route_index。原生層不追蹤敵人流量，亦非全體逐格路線均勻抽樣；正式遊戲的 PortalMap.allocate_route_for 在 GDScript 端對 threshold 內完整候選依 Troop.route_selection 建立 Uniform 等機率或 Softmax(-score / route_temperature) 表，再以波內序號 / 總數對應累積機率區間，固定路線配額後打亂出發順序；soldier 預設 Uniform，其餘 Softmax；原生 sample_route 的選擇規則保持原樣。EnemyWave 出生前取好本波全部行程（預設 64 隻、每次 1 隻），不在移動時重新查圖。最短路資料只在區塊內以局部 DAG 壓縮同分走法，並未用此 DAG 限制全域道路方向。
 
@@ -64,3 +64,11 @@ F1 顯示本波各兵種已分配的完整路線，F2 讀取地塊 Resource 顯�
 RoadEditGuard.prepare(cells, ports, terminals) 在完整快照後建立迭代 Tarjan block-cut forest，凍結連接所有起終點的有效地塊為不同 anchor，其餘連通塊至多有一個 anchor。多起點共用檢查。RoadEditGuard.add_cell(Vector2i) 以四鄰格與 union-by-size／path-compression 並查集維護暫緩地塊；只有合併不同 anchor 才回傳 true，需要完整重建。相同接點的死路環不會誤觸發。重建前 guard 已標記 dirty，之後需重新 prepare。初始化 O(V+E)，新增攤銷 O(alpha(V)) 與 hash 查詢，不做路徑列舉。
 
 新增操作遵循 TilePlacement 的自動四向接口刷新；刪除、接口任意修改、移動起終點等操作請呼叫 PortalMap.rebuild()。檢查只影響新增幾何，不攔截塔或兵種成本變更。暫緩地塊仍有 TileRecord；參數顯示與原生 ordered 成本快照分開，避免新增死路導致成本陣列錯位或無效重算。
+
+## 完整候選的批次運算
+
+`candidate_representatives(profile_key, local_samples, segment_ids)` 直接以 native sample_cells 的整數格子 ID 完成有限抽樣、原始去重、O(L) 去環、節點與實際分段重建及去環後去重，再整批回傳 entries／normalization。segment_ids 是呼叫者持有的實體分段登錄表，保持原先插入順序；兵種偏好使用幾何表的副本，避免污染共用池。公開 sample_route 保持原 seeded 抽樣與原生來源格式。
+
+靜態介面 `search_costs(weights)` 轉換正搜尋成本；`rank_candidates(entries, weights, threshold, temperature, selection)` 依完整格子行程去重、原始 signed 評分、嚴格門檻及機率表；`build_distribution(scores, temperature, selection=1)` 建立 Uniform(0)／Softmax(1)；`allocate_indices(cdf, total)` 以原有 index / total 規則批次回傳配額索引。這些皆為已提交資料上的計算，不讀場景／Resource、不管理波次，不在敵人移動時呼叫。
+
+`tests/navigation/native_candidates.gd` 對照保留的腳本去環參考與 scalar sample_route，逐條比較完整候選、來源、順序、分段、原始分數、門檻、CDF 與 256 名配額；`tests/native/candidate_walk.cpp` 可獨立編譯驗證核心去環與 scratch 清理。

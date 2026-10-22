@@ -17,4 +17,3 @@ score_threshold = 25.0
 path_base_cost = 0.0
 threat_weight = -1.0
 model = ExtResource("3")
-model_scale = Vector3(1, 1, 1)

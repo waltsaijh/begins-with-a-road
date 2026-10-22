@@ -1,5 +1,5 @@
 extends SceneTree
-const Walk = preload("res://scripts/navigation/routes/candidate_walk.gd")
+const Walk = preload("res://tests/fixtures/candidate_walk_reference.gd")
 const Candidates = preload("res://scripts/navigation/routes/candidate_routes.gd")
 const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
 const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
@@ -8,10 +8,34 @@ var failures := 0
 
 class SamplePlanner extends RefCounted:
 	var walks: Array[PackedVector2Array] = []
+	var graph: Dictionary
 	func find_paths(_key: String, _weights: PackedFloat64Array, _start: int, _goal: int, _threshold: float, _penalty: float, _budget: int) -> Dictionary:
 		return {"valid": true, "reachable": true, "routes": walks.size(), "choice_edges": 99}
 	func sample_route(_key: String, _variant: int, route_index: int) -> Dictionary:
 		return {"cells": walks[route_index], "nodes": PackedInt32Array([0, 1, 2]), "edges": PackedInt32Array([90, 91]), "length": walks[route_index].size()-1, "score": -999.0, "best_score": -999.0, "route_index": route_index}
+
+	func candidate_representatives(key: String, samples: int, segments: Dictionary) -> Dictionary:
+		var tiles: PackedVector2Array = graph.tiles
+		var indices := {}
+		var node_at := PackedInt32Array()
+		node_at.resize(tiles.size())
+		node_at.fill(-1)
+		for i in tiles.size(): indices[Vector2i(tiles[i])] = i
+		for node: Dictionary in graph.nodes: node_at[indices[node.cell]] = node.id
+		var entries := []
+		var raw_seen := {}
+		var seen := {}
+		for index in walks.size():
+			for variant in samples:
+				var route := sample_route(key, variant, index)
+				if raw_seen.has(route.cells): continue
+				raw_seen[route.cells] = true
+				var entry := Walk.normalize(route, tiles, indices, node_at, segments)
+				if seen.has(route.cells): continue
+				seen[route.cells] = true
+				route.candidate_variant = variant
+				entries.append({"route": route, "indices": entry.indices, "ranges": entry.ranges})
+		return {"valid": true, "entries": entries, "normalization": {"normalization_us": 0, "loop_erased_routes": 0, "loop_erased_steps": 0, "raw_samples": raw_seen.size()}}
 
 func _initialize() -> void: verify.call_deferred()
 
@@ -46,6 +70,7 @@ func verify() -> void:
 			tiles.append(Vector2(x, y))
 	var graph := {"tiles": tiles, "nodes": [{"id": 0, "cell": Vector2i(0, 0)}, {"id": 1, "cell": Vector2i(1, 1)}, {"id": 2, "cell": Vector2i(3, 0)}], "start_node": 0, "goal_node": 2}
 	var planner := SamplePlanner.new()
+	planner.graph = graph
 	planner.walks = [
 		PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(2, 1), Vector2(2, 0), Vector2(1, 0), Vector2(2, 0), Vector2(3, 0)]),
 		PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(2, 0), Vector2(3, 0)]),
@@ -123,7 +148,8 @@ func verify() -> void:
 		all_paths[route.cells] = true
 		check(route.score == route.length, "Native normalized length and raw score differ")
 	var debug: Dictionary = controller.debug_graph_for(controller.troop)
-	check(debug.edges.size() == real_plan.used_edges and debug.nodes.size() == real_plan.active_nodes, "Debug summary includes erased nodes or segments")
+	var details: Dictionary = controller.debug_summary_for(controller.troop)
+	check(debug.edges.size() == details.used_edges and debug.nodes.size() == details.active_nodes, "Debug summary includes erased nodes or segments")
 	var normalized_count := real_plan.routes as int
 	var erased_count := real_plan.loop_erased_routes as int
 	scene.queue_free()

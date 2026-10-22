@@ -16,7 +16,7 @@ const directory = process.argv.find(arg => arg.startsWith('--directory='))?.slic
   let browser, server;
   try {
     const log = fs.openSync('.godot/enemy_web_server.log', 'w');
-    server = cp.spawn(process.env.BENCHMARK_PYTHON || 'python',
+    server = cp.spawn(process.env.TEST_PYTHON || 'python',
       ['tools/web/serve_web.py', '--port', '8984', '--directory', directory],
       { windowsHide: true, stdio: ['ignore', log, log] });
     let ready = false;
@@ -26,20 +26,20 @@ const directory = process.argv.find(arg => arg.startsWith('--directory='))?.slic
       if (!ready) await pause(100);
     }
     assert.ok(ready, 'Test server did not start');
-    browser = await chromium.launch({ executablePath: process.env.BENCHMARK_BROWSER,
+    browser = await chromium.launch({ executablePath: process.env.TEST_BROWSER,
       headless: true, args: ['--enable-unsafe-swiftshader'] });
     const suites = [{ page: 'index.html', prefix: 'ENEMY_CHECK:', log: 'enemy_tests', report: 'enemies' }];
     if (process.argv.includes('--shop')) suites.push({ page: 'shop.html', prefix: 'CARD_SHOP_CHECK:', log: 'shop_render', report: 'shop', screenshot: '.godot/test-results/cards/shop_web.png' });
-    if (process.argv.includes('--distribution')) suites.push({ page: 'distribution.html', prefix: 'ROUTE_DISTRIBUTION_CHECK:', log: 'route_distribution_tests', report: 'route_distribution', timing: true });
+    if (process.argv.includes('--distribution')) suites.push({ page: 'distribution.html', prefix: 'ROUTE_DISTRIBUTION_CHECK:', log: 'route_distribution_tests', report: 'route_distribution', platformName: true });
     if (process.argv.includes('--status')) suites.push({ page: 'status.html', prefix: 'ENEMY_STATUS_CHECK:', log: 'enemy_status_render', report: 'enemy_status', screenshot: '.godot/test-results/enemies/enemy_status_web.png' });
     if (process.argv.includes('--multimesh')) suites.push({ page: 'multimesh.html', prefix: 'ENEMY_MULTIMESH_CHECK:', log: 'enemy_multimesh_gpu', report: 'enemy_multimesh' });
-    if (process.argv.includes('--separation')) suites.push({ page: 'separation.html', prefix: 'ENEMY_SEPARATION_CHECK:', log: 'enemy_separation', report: 'enemy_visual_separation', timing: true });
-    if (process.argv.includes('--troops')) suites.push({ page: 'troops.html', prefix: 'TROOP_CHECK:', log: 'troop_tests', report: 'troop_profiles', timing: true });
+    if (process.argv.includes('--separation')) suites.push({ page: 'separation.html', prefix: 'ENEMY_SEPARATION_CHECK:', log: 'enemy_separation', report: 'enemy_visual_separation', platformName: true });
+    if (process.argv.includes('--troops')) suites.push({ page: 'troops.html', prefix: 'TROOP_CHECK:', log: 'troop_tests', report: 'troop_profiles', platformName: true });
     if (process.argv.includes('--walk-render')) suites.push({ page: 'walk.html', prefix: 'ENEMY_WALK_RENDER_CHECK:', log: 'enemy_walk_render', report: 'enemy_walk_render', screenshot: '.godot/test-results/enemies/enemy_walk_web.png' });
     if (process.argv.includes('--tower-obstacles')) suites.push({ page: 'obstacles.html', prefix: 'TOWER_OBSTACLE_CHECK:', log: 'tower_obstacle_tests', report: 'tower_obstacles' });
     if (process.argv.includes('--towers')) suites.push({ page: 'towers.html', prefix: 'TOWER_CHECK:', log: 'towers_tests', report: 'towers' });
     if (process.argv.includes('--debug')) suites.push({ page: 'debug.html', prefix: 'DEBUG_CHECK:', log: 'debug_overlay_tests', report: 'debug_overlay' });
-    if (process.argv.includes('--waypoint')) suites.push({ page: 'waypoint.html', prefix: 'WAYPOINT_CHECK:', log: 'waypoint_current', report: 'waypoint_routes_web', timing: true });
+    if (process.argv.includes('--waypoint')) suites.push({ page: 'waypoint.html', prefix: 'WAYPOINT_CHECK:', log: 'waypoint_current', report: 'waypoint_routes_web', platformName: true });
     if (process.argv.includes('--dead-end')) suites.push({ page: 'dead_end.html', prefix: 'DEAD_END_CHECK:', log: 'dead_end_edits', report: 'dead_end_edits' });
     if (process.argv.includes('--cards')) {
       suites.push({ page: 'cards.html', prefix: 'CARD_CHECK:', log: 'cards_tests', report: 'cards' });
@@ -73,10 +73,9 @@ const directory = process.argv.find(arg => arg.startsWith('--directory='))?.slic
     }
     const native = JSON.parse(fs.readFileSync('.godot/'+suite.log+'.out', 'utf8')
       .split(/\r?\n/).find(s => s.startsWith(suite.prefix)).slice(suite.prefix.length));
-    if (suite.timing) {
+    if (suite.platformName) {
       const comparable = value => {
         const copy = structuredClone(value); delete copy.platform;
-        for (const entry of copy.cases) { delete entry.raw_plan_us; delete entry.solve_us; delete entry.distribution_build_us; delete entry.weighted64_us; delete entry.old_shuffle64_us; }
         return copy;
       };
       assert.deepEqual(comparable(report), comparable(native));

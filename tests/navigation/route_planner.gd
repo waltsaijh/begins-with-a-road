@@ -114,7 +114,8 @@ func verify() -> void:
 			var route: Dictionary = controller.sample_route(seed)
 			check_sample(controller.graph, route)
 			assert(route.length == route.score and route.score-controller.plan.score < controller.troop.score_threshold)
-		print("SCENE_POOL:", name, " vertices=", controller.plan.active_nodes, " edges=", controller.plan.used_edges, " paths=", controller.plan.routes, " best=", controller.plan.score, " max_score=", maximum_score)
+		var details: Dictionary = controller.debug_summary_for(controller.troop)
+		print("SCENE_POOL:", name, " vertices=", details.active_nodes, " edges=", details.used_edges, " paths=", controller.plan.routes, " best=", controller.plan.score, " max_score=", maximum_score)
 		scene.queue_free()
 		await process_frame
 	print("PASS: shared cyclic graph and route pool, profile cache/invalidation, all local ties, actual nonrepeated portal visits, physical weighted samples, controls and both real scenes")

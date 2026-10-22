@@ -1,6 +1,6 @@
 # 測試
 
-保留可驗證目前行為的功能回歸；一次性效能量測與重複截圖場景已清除。同一項的 `.gd`、`.gd.uid` 與 `.tscn` 保持在同一目錄。測試資料與預設值盡量獨立於使用者正在編輯的關卡與塔數值。
+保留可驗證目前行為的功能回歸；一次性效能量測與重複截圖場景已清除，功能測試內的重複計時迴圈也已移除，仍保留機率分布及避讓工作量上限等斷言。同一項的 `.gd`、`.gd.uid` 與 `.tscn` 保持在同一目錄。測試資料與預設值盡量獨立於使用者正在編輯的關卡與塔數值。
 
 | 目錄 | 範圍 |
 | --- | --- |
@@ -54,3 +54,28 @@ godot --editor --path . -- --test-card-resource-refresh
 `navigation/debug_overlay.tscn` 驗證 F1 當波各兵種行程與目前圖的全部 vertex 編號／位置、預設隱藏、關閉隱藏、不逐幀重建，以及戰鬥行程固定時節點仍隨路網更新。實際渲染截圖保存於 `.godot/test-results/navigation/f1_vertices.png`。
 
 `godot --headless --path . --script res://tests/navigation/loop_erasure.gd` 驗證建池去環、節點與連續分段重建、去重後的正負原始評分、嚴格門檻、256 名敵人的配額與 32×32 合成房間網路；地形位於 fixtures/route_loop_fixture.gd，不改正式地圖。效能原始樣本保存在 `.godot/test-results/navigation/loop_erasure_256/`，當次精簡結論見 [去環量測摘要](../reports/loop_erasure_2026-10-22.md)。
+
+`godot --headless --path . --script res://tests/navigation/route_batch.gd` 驗證輕量計畫摘要、按需除錯聯集、256 名批次配額與單筆一致、跨群組一次準備、共用唯讀路線／世界座標、快照與地圖 transform 隔離，以及獨立移動進度。效能對照產物位於 `.godot/test-results/navigation/route_batch_256/`，結論見[當次摘要](../reports/route_batch_2026-10-22.md)。
+
+`godot --headless --path . --script res://tests/navigation/native_candidates.gd` 驗證 C++ 批次候選與 scalar 抽樣加腳本去環參考逐條一致，涵蓋節點／分段／來源順序、共用分段表、正成本轉換、signed 評分、嚴格門檻、Uniform／Softmax 與 256 名配額。`fixtures/candidate_walk_reference.gd` 僅供測試；正式運算位於原生核心。`tests/native/candidate_walk.cpp` 可用 C++17 獨立編譯，輸出放 `.godot/`。
+
+## 手動重現 256 混兵場景
+
+`godot --path . res://tests/enemies/render_warmup.tscn` 使用實際渲染驗證載入鎖定、代表模型繪製、RNG／正式敵群隔離、清理與恢復開波，並檢查正式關卡入口及中途離場。畫面保存於 `.godot/test-results/enemies/render_warmup*.png`。Headless 只檢查跳過預熱時的功能行為，不能驗證 shader 已編譯。
+
+開啟 `tests/enemies/mixed_256.tscn` 後按 F6，或執行 `godot --path . res://tests/enemies/mixed_256.tscn`。這是獨立試驗場，不修改正式入口；載入完成後手動按「開始一局」，不會自動生怪。
+
+有畫面時會先顯示等待介面，逐一預熱兵種模型、動畫及狀態顯示，再開放開始按鈕。首次顯示成本移至這個等待階段；仍可用再次開波比較剩餘的批量建立成本。
+
+場景沿用 Web 報告的 32×32／801 道路格、16 座 Sentry、Soldier 86／Quickfeet 85／Heavy 85，同刻生成。兵種使用測試副本：生命 1,000,000、速度倍率 0.45、波次速度 2.5，其餘跟隨目前 Resource。鏡頭支援原有拖曳旋轉、平移與縮放，F1／F2 可查看路線與威脅，建造輸入鎖定。
+
+「清場並再次開波」移除現有敵人與未完成攻擊，保留地圖、候選快取、renderer 及已載入資源；不必等高血量敵人走完。「重新載入場景」重建場景；Web 的首次頁面載入請重新整理瀏覽器。場景沒有自動計時、P99 收集或報告輸出，不與歷史量測數字混用。
+
+Web 匯出及啟動方式（將 `godot` 換成可用執行檔）：
+
+```powershell
+./tools/web/export_test.ps1 -Godot godot -Scene res://tests/enemies/mixed_256.tscn -OutputDirectory .godot/manual_mixed_256_web
+python tools/web/serve_web.py --directory .godot/manual_mixed_256_web --port 8993
+```
+
+開啟 `http://127.0.0.1:8993/index.html`。此測試匯出保留供手動操作，正式 Web 匯出仍排除 `tests/`。

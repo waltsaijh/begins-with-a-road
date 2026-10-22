@@ -70,10 +70,12 @@ func _speed_factor(delta: float) -> float:
 		set_effect_icon(&"slow", null)
 	return factor
 
-func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> void:
+func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, shared_snapshot := false) -> void:
 	enemy_id = id
 	route = selected_route
-	waypoints = points.duplicate()
+	# Spawn scheduling owns immutable packed snapshots; external callers keep
+	# the defensive copy. Movement reads waypoints and changes only _next.
+	waypoints = points if shared_snapshot else points.duplicate()
 	_next = 1
 	_finished = false
 	travelled_distance = 0.0

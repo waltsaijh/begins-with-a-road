@@ -24,3 +24,5 @@ ui.expansion.north,↑ North,↑ 北方
 ui.expansion.west,← West,← 西方
 ui.expansion.south,↓ South,↓ 南方
 ui.expansion.east,→ East,→ 東方
+ui.loading.title,Loading…,載入中…
+ui.loading.visuals,Preparing visuals…  %d / %d,準備畫面…  %d / %d

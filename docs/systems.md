@@ -17,7 +17,7 @@
 | `navigation/road_graph_snapshot.gd` | GridMap → C++ 用的整數座標／接口陣列 |
 | `navigation/portal_map.gd` | 重建、評分失效、原生／候選池規劃與抽樣 API |
 | `navigation/routes/candidate_routes.gd` | 共用有限代表路線池、原始 signed 評分與 threshold 篩選 |
-| `navigation/routes/candidate_walk.gd` | 建池時完整逐格行程去環、路長／節點／分段重建 |
+| 原生候選核心 | 批次展開、完整逐格去環、路長／節點／分段重建、去重評分與機率表 |
 | `navigation/visualization/region_paths.gd` | 從距離表還原供預覽的同成本方向 |
 | `navigation/visualization/portal_overlay.gd` | F1 兵種路徑與 vertex／F2 威脅、地塊參數查看與切換列 |
 | `enemies/enemy.gd` | 沿出生時固定的逐格行程移動，抵達後刪除 |
@@ -305,12 +305,23 @@ var route = controller.sample_for(profile, enemy_id, 1)
 
 1. 共用以長度探索的有限節點路線池；依相同 search_budget／overlap_penalty 與起點重用幾何代表資料。
 2. 取得全圖原始分數陣列。如果最低分 m ≤ 0，搜尋成本設為 `evaluation + (1 - m)`；否則保留原正成本。這個共同平移保留地塊之間的偏好順序，讓所有搜尋成本為正。以此加入兵種偏好候選；若全部搜尋成本已為 1，直接重用中性池，避免重跑相同搜尋。
-3. 每個節點路線抽至多 4 個區塊內同探索成本走法。candidate_walk.gd 在建池時以堆疊與格子索引表做 O(L) 去環：遇到仍在堆疊中的格子，移除其後繞回的部分；每格最多推入與移除一次。重建 cells／length／nodes／edges、indices 與連續 ranges，分段涵蓋相鄰 vertex 間實際保留的格子。相同分段使用相同 ID；原生 edge ID 可能因剪接失效，因此正式候選分段 ID 屬於各候選池／計畫，不能拿去索引原生 choice_edges。相同原始樣本先避免重做去環，所有不同原始樣本仍在去環後按完整路徑重新去重，不列舉全部走法。
+3. 每個節點路線抽至多 4 個區塊內同探索成本走法。原生 candidate_walk_core 在建池時以堆疊與密集格子索引表做 O(L) 去環：遇到仍在堆疊中的格子，移除其後繞回的部分；每格最多推入與移除一次。重建 cells／length／nodes／edges、indices 與連續 ranges，分段涵蓋相鄰 vertex 間實際保留的格子。相同分段使用相同 ID；原生 edge ID 可能因剪接失效，因此正式候選分段 ID 屬於各候選池／計畫，不能拿去索引原生 choice_edges。相同原始樣本先避免重做去環，所有不同原始樣本仍在去環後按完整路徑重新去重，不列舉全部走法。
 4. 對每個去環後的完整候選重新加總原始 evaluation，起始格不計費；探索來源的 score／best_score 不保留作為正式行程分數。soldier 為總步數，quickfeet 為總 threat，heavy 為負總 threat。
 5. 計算池內 min_score，僅保留 `score - min_score < score_threshold`，等號排除；INF 停用硬篩選。保留者依 route_selection 採 Uniform 等機率或穩定 Softmax 計算機率，以波內序號 / 總數決定路線配額，再打亂出發順序。
 
 平移只用於搜尋，會影響不同長度候選的探索次序，不能保證與原始總分有相同排序；最終評分與 threshold 一律使用未轉換的分數。此方法處理正／零／負值，拒絕 NaN／無限地塊評分。這是有限候選中的最佳分數，不保證全圖最優 simple path，也不保證保留所有同分逐格走法。search_budget 限制搜尋次數，不是路線數 K；有限代表數由 EnemyConstants.CANDIDATE_LOCAL_SAMPLES 控制。
 
+候選運算透過 RoadRoutePlanner.candidate_representatives 整批執行：直接在 C++ 以格子整數 ID 抽取有限局部走法，對原始樣本去重，再去環並重建分段，最後才一次轉成腳本使用的 packed buffers。密集索引 scratch 跨樣本重用，只重設走過的格子，不為每條路線清空整張地圖。分段登錄仍由各幾何池／兵種計畫持有，保持先出現者的 ID 與候選順序。
+
+search_costs 在原生端驗證及轉換正成本；rank_candidates 合併中性／偏好候選、保留第一個相同完整行程、加總原始 signed 分數、執行嚴格門檻及穩定 Uniform／Softmax。route_distribution.build 為原生機率表的薄介接，seeded 隨機抽樣仍用原 Godot RNG；批次配額索引在 C++ 以相同 index / total 與 CDF 上界規則計算。快取、失效、兵種 Resource、波次規則及快照生命週期仍由 GDScript 協調；不增加敵人移動工作。純 GDScript 去環參考移到 tests/fixtures/candidate_walk_reference.gd（保留 UID），只供獨立對照，不作執行期備援。
+
+正式 `PortalMap.plan_for(profile, origin)` 回傳輕量摘要（分數、候選數、機率、門檻及探索診斷）；不含最終候選的 active_nodes／used_edges／steps／directions。原生來源的同名欄位也不混入正式摘要，避免顯示去環前的資料。需要上述除錯聯集時呼叫 `debug_summary_for`，第一次掃描保留候選建立並快取，後續回傳防修改副本；計畫失效時一併清除。`debug_graph_for` 的加權分段圖仍獨立按需建立。F1 依當波完整行程畫線，不要求這份除錯摘要，因此一般遊戲與 F1 不為摘要聯集增加建池工作。
+
+`PortalMap.prepare_route_batch(profile, total, origin)` 每個兵種／入口只檢查與準備一次計畫，再以既有 CDF 對全部 `index / total` 批次分配，回傳 routes 與 pool_size；不改候選順序、分數、Uniform／Softmax 或門檻語意。公開單筆 `allocate_route_for` 仍維持原本的準備檢查，供探查及單筆呼叫使用。批次相同候選只建立一次獨立於計畫快取的路線快照，再給每名敵人各自的 Dictionary；其中 packed 路線 buffers 約定唯讀，不能直接修改共用路線。
+
+`WaveSpawnSchedule.build` 先跨同兵種／入口的所有群組計算總配額，批次準備各來源，再按原 group 的出生刻度與洗牌規則產生排程。route_waypoints 在該次 build 中以完整 cells 作 key，同一條實體路線只轉換一次世界座標，亦可由不同兵種共用。快取僅存在該次呼叫，下一次預覽／開波重新捕捉地圖 transform，不能回寫或重用先前波次的座標資料；獨立場景的 legacy 開波與預覽也使用批次配額。排程快照保存共用唯讀 points，Enemy 只共用該 buffers，各自改變 _next、位置與狀態；對外一般 `Enemy.follow` 仍防禦性複製輸入，只有內部排程明確使用 shared_snapshot。移動與傷害流程不新增建表、轉換或去環。
+
+回歸入口 `tests/navigation/route_batch.gd` 驗證除錯摘要延後建立與失效、256 名批次與單筆結果一致、跨群組一次準備、座標快照共用／變換更新、當波分數隔離、外部輸入防禦複製、獨立移動進度及預覽不消耗亂數。
 去環、重建分段、評分與機率表只在候選池／計畫失效時執行並快取，sample／allocate 與敵人移動不呼叫去環。summary 的 normalization_us／loop_erased_routes／loop_erased_steps／raw_samples 描述該計畫所用幾何與兵種代表的建池工作（共用池的工作可能已由其他計畫快取），不是每次快取查詢的耗時。去環後不同來源可能合併，候選數、最佳原始分數與配額可因此改變；不保留繞圈來累加負分。
 
 回歸入口為 tests/navigation/loop_erasure.gd，包含移除 vertex 的跨段去環、被移除格子的再次進入、資料重建、嚴格門檻、正負評分、去重與 256 名敵人的 Uniform／Softmax 配額，並檢查 32×32 合成房間網路的全部候選。
@@ -379,7 +390,7 @@ godot --headless --path . tests/cards/cards.tscn
 godot --path . tests/cards/card_preview.tscn
 ```
 
-`tests/native/portal_graph.cpp` 可獨立以 C++17 編譯；測試包含圖片配置、寬區入口、障礙兩側、外部支路、開口端點、2×2 換道、9×9 交會點迷宮、50×50 全滿，以及 3000 張隨機圖對照獨立障礙 flood-fill。加 `benchmark` 可量測 Windows 核心時間。
+`tests/native/portal_graph.cpp` 可獨立以 C++17 編譯；測試包含圖片配置、寬區入口、障礙兩側、外部支路、開口端點、2×2 換道、9×9 交會點迷宮、50×50 全滿，以及 3000 張隨機圖對照獨立障礙 flood-fill。
 
 `tests/native/portal_routes.cpp` 以窮舉小圖核對所有最短路、距離、方向與計數，並測試多入口、障礙邊界、50×50、計數溢位與共用距離表。
 
@@ -408,3 +419,17 @@ python tools/web/serve_web.py
 
 開啟 http://127.0.0.1:8765/index.html。伺服器提供 COOP／COEP 標頭，正式部署也需對應的跨來源隔離設定。
 
+
+## 效能量測的分段與對照
+
+### 敵人首次顯示預熱
+
+有實際渲染的關卡在允許操作前，由 EnemyWave 呼叫獨立的 `enemies/rendering/enemy_render_warmup.gd`，透過原有 renderer 在目前相機前逐一繪製兵種代表與頭頂狀態。正式關卡也收集所有 ACT 中的自訂兵種。代表不加入出生排程／戰鬥名單，不分配路線、不消耗 RNG；模型動畫推進與真正繪製完成後移除。一般移動迴圈沒有新增工作。Headless 跳過 GPU 預熱。
+
+等待介面為可編輯的 `scenes/levels/components/loading_overlay.tscn`，顯示完成的兵種數，完成後以實際 0.25 秒淡出。其腳本只處理顯示與攔截輸入；預熱模組暫停關卡的 processing 並保存／還原原模式，波次另以 `presentation_ready` 拒絕提早開波。關閉場景會一起移除預熱節點與遮罩。本分支仍直接進入 level，尚無地圖選擇場景；日後轉場可沿用此等待介面。
+
+這是將首次模型／材質繪製提前到載入期間，並非離線 shader bake，也不消除大量實例同幀建立的成本。等待進度代表已準備兵種數，不是精確剩餘秒數；單一材質的同步編譯仍可能暫停等待畫面。新增特效或執行期才更換的材質不保證已涵蓋。
+
+`tests/enemies/mixed_256.tscn` 保留報告相同負載供手動重現，啟動時建立合成地圖、16 塔與三兵種測試副本，完成建池後等使用者按開始，不含自動量測。清場重開使用正常敵人離場路徑，等待刪除完成並清除飛行攻擊／效果，再以相同 EnemyWave 與候選快取建立下一批；不重新建立地圖或偷偷重載 renderer。「重新載入場景」則重建整個場景，Web 頁面冷啟動仍須重新整理瀏覽器。操作入口見 [測試說明](../tests/README.md)。
+
+P99 判因採固定 simulation delta／相同暖機與取樣步數，核對完整路線、末端戰況及逐幀工作計數；wall 幀間隔仍直接量測。以 process_priority 前後的 Time.get_ticks_usec 探針分開節點更新、戰鬥、模型／避讓、狀態及 pre/post draw，viewport CPU／GPU 計時另列。Performance.TIME_PROCESS／TIME_PHYSICS_PROCESS 是定期更新統計，不代替逐幀分段值。固定工作量校準、硬體計數及同版本互比可辨識環境吞吐量變化；保留全部有效慢樣本，不把校準後或挑選較快輪次當作遊戲修正收益。調查證據與範圍見 [P99 判因報告](../reports/p99_investigation_2026-10-22.md)。

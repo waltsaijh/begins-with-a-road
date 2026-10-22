@@ -1,5 +1,5 @@
 extends RefCounted
-## Normalize complete sampled walks once, before deduplication and scoring.
+## Test-only scalar reference for the native candidate pipeline.
 ## Dense tile indices keep loop erasure linear in the sampled walk length.
 
 static func normalize(route: Dictionary, tiles: PackedVector2Array, tile_indices: Dictionary, node_at: PackedInt32Array, segment_ids: Dictionary) -> Dictionary:
