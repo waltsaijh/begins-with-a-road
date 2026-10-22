@@ -22,6 +22,7 @@
 | 獨立測試地圖的開始按鈕 | `enemies/components/enemy_wave_controls.tscn` | `Root/Start`；正式關卡使用起點對話框 |
 | 敵人血條、護盾、技能條與狀態圖示 | `enemies/components/enemy_status_appearance.tscn` | 根尺寸是整條容量；`Background` 樣式、`Health`／`Shield` 顏色、`Skill` 位置／尺寸／顏色、`Icon` 尺寸／高度與邊框 |
 | 敵人狀態顯示層 | `enemies/components/enemy_status_overlay.tscn` | `EnemyStatusOverlay` 的 `icon_gap`；`Appearance` 是外觀範本，遊戲中會隱藏 |
+| F1 vertex 標記 | `navigation/components/vertex_marker.tscn` | Point 的圓點與 ID 的字級／外框／高度；F1 同時顯示目前圖的 vertex 與編號 |
 | F1／F2 除錯面板 | `navigation/route_debug_panel.tscn` | 按鈕、圖例、地塊資訊與錯誤訊息 |
 
 敵人狀態由同一個 overlay 的單一 MultiMeshInstance2D 繪製，每批只保留一份外觀範本，不為每隻敵人建立整組 Control。啟動時讀取上表列出的尺寸、顏色與樣式：矩形 StyleBoxFlat 由 shader 繪製，圓角、陰影及其他樣式一次烘焙到共用圖集；靜態效果圖片首次使用時加入圖集，敵人清空後釋放圖示快取。執行期間修改範本需重新建立顯示層；任意新增的節點不會自動繪製到每隻敵人頭頂。`Health`／`Shield` 在範本中的寬度只用來展示外觀，遊戲中的比例由血量與護盾決定。

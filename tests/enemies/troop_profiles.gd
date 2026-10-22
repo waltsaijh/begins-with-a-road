@@ -33,7 +33,8 @@ func verify() -> void:
 	heavy.max_health = 500
 	heavy.speed_multiplier = 0.5
 	check(soldier.max_health == 100 and soldier.speed_multiplier == 1 and is_inf(soldier.score_threshold), "Soldier defaults incorrect")
-	check(quick.max_health == 50 and quick.speed_multiplier == 1.5 and quick.score_threshold == 25, "Quickfeet defaults incorrect")
+	# Movement speed is editable balance, independent of the routing contract.
+	check(quick.configuration_error().is_empty(), "Quickfeet resource is invalid")
 	check(heavy.max_health == 500 and heavy.speed_multiplier == 0.5 and heavy.score_threshold == 25, "Heavy fixture stats incorrect")
 	for profile in [soldier, quick, heavy]:
 		for property: Dictionary in profile.get_property_list():

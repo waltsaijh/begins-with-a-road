@@ -41,7 +41,7 @@ tile_costs 是與 graph.tiles 同序的 PackedFloat64Array，空陣列為全 1�
 
 中繼補路以一般探索次數為 0 的實體道路為目標，各方向分別嘗試。先建立共用起點正向／終點反向樹，拼接兩段原始成本最短路與指定 edge；若重複節點，嘗試固定前段重搜後段、固定後段重搜前段，取合法且較便宜者。只執行一輪、去除相同 edge 序列，不列舉 simple path。獨立兩段無衝突時達到該中繼的最短成本下界；修補有衝突的情況不保證全域最優或完整覆蓋。只達 budget 上限而未連續停滯 8 次時不觸發。
 
-正成本最短路不會重複 vertex，但可重訪同一寬區或重用其他路段已經走過的地塊。方向聯集可能有環；已移除 choose_next，敵人須出生時抽取完整路線，而非在聯集中任意選邊。
+原生正成本最短路不會重複 vertex，但其展開樣本仍可重訪同一寬區或重用其他路段已經走過的地塊。正式 PortalMap 的 candidate_routes 在建池時以 candidate_walk 做 O(L) 去環，重新建立完整路線與分段、去重及原始評分後才建立配額；原生 sample_route API 保留探索來源的語意，不直接當作正式敵人的最終行程。方向聯集可能有環；已移除 choose_next，敵人須出生時抽取完整路線，而非在聯集中任意選邊。
 
 sample_route 的 route_index=-1 先以 seed 從池條目偽隨機選擇；非負值指定池索引，越界或小於 -1 回傳空。兩種模式都再從區塊內全部同成本走法抽樣，原二參數呼叫的 seed 結果保持一致。回傳 nodes/edges/cells/length/score/best_score/route_index。原生層不追蹤敵人流量，亦非全體逐格路線均勻抽樣；正式遊戲的 PortalMap.allocate_route_for 在 GDScript 端對 threshold 內完整候選依 Troop.route_selection 建立 Uniform 等機率或 Softmax(-score / route_temperature) 表，再以波內序號 / 總數對應累積機率區間，固定路線配額後打亂出發順序；soldier 預設 Uniform，其餘 Softmax；原生 sample_route 的選擇規則保持原樣。EnemyWave 出生前取好本波全部行程（預設 64 隻、每次 1 隻），不在移動時重新查圖。最短路資料只在區塊內以局部 DAG 壓縮同分走法，並未用此 DAG 限制全域道路方向。
 
@@ -57,7 +57,7 @@ tests/native/diverse_routes.cpp 的 25,600 組小圖起終點對照 simple-path 
 
 get_debug_graph(key) 回傳候選池有效 nodes（PackedInt32Array）與 edges（Array）。各 edge 包含 id/from/to/cost/links；cost 是未加探索懲罰的原始成本，links 是該 edge 所有局部同成本走法的實體格座標對。第一次呼叫才封裝並快取，不做額外尋路；回傳深層副本，計畫重建時清除。F1 顯示開啟時才讀取，不增加一般規劃摘要的資料量。
 
-F1 顯示本波各兵種已分配的完整路線，F2 讀取地塊 Resource 顯示威脅與參數；F3 已移除。兩個圖層皆可獨立關閉，無節點 Label3D。
+F1 顯示本波各兵種已分配的完整路線，F2 讀取地塊 Resource 顯示威脅與參數；F3 已移除。兩個圖層皆可獨立關閉；F1 另以共用 vertex_marker 場景顯示目前圖的節點圓點與 Label3D 編號。
 
 ## 新增地塊前置檢查
 

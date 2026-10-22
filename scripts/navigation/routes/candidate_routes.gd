@@ -1,21 +1,25 @@
 extends RefCounted
 const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
+const Walk = preload("res://scripts/navigation/routes/candidate_walk.gd")
 ## All troops rank a FINITE set of complete routes using raw tile scores.
 ## Geometry/local representatives are shared across troops with the same search settings.
 var _cell_indices := {}
-var _node_cells: Array[Vector2i] = []
+var _tiles := PackedVector2Array()
+var _node_at := PackedInt32Array()
 var _pools := {}
 var _plans := {}
 
 func prepare(graph: Dictionary) -> void:
 	_cell_indices.clear()
-	_node_cells.clear()
+	_tiles = graph.tiles.duplicate()
+	_node_at.resize(_tiles.size())
+	_node_at.fill(-1)
 	_pools.clear()
 	_plans.clear()
 	for i in graph.tiles.size():
 		_cell_indices[Vector2i(graph.tiles[i])] = i
 	for node: Dictionary in graph.nodes:
-		_node_cells.append(node.cell)
+		_node_at[_cell_indices[Vector2i(node.cell)]] = node.id
 
 func invalidate(profile_key := "") -> void:
 	if profile_key.is_empty():
@@ -30,45 +34,41 @@ func _pool(planner: RefCounted, profile: Troop, start: int) -> Dictionary:
 	var base: Dictionary = planner.find_paths(key, PackedFloat64Array(), start, -1, INF, profile.overlap_penalty, profile.search_budget)
 	if not base.get("valid", false):
 		return base
-	var extracted := _representatives(planner, key, base, 0)
+	var segment_ids := {}
+	var extracted := _representatives(planner, key, base, segment_ids)
 	if not extracted.valid:
 		return extracted
-	var pool := {"valid": true, "base": base, "entries": extracted.entries}
+	var pool := {"valid": true, "base": base, "entries": extracted.entries, "segments": segment_ids, "normalization": extracted.normalization}
 	_pools[key] = pool
 	return pool
 
-func _representatives(planner: RefCounted, key: String, base: Dictionary, edge_offset: int) -> Dictionary:
+func _representatives(planner: RefCounted, key: String, base: Dictionary, segment_ids: Dictionary) -> Dictionary:
 	var entries := []
 	var seen := {}
+	var raw_seen := {}
+	var normalization := {"normalization_us": 0, "loop_erased_routes": 0, "loop_erased_steps": 0, "raw_samples": 0}
 	for route_index in base.routes:
 		for variant in EnemyConstants.CANDIDATE_LOCAL_SAMPLES:
 			var route: Dictionary = planner.sample_route(key, variant, route_index)
-			if route.is_empty() or seen.has(route.cells):
+			if route.is_empty():
 				continue
+			# Repeated local samples need no second normalization. Deduplicate
+			# distinct guides again below, after their loops have been erased.
+			if raw_seen.has(route.cells): continue
+			raw_seen[route.cells] = true
+			var began := Time.get_ticks_usec()
+			var entry := Walk.normalize(route, _tiles, _cell_indices, _node_at, segment_ids)
+			normalization.normalization_us += Time.get_ticks_usec()-began
+			normalization.raw_samples += 1
+			if not entry.valid: return entry
+			if entry.erased_steps > 0:
+				normalization.loop_erased_routes += 1
+				normalization.loop_erased_steps += entry.erased_steps
+			if seen.has(route.cells): continue
 			seen[route.cells] = true
-			if edge_offset > 0:
-				var remapped: PackedInt32Array = route.edges
-				for i in remapped.size():
-					remapped[i] += edge_offset
-				route.edges = remapped
-			var indices := PackedInt32Array()
-			for cell: Vector2 in route.cells:
-				indices.append(_cell_indices[Vector2i(cell)])
-			var ranges: Array[Vector2i] = []
-			var cursor := 0
-			for i in route.edges.size():
-				var begin := cursor
-				var target: Vector2i = _node_cells[route.nodes[i+1]]
-				while cursor+1 < route.cells.size():
-					cursor += 1
-					if Vector2i(route.cells[cursor]) == target:
-						break
-				if Vector2i(route.cells[cursor]) != target:
-					return {"valid": false, "error": "候選路線的入口分段不一致"}
-				ranges.append(Vector2i(begin, cursor))
 			route.candidate_variant = variant
-			entries.append({"route": route, "indices": indices, "ranges": ranges})
-	return {"valid": true, "entries": entries}
+			entries.append({"route": route, "indices": entry.indices, "ranges": entry.ranges})
+	return {"valid": true, "entries": entries, "normalization": normalization}
 
 func plan_for(planner: RefCounted, profile: Troop, key: String, start: int, weights: PackedFloat64Array) -> Dictionary:
 	if _plans.has(key):
@@ -102,15 +102,21 @@ func plan_for(planner: RefCounted, profile: Troop, key: String, start: int, weig
 		guided_weights[i] = value
 		neutral = neutral and value == 1.0
 	var entries: Array = pool.entries.duplicate()
+	var normalization: Dictionary = pool.normalization.duplicate()
 	# The shared pool already used all-one costs; do not run the same search twice.
 	if not neutral:
 		var guided_key := "guided:"+key
 		var guided: Dictionary = planner.find_paths(guided_key, guided_weights, start, -1, INF, profile.overlap_penalty, profile.search_budget)
 		if not guided.get("valid", false):
 			return guided
-		var extracted := _representatives(planner, guided_key, guided, pool.base.choice_edges)
+		# The geometry registry is immutable. Guided-only segments live with
+		# this plan, so profile edits cannot accumulate stale global segments.
+		var segment_ids: Dictionary = pool.segments.duplicate()
+		var extracted := _representatives(planner, guided_key, guided, segment_ids)
 		if not extracted.valid:
 			return extracted
+		for field: String in normalization:
+			normalization[field] += extracted.normalization[field]
 		var seen := {}
 		for entry: Dictionary in entries:
 			seen[entry.route.cells] = true
@@ -157,6 +163,7 @@ func plan_for(planner: RefCounted, profile: Troop, key: String, start: int, weig
 	summary.active_nodes = nodes.size()
 	summary.used_edges = edges.size()
 	summary.cached = false
+	summary.merge(normalization)
 	var accepted_scores := PackedFloat64Array()
 	for candidate: Dictionary in accepted:
 		accepted_scores.append(candidate.score)

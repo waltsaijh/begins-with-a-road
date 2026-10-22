@@ -50,3 +50,7 @@ godot --editor --path . -- --test-card-resource-refresh
 `combat/attack_area` 驗證格子資源儲存重載、Sentry 例圖、四向旋轉、預覽／索敵／威脅一致、非圓形遠角目標、範圍外近敵不搶目標、Resource 修改失效、新道路稀疏影響與圓形備援。預覽截圖與結果寫入 `.godot/test-results/combat/`。原有 combat／towers 的圓形回歸使用獨立範本，避免設計師修改 Sentry 範圍影響測試。
 
 `--test-card-resource-refresh` 透過已啟用的編輯器外掛啟動測試，驗證修改塔範圍 offsets 時的新舊商店卡面、腳本熱更新、部分節點重建與離場通知。測試只修改複製的 Resource，不儲存正式塔資料；結果寫入 `.godot/test-results/editor/`。可使用 headless 編輯器驗證節點生命週期。若正式專案的 GDExtension 被另一個編輯器鎖住，使用預先完成匯入的隔離專案副本（保留 assets、scripts、scenes、addons、測試 fixtures 及本測試，啟用相同編輯器外掛），勿移除正式專案的擴充或關閉使用者的編輯器。
+
+`navigation/debug_overlay.tscn` 驗證 F1 當波各兵種行程與目前圖的全部 vertex 編號／位置、預設隱藏、關閉隱藏、不逐幀重建，以及戰鬥行程固定時節點仍隨路網更新。實際渲染截圖保存於 `.godot/test-results/navigation/f1_vertices.png`。
+
+`godot --headless --path . --script res://tests/navigation/loop_erasure.gd` 驗證建池去環、節點與連續分段重建、去重後的正負原始評分、嚴格門檻、256 名敵人的配額與 32×32 合成房間網路；地形位於 fixtures/route_loop_fixture.gd，不改正式地圖。效能原始樣本保存在 `.godot/test-results/navigation/loop_erasure_256/`，當次精簡結論見 [去環量測摘要](../reports/loop_erasure_2026-10-22.md)。
