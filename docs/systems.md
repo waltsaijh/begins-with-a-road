@@ -89,7 +89,7 @@ tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高�
 
 - 點卡片或 1～9：選擇對應手牌；再次選同卡取消。也可按住手牌拖到地圖後放開放置，拖曳過程沿用位置 hologram 與旋轉提示。
 - 選卡時左鍵：一次放下塔、底座地塊與周圍道路，成功後消耗一張；R 或右鍵順時針旋轉，Esc 取消。在同一格的 hologram 停留 0.5 秒後，塔上方會浮出 R 鍵與順時針箭頭提示；換格、移入 UI 或取消選卡時隱藏。
-- 波次結束後點右下商店牌組：展開四張商品與最左側重刷牌；點商品購買加入手牌，點外側或 Esc 收回。
+- 波次結束後點右下商店牌組：展開上排四張塔牌、下排兩張輔助牌與右下重刷牌；點商品購買加入手牌，點外側或 Esc 收回。
 - 地塊由建造卡加入，未選卡時點擊空格不會放置道路，也不顯示單格預覽。
 - 未選卡時右鍵：在道路放置／移除防禦塔。
 - 左鍵從卡牌以外的位置拖曳：以滑鼠相對目前 focus 投影（畫面中心）的前後向量計算有號角差，跨越 ±π 仍累積最短角差；未超過轉速上限時，順時針／逆時針一圈對應地圖同向一整圈，不受圓半徑、解析度或縮放影響。只改 azimuth，不改仰角、距離、縮放及地形。地面、柱側、天空及其他 UI 都可起拖，不再掃描 GridMap 模型判斷天空。Camera3D 的 `orbit_drag_threshold` 預設 4px，超過才啟動旋轉；`orbit_dead_zone` 預設 16px，前後任一向量落入中心範圍時不計角差。CardButton 透過 `camera_drag_blockers` 群組提供含 hover 下緣與旋轉／縮放的實際命中區，涵蓋手牌、商品、牌背與重刷牌，包含停用牌；只在按下時檢查。相機在 GUI 前暫存非卡牌左鍵按下，拖曳時攔截，若放開前未超過門檻則在 deferred 階段依原位置／修飾鍵遞送按下與放開，保留原 GUI → gameplay 的點擊流程，避免放塔／選入口／按鈕在起拖時先提交。實際旋轉在 Camera3D 的 `_process` 以單調時鐘的真實秒數推進，每幀轉角限制為 `maximum_orbit_speed × real_delta`，目前預設 360°/s，不受 1x／2x／4x 或零 time_scale 影響。同幀滑鼠角差累加後除以真實 delta，得到目標角速度並夾在 ±`maximum_orbit_speed`，每幀取用後清零；沒有未完成角度或多圈佇列。只對目前角速度做 `lerp(current, target, 1-exp(-response × real_delta))`，`response = log(100) / orbit_smoothing_seconds`；預設 0.15 秒消除 99% 速度差。加速、減速、反向與放開皆用同一條響應：滑鼠停止移動或放開後目標角速度為 0，速度低於 0.01°/s 時歸零，不再使用獨立緩停動畫。角度位移採此速度響應的精確積分 `target × delta + (previous-target) × follow / response`，使持續相同輸入時的過渡不依賴幀率；釋放時沒有新的旋轉目標，尾段轉角約為當前角速度 / response，與先前畫幾圈無關。未超過轉速上限的圈數在速度收斂後維持角度比例，超過上限的輸入不補轉。新非卡牌左鍵手勢、離開視窗、失焦或切換中鍵立即重設輸入與速度，中鍵優先平移。旋轉開始後跨過卡牌或 UI 仍持續。暫停時相機保持運作，但原點擊仍經 HUD 的遊戲輸入鎖定，不推進時間。
@@ -104,7 +104,7 @@ tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高�
 
 三張地圖均包含 `scenes/cards/card_placement.tscn`。初始三張卡先抽塔種，再依該塔的候選權重抽地塊配置；Sentry 目前包含 Corner、Bridge、Flank、Blasting。放置成功消耗、失敗保留；波次結束可由商店補充。卡面使用 `scenes/cards/components/card_view.tscn`，可在 Godot 2D 編輯器調整。底紙與灰階卡框使用 NinePatchRect，獨立塔圖示使用 TextureRect，文字使用 Label；地塊配置示意使用共用場景範本。塔的 `icon`／`accent_color` 統一提供圖示與染色，同種塔的卡片因此共用同一色彩。
 
-每張 `BuildCard` 引用獨立的 `TowerDefinition` 與 `TilePreset`；後者的 `road_offsets` 為相對塔中心的 Vector2i 陣列，塔完整 footprint 的底座也會自動補齊。卡片與塔都以同一個 `TowerDefinition.cells_at()` 計算旋轉後佔格。道路可合併既有道路，保留既有地塊參數／合法外觀；不能覆蓋塔、石地或任何起終點。預覽以綠／紅顯示整組範圍與塔模型，滑鼠在 UI 上時隱藏。
+防禦塔 `BuildCard` 引用獨立的 `TowerDefinition` 與 `TilePreset`；後者的 `road_offsets` 為相對塔中心的 Vector2i 陣列，塔完整 footprint 的底座也會自動補齊。卡片與塔都以同一個 `TowerDefinition.cells_at()` 計算旋轉後佔格。道路可合併既有道路，保留既有地塊參數／合法外觀；不能覆蓋塔、石地或任何起終點。預覽以綠／紅顯示整組範圍與塔模型，滑鼠在 UI 上時隱藏。
 
 Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側兩格、上方橫排三格、左側三格＋下方一格，沒有地形評分。新增／編輯／刪除方法見 `assets/data/tile_presets/README.md`；`tests/cards/tile_presets.tscn` 驗證塔專屬候選與相對權重、存檔與刪除、preset 變更通知、初始手牌及空清單的重抽處理。
 
@@ -120,7 +120,7 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 `assets/translations/card_names.csv` 使用 Godot 內建翻譯，`keys` 欄使用點號分隔、小寫 snake_case 的穩定識別碼，`en`／`zh_TW` 欄放翻譯；加入新塔名或地塊前綴時新增一列即可。`card.name_format` 這一列決定組合順序與間距，因此完整純文字名稱為英文 `Corner Sentry`、繁體中文 `轉角哨塔`；卡面使用獨立前綴／塔名節點呈現對應字重與行數。Godot 匯入 CSV 後產生 `.translation`，已登錄於 Project Settings → Localization → Translations；預設依系統語言，缺少對應語言時回退 `zh_TW`。程式可呼叫 `TranslationServer.set_locale("en")` 或 `TranslationServer.set_locale("zh_TW")`，既有卡面會更新。`tests/cards/card_names.tscn` 驗證語言切換、獨立命名、標題列對齊與價格更新。
 
-自製圖片：將 PNG 放入 `assets/sprites/cards/` 或 `assets/sprites/towers/`。塔種的 `assets/data/towers/*.tres` 設定 Icon／Accent Color；圖示以透明度作輪廓，統一染成較深的 accent（預設 darkened 0.45，可於卡面根節點 Icon Darkening 調整）。固定 BuildCard 資源可在 Card Artwork 指定底紙或卡框變種；隨機生成卡片沿用場景根節點 Default Artwork。預設卡面 144×208、圖示 64×64、NinePatch 四邊切片各 16 像素；卡框仍採灰階乘色，底紙保持原色。`scenes/cards/card_shop_view.tscn` 根節點 Artwork 可統一替換 Coin Texture 與 Card Back Texture（預設 gold.png／card_back.png），同步套用所有價格、餘額與五張卡背。編輯器預覽與變更會同步更新，沒有逐幀更新卡面。完整繪圖、切片及替換說明見 `assets/sprites/README.md`。
+自製圖片：將 PNG 放入 `assets/sprites/cards/` 或 `assets/sprites/towers/`。塔種的 `assets/data/towers/*.tres` 設定 Icon／Accent Color；圖示以透明度作輪廓，統一染成較深的 accent（預設 darkened 0.45，可於卡面根節點 Icon Darkening 調整）。固定 BuildCard 資源可在 Card Artwork 指定底紙或卡框變種；隨機生成卡片沿用場景根節點 Default Artwork。預設卡面 144×208、圖示 64×64、NinePatch 四邊切片各 16 像素；卡框仍採灰階乘色，底紙保持原色。`scenes/cards/card_shop_view.tscn` 根節點 Artwork 可統一替換 Coin Texture 與 Card Back Texture（預設 gold.png／card_back.png），同步套用所有價格、餘額與七張卡背。編輯器預覽與變更會同步更新，沒有逐幀更新卡面。完整繪圖、切片及替換說明見 `assets/sprites/README.md`。
 
 驗證入口為 `tests/cards/cards.tscn` 與 `tests/cards/card_preview.tscn`。
 
@@ -130,7 +130,7 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 ### 回合商店
 
-每波敵人全數抵達或被擊殺後，右下升起五張背面牌，最上方顯示商店圖示。點擊展開時，左下手牌疊起並暫停建造工具；商品標題列左側顯示塔名，右側靠右顯示金幣與價格，最左側背面牌用於重刷，其價格放在卡片內的上方並水平置中，數字固定白色。購買後商品與價格立即移除，其餘商品連同重刷牌向右靠攏，不留空洞；買入卡從畫面下方滑入疊起手牌的最上方。重刷保留重刷牌，圖示以二次 ease-in-out 在 0.5 秒內旋轉 360 度，四張新商品從畫面下方插入；旋轉期間不會重複扣款。金錢不足時，重刷牌與商品一樣淡灰且不可購買。點商店外的空白處或 Esc 收回，恢復手牌與建造。開始下一波時，商店自動收回並隱藏。每波只發一次獎勵，開關商店不會重抽商品。
+每波敵人全數抵達或被擊殺後，右下升起七張背面牌，最上方顯示商店圖示。點擊展開時，左下手牌疊起並暫停建造工具；商品標題列左側顯示塔名，右側靠右顯示金幣與價格，右下背面牌用於同時重刷兩排，其價格放在卡片內的上方並水平置中，數字固定白色。購買後商品與價格立即移除，其餘商品在各自排內向右靠攏，下排右端保留重刷牌，不留空洞；買入卡從畫面下方滑入疊起手牌的最上方。重刷保留重刷牌，圖示以二次 ease-in-out 在 0.5 秒內旋轉 360 度，六張新商品從畫面下方插入；旋轉期間不會重複扣款。金錢不足時，重刷牌與商品一樣淡灰且不可購買。點商店外的空白處或 Esc 收回，恢復手牌與建造。開始下一波時，商店自動收回並隱藏。每波只發一次獎勵，開關商店不會重抽商品。
 
 手牌新增只建立一個卡面，消耗只移除對應卡面，既有卡面保持同一實例；快捷鍵與點擊索引隨順序更新。插牌預設 0.28 秒、商店靠攏 0.22 秒，位於 CardFanLayout。連續購買、快速收合或重新排版會從當前動畫位置接續，不把插入中的牌重新丟回畫面外；插入期間該手牌不接受點擊，商店靠攏／補牌時也短暫停用商品點擊。商店商品的固定索引與顯示序號分開，靠攏後仍購買正確商品。
 
@@ -138,9 +138,27 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 Hover 沿卡牌自身上方提起 6 原始 px（正常顯示約 5 px）；手牌選中上提 24 原始 px（約 20 px），選中優先於 hover，不相加。Hand 的 `selected_lift`／`selection_seconds` 控制選中高度與切換時間，預設 24px／0.22 實際秒；hover 使用 CardFanLayout 的 6px／0.14 秒。切換、移開或取消選中都從當前位置接續 Tween，上提與命中區的 `hover_lift` 同步過渡。選中卡面在可編輯的 Visuals 子節點以 ±0.6°、3.6 秒週期輕晃，選取振幅在 0.22 秒內淡入／淡出；CardView 的 Selection Motion 可調整幅度、週期與混合時長。只有正在選中或淡出中的卡面逐幀更新搖動，速度獨立於 1x／2x／4x；暫停依場景樹凍結。外層 Button 不跟著晃動，所以命中與拖曳穩定，且不與扇形布局的旋轉 Tween 競爭。所有卡牌維持原尺寸與順序，不放大或置頂。正面與牌背共用 CardButton，提起時保留原位置下緣的命中範圍；CardFanLayout.pick 也使用當前命中延伸，讓選中牌移開 hover 後仍可從原下緣操作。命中依旋轉／縮放後座標，只在實際滑鼠移動時重新挑選；動畫不會反覆觸發布局，折疊時清除上提與焦點。
 
-預設初始金幣 0、每波獲得 10、每張卡 3、重刷 1。`ShopConstants` 管理共用預設；card_shop.tscn 可在 Inspector 覆寫金幣、波次獎勵、重刷價格與 seed，塔資源的 Card Price 決定每次抽出卡片的價格；已抽出的 BuildCard 保存當時價格。購買扣款並加入手牌，同一商品不能重複購買；重刷重新產生四張商品。塔種使用洗牌袋補足四個位置，地塊預設則為每張卡依所屬塔的候選權重獨立抽取，因此可能重複同種組合。商店有自己的 RNG，不影響敵人選路。
+預設初始金幣 0、每波獲得 10、每張卡 3、重刷 1。`ShopConstants` 管理共用預設；card_shop.tscn 可在 Inspector 覆寫金幣、波次獎勵、重刷價格與 seed，塔資源的 Card Price 決定每次抽出卡片的價格；已抽出的 BuildCard 保存當時價格。購買扣款並加入手牌，同一商品不能重複購買；重刷重新產生上排四張塔牌與下排兩張輔助牌。塔種使用洗牌袋補足四個位置，地塊預設則為每張卡依所屬塔的候選權重獨立抽取，因此可能重複同種組合。商店有自己的 RNG，不影響敵人選路。
 
 可編輯 UI 為 `scenes/cards/card_shop_view.tscn`（商店整體）與 `scenes/cards/components/` 下的 `shop_slot.tscn`（卡位）、`card_back.tscn`（背面與圖示）、`card_price.tscn`（共用金幣與價格列）。商品正面沿用同資料夾的 `card_view.tscn`，Presentation 選 HAND／SHOP 會切換標題列配置。價格跟著正面一起翻轉與移動，點擊價格也能購買。動畫使用 Tween，沒有逐幀重建卡面。`tests/cards/card_shop.tscn` 驗證插牌、靠攏後購買、卡面實例保留、金幣、重刷、輸入隔離、消耗、波次切換、弧形重疊與快速收合；Web 可用 `tools/web/verify_enemy_web.cjs --shop` 比對當次原生輸出。
+
+### 臨時交通設施與候選流量
+
+`BuildCard.traffic` 引用 `TrafficStructureDefinition`，與 tower 互斥；不需要 TilePreset。`visual_definition()` 讓卡面及 hologram 共用模型、名稱、icon／accent；輔助卡在原地塊示意區畫簡短效果與初始波數。CardPlacement 保持原拖放／點選提交及價格快照；TowerMap 的 validate_card／place_card 分派至 TrafficStructures，回傳 Node3D（塔仍是 DefenseTower，輔助為 TrafficStructure）。
+
+三份可編輯資源位於 `assets/data/traffic/`。旗幟的模型引用 `assets/models/traffic/flag_ground.tscn`，附一格石地與既有風格支柱，預覽與正式放置共用，隨設施到期／移除一起清除；基座屬於顯示，不加入道路導航。旗幟 NEAR_ROAD 要求 anchor 是空格，旋轉後 influence_offsets 中至少一格有未被塔占用的道路；拒馬、窄口 ON_ROAD 要求既有道路。所有設施拒絕端點、塔、兵營駐點與互斥設施。`occupancy_group`／`compatible_groups` 必須雙方明確允許才可同格。既有塔卡、直接道路新增及 ACT 路徑也會檢查設施占位。管理器從不呼叫 set_cell_item 或修改 blocked_cells，移除保留道路 item、orientation 與參數。
+
+Troop 的 `body_size` 是單選體型，`tags: Array[StringName]` 保存 ground／flying／armored 等可複合特性；`has_tag()` 對三個體型只看 body_size，避免 free tags 產生互斥體型。未設定的新舊資源預設 standard、ground。設施 required_tags 採全符合，excluded_tags 任一符合即排除，沒有隱含兵種 ID 判斷。拒馬排除 large，對 Soldier／Quickfeet 均套用 ×0.5，Heavy 不受影響。
+
+權重資料流：原生搜尋 → CandidateRoutes 的原始分數及 strict threshold → `TrafficWeights.log_multipliers()` → `Distribution.build()` → 原 CDF 的 index／total → WaveSpawnSchedule。每個設施只要與完整路線任一格相交就加入一次 log(multiplier)，不因重複格或範圍較大重複計算。減去最大 log weight 再 exp，避免乘積溢位。全零權重會回傳不可用；其餘結果皆有限非負。正式效果與候選效果的機率快取分離，不使搜尋池失效。
+
+有限候選與 threshold 不因旗幟放寬。若有效候選全不經過範圍、全經過相同倍率、只有單一路線，或整數配額未跨 CDF 區間，流量可不變。候選時明示「分流未變：候選路線或整數配額限制」。全零權重的候選顯示「下一波沒有正權重路線」，保留基準流量且不製造敵軍減少標記；正式排程仍依無路線規則拒絕開波。預設三份資源倍率皆正。
+
+放置時 snapshot effect 及 remaining_waves，不即刻減壽命。wave_started 記錄既有實例；wave_finished 僅對這一批扣一次，零時移除並通知 PortalMap 更新效果。ACT 之間持續有效、最終波也扣除；提前 remove／tree_exiting 會清索引，卸載清空效果。模型只是純 Node3D，預覽不建立正式 TrafficStructure，不可能參與扣除。
+
+WaveFlowPreview 同時持有 baseline 與候選 forecast。兩者使用同一 WaveSpawnSchedule.build(..., shuffle_departures=false)，候選以明確 modifiers 參數覆寫，不切換正式全域狀態。懸停只篩選已算好的入口／兵種資料；候選位置不變時不重建。`TrafficFlowDelta` 從互通接口判斷實際岔路，逐有向出口比較整數 visit count，達 `minimum_quota_change`（預設 1）才產生 ↑／↓。標記放在該出口的 0.65 格位置，投影後保持螢幕垂直；不含數字或百分比。增量箭頭沿螢幕向上漂移、減量向下，以實際時間推進，不受倍速影響；每個週期接縫平滑淡出／淡入避免跳回。Float Distance（預設 5px）與 Float Period（預設 2 秒）、顏色／大小可編輯 `scenes/traffic/components/traffic_delta_overlay.tscn`。流動中心線繼續使用 Phase 1 Renderer。
+
+卡牌取消、無效位置、UI、離開視窗、失焦、暫停及開波清除候選；expiry／成本／幾何變更令正式預覽失效。所有已開波 pending/live 行程保持快照。驗證與人工操作見 [tests/traffic/README.md](../tests/traffic/README.md)。
 
 ### 除錯顯示的資料
 
@@ -381,6 +399,8 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 關卡清理與正常清場分開處理：關閉視窗時 HUD 可能先離開場景樹，之後最後一隻敵人的 `tree_exiting` 仍會觸發波次完成。LevelSession 在進入下一波前確認自身未排程刪除且 HUD 仍在場景樹；HUD 對離場後的準備期通知與投影呼叫直接返回，使用 viewport 前再次檢查有效性。`tests/levels/level_teardown.tscn` 覆蓋倍速、按鈕／內部開波入口、不同出生階段、場景移除與延後刪除，也保留正常完成及獎勵的正向驗證。
 
 ## 建置與驗證
+
+Routing Sandbox 五塔移植的數值來源、精確範圍與索敵、迫擊砲即時傷害／視覺拆分、交叉火力全體攻擊、兵營駐點／接戰／反擊／重生、抽牌權重及資產重建，集中記錄在 [防禦塔資料](../assets/data/towers/README.md)。現版 Sentry 資源及候選不因移植回退。
 
 C++ GDExtension 建置為 bin/road_graph.editguard.*，避免覆寫先前已載入的 DLL；Windows／Web 各自使用 debug／release 版本。SDK 與重新建置方式見 `native/README.md`。新擴充需重新啟動 Godot 後載入。
 

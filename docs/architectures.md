@@ -27,6 +27,7 @@
 | 地圖 `map` | 格子資料、道路接口與批次變更；外觀變種和浮起動畫獨立管理 |
 | 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額與除錯顯示 |
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
+| 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
 | 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果 |
 | 鏡頭與環境 `camera`／`environment` | 鏡頭平移、縮放與旋轉、雲海與環境呈現 |
 
@@ -62,6 +63,7 @@ scripts/
 ├── navigation/              道路快照、原生介接與重建協調
 │   ├── routes/              候選行程、兵種評分與配額機率
 │   └── visualization/       F1／F2 路線與地塊除錯顯示
+├── traffic/                 臨時設施資料、實例、權重及預覽差異
 └── towers/                  塔種、塔實例、占格與地圖提交
 ```
 
@@ -82,7 +84,7 @@ scripts/
 | 範圍 | 責任與主要協作 |
 | --- | --- |
 | `cards/` | 管理手牌庫存、選卡與旋轉狀態，送出預覽／放置意圖，依關卡階段及商店狀態切換輸入；成功提交後才消耗卡牌 |
-| `cards/definitions/` | `BuildCard` 組合塔種、價格與 `TilePreset`；候選資源保存各塔的地塊檔案引用與相對權重 |
+| `cards/definitions/` | `BuildCard` 組合塔種與 `TilePreset`，或單獨輔助設施定義，保存價格快照；候選資源保存各塔的地塊檔案引用與相對權重 |
 | `cards/shop/` | 保存金幣及商品庫存，處理波次獎勵、購買、重刷與抽牌 RNG，將結果交給手牌與商店畫面 |
 | `cards/presentation/` | 卡面、名稱、地塊示意、扇形布局、手牌／商品動畫，以及世界中的放置模型和旋轉提示 |
 | `towers/` | `TowerDefinition` 提供塔種設定，`DefenseTower` 保存實例狀態；`TowerMap` 驗證整組地塊、占格、端點、BFS 連通性及固定行程，提交塔與道路並更新威脅 |
@@ -96,6 +98,8 @@ scripts/
 地塊資料集合在 `map/tile/` 實作，執行時由 `PortalMap` 為每張地圖持有一份；導航消費其成本陣列，塔系統透過控制器提交覆蓋變更。store 快取評分輸入，實際路線探索由導航及原生核心完成，檔案位置與實例持有者在這裡分開說明。
 
 ### 戰鬥、敵人與呈現
+
+兵營由 combat 根目錄的 BarracksSystem 協調，FriendlySoldier 保存生命、駐點與接戰實例狀態；TowerDefinition 引用 BarracksDeployment 資料。Enemy 只保存接戰持有者並暫停既定行程，不重新尋路；TowerMap 負責駐點放置限制。恢復塔的共用即時單體／範圍／全體策略位於 combat/attacks，純視覺與聲音仍由 rendering 層處理。資源與來源說明見 [塔資料](../assets/data/towers/README.md)。
 
 | 範圍 | 責任與主要協作 |
 | --- | --- |
@@ -118,6 +122,8 @@ scripts/
 3. **每幀**：敵人更新邏輯位置 → 戰鬥建立索引並結算 → 模型層提交姿態與避讓後位置 → UI 投影頭頂狀態，特效層繪製已結算事件。
 
 新增內容優先沿用對應功能與上述責任邊界。共用常數跟隨所屬功能，Resource 型別跟隨其資料領域；可編輯的 `.tres` 實例仍放 `assets/data/`。UI、渲染、測試與工具各自透過現有介面協作，搬移腳本時同步更新明確路徑並保留 UID。
+
+`traffic/` 由 TowerMap 持有設施管理器，另存占位及效果，不加入導航障礙或戰鬥塔列表。PortalMap 保存正式效果與獨立配額快取；候選探索仍歸 navigation/routes。CardPlacement 將唯讀候選效果送至既有 WaveFlowPreview，沿用出生排程、流量統計與渲染器。資料／模型／圖示位於 assets 對應的 traffic 子目錄，岔路標記外觀在 scenes/traffic/components；驗證位於 tests/traffic。
 
 ## 資料與責任邊界
 

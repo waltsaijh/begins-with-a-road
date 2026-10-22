@@ -14,6 +14,12 @@ extends Resource
 		tile_preset = value
 		if tile_preset != null: tile_preset.changed.connect(emit_changed)
 		emit_changed()
+@export var traffic: TrafficStructureDefinition:
+	set(value):
+		if is_instance_valid(traffic) and traffic.changed.is_connected(emit_changed): traffic.changed.disconnect(emit_changed)
+		traffic = value
+		if traffic != null: traffic.changed.connect(emit_changed)
+		emit_changed()
 @export var tower: TowerDefinition:
 	set(value):
 		if tower != value:
@@ -39,10 +45,20 @@ static func from_parts(definition: TowerDefinition, preset: TilePreset) -> Build
 	if definition != null: result.price = definition.card_price
 	return result
 
+static func from_traffic(definition: TrafficStructureDefinition) -> BuildCard:
+	var result := BuildCard.new()
+	result.traffic = definition
+	result.price = definition.card_price
+	return result
+
+func visual_definition() -> Resource:
+	return traffic if traffic != null else tower
+
 func localized_prefix() -> String:
 	return tile_preset.localized_prefix() if tile_preset != null else ""
 
 func localized_name() -> String:
+	if traffic != null: return traffic.localized_name()
 	if tower == null: return tr("card.unassigned")
 	var tower_name := tower.localized_name()
 	var prefix := localized_prefix()
@@ -59,6 +75,7 @@ func tower_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 	return tower.cells_at(anchor, turns) if tower != null else []
 
 func ground_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
+	if traffic != null: return [anchor]
 	var result := tower_cells(anchor, turns)
 	if tile_preset == null: return result
 	for offset in tile_preset.road_offsets:
@@ -68,6 +85,9 @@ func ground_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 	return result
 
 func configuration_error() -> String:
+	if traffic != null:
+		if tower != null: return "建造卡不能同時指定塔與輔助設施"
+		return traffic.configuration_error()
 	if tower == null or tower.model == null or tower.footprint.is_empty():
 		return "卡片缺少防禦塔模型或佔格設定"
 	if not Vector2i.ZERO in tower.footprint:

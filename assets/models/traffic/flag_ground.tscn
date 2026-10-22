@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/tiles/stone.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/tiles/variants/pillar_support.tscn" id="2"]
+
+[node name="FlagGround" type="Node3D"]
+
+[node name="Tile" parent="." instance=ExtResource("1")]
+
+[node name="Pillar" parent="." instance=ExtResource("2")]
+scale = Vector3(0.86, 1, 0.86)

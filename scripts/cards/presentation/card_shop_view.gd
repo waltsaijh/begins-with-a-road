@@ -1,6 +1,6 @@
 @tool
 extends CanvasLayer
-## Five reusable slots animate between a face-down deck and the shop row.
+## Seven reusable slots animate between a face-down deck and two shop rows.
 signal open_requested
 signal close_requested
 signal purchase_requested(index: int)
@@ -15,7 +15,7 @@ const RerollIcon = preload("res://assets/sprites/cards/reroll_icon.png")
 	set(value):
 		coin_texture = value
 		_refresh_artwork()
-## Shared by all five backs; edit card_back.tscn to adjust nine-patch margins.
+## Shared by all seven backs; edit card_back.tscn to adjust nine-patch margins.
 @export var card_back_texture: Texture2D:
 	set(value):
 		card_back_texture = value
@@ -190,6 +190,15 @@ func active_indices() -> PackedInt32Array:
 		if not opened or _in_stock(i): result.append(i)
 	return result
 
+func row_indices(upper: bool) -> PackedInt32Array:
+	var result := PackedInt32Array()
+	for candidate in active_indices():
+		if upper == (candidate >= 1 and candidate <= 4): result.append(candidate)
+	if result.has(0):
+		result.remove_at(result.find(0))
+		result.append(0)
+	return result
+
 func _layout(animate: bool, entering: bool, flip := true) -> void:
 	if not available or not is_inside_tree(): return
 	if _motion != null: _motion.kill()
@@ -200,12 +209,12 @@ func _layout(animate: bool, entering: bool, flip := true) -> void:
 	var card := ShopConstants.CARD_SIZE
 	var active := active_indices()
 	var step := card.x-CardFanLayout.OVERLAP
-	var width := CardFanLayout.width_for(card.x, active.size(), step)
+	var width := CardFanLayout.width_for(card.x, 4, step)
 	var scale_factor := minf(CardFanLayout.CARD_SCALE, (viewport.x-ShopConstants.MARGIN*2)/width) if opened else CardFanLayout.CARD_SCALE
 	var base := Vector2(viewport.x-ShopConstants.MARGIN-(width if opened else card.x)*scale_factor, viewport.y-24-card.y*scale_factor+vertical_offset)
-	if opened: base.y -= CardFanLayout.drop_for(active.size(), step)*scale_factor
-	$Root/ShopArea.position = base-Vector2(16, 82 if opened else 60)
-	$Root/ShopArea.size = Vector2((width if opened else card.x)*scale_factor+32, card.y*scale_factor+(114 if opened else 68))
+	if opened: base.y -= CardFanLayout.drop_for(4, step)*scale_factor
+	$Root/ShopArea.position = base-Vector2(16, (card.y+102)*scale_factor if opened else 60)
+	$Root/ShopArea.size = Vector2((width if opened else card.x)*scale_factor+32, card.y*scale_factor+(card.y+134)*scale_factor if opened else card.y*scale_factor+68)
 	_animating = animate and (flip or not _entering.is_empty())
 	var duration := CardFanLayout.INSERT_TIME if not _entering.is_empty() else (ShopConstants.ANIMATION_TIME if flip else CardFanLayout.SHIFT_TIME)
 	if animate:
@@ -214,7 +223,7 @@ func _layout(animate: bool, entering: bool, flip := true) -> void:
 		var slot := slots[i]
 		var rank := active.find(i)
 		if opened and rank < 0:
-			# The closed deck restores all five backs. Sold slots must be
+			# The closed deck restores all seven backs. Sold slots must be
 			# hidden again before skipping their layout on reopening.
 			_show_face(i, true)
 			continue
@@ -224,12 +233,19 @@ func _layout(animate: bool, entering: bool, flip := true) -> void:
 		slot.pivot_offset = Vector2(card.x*0.5, card.y)
 		var compensation := slot.pivot_offset*(scale_factor-1)
 		var target := base+CardFanLayout.offset(rank, active.size(), step, 1, card)*scale_factor+compensation if opened else base+ShopConstants.STACK_OFFSET*i*scale_factor+compensation
-		var angle := CardFanLayout.angle(rank, active.size(), 1) if opened else 0.0
+		var angle := 0.0
+		if opened:
+			var row := row_indices(i >= 1 and i <= 4)
+			var row_rank := row.find(i)
+			var row_width := CardFanLayout.width_for(card.x,row.size(),step)
+			var row_base := base+Vector2((width-row_width)*scale_factor, -(card.y+20)*scale_factor if i >= 1 and i <= 4 else 0.0)
+			target = row_base+CardFanLayout.offset(row_rank,row.size(),step,1,card)*scale_factor+compensation
+			angle = CardFanLayout.angle(row_rank,row.size(),1)
 		var lift := CardFanLayout.HOVER_LIFT if i == _hovered else 0.0
 		if lift > 0: target += Vector2.UP.rotated(angle)*lift*scale_factor
 		slot.get_node("Face/Card").hover_lift = lift
 		slot.get_node("Face/Back").hover_lift = lift
-		slot.z_index = rank+1 if opened else slots.size()-i
+		slot.z_index = (7 if i == 0 else i) if opened else slots.size()-i
 		if entering or _fresh.erase(i):
 			slot.position = Vector2(target.x, viewport.y+32+i*4)
 			slot.scale = Vector2.ONE*scale_factor

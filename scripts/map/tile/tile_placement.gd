@@ -25,13 +25,14 @@ func place_cell(cell: Vector3i) -> bool:
 		return false
 	if map.get_cell_item(cell) != GridMap.INVALID_CELL_ITEM:
 		return false
-	add_cells([cell])
-	return true
+	return not add_cells([cell]).is_empty()
 
 ## The caller validates first. Set all ground before refreshing any connections.
 ## Cards delay notifications until their tower occupancy has also been committed.
 func add_cells(cells: Array[Vector3i], notify := true) -> Array[Vector3i]:
+	var towers := get_node_or_null("../TowerMap")
 	for cell in cells:
+		if map.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM and towers != null and towers.traffic != null and towers.traffic.occupied.has(Vector2i(cell.x,cell.z)): return []
 		if cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767:
 			return []
 	var added: Array[Vector3i] = []

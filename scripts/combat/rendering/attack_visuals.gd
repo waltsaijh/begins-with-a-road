@@ -6,10 +6,32 @@ var impacts: Array[Node3D]:
 	get: return $ImpactEffects.active
 @onready var _instance: MeshInstance3D = $Geometry
 var _visible_last_frame := false
+var restored_bursts: Node3D
+var _shot_players: Array[AudioStreamPlayer] = []
+var _last_shot := {}
 
 func _ready() -> void:
 	process_priority = 100
 	_instance.global_transform = Transform3D.IDENTITY
+	restored_bursts = preload("res://scripts/combat/rendering/restored_bursts.gd").new()
+	add_child(restored_bursts)
+	# Prototype's shared six-voice / 25 ms-per-kind budget, real-time cosmetic only.
+	for i in 6:
+		var voice := AudioStreamPlayer.new()
+		voice.volume_db = -20
+		add_child(voice)
+		_shot_players.append(voice)
+
+func play_restored_shot(kind: int,stream: AudioStream) -> void:
+	if stream == null: return
+	var now := Time.get_ticks_usec()
+	if now-int(_last_shot.get(kind,-25000)) < 25000: return
+	for voice in _shot_players:
+		if not voice.playing:
+			voice.stream = stream
+			voice.play()
+			_last_shot[kind] = now
+			return
 
 func add_beam(start: Vector3, end: Vector3, color: Color, width: float, duration: float) -> void:
 	beams.append({"start": start, "end": end, "color": color, "width": width, "duration": duration, "age": 0.0})

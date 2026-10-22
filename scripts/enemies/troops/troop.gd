@@ -4,10 +4,26 @@ extends Resource
 ## Editable troop definition. Instances keep health, routes and visual state separately.
 const TileRecord = preload("res://scripts/map/tile/tile_parameters.gd")
 enum RouteSelection { UNIFORM, SOFTMAX }
+## One mutually exclusive size, plus composable movement/trait tags.
+@export_enum("small", "standard", "large") var body_size := "standard":
+	set(value):
+		body_size = value
+		emit_changed()
+@export var tags: Array[StringName] = [&"ground"]:
+	set(value):
+		tags = value
+		emit_changed()
+
+func has_tag(tag: StringName) -> bool:
+	return tag == StringName(body_size) or (tag not in [&"small", &"standard", &"large"] and tag in tags)
+
 @export var troop_name := "new_troop"
 @export var name_key := ""
 @export var sort_order := 100
 @export var icon: Texture2D
+## Contact combat only. Zero means no authored melee damage for a new profile.
+@export var melee_damage := 0.0
+@export var melee_interval := 1.0
 @export var debug_color := Color("40d9ff")
 @export_range(1.0, 10000.0, 1.0, "or_greater") var max_health := EnemyConstants.MAX_HEALTH:
 	set(value):
@@ -110,6 +126,7 @@ func localized_name() -> String:
 	return troop_name if text == name_key else text
 
 func configuration_error() -> String:
+	if not is_finite(melee_damage) or melee_damage < 0 or not is_finite(melee_interval) or melee_interval <= 0: return "兵種近戰反擊設定無效"
 	if troop_name.strip_edges().is_empty(): return "兵種缺少 ID"
 	if not is_finite(max_health) or max_health <= 0 or not is_finite(speed_multiplier) or speed_multiplier <= 0: return "兵種血量與速度必須大於 0"
 	if not is_finite(max_shield) or max_shield < 0: return "兵種護盾不可小於 0"

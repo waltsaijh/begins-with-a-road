@@ -10,6 +10,8 @@ extends Resource
 			name_key = value
 			emit_changed()
 @export var model: PackedScene
+## Optional friendly deployment; soldiers are not navigation obstacles.
+@export var deployment: BarracksDeployment
 ## Base shop price when this tower is rolled into a construction card.
 @export_range(0, 100, 1, "or_greater") var card_price := ShopConstants.DEFAULT_CARD_PRICE
 ## Transparent icon silhouette is tinted with a darker accent_color in card UI.
@@ -82,6 +84,7 @@ func roll_tile_preset(rng: RandomNumberGenerator) -> TilePreset:
 	return options[-1].preset
 
 func configuration_error() -> String:
+	if deployment != null and not deployment.configuration_error().is_empty(): return deployment.configuration_error()
 	if not is_finite(max_health) or max_health <= 0 or not is_finite(default_damage) or default_damage < 0:
 		return "防禦塔血量／傷害設定無效"
 	if not is_finite(attack_interval) or attack_interval <= 0 or not is_finite(attack_radius) or attack_radius < 0 or not is_finite(threat) or threat < 0:

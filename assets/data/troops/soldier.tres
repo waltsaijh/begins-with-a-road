@@ -10,5 +10,6 @@ troop_name = "soldier"
 name_key = "troop.soldier.name"
 sort_order = 0
 icon = ExtResource("1_87ixf")
+melee_damage = 5.0
 route_selection = 0
 model = ExtResource("3")

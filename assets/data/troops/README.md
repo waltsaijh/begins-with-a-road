@@ -53,3 +53,9 @@ Icon 是獨立 Texture2D，直接選取 PNG 即可，不受模型匯入方式影
 ## 避讓
 
 視覺位移以約 0.8 秒的平滑阻尼過渡，完成後保留側向位置，不在鄰兵離開後歸零。轉彎期間不互相碰撞，並保留現有位移；避讓不修改邏輯位置、行走速度與固定路線。過渡速度可在 `EnemyRenderConstants.VISUAL_OFFSET_SMOOTH_TIME` 調整，目前為 0.35；這是阻尼時間尺度，並非固定總時長。
+
+## 多標籤
+
+Body Size 單選 small／standard／large；Tags 是可複合 StringName 清單，例如 ground、flying、armored、uncontrollable。消費端使用 `has_tag()`；不要把體型塞入 Tags，三個體型的查詢只以 Body Size 為準。未設定資源安全預設 standard＋ground。
+
+Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large＋ground＋armored。這些資料不修改既有生命、速度、攻擊或固定行程；臨時設施依 required_tags 選擇對象。

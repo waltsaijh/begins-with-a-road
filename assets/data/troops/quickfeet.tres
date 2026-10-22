@@ -6,10 +6,13 @@
 
 [resource]
 script = ExtResource("1")
+body_size = "small"
 troop_name = "quickfeet"
 name_key = "troop.quickfeet.name"
 sort_order = 10
 icon = ExtResource("1_0cwrg")
+melee_damage = 3.0
+melee_interval = 0.8
 debug_color = Color(1, 0.7607843, 0.2784314, 1)
 max_health = 50.0
 speed_multiplier = 1.3

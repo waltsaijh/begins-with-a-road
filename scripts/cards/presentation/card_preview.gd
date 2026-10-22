@@ -8,7 +8,7 @@ extends Node3D
 @onready var attack_area: MeshInstance3D = $AttackArea
 var range_cells: Array[Vector2i] = []
 var ghost: Node3D
-var _definition: TowerDefinition
+var _definition: Resource
 var _material: StandardMaterial3D
 var hint_anchor := Vector3.ZERO
 
@@ -28,11 +28,11 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 			mesh.surface_add_vertex(center+corner)
 	mesh.surface_end()
 	ground.mesh = mesh
-	_show_attack_area(map, card.tower, cell, turns)
-	if _definition != card.tower:
+	_show_attack_area(map, card.visual_definition(), cell, turns)
+	if _definition != card.visual_definition():
 		if ghost != null:
 			ghost.free()
-		_definition = card.tower
+		_definition = card.visual_definition()
 		ghost = null
 		if _definition != null and _definition.model != null:
 			ghost = _definition.model.instantiate()
@@ -45,8 +45,11 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 		hint_anchor.y = _top_height(ghost, hint_anchor.y)
 	hint_anchor += Vector3.UP*0.12
 
-func _show_attack_area(map: GridMap, definition: TowerDefinition, cell: Vector3i, turns: int) -> void:
-	range_cells = definition.attack_cells_at(Vector2i(cell.x, cell.z), turns)
+func _show_attack_area(map: GridMap, definition: Resource, cell: Vector3i, turns: int) -> void:
+	if definition is TrafficStructureDefinition:
+		range_cells.assign(definition.effect_at(Vector2i(cell.x, cell.z), turns).cells.keys())
+	else:
+		range_cells = definition.attack_cells_at(Vector2i(cell.x, cell.z), turns)
 	var mesh := ImmediateMesh.new()
 	if not range_cells.is_empty():
 		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)

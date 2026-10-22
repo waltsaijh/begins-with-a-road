@@ -1,7 +1,7 @@
 extends RefCounted
 ## Threshold-filtered complete routes: uniform or stable softmax weights.
 ## Build once; look up cumulative probability intervals in O(log routes).
-static func build(scores: PackedFloat64Array, temperature: float, selection: Troop.RouteSelection = Troop.RouteSelection.SOFTMAX) -> Dictionary:
+static func build(scores: PackedFloat64Array, temperature: float, selection: Troop.RouteSelection = Troop.RouteSelection.SOFTMAX, log_modifiers := PackedFloat64Array()) -> Dictionary:
 	if selection not in [Troop.RouteSelection.UNIFORM, Troop.RouteSelection.SOFTMAX]:
 		return {"valid": false, "error": "未知的路線分配模式"}
 	if selection == Troop.RouteSelection.SOFTMAX and (is_nan(temperature) or temperature <= 0):
@@ -15,11 +15,20 @@ static func build(scores: PackedFloat64Array, temperature: float, selection: Tro
 	var cdf := PackedFloat64Array()
 	probabilities.resize(scores.size())
 	cdf.resize(scores.size())
+	if not log_modifiers.is_empty() and log_modifiers.size() != scores.size():
+		return {"valid": false, "error": "選路倍率數量不一致"}
+	var peak := -INF
+	for i in scores.size():
+		var value := 0.0 if selection == Troop.RouteSelection.UNIFORM or is_inf(temperature) else -(scores[i]-best)/temperature
+		if not log_modifiers.is_empty(): value += log_modifiers[i]
+		if is_nan(value) or value == INF: return {"valid": false, "error": "選路倍率無效"}
+		probabilities[i] = value
+		peak = maxf(peak, value)
+	if not scores.is_empty() and peak == -INF: return {"valid": false, "error": "沒有正權重路線"}
 	var total := 0.0
 	for i in scores.size():
-		var weight := 1.0 if selection == Troop.RouteSelection.UNIFORM or is_inf(temperature) else exp(-(scores[i]-best)/temperature)
-		probabilities[i] = weight
-		total += weight
+		probabilities[i] = exp(probabilities[i]-peak)
+		total += probabilities[i]
 	var cumulative := 0.0
 	for i in scores.size():
 		# Accumulate raw weights in the same order as total, including trailing

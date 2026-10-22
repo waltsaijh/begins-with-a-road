@@ -24,3 +24,19 @@ ui.expansion.north,↑ North,↑ 北方
 ui.expansion.west,← West,← 西方
 ui.expansion.south,↓ South,↓ 南方
 ui.expansion.east,→ East,→ 東方
+
+tower.mortar.name,Mortar,迫擊砲
+tower.ballista.name,Ballista,弩砲
+tower.broadside.name,Airship Broadside,空艇舷炮
+tower.barracks.name,Barracks,兵營
+
+traffic.flag.name,Flag,旗幟
+traffic.barricade.name,Barricade,拒馬
+traffic.narrow_passage.name,Narrow Passage,窄口
+traffic.flag.effect,Attracts ground units,吸引地面單位
+traffic.barricade.effect,Non-heavy units avoid,非重型單位迴避
+traffic.narrow_passage.effect,Large units avoid,大型單位迴避
+traffic.duration,Lasts {waves} waves,持續 {waves} 波
+traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
+traffic.no_change,No forecast change: candidate routes or whole-unit quotas limit this effect,分流未變：候選路線或整數配額限制
+traffic.unavailable,No positive-weight route for the next wave,下一波沒有正權重路線

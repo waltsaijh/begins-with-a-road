@@ -11,6 +11,8 @@ var shots_fired := 0
 var projectiles: Array[Dictionary] = []
 var visuals: Node3D
 var _index := SpatialIndex.new()
+var barracks: Node3D
+var friendly_index_ready := false
 
 func _ready() -> void:
 	process_priority = 50
@@ -18,8 +20,13 @@ func _ready() -> void:
 	visuals = Visuals.instantiate()
 	add_child(visuals)
 	visuals.projectiles = projectiles
+	barracks = preload("res://scripts/combat/barracks_system.gd").new()
+	barracks.combat = self
+	add_child(barracks)
 
 func _process(delta: float) -> void:
+	var reuse_index := friendly_index_ready
+	friendly_index_ready = false
 	if map == null or not is_instance_valid(wave) or not is_instance_valid(tower_map):
 		return
 	var step := maxf(0.0, delta)
@@ -28,7 +35,7 @@ func _process(delta: float) -> void:
 		return
 	if tower_map.towers.is_empty() and projectiles.is_empty():
 		return
-	_index.rebuild(wave.living_enemies(), map)
+	if not reuse_index: _index.rebuild(wave.living_enemies(), map)
 	# Existing flights age before new shots; a shot fired this frame starts at zero.
 	for i in range(projectiles.size()-1, -1, -1):
 		var shot: Dictionary = projectiles[i]
@@ -38,34 +45,37 @@ func _process(delta: float) -> void:
 			continue
 		shot.age += step
 		if shot.age >= shot.duration:
-			for target in _index.targets_in(shot.cell, shot.radius):
-				shot.payload.apply(target)
-			visuals.add_impact(shot.end, shot.radius, shot.color, map)
+			if not shot.get("visual_only",false):
+				for target in _index.targets_in(shot.cell, shot.radius):
+					shot.payload.apply(target)
+			if shot.get("visual_only",false): visuals.restored_bursts.mortar_impact(shot.end)
+			else: visuals.add_impact(shot.end, shot.radius, shot.color, map)
 			projectiles.remove_at(i)
 	if not enabled:
 		return
 	for tower: DefenseTower in tower_map.towers.values():
 		if tower.is_queued_for_deletion() or tower.health <= 0 or tower.attack == null:
 			continue
-		var target: Node3D
-		if tower.definition != null and tower.definition.attack_area != null:
-			# An outside tile must never steal a shot from an asymmetric shape.
-			target = _index.target_in_offsets(tower.grid_cell, tower.attack_offsets())
-		else:
-			# Circular lookahead preserves nearest-first priority in one query.
-			target = _index.target_for(tower.grid_cell, tower.attack_radius+TowerConstants.AIM_LOOKAHEAD_TILES)
+		var target: Node3D = tower.attack.select_target(self,tower)
 		if target == null:
 			continue
 		var aligned := tower.aim_at(aim_position(target, tower.attack), step)
 		if elapsed < tower.next_attack_time or not aligned:
 			continue
-		if not tower.covers_cell(_index.cell_for(target.global_position)):
+		if not tower.attack is VolleyAttack and not tower.covers_cell(_index.cell_for(target.global_position)):
 			continue
 		if not tower.attack.configuration_error().is_empty() or not is_finite(tower.attack_interval) or tower.attack_interval <= 0:
 			continue
+		tower.prepare_shot(target)
 		tower.attack.fire(self, tower, target)
+		tower.present_shot(target,visuals)
 		tower.next_attack_time = elapsed+tower.attack_interval
 		shots_fired += 1
+
+func default_target(tower: DefenseTower) -> Node3D:
+	if tower.definition != null and tower.definition.attack_area != null:
+		return _index.target_in_offsets(tower.grid_cell,tower.attack_offsets())
+	return _index.target_for(tower.grid_cell,tower.attack_radius+TowerConstants.AIM_LOOKAHEAD_TILES)
 
 func aim_position(target: Node3D, attack: TowerAttack) -> Vector3:
 	if attack is ProjectileAttack:

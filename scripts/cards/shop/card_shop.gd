@@ -2,6 +2,7 @@ extends Node
 signal balance_changed(coins: int)
 ## Wave-bound shop state and transactions. The view owns only layout/animation.
 @export var catalog: Array[TowerDefinition] = []
+@export var traffic_catalog: Array[TrafficStructureDefinition] = []
 @export var wave_reward := ShopConstants.WAVE_REWARD
 @export var reroll_price := ShopConstants.REROLL_PRICE
 @export var initial_coins := ShopConstants.INITIAL_COINS
@@ -77,8 +78,36 @@ func roll_cards(count: int) -> Array[BuildCard]:
 		result.append(BuildCard.from_parts(tower, preset))
 	return result
 
+func roll_traffic_cards(count: int) -> Array[BuildCard]:
+	var valid: Array[TrafficStructureDefinition] = []
+	for definition in traffic_catalog:
+		if definition != null and definition.configuration_error().is_empty(): valid.append(definition)
+	var result: Array[BuildCard] = []
+	var bag: Array[TrafficStructureDefinition] = []
+	if valid.is_empty(): return result
+	for i in count:
+		if bag.is_empty():
+			bag.assign(valid)
+			for j in range(bag.size()-1,0,-1):
+				var index := _rng.randi_range(0,j)
+				var swap := bag[j]
+				bag[j] = bag[index]
+				bag[index] = swap
+		result.append(BuildCard.from_traffic(bag.pop_back()))
+	return result
+
+func roll_offers() -> Array[BuildCard]:
+	var result := roll_cards(ShopConstants.OFFER_COUNT)
+	var support := roll_traffic_cards(2)
+	if result.is_empty() and support.is_empty(): return []
+	# Stable indices preserve row identity even if an entire pool is invalid.
+	result.resize(ShopConstants.OFFER_COUNT)
+	support.resize(2)
+	result.append_array(support)
+	return result
+
 func _deal() -> bool:
-	var next := roll_cards(ShopConstants.OFFER_COUNT)
+	var next := roll_offers()
 	if next.is_empty(): return false
 	_accept_deal(next)
 	return true
@@ -88,7 +117,7 @@ func _accept_deal(next: Array[BuildCard]) -> void:
 	prices.clear()
 	sold.clear()
 	for card in offers:
-		prices.append(card.price)
+		prices.append(card.price if card != null else 0)
 		sold.append(0)
 	deals += 1
 
@@ -122,11 +151,11 @@ func buy(index: int) -> bool:
 	return true
 
 func reroll() -> bool:
-	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or catalog.is_empty() or view.rerolling:
+	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or view.rerolling:
 		return false
 	if coins < maxi(0, reroll_price):
 		return false
-	var next := roll_cards(ShopConstants.OFFER_COUNT)
+	var next := roll_offers()
 	if next.is_empty(): return false
 	coins -= maxi(0, reroll_price)
 	_accept_deal(next)

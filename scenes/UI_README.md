@@ -27,3 +27,5 @@
 敵人狀態由同一個 overlay 的單一 MultiMeshInstance2D 繪製，每批只保留一份外觀範本，不為每隻敵人建立整組 Control。啟動時讀取上表列出的尺寸、顏色與樣式：矩形 StyleBoxFlat 由 shader 繪製，圓角、陰影及其他樣式一次烘焙到共用圖集；靜態效果圖片首次使用時加入圖集，敵人清空後釋放圖示快取。執行期間修改範本需重新建立顯示層；任意新增的節點不會自動繪製到每隻敵人頭頂。`Health`／`Shield` 在範本中的寬度只用來展示外觀，遊戲中的比例由血量與護盾決定。
 
 節點名稱是程式讀取資料的介面，調整位置、尺寸、樣式與素材即可；如要重新命名節點，也需更新對應腳本路徑。動態集合請編輯其 `.tscn` 範本，而不是執行中的 Remote 複本。場景內顏色若由資料覆寫（塔 accent、目前 ACT、時間線進度），可在其根節點的 Inspector 調整相關設定。
+
+Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。

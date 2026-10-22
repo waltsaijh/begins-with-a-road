@@ -108,12 +108,19 @@ func aim_at(target: Vector3, delta: float) -> bool:
 	var forward := (-_aim_pivot.global_basis.z).normalized()
 	return forward.dot((target-_aim_pivot.global_position).normalized()) >= cos(TowerConstants.AIM_TOLERANCE)
 
+func prepare_shot(target: Node3D) -> void:
+	if _visual != null and _visual.has_method("prepare_target"): _visual.prepare_target(target)
+
 ## Query only: firing must never rotate the model or bypass smooth aiming.
 func muzzle_position() -> Vector3:
+	if _visual != null and _visual.has_method("muzzle_position"): return _visual.muzzle_position()
 	if _muzzle != null:
 		return _muzzle.global_position
 	var origin := _aim_pivot if _aim_pivot != null else (_visual if _visual != null else self)
 	return origin.to_global(definition.muzzle_offset if definition != null else TowerConstants.MUZZLE_OFFSET)
+
+func present_shot(target: Node3D,effects: Node = null) -> void:
+	if _visual != null and _visual.has_method("fire"): _visual.fire(target,effects)
 
 func take_damage(amount: float) -> void:
 	if is_queued_for_deletion() or health <= 0 or not is_finite(amount) or amount <= 0:

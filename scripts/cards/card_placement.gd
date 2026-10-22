@@ -1,5 +1,7 @@
 extends Node3D
 signal cards_changed
+signal traffic_preview_changed(effect: Dictionary)
+var traffic_candidate := {}
 ## Input orchestration. BuildCard is data, TowerMap is the commit authority.
 @export var cards: Array[BuildCard] = []
 ## Used when no fixed starting cards are authored above.
@@ -16,7 +18,7 @@ var _last_cell := TileConstants.INVALID_CELL
 var _dirty := true
 var _retry := 0.0
 var _preview_error := ""
-var _preview_definition: TowerDefinition
+var _preview_definition: Resource
 var input_suspended := false
 var pause_locked := false
 var entry_selection_active := false
@@ -36,6 +38,9 @@ var _mouse_in_viewport := true
 func _ready() -> void:
 	cards = cards.duplicate()
 	controller.graph_changed.connect(_invalidate)
+	towers.traffic.changed.connect(_invalidate)
+	preview.visibility_changed.connect(func():
+		if not preview.visible: set_traffic_candidate({}))
 	placement.cell_placed.connect(func(_cell: Vector3i): _invalidate())
 	var wave := get_node_or_null("../EnemyWave")
 	if wave != null:
@@ -61,12 +66,21 @@ func _ready() -> void:
 		_on_wave_started()
 	set_process(false)
 
+func set_traffic_candidate(effect: Dictionary) -> void:
+	if traffic_candidate == effect: return
+	traffic_candidate = effect.duplicate(true)
+	traffic_preview_changed.emit(traffic_candidate)
+
+func preview_traffic_at(card: BuildCard, cell: Vector3i, rotation_steps: int, valid: bool) -> void:
+	set_traffic_candidate(card.traffic.effect_at(Vector2i(cell.x,cell.z),rotation_steps) if valid and card.traffic != null else {})
+
 func select_card(index: int, toggle := true) -> void:
 	if input_suspended and index >= 0:
 		return
+	set_traffic_candidate({})
 	if toggle: hand.cancel_drag()
 	selected = index if index >= 0 and index < cards.size() and cards[index] != null and (not toggle or index != selected) else -1
-	var next_definition: TowerDefinition = cards[selected].tower if selected >= 0 else null
+	var next_definition: Resource = cards[selected].visual_definition() if selected >= 0 else null
 	if _preview_definition != next_definition:
 		if is_instance_valid(_preview_definition) and _preview_definition.changed.is_connected(_invalidate):
 			_preview_definition.changed.disconnect(_invalidate)
@@ -158,10 +172,10 @@ func add_card(card: BuildCard) -> bool:
 	cards_changed.emit()
 	return true
 
-func place_selected(cell: Vector3i) -> DefenseTower:
+func place_selected(cell: Vector3i) -> Node3D:
 	if input_suspended or selected < 0 or selected >= cards.size():
 		return null
-	var tower: DefenseTower = towers.place_card(cards[selected], cell, turns)
+	var tower: Node3D = towers.place_card(cards[selected], cell, turns)
 	if tower == null:
 		_dirty = true
 		return null
@@ -227,6 +241,7 @@ func _process(delta: float) -> void:
 		_last_cell = cell
 		_retry = 0.0
 		_preview_error = towers.validate_card(cards[selected], cell, turns)
+		preview_traffic_at(cards[selected], cell, turns, _preview_error.is_empty())
 		if cards[selected].configuration_error().is_empty():
 			preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
 		else:
@@ -242,6 +257,15 @@ func _process(delta: float) -> void:
 func _reset_rotation_hint() -> void:
 	_hint_cell = TileConstants.INVALID_CELL
 	rotation_hint.reset()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT and is_node_ready():
+		_mouse_in_viewport = false
+		preview.hide()
+		_reset_rotation_hint()
+	elif what == NOTIFICATION_WM_WINDOW_FOCUS_IN:
+		_mouse_in_viewport = true
+		_dirty = true
 
 func _exit_tree() -> void:
 	if is_instance_valid(_preview_definition) and _preview_definition.changed.is_connected(_invalidate):

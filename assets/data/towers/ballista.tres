@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://c6qnwdotfkw8i"]
+
+[ext_resource type="Resource" path="res://assets/data/towers/attacks/ballista.tres" id="1_37xr8"]
+[ext_resource type="Resource" path="res://assets/data/towers/ranges/ballista.tres" id="2_guvrq"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/ballista.tscn" id="4_57dd7"]
+[ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="5_1kgwr"]
+[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="6_gmvhy"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_onxsf"]
+load_path = "res://.godot/imported/ballista.png-59867b7fd3dc5b9554f97b5f21f94334.ctex"
+
+[sub_resource type="Resource" id="Resource_x6mxv"]
+script = ExtResource("6_gmvhy")
+preset_path = "res://assets/data/tile_presets/ballista_01.tres"
+
+[sub_resource type="Resource" id="Resource_y0y6a"]
+script = ExtResource("6_gmvhy")
+preset_path = "res://assets/data/tile_presets/ballista_02.tres"
+
+[sub_resource type="Resource" id="Resource_ww1w6"]
+script = ExtResource("6_gmvhy")
+preset_path = "res://assets/data/tile_presets/ballista_03.tres"
+
+[sub_resource type="Resource" id="Resource_ktw57"]
+script = ExtResource("6_gmvhy")
+preset_path = "res://assets/data/tile_presets/ballista_04.tres"
+
+[resource]
+script = ExtResource("5_1kgwr")
+name_key = "tower.ballista.name"
+model = ExtResource("4_57dd7")
+card_price = 11
+icon = SubResource("CompressedTexture2D_onxsf")
+accent_color = Color(0.49019608, 0.74509805, 0.92941177, 1)
+footprint = Array[Vector2i]([Vector2i(0, 0)])
+attack_area = ExtResource("2_guvrq")
+attack_radius = 4.0
+default_damage = 15.0
+attack_interval = 1.4
+attack = ExtResource("1_37xr8")
+tile_preset_candidates = Array[ExtResource("6_gmvhy")]([SubResource("Resource_x6mxv"), SubResource("Resource_y0y6a"), SubResource("Resource_ww1w6"), SubResource("Resource_ktw57")])

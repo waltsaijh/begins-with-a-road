@@ -18,3 +18,6 @@ func configuration_error() -> String:
 
 func fire(_combat: Node, _tower: Node3D, _target: Node3D) -> void:
 	push_error("TowerAttack subclasses must implement fire()")
+
+func select_target(combat: Node, tower: Node3D) -> Node3D:
+	return combat.default_target(tower)

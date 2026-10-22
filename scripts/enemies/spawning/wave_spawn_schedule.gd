@@ -7,7 +7,7 @@ static func origins_for(group: WaveSpawnGroup, additional_starts: PackedInt32Arr
 		if not index in origins: origins.append(index)
 	return origins
 
-static func build(definition: WaveDefinition, controller: Node, first_id: int, shuffle_departures := true, additional_starts: PackedInt32Array = PackedInt32Array()) -> Dictionary:
+static func build(definition: WaveDefinition, controller: Node, first_id: int, shuffle_departures := true, additional_starts: PackedInt32Array = PackedInt32Array(), modifiers: Variant = null) -> Dictionary:
 	if not definition.configuration_error().is_empty(): return {}
 	# Allocate entrances by troop + authored origin across the whole wave first.
 	# IDs never seed either entrance or route choice; only departures are shuffled.
@@ -20,7 +20,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 		for origin in assignments[group_index]:
 			var key := "%d:%d" % [group.troop.get_instance_id(), origin]
 			if not quotas.has(key):
-				var plan: Dictionary = controller.plan_for(group.troop, origin)
+				var plan: Dictionary = controller.plan_for(group.troop, origin, modifiers)
 				if not plan.get("valid", false) or plan.get("routes", 0) == 0: return {}
 				pool_size += int(plan.routes)
 				quotas[key] = 0
@@ -38,7 +38,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 			var key := "%d:%d" % [profile.get_instance_id(), origin]
 			var allocation_index := int(used[key])
 			used[key] += 1
-			var route: Dictionary = controller.allocate_route_for(profile, allocation_index, quotas[key], origin)
+			var route: Dictionary = controller.allocate_route_for(profile, allocation_index, quotas[key], origin, modifiers)
 			if route.is_empty(): return {}
 			var points := PackedVector3Array()
 			for cell: Vector2 in route.cells:

@@ -22,6 +22,10 @@ var _next := 1
 var _finished := false
 var _slow_multiplier := 1.0
 var _slow_remaining := 0.0
+## A friendly can pause this immutable trip; it never replaces route/waypoints.
+var engaged_by: Node3D
+var melee_damage := 0.0
+var melee_interval := 1.0
 
 func can_be_targeted() -> bool:
 	return not _finished and not is_queued_for_deletion() and health > 0
@@ -39,6 +43,7 @@ func take_damage(amount: float) -> void:
 	var applied := minf(health, amount-absorbed)
 	health -= applied
 	if health <= 0:
+		if is_instance_valid(engaged_by): engaged_by.release()
 		_finished = true
 		set_process(false)
 		died.emit(self)
@@ -71,6 +76,9 @@ func _speed_factor(delta: float) -> float:
 	return factor
 
 func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> void:
+	if is_instance_valid(engaged_by): engaged_by.release()
+	melee_damage = troop.melee_damage if troop != null else 0.0
+	melee_interval = troop.melee_interval if troop != null else 1.0
 	enemy_id = id
 	route = selected_route
 	waypoints = points.duplicate()
@@ -93,6 +101,9 @@ func _process(delta: float) -> void:
 	# Spend leftover distance on the next segment, preserving speed at corners
 	# and even when one slow frame crosses several tiles.
 	var remaining := maxf(0.0, delta)*move_speed*_speed_factor(maxf(0.0, delta))
+	if is_instance_valid(engaged_by):
+		move_direction = (engaged_by.global_position-global_position).normalized()
+		return
 	var travelled := 0.0
 	while _next < waypoints.size():
 		var offset := waypoints[_next]-global_position

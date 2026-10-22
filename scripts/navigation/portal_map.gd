@@ -28,6 +28,24 @@ var _edit_guard: RefCounted
 var _edit_guard_ready := false
 ## Physical road cells occupied by obstacles. Rendering keeps the underlying tiles.
 var blocked_cells := {}
+var traffic_effects: Array = []
+var _traffic_distributions := {}
+
+func set_traffic_effects(effects: Array) -> void:
+	traffic_effects = effects.duplicate(true)
+	_traffic_distributions.clear()
+	plan_changed.emit()
+
+func _traffic_distribution(profile: Troop, start_index: int, effects: Array) -> Dictionary:
+	var key := _profile_key(profile, start_index)
+	var cache_key := [key, effects]
+	if not _traffic_distributions.has(cache_key):
+		_traffic_distributions[cache_key] = _candidate_routes.modified_distribution(key, profile, effects)
+	return _traffic_distributions[cache_key]
+
+func clear_traffic_preview_cache() -> void:
+	_traffic_distributions.clear()
+
 
 func terminal_cells() -> Array[Vector2i]:
 	var result: Array[Vector2i] = []
@@ -63,6 +81,7 @@ func _on_cell_placed(cell: Vector3i) -> void:
 	rebuild()
 
 func rebuild() -> void:
+	_traffic_distributions.clear()
 	_edit_guard_ready = false
 	revision += 1
 	graph = {}
@@ -140,7 +159,7 @@ func _profile_key(profile: Troop, start_index := 0) -> String:
 	var key := "profile:%d" % profile.get_instance_id()
 	return key if start_index == 0 else key+":start:%d" % start_index
 
-func plan_for(profile: Troop, start_index := 0) -> Dictionary:
+func plan_for(profile: Troop, start_index := 0, modifiers: Variant = null) -> Dictionary:
 	if profile == null: return {"valid": false, "error": "尚未設定可用兵種"}
 	if planner == null:
 		return {"valid": false, "error": "尚未建立移動圖"}
@@ -154,20 +173,36 @@ func plan_for(profile: Troop, start_index := 0) -> Dictionary:
 		planner.invalidate("guided:"+_profile_key(profile, start_index))
 		_candidate_routes.invalidate(_profile_key(profile, start_index))
 		return evaluated
-	return _candidate_routes.plan_for(planner, profile, _profile_key(profile, start_index), start_nodes[start_index], evaluated.costs)
+	var result: Dictionary = _candidate_routes.plan_for(planner, profile, _profile_key(profile, start_index), start_nodes[start_index], evaluated.costs)
+	var effects: Array = traffic_effects if modifiers == null else modifiers
+	if result.get("valid", false) and not effects.is_empty():
+		var distribution := _traffic_distribution(profile, start_index, effects)
+		if not distribution.get("valid", false): return distribution
+		result.route_probabilities = distribution.probabilities
+	return result
 
 func sample_for(profile: Troop, seed: int, start_index := 0, route_index := -1) -> Dictionary:
-	return _candidate_routes.sample(_profile_key(profile, start_index), seed, route_index) if planner != null and profile != null else {}
+	if planner == null or profile == null: return {}
+	if traffic_effects.is_empty(): return _candidate_routes.sample(_profile_key(profile,start_index),seed,route_index)
+	var entry := plan_for(profile,start_index)
+	if not entry.get("reachable",false): return {}
+	var distribution := _traffic_distribution(profile,start_index,traffic_effects)
+	var index := route_index if route_index >= 0 else preload("res://scripts/navigation/routes/route_distribution.gd").sample(distribution.cdf,seed)
+	var result: Dictionary = _candidate_routes.sample(_profile_key(profile,start_index),seed,index)
+	if not result.is_empty(): result.selection_probability = distribution.probabilities[index]
+	return result
 
 func debug_graph_for(profile: Troop, start_index := 0) -> Dictionary:
 	var entry := plan_for(profile, start_index)
 	return _candidate_routes.debug_graph(_profile_key(profile, start_index)) if entry.get("valid", false) else {}
 
 ## Deterministic wave allocation through cumulative probability intervals.
-func allocate_route_for(profile: Troop, index: int, total: int, start_index := 0) -> Dictionary:
-	var entry := plan_for(profile, start_index)
+func allocate_route_for(profile: Troop, index: int, total: int, start_index := 0, modifiers: Variant = null) -> Dictionary:
+	var entry := plan_for(profile, start_index, modifiers)
 	if not entry.get("reachable", false):
 		return {}
+	var effects: Array = traffic_effects if modifiers == null else modifiers
+	if not effects.is_empty(): return _candidate_routes.allocate_modified(_profile_key(profile, start_index), index, total, _traffic_distribution(profile, start_index, effects))
 	return _candidate_routes.allocate(_profile_key(profile, start_index), index, total)
 
 ## Stateless sampling for probes and previews;
@@ -208,6 +243,7 @@ func _apply_region_paths() -> void:
 		region.route_visible_links = PackedInt32Array()
 
 func _on_costs_changed(id: int) -> void:
+	_traffic_distributions.clear()
 	if id == 0:
 		_candidate_routes.invalidate()
 	else:

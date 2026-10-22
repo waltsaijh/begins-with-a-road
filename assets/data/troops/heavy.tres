@@ -6,10 +6,14 @@
 
 [resource]
 script = ExtResource("1")
+body_size = "large"
+tags = Array[StringName]([&"ground", &"armored"])
 troop_name = "heavy"
 name_key = "troop.heavy.name"
 sort_order = 20
 icon = ExtResource("1_jymb2")
+melee_damage = 9.0
+melee_interval = 1.2
 debug_color = Color(0.7568628, 0.5490196, 1, 1)
 speed_multiplier = 0.4
 max_shield = 150.0
@@ -17,4 +21,3 @@ score_threshold = 25.0
 path_base_cost = 0.0
 threat_weight = -1.0
 model = ExtResource("3")
-model_scale = Vector3(1, 1, 1)
