@@ -1,6 +1,14 @@
 extends CanvasLayer
 ## Pause UI keeps processing while the rest of the scene is paused.
-signal exit_requested
+signal home_requested
+const SettingsAdapter = preload("res://scripts/settings/game_settings.gd")
+const SettingsScene = preload("res://scenes/settings/settings_page.tscn")
+var settings_page: Control
+var _settings_camera: Camera3D
+@export_range(0.0, 1.0, 0.01) var settings_veil_alpha := 0.82
+var _settings_veil_motion: Tween
+var _pause_veil_alpha := 0.0
+var _returning_home := false
 const SPEEDS := [1.0, 2.0, 4.0]
 const PauseIcon = preload("res://assets/sprites/interface/pause.png")
 const SPEED_ICONS: Array[Texture2D] = [
@@ -34,21 +42,52 @@ var _callout_reveal := 0.0:
 @onready var resume_button: Button = $PauseBlocker/Menu/Margin/Actions/Resume/Button
 @onready var restart_button: Button = $PauseBlocker/Menu/Margin/Actions/Restart/Button
 @onready var settings_button: Button = $PauseBlocker/Menu/Margin/Actions/Settings/Button
-@onready var exit_button: Button = $PauseBlocker/Menu/Margin/Actions/Exit/Button
-@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, settings_button, exit_button]
+@onready var home_button: Button = $PauseBlocker/Menu/Margin/Actions/ReturnHome/Button
+@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, settings_button, home_button]
 @onready var _cards: Node = get_node_or_null("../CardPlacement")
 
 func _ready() -> void:
+	_pause_veil_alpha = $PauseBlocker/WhiteVeil.color.a
 	speed_button.pressed.connect(cycle_speed)
 	pause_button.pressed.connect(func(): set_paused(not pause_requested))
 	resume_button.pressed.connect(set_paused.bind(false))
 	restart_button.pressed.connect(request_restart)
-	exit_button.pressed.connect(request_exit)
+	home_button.pressed.connect(request_return_home)
+	ScreenTransition.finished.connect(_on_transition_finished)
+	settings_page = SettingsScene.instantiate()
+	add_child(settings_page)
+	settings_page.option_changed.connect(func(key: StringName, value: Variant): SettingsAdapter.apply(key, value, get_viewport()))
+	settings_page.visibility_changed.connect(_on_settings_visibility_changed)
+	settings_button.pressed.connect(open_settings)
 	pause_menu.hide()
 	pause_menu.modulate.a = 0.0
 	Engine.time_scale = SPEEDS[speed_index]
 	_update_labels()
 	_position_callout()
+
+func open_settings() -> void:
+	if not pause_requested or ScreenTransition.active: return
+	settings_page.configure(SettingsAdapter.sections(), SettingsAdapter.read(get_viewport()))
+	settings_page.open()
+
+func _on_settings_visibility_changed() -> void:
+	var active := settings_page.is_visible_in_tree()
+	_set_settings_navigation_locked(active)
+	if not is_inside_tree(): return
+	$PauseBlocker/Menu.visible = not active
+	_fade_settings_veil(active)
+	if not active and pause_requested: settings_button.grab_focus()
+
+func _set_settings_navigation_locked(value: bool) -> void:
+	if value: _settings_camera = get_viewport().get_camera_3d()
+	if is_instance_valid(_settings_camera) and _settings_camera.has_method("set_navigation_locked"):
+		_settings_camera.set_navigation_locked(value)
+	if not value: _settings_camera = null
+
+func _fade_settings_veil(reveal: bool) -> void:
+	if _settings_veil_motion != null: _settings_veil_motion.kill()
+	_settings_veil_motion = create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	_settings_veil_motion.tween_property($PauseBlocker/WhiteVeil, "color:a", maxf(_pause_veil_alpha, settings_veil_alpha) if reveal else _pause_veil_alpha, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 func _process(_delta: float) -> void:
 	_position_callout()
@@ -71,6 +110,9 @@ func _animate_callout(reveal: bool) -> void:
 
 func _position_callout() -> void:
 	if not is_inside_tree(): return
+	if is_instance_valid(settings_page) and settings_page.visible:
+		early_start.hide()
+		return
 	var viewport := get_viewport()
 	if viewport == null or not is_instance_valid(early_start): return
 	if pause_requested: early_start.disabled = true
@@ -104,16 +146,20 @@ func _update_labels() -> void:
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
 	settings_button.text = tr("ui.pause.settings")
-	exit_button.text = tr("ui.pause.exit")
+	home_button.text = tr("ui.pause.home")
 
 func cycle_speed() -> void:
-	if pause_requested: return
+	if pause_requested or ScreenTransition.active: return
 	speed_index = (speed_index+1)%SPEEDS.size()
 	if not pause_requested: Engine.time_scale = SPEEDS[speed_index]
 	_update_labels()
 
 func set_paused(value: bool) -> void:
+	if _returning_home: return
 	if value == pause_requested: return
+	if not value and settings_page.visible:
+		settings_page.hide()
+	$PauseBlocker/Menu.show()
 	pause_requested = value
 	if value:
 		get_tree().paused = true
@@ -150,7 +196,11 @@ func _fade_pause_menu(reveal: bool) -> void:
 			if not pause_requested: pause_menu.hide())
 
 func _input(event: InputEvent) -> void:
+	if ScreenTransition.active:
+		get_viewport().set_input_as_handled()
+		return
 	if not pause_requested: return
+	if settings_page.is_visible_in_tree(): return
 	var camera := get_viewport().get_camera_3d()
 	if event is InputEventMouse:
 		# Menu input reaches the camera's click/drag arbitration before GUI.
@@ -172,21 +222,27 @@ func _input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 func request_restart() -> void:
-	if not pause_requested: return
+	if not pause_requested or ScreenTransition.active: return
 	set_paused(false)
 	Engine.time_scale = 1.0
 	var error := get_tree().reload_current_scene()
 	if error != OK: push_error("Could not restart the current scene: %s" % error_string(error))
 
-func request_exit() -> void:
-	if _pause_menu_motion != null: _pause_menu_motion.kill()
-	pause_requested = false
-	get_tree().paused = false
-	Engine.time_scale = 1.0
-	exit_requested.emit()
-	get_tree().quit()
+func request_return_home() -> void:
+	if not pause_requested or ScreenTransition.active: return
+	if not ScreenTransition.change_scene("res://scenes/menus/main_menu.tscn"): return
+	_returning_home = true
+	_set_settings_navigation_locked(true)
+	home_requested.emit()
+
+func _on_transition_finished(error: int) -> void:
+	if error != OK and _returning_home:
+		_returning_home = false
+		_set_settings_navigation_locked(false)
 
 func _exit_tree() -> void:
+	_set_settings_navigation_locked(false)
+	if _settings_veil_motion != null: _settings_veil_motion.kill()
 	if _pause_menu_motion != null: _pause_menu_motion.kill()
 	get_tree().paused = false
 	Engine.time_scale = 1.0

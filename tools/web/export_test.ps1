@@ -10,7 +10,7 @@ $taskPresetBytes = [IO.File]::ReadAllBytes($taskPresets)
 $taskOutput = Join-Path $taskRoot $OutputDirectory
 New-Item -ItemType Directory -Force -Path $taskOutput | Out-Null
 try {
-    $taskConfig = [IO.File]::ReadAllText($taskProject).Replace('run/main_scene="res://scenes/level.tscn"', ('run/main_scene="'+$Scene+'"'))
+    $taskConfig = [regex]::Replace([IO.File]::ReadAllText($taskProject), '(?m)^run/main_scene="[^"]*"', { param($match) 'run/main_scene="'+$Scene+'"' })
     if (-not $taskConfig.Contains('run/main_scene="'+$Scene+'"')) { throw 'Unexpected main scene; export aborted' }
     $taskExport = [IO.File]::ReadAllText($taskPresets).Replace('tests/*,', '')
     [IO.File]::WriteAllText($taskProject, $taskConfig)

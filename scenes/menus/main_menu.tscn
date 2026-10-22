@@ -1,0 +1,120 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/menus/main_menu.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/menus/components/menu_stage.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/menus/components/menu_crest.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/settings/components/settings_button.tscn" id="4"]
+[ext_resource type="Theme" path="res://assets/themes/settings.tres" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/settings/settings_page.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/menus/map_selection.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/menus/components/frontier_preview.tscn" id="8"]
+
+[sub_resource type="Animation" id="Enter"]
+resource_name = "enter"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/path = NodePath("Home:modulate")
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.6), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]}
+
+[sub_resource type="AnimationLibrary" id="Animations"]
+_data = {"enter": SubResource("Enter")}
+
+[node name="MainMenu" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Stage" parent="." instance=ExtResource("2")]
+
+[node name="MapPreviews" type="Node3D" parent="."]
+visible = false
+
+[node name="Frontier" parent="MapPreviews" instance=ExtResource("8")]
+
+[node name="Interface" type="CanvasLayer" parent="."]
+layer = 6
+
+[node name="Home" type="Control" parent="Interface"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5")
+
+[node name="Column" type="VBoxContainer" parent="Interface/Home"]
+layout_mode = 1
+anchor_left = 0.07
+anchor_top = 0.5
+anchor_right = 0.47
+anchor_bottom = 0.5
+offset_top = -195.0
+offset_bottom = 195.0
+theme_override_constants/separation = 14
+
+[node name="Crest" parent="Interface/Home/Column" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Title" type="Label" parent="Interface/Home/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.125, 0.243, 0.278, 1)
+theme_override_font_sizes/font_size = 30
+text = "BEGINS WITH A ROAD"
+
+[node name="Subtitle" type="Label" parent="Interface/Home/Column"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ui.menu.subtitle"
+
+[node name="Tagline" type="Label" parent="Interface/Home/Column"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "ui.menu.tagline"
+autowrap_mode = 2
+
+[node name="Gap" type="Control" parent="Interface/Home/Column"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Actions" type="VBoxContainer" parent="Interface/Home/Column"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Start" parent="Interface/Home/Column/Actions" instance=ExtResource("4")]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "ui.menu.start"
+alignment = 0
+
+[node name="Settings" parent="Interface/Home/Column/Actions" instance=ExtResource("4")]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "ui.pause.settings"
+alignment = 0
+
+[node name="Exit" parent="Interface/Home/Column/Actions" instance=ExtResource("4")]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "ui.pause.exit"
+alignment = 0
+
+[node name="MapSelection" parent="Interface" instance=ExtResource("7")]
+
+[node name="SettingsVeil" type="ColorRect" parent="Interface"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+mouse_filter = 2
+
+[node name="SettingsPage" parent="Interface" instance=ExtResource("6")]
+
+[node name="Entry" type="AnimationPlayer" parent="Interface"]
+libraries = {&"": SubResource("Animations")}

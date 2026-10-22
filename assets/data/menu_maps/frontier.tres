@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MenuMapDefinition" format=3]
+[ext_resource type="Script" path="res://scripts/menus/definitions/menu_map_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/data/levels/frontier.tres" id="2"]
+[resource]
+script = ExtResource("1")
+title_key = "ui.maps.frontier"
+description_key = "ui.maps.frontier_description"
+level = ExtResource("2")
+level_scene = "res://scenes/level.tscn"

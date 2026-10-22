@@ -96,7 +96,12 @@ func verify() -> void:
 	# An independently detached HUD must tolerate late calls and tween setters.
 	var scene := await setup_case(2.0, true, "live")
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
+	var camera: Camera3D = scene.get_node("Camera3D")
+	hud.set_paused(true)
+	hud.open_settings()
+	check(camera._navigation_locked, "Settings did not lock navigation before HUD removal")
 	scene.remove_child(hud)
+	check(not camera._navigation_locked and not get_tree().paused, "Detached HUD retained the settings navigation lock or pause state")
 	hud.set_start_available(true)
 	hud._position_callout()
 	for enemy: Node3D in scene.get_node("EnemyWave").living_enemies(): enemy.free()

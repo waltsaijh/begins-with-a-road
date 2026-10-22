@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="BEGINS WITH A ROAD"
-run/main_scene="res://scenes/level.tscn"
+run/main_scene="res://scenes/menus/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+ScreenTransition="*res://scenes/interface/screen_transition.tscn"
 
 [display]
 
