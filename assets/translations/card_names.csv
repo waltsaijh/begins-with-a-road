@@ -24,12 +24,10 @@ ui.expansion.north,↑ North,↑ 北方
 ui.expansion.west,← West,← 西方
 ui.expansion.south,↓ South,↓ 南方
 ui.expansion.east,→ East,→ 東方
-
 tower.mortar.name,Mortar,迫擊砲
 tower.ballista.name,Ballista,弩砲
 tower.broadside.name,Airship Broadside,空艇舷炮
 tower.barracks.name,Barracks,兵營
-
 traffic.flag.name,Flag,旗幟
 traffic.barricade.name,Barricade,拒馬
 traffic.narrow_passage.name,Narrow Passage,窄口
@@ -40,3 +38,48 @@ traffic.duration,Lasts {waves} waves,持續 {waves} 波
 traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
 traffic.no_change,No forecast change: candidate routes or whole-unit quotas limit this effect,分流未變：候選路線或整數配額限制
 traffic.unavailable,No positive-weight route for the next wave,下一波沒有正權重路線
+relic.frost_ray.name,Frost Ray,冰霜射線
+relic.frost_ray.description,"Hits add 2s frost with diminishing returns, up to 60% slow.",每次命中附加 2 秒冰霜。每層減速遞減，最高減速 60%。
+relic.fuel_supply.name,Fuel Supply,燃料供能
+relic.fuel_supply.description,Other towers within 5 tiles gain +15% damage per Crossfire.,周圍 5 格的其他塔傷害 +15%；各來源加法疊加。
+relic.small_fry.name,Small Fry,專打雜魚
+relic.small_fry.description,Deal 75% more damage to small enemies.,對 small 體型敵人傷害 +75%。
+relic.air_strike.name,Air Strike,空中打擊
+relic.air_strike.description,Target flying enemies; blasts check actual altitude.,可瞄準與炸傷 flying 敵人，爆炸檢查實際高度。
+relic.explosive_shell.name,Explosive Shell!,爆裂彈！
+relic.explosive_shell.description,Every third shell has 1.8x blast radius and damages friendly towers.,每第 3 發爆炸半徑 ×1.8，也會傷害我方塔。
+relic.assembled_cannon.name,Cannon Assembled,大砲已組裝
+relic.assembled_cannon.description,"3x damage, 1.5x attack interval, half shell speed.",傷害 ×3、攻擊間隔 ×1.5、砲彈速度 ×0.5。
+relic.departure.name,Departure,出發
+relic.departure.description,Patrol along the original broadside reach without turning.,沿原左右舷射程往返巡航，朝向不變。
+relic.rapid_fire.name,Rapid Fire,快速開火
+relic.rapid_fire.description,"Every 6s fire three shots per valid side, 0.12s apart.",每 6 秒朝有效左右舷各連射 3 發，間隔 0.12 秒。
+relic.crew_concentration.name,Crew Concentration,人員集中
+relic.crew_concentration.description,2.5x damage; fire only to the local right.,傷害 ×2.5，只向本體右舷開火。
+relic.hunting.name,Hunting,狩獵
+relic.hunting.description,"Every 8s execute a non-boss, preferring large enemies.",每 8 秒可處決一名普通敵人，優先 large；不影響 Boss。
+relic.protagonist.name,Become the Protagonist,成為主角
+relic.protagonist.description,Remove the Sentry level cap; keep its original card growth.,解除哨塔 Lv.3 上限，沿用同種卡牌與原成長。
+relic.support_attack.name,Supporting Fire,支援攻擊
+relic.support_attack.description,"Triple effective reach, preserving shape and orientation.",有效射程 ×3，保持範圍形狀與朝向。
+relic.powerful_shot.name,Powerful Shot,強力射擊
+relic.powerful_shot.description,"Bolts pierce along their trajectory, once per enemy.",弩箭沿直線貫穿多敵，每敵每發僅命中一次。
+relic.secret_mission.name,Secret Mission,隱密任務
+relic.secret_mission.description,"2x damage if no other tower is within 3 tiles, including Barracks.",周圍 3 格沒有其他塔時傷害 ×2，兵營也算塔。
+relic.heavy_bolts.name,Heavy Bolts,超重型箭矢
+relic.heavy_bolts.description,Push enemies back 0.3 tiles along their fixed route.,命中沿敵人固定行程推回 0.3 格，不重新選路。
+relic.reinforcements.name,Reinforcements,來點增援
+relic.reinforcements.description,Each Barracks deploys a third fully functional soldier.,每座兵營增加第三名完整友軍。
+relic.sharpshooter.name,Sharpshooter,神射手
+relic.sharpshooter.description,"Unengaged soldiers shoot enemies within 3 tiles, retaining melee.",未接戰的友軍可射擊 3 格內敵人，保留近戰。
+relic.global_haste.name,Battle Rhythm,戰鬥節奏
+relic.global_haste.description,All towers and soldiers gain +8% attack speed. Up to 3 copies.,全體塔與友軍攻速 +8%，最多 3 次。
+relic.global_damage.name,Refined Arms,精製武裝
+relic.global_damage.description,All towers and soldiers gain +10% damage. Up to 3 copies.,全體塔與友軍傷害 +10%，最多 3 次。
+relic.gold.name,Supply Cache,補給箱
+relic.gold.description,Immediately gain 20 gold. Up to 5 copies.,立即獲得 20 金幣，最多 5 次。
+relic.reroll_discount.name,Regular Discount,熟客優惠
+relic.reroll_discount.description,"Rerolls cost 1 less, down to zero. Up to 2 copies.",刷新費用減 1，最低 0，最多 2 次。
+relic.collection,Relics,本局遺物
+relic.choose,Choose a relic,選擇一件遺物
+relic.empty,No relics yet,尚未取得遺物

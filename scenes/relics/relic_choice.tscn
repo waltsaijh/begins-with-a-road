@@ -1,0 +1,68 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/relics/relic_choice.gd" id="script"]
+[sub_resource type="StyleBoxFlat" id="collection_style"]
+bg_color = Color(0.94,0.91,0.82,1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.43,0.52,0.49,1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+[node name="RelicChoice" type="CanvasLayer"]
+process_mode = 3
+layer = 7
+script = ExtResource("script")
+[node name="InventoryButton" type="Button" parent="."]
+offset_left = 20.0
+offset_top = 74.0
+offset_right = 150.0
+offset_bottom = 110.0
+text = "relic.collection"
+[node name="Modal" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_top = 80.0
+color = Color(0.10,0.17,0.18,0.70)
+[node name="Center" type="CenterContainer" parent="Modal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Layout" type="VBoxContainer" parent="Modal/Center"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+[node name="Title" type="Label" parent="Modal/Center/Layout"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+text = "relic.choose"
+[node name="Cards" type="HBoxContainer" parent="Modal/Center/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 24
+[node name="Collection" type="PanelContainer" parent="."]
+visible = false
+offset_left = 20.0
+offset_top = 118.0
+offset_right = 450.0
+offset_bottom = 550.0
+theme_override_styles/panel = SubResource("collection_style")
+[node name="Scroll" type="ScrollContainer" parent="Collection"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+[node name="Items" type="VBoxContainer" parent="Collection/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12

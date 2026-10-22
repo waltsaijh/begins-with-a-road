@@ -21,14 +21,23 @@ var skin: MeshInstance3D
 var _normal: Material
 var _hit: StandardMaterial3D
 var respawn_pulse := 0.0
+var _max_health := 40.0
+var ranged_timer := 0.0
+var slot_index := 0
 func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> void:
+	slot_index = slot
 	tower = owner_tower
 	manager = owner_manager
-	settings = tower.definition.deployment
+	settings = tower.deployment
 	health = settings.health
+	_max_health = settings.health
+	tower.stats_changed.connect(_refresh_stats)
 	home = tower.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),tower.rotation_steps)
-	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),tower.rotation_steps))*(6.0/48.0 if slot == 1 else -6.0/48.0)
+	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),tower.rotation_steps))*(6.0/48.0 if slot == 1 else (-6.0/48.0 if slot == 0 else 0.0))
 	home_position = manager.world(home)+manager.map.global_basis*Vector3(side.x*manager.map.cell_size.x,0,side.y*manager.map.cell_size.z)
+	if slot >= 2:
+		var back := Vector2(BuildCard.rotate_cell(Vector2i(0,1),tower.rotation_steps))*0.18
+		home_position += manager.map.global_basis*Vector3(back.x*manager.map.cell_size.x,0,back.y*manager.map.cell_size.z)
 	global_position = home_position
 	rotation.y = -tower.rotation_steps*PI/2
 	model = settings.unit_model.instantiate()
@@ -62,6 +71,10 @@ func release() -> void:
 	target = null
 	attack_timer = 0
 	enemy_timer = 0
+
+func _refresh_stats() -> void:
+	health = health/_max_health*settings.health
+	_max_health = settings.health
 func take_damage(amount: float) -> void:
 	if dead: return
 	health = maxf(0,health-amount)
@@ -95,6 +108,7 @@ func advance(delta: float) -> void:
 	respawn_pulse = maxf(0,respawn_pulse-delta*3)
 	scale = Vector3.ONE*(1+respawn_pulse*0.1)
 	pulse = maxf(0,pulse-delta*5)
+	ranged_timer = maxf(0,ranged_timer-delta)
 	if is_instance_valid(target):
 		if not target.can_be_targeted() or manager.distance(target.global_position,home_position) > settings.engage_radius or (is_instance_valid(target.engaged_by) and target.engaged_by != self): release()
 	else: target = null
@@ -102,6 +116,7 @@ func advance(delta: float) -> void:
 		var candidates: Array[Node3D] = manager.combat._index.targets_near(home_position,settings.engage_radius)
 		candidates.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
 		for enemy in candidates:
+			if enemy.troop != null and enemy.troop.has_tag(&"flying"): continue
 			if is_instance_valid(enemy.engaged_by) or manager.path(home,manager.cell(enemy.global_position),home,settings.local_radius).is_empty(): continue
 			target = enemy
 			break
@@ -123,6 +138,15 @@ func advance(delta: float) -> void:
 		if is_instance_valid(target) and target.can_be_targeted() and enemy_timer <= 0:
 			enemy_timer += target.melee_interval
 			take_damage(target.melee_damage)
+	if not dead and tower.has_relic(&"sharpshooter") and (not is_instance_valid(target) or target.engaged_by != self) and ranged_timer <= 0:
+		var ranged: Array[Node3D] = manager.combat._index.targets_near(global_position,tower.relic_value(&"sharpshooter", &"range"))
+		ranged.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
+		if not ranged.is_empty():
+			var victim: Node3D = ranged[0]
+			manager.combat.visuals.add_beam(global_position+Vector3.UP*0.5,victim.global_position+Vector3.UP*0.25,Color("ead5a2"),0.035,0.18)
+			victim.take_damage(settings.damage)
+			ranged_timer = tower.relic_value(&"sharpshooter", &"interval")*settings.interval/tower.definition.deployment.interval
+			pulse = 1.0
 	var motion := global_position-previous
 	if motion.length_squared() > 0.000001: look_at(global_position+Vector3(motion.x,0,motion.z))
 	elif is_instance_valid(target):

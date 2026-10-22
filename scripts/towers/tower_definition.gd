@@ -12,6 +12,7 @@ extends Resource
 @export var model: PackedScene
 ## Optional friendly deployment; soldiers are not navigation obstacles.
 @export var deployment: BarracksDeployment
+@export var growth: TowerGrowth = preload("res://assets/data/towers/growth/standard.tres")
 ## Base shop price when this tower is rolled into a construction card.
 @export_range(0, 100, 1, "or_greater") var card_price := ShopConstants.DEFAULT_CARD_PRICE
 ## Transparent icon silhouette is tinted with a darker accent_color in card UI.
@@ -84,6 +85,8 @@ func roll_tile_preset(rng: RandomNumberGenerator) -> TilePreset:
 	return options[-1].preset
 
 func configuration_error() -> String:
+	if growth == null: return "缺少升級成長資料"
+	if not growth.configuration_error().is_empty(): return growth.configuration_error()
 	if deployment != null and not deployment.configuration_error().is_empty(): return deployment.configuration_error()
 	if not is_finite(max_health) or max_health <= 0 or not is_finite(default_damage) or default_damage < 0:
 		return "防禦塔血量／傷害設定無效"
@@ -106,3 +109,31 @@ func cells_at(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 func attack_cells_at(anchor: Vector2i, turns := 0, radius_override := -1.0) -> Array[Vector2i]:
 	if attack_area != null: return attack_area.cells_at(anchor, turns)
 	return TowerAttackArea.circle_cells(anchor, attack_radius if radius_override < 0 else radius_override)
+
+func effective_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false, radius_override := -1.0) -> Array[Vector2i]:
+	if factor == 1 and not right_only: return attack_cells_at(anchor, turns, radius_override)
+	var local: Array[Vector2i] = []
+	if attack_area == null:
+		local = TowerAttackArea.circle_cells(Vector2i.ZERO, (attack_radius if radius_override < 0 else radius_override)*factor)
+	else:
+		var seen := {}
+		# Scale the entire effective tile footprint, filling every scaled tile.
+		for offset in attack_area.offsets:
+			for y in range(ceili((offset.y-0.5)*factor), ceili((offset.y+0.5)*factor)):
+				for x in range(ceili((offset.x-0.5)*factor), ceili((offset.x+0.5)*factor)):
+					seen[Vector2i(x,y)] = true
+		local.assign(seen.keys())
+	var result: Array[Vector2i] = []
+	for offset in local:
+		if not right_only or offset.x > 0: result.append(anchor+BuildCard.rotate_cell(offset,turns))
+	return result
+
+func patrol_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false) -> Array[Vector2i]:
+	var reach := 0
+	for offset in attack_cells_at(Vector2i.ZERO): reach = maxi(reach,absi(offset.x))
+	var covered := {}
+	for step in range(-reach,reach+1):
+		for cell in effective_attack_cells(anchor+BuildCard.rotate_cell(Vector2i(step,0),turns),turns,factor,right_only): covered[cell] = true
+	var result: Array[Vector2i] = []
+	result.assign(covered.keys())
+	return result

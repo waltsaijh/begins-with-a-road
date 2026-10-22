@@ -2,6 +2,7 @@
 
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/crossfire.tres" id="1_7cxd6"]
 [ext_resource type="Texture2D" uid="uid://cs0oo8natsp6e" path="res://assets/sprites/towers/crossfire.png" id="2_dc2h6"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="2_st668"]
 [ext_resource type="PackedScene" path="res://assets/models/towers/crossfire.tscn" id="3_st668"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="4_fbig6"]
 [ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="5_kljqr"]

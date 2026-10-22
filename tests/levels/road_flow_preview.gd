@@ -307,6 +307,10 @@ func verify() -> void:
 		wave._process(100.0)
 		for enemy in wave.living_enemies(): enemy.take_damage(100000)
 		await frames()
+		if scene.choosing_relic:
+			check(not panel.visible and preview.arrows.mesh == null,"Relic choice hides forecast")
+			scene.relic_choice.choose(scene.relic_choice.offers[0])
+			await get_tree().create_timer(0.3).timeout
 		if index == 0:
 			check(panel.visible and second_panel.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion did not refresh per-entrance lists")
 			check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition),"Next wave retained stale entrance counts")
@@ -340,6 +344,9 @@ func verify() -> void:
 	wave._process(100.0)
 	for enemy in wave.living_enemies(): enemy.take_damage(100000)
 	await frames()
+	if scene.choosing_relic:
+		scene.relic_choice.choose(scene.relic_choice.offers[0])
+		await get_tree().create_timer(0.3).timeout
 	check(scene.finished and not panel.visible and preview.arrows.mesh == null, "Final wave left prediction visible")
 	var weak_preview: WeakRef = weakref(preview)
 	scene.queue_free()

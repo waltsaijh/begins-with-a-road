@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicDefinition" format=3]
+[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/barracks.png" id="icon"]
+[ext_resource type="Resource" path="res://assets/data/towers/barracks.tres" id="tower"]
+[resource]
+script = ExtResource("script")
+id = &"sharpshooter"
+name_key = "relic.sharpshooter.name"
+description_key = "relic.sharpshooter.description"
+icon = ExtResource("icon")
+tower = ExtResource("tower")
+parameters = {"range": 3.0, "interval": 1.2}

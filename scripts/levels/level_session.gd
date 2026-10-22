@@ -16,6 +16,9 @@ var _wave_start_elapsed := 0.0
 var _balance: Label
 var _hud: CanvasLayer
 var choosing_start := false
+var choosing_relic := false
+var _settling_wave := false
+var relic_choice: CanvasLayer
 @onready var expansion: Node3D = $SpawnExpansion
 
 func _enter_tree() -> void:
@@ -85,6 +88,10 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_hud = get_node("LevelHUD")
+	relic_choice = preload("res://scenes/relics/relic_choice.tscn").instantiate()
+	add_child(relic_choice)
+	relic_choice.setup(get_node("TowerMap").relics)
+	relic_choice.selected.connect(_on_relic_selected)
 	timeline = get_node("LevelHUD/Header/WaveTimeline")
 	timeline.configure(level)
 	var shop: Node = get_node("CardPlacement/Shop")
@@ -114,16 +121,16 @@ func _prepare_wave() -> void:
 	set_process(false)
 
 func _update_start_callout() -> void:
-	var available: bool = not finished and not choosing_start and not _wave.active and not _wave_starting
+	var available: bool = not finished and not choosing_start and not choosing_relic and not _settling_wave and not _wave.active and not _wave_starting
 	_hud.set_start_available(available)
 	preparation_changed.emit(available)
 
 func _on_start_requested() -> void:
-	if choosing_start or get_tree().paused or _hud.pause_requested: return
+	if choosing_start or choosing_relic or get_tree().paused or _hud.pause_requested: return
 	_begin_wave_start()
 
 func _begin_wave_start() -> void:
-	if finished or choosing_start or _wave.active or _wave_starting or not _wave.start_allowed: return
+	if finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
 	_wave_starting = true
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
@@ -139,6 +146,9 @@ func _on_wave_started() -> void:
 	set_process(false)
 
 func _process(delta: float) -> void:
+	if _settling_wave:
+		if get_node("TowerMap").combat.projectiles.is_empty(): _finish_wave_transition()
+		return
 	if not _valid or finished or choosing_start or _wave.active: return
 	if _wave_starting:
 		_advance_wave_start(maxf(0.0, delta))
@@ -155,15 +165,47 @@ func _on_wave_finished() -> void:
 	# after later siblings such as the HUD have already left the tree.
 	if not is_inside_tree() or is_queued_for_deletion(): return
 	if not is_instance_valid(_hud) or not _hud.is_inside_tree(): return
+	if _settling_wave: return
+	_settling_wave = true
+	_wave.start_allowed = false
+	get_node("CardPlacement").set_entry_selection(true)
+	_update_start_callout()
+	if not get_node("TowerMap").combat.projectiles.is_empty():
+		set_process(true)
+		return
+	_finish_wave_transition()
+
+func _finish_wave_transition() -> void:
+	_settling_wave = false
 	set_process(false)
 	current_wave += 1
+	if _is_act_boundary(current_wave):
+		choosing_relic = true
+		_wave.start_allowed = false
+		get_node("CardPlacement").set_entry_selection(true)
+		_update_start_callout()
+		_wave._update_button()
+		if relic_choice.begin(): return
+		# Custom catalogs may be exhausted. No duplicate reward or deadlocked run.
+		choosing_relic = false
+	_continue_after_reward()
+
+func _on_relic_selected(_relic: RelicDefinition) -> void:
+	if not choosing_relic or is_queued_for_deletion(): return
+	choosing_relic = false
+	_continue_after_reward()
+
+func _continue_after_reward() -> void:
 	if current_wave == _waves.size():
+		get_node("CardPlacement").set_entry_selection(false)
 		finished = true
 		_wave.start_allowed = false
 		timeline.set_state(current_wave, 0.0, false)
 		level_finished.emit()
 		_update_start_callout()
 	else:
+		_wave.start_allowed = true
+		get_node("CardPlacement").set_entry_selection(false)
 		_prepare_wave()
 		if level.expand_starts_after_act and _is_act_boundary(current_wave):
 			choosing_start = true

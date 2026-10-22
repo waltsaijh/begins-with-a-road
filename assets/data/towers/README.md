@@ -7,17 +7,17 @@ TowerDefinition → 每塔 TilePresetCandidate → 獨立 TilePreset → BuildCa
 
 來源為 `D:/games/card-tower-defense/scripts/card_data.gd`、`scripts/tower.gd`、`scripts/soldier.gd` 與 `scripts/soldier_manager.gd`。這些是來源註記，遊戲執行不讀取外部專案。
 
-| 資源 | 原傷害／間隔 | 原範圍及行為 | 原卡價 |
+| 資源 | 原傷害／間隔 | 來源範圍與現版行為 | 原卡價 |
 | --- | --- | --- | --- |
-| mortar | 8／2 秒 | 索敵圓半徑 3、目標中心爆炸半徑 1；開火即扣血 | 14 |
+| mortar | 8／2 秒 | 索敵圓半徑 3、目標中心爆炸半徑 1；落地時依實際位置扣血 | 14 |
 | ballista | 15／1.4 秒 | 前方 1–4 格，單體、不貫穿 | 11 |
 | broadside | 8／1 秒 | 左右各 1–3 格，每次單體，按側別選砲口 | 12 |
 | crossfire | 4／0.8 秒 | 圓半徑 2 內全部有效敵人 | 13 |
 | barracks | 每友軍 4／1 秒 | 兩名友軍；各駐位半徑 1.5 接敵 | 15 |
 
-Sentry 資源、模型、攻擊、範圍與四個現有候選保持原樣。新塔的 `max_health=200`、`threat=1` 沿用新版 TowerConstants，**不是舊塔原始平衡值**；舊版沒有對應塔生命／Cost Routing 威脅參數。未新增減速效果、法術、永久升級或 Boss 機制。
+Sentry 資源、模型、攻擊、範圍與四個現有候選保持原樣。新塔的 `max_health=200`、`threat=1` 沿用新版 TowerConstants，**不是舊塔原始平衡值**；舊版沒有對應塔生命／Cost Routing 威脅參數。Phase 3 已加入卡牌升級與本局遺物；不新增正式 Boss、法術或局外升級。
 
-`VolleyAttack` 共用單體／即時範圍／全體策略。舊塔保留出生順序優先；圓範圍採格子索引收集候選後精確檢查實際平面距離，方向塔使用 TowerAttackArea。原迫擊砲視覺總長 0.4 秒，前 40% 為彈道，後 60% 為爆炸；新視覺不持有傷害 payload，落地絕不再次扣血。其他新版 Arrow／Beam／Projectile 語意不變。
+`VolleyAttack` 共用單體／延遲迫擊砲／全體策略。舊塔保留出生順序優先；圓範圍採格子索引收集候選後精確檢查實際平面距離，方向塔使用 TowerAttackArea。迫擊砲現在以速度 6 格／秒、最短 0.25 秒飛向鎖定的實際位置，落地才結算球形範圍傷害及單次爆炸；保留基本傷害 8 與爆炸半徑 1。其他新版 Arrow／Beam／Projectile 語意不變。
 
 新道路配置逐一轉自 CardData.PATTERNS，每塔四項候選等權 1；兵營只有一個空道路配置，仍需覆蓋既有道路。舊變體沒有獨立前綴名稱，移植配置的 prefix_key 留空，不編造名稱。弩砲舊 +X 朝向整組正規化至 -Z，模型、攻擊與道路一起旋轉。不要把舊道路配置覆寫進 Sentry 目前的地塊。
 
@@ -44,3 +44,5 @@ BarracksSystem 在敵人移動後、塔攻擊前更新友軍，沿可行道路�
 自動：`tests/combat/tower_restoration.tscn`（headless 與渲染）；原有 combat、attack_area、tower_obstacles、card_shop、card_drag_placement、level_flow、road_flow_preview、level_teardown 分別驗證共用流程。
 
 人工：F6 執行 `tests/combat/tower_restoration_playground.tscn`，為獨立雙入口、六塔與三波測試關卡。準備期可 hover 各入口情報，點任一開始按鈕；放大檢查後座、左右砲口、全體射擊、迫擊砲彈道、雙友軍接戰與血條。測試兵種生命 250 及移速 1.6 僅屬測試配方，不改 Frontier。加 `-- --smoke` 會自動開波、拍照並結束。正式 F5 仍使用原 Frontier。
+
+升級倍率與遺物效果見 [Phase 3](../../../docs/phase3.md)。成長 Resource 位於 growth/，迫擊砲與兵營採 damage_only，其他塔採 standard。

@@ -270,7 +270,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 - `ArrowAttack`：快速單體箭矢，只追蹤原先鎖定者，抵達後扣血；目標已死亡或抵達終點時飛至最後位置後消失，不轉移目標或造成範圍傷害。sentry_arrow.tres 可調 speed（世界單位／秒，預設 24）、arrow_length／arrow_width、trail_length／trail_width／color。
 - `BeamAttack`：立即對目標扣血，再顯示短暫灰色軌跡。sentry_beam.tres 可調 trail_duration／trail_width／color。
 - `ProjectileAttack`：飛向發射時鎖定的落點格；經 flight_time 後對該格周圍 splash_radius 內**當時仍在場**的敵人結算。0 半徑代表落點一格。可調拋物線高度與外觀大小。範例為 attacks/explosive_projectile.tres，預設 0.6 秒、1.5 格半徑並附減速效果；將塔的 Attack 指向此資源即可使用。
-- `HitEffect`：覆寫 apply(target, source, damage) 新增命中效果。同類效果不疊加，以最佳強度及最長剩餘時間合併成一份狀態，不加總強度或時間；不同效果種類可各自存在。內建 SlowEffect 可設定 speed_multiplier／duration，倍率越低越強：合併時倍率取 min、時間取 max(既有剩餘時間, 新 duration)。例如 0.4 倍速剩 1 秒遇到 0.8 倍速持續 3 秒，合併為 0.4 倍速持續 3 秒，期間不退回 0.8；已經過的時間不重新補滿。效果在基本傷害後套用，死亡者不再套用狀態。未來新增同類狀態也須遵循此規則，並自行定義最佳強度的比較方式。
+- `HitEffect`：覆寫 apply(target, source, damage) 新增命中效果。一般同類效果不疊加（Phase 3 冰霜為獨立可堆疊種類），以最佳強度及最長剩餘時間合併成一份狀態，不加總強度或時間；不同效果種類可各自存在。內建 SlowEffect 可設定 speed_multiplier／duration，倍率越低越強：合併時倍率取 min、時間取 max(既有剩餘時間, 新 duration)。例如 0.4 倍速剩 1 秒遇到 0.8 倍速持續 3 秒，合併為 0.4 倍速持續 3 秒，期間不退回 0.8；已經過的時間不重新補滿。效果在基本傷害後套用，死亡者不再套用狀態。未來新增同類狀態也須遵循此規則，並自行定義最佳強度的比較方式。
 
 攻擊發射時保存當次傷害與效果數值；塔被移除後，已發射投射物仍會命中。`DefenseTower.damage_against(target)` 可覆寫特定傷害規則；其他發射機制可繼承 TowerAttack.fire()。Attack 留空時只當障礙塔。塔／敵人透過 take_damage(amount) 扣血；塔死亡會釋放障礙並更新地圖。敵人死亡立即退出 Wave 與 MultiMesh，killed 與到達終點的 completed 分別計數；全數死亡也能結束波次，目前敵人不會反擊塔。
 
@@ -400,7 +400,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 
 ## 建置與驗證
 
-Routing Sandbox 五塔移植的數值來源、精確範圍與索敵、迫擊砲即時傷害／視覺拆分、交叉火力全體攻擊、兵營駐點／接戰／反擊／重生、抽牌權重及資產重建，集中記錄在 [防禦塔資料](../assets/data/towers/README.md)。現版 Sentry 資源及候選不因移植回退。
+Routing Sandbox 五塔移植的數值來源、精確範圍與索敵、迫擊砲固定落點的延遲傷害／單次爆炸、交叉火力全體攻擊、兵營駐點／接戰／反擊／重生、抽牌權重及資產重建，集中記錄在 [防禦塔資料](../assets/data/towers/README.md)。現版 Sentry 資源及候選不因移植回退。
 
 C++ GDExtension 建置為 bin/road_graph.editguard.*，避免覆寫先前已載入的 DLL；Windows／Web 各自使用 debug／release 版本。SDK 與重新建置方式見 `native/README.md`。新擴充需重新啟動 Godot 後載入。
 
@@ -458,3 +458,7 @@ python tools/web/serve_web.py
 米白筆觸不保留任何固定底線。只有有限長度的柔和細線沿道路前進，前後端以 smoothstep 完整漸淡至透明；不使用 glow／emission。渲染器只在現有有向流量網路上配置動畫時鐘，不修改路線、配額或 RNG；完整網路共用時鐘使 hover 不重置位置，間隔依顯示網路長度設定，避免每兩格重複一個亮段。Highlight Color／Highlight Length 控制筆觸外觀，Line Width／Flow Speed 的場景覆寫仍優先。
 
 Highlight Length 的 Inspector 滑桿範圍為 0.10～20.0，Flow Speed 為 0～10.0；兩者皆允許直接輸入更大的數值。增加長度時，筆觸週期至少為長度的兩倍，保留前後透明區間，避免長筆觸重疊成永久底線。這些範圍不會重設場景既有數值。
+
+## 塔牌疊加與遺物（Phase 3）
+
+完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物，再選遺物，最後才擴張或完成關卡；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。

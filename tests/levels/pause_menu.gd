@@ -54,6 +54,7 @@ func verify() -> void:
 		failures = previous.failures
 		check(scene.get_instance_id() != previous.scene_id and scene.current_wave == 0 and not wave.active and wave.living_enemies().is_empty(), "Restart did not create a fresh level without old enemies")
 		check(shop.coins == shop.initial_coins and cards.cards.size() == cards.initial_card_count and cards.selected == -1, "Restart retained the old economy or hand selection")
+		check(scene.get_node("TowerMap").relics.held.is_empty(), "Restart retained acquired relics")
 		check(not get_tree().paused and Engine.time_scale == 1.0 and hud.speed_index == 0 and not hud.pause_menu.visible and not cards.pause_locked, "Restart retained pause or speed state")
 		print("PAUSE_MENU_CHECK:"+JSON.stringify({"failures": failures, "hover_shift_scale": true, "stable_hit_area": true, "no_underline": true, "settings_placeholder": true, "restart_live_level": true, "translations": true}))
 		get_tree().quit(1 if failures else 0)
@@ -94,6 +95,8 @@ func verify() -> void:
 	scene._process(1.5)
 	wave._process(0.0)
 	shop.coins = 750
+	var relics: RunRelics = scene.get_node("TowerMap").relics
+	check(relics.acquire(relics.catalog.find(&"protagonist")), "Restart fixture did not acquire a relic")
 	hud.cycle_speed()
 	hud.cycle_speed()
 	check(wave.active and not wave.living_enemies().is_empty(), "Restart fixture did not start a live wave")

@@ -22,9 +22,10 @@ func clear() -> void:
 	for burst in bursts: burst.root.queue_free()
 	bursts.clear()
 
-func mortar_impact(at: Vector3) -> void:
+func mortar_impact(at: Vector3, radius := 1.0) -> void:
 	if bursts.size() >= LIMIT: return
 	var root := K.group(self,"MortarImpact",at+Vector3.UP*0.11)
+	root.scale = Vector3.ONE*maxf(0.01,radius)
 	var ring := K.part(root,"ring",Vector3.ONE,Vector3.ZERO,"amber")
 	ring.material_override = ring.material_override.duplicate()
 	ring.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

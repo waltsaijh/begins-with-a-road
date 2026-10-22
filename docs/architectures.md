@@ -28,6 +28,7 @@
 | 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額與除錯顯示 |
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
 | 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
+| 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與收藏 UI |
 | 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果 |
 | 鏡頭與環境 `camera`／`environment` | 鏡頭平移、縮放與旋轉、雲海與環境呈現 |
 
@@ -63,6 +64,7 @@ scripts/
 ├── navigation/              道路快照、原生介接與重建協調
 │   ├── routes/              候選行程、兵種評分與配額機率
 │   └── visualization/       F1／F2 路線與地塊除錯顯示
+├── relics/                  本局遺物、獎勵抽取與選擇／收藏 UI
 ├── traffic/                 臨時設施資料、實例、權重及預覽差異
 └── towers/                  塔種、塔實例、占格與地圖提交
 ```
@@ -71,7 +73,7 @@ scripts/
 
 | 範圍 | 責任與主要協作 |
 | --- | --- |
-| `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，協調手牌、商店及開波權限 |
+| `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，包含清波後等待砲彈、ACT 遺物選擇，再協調手牌、商店及開波權限 |
 | `levels/definitions/` | `LevelDefinition` → `ActDefinition` → `WaveDefinition` → `WaveSpawnGroup` 保存可編輯配方與設定驗證；編輯器外掛、關卡和生成系統共用這些型別 |
 | `levels/expansion/` | 依已提交道路搜尋新入口候選，處理方向選擇、預覽和新增道路／端點；完成後由 session 恢復下一波準備 |
 | `levels/presentation/` | 將 session 進度投影到時間線、起點對話框、餘額與下一波兵種列；協調準備期流量預覽、處理倍速、暫停過渡、選單與玩家意圖 |
@@ -138,3 +140,5 @@ scripts/
 測試依功能分類；JSON、截圖與 log 放在已忽略的 `.godot/`，`reports/` 只保存需要長期參考的摘要。一次性壓測與重複純預覽場景已清除，保留功能與實際繪製回歸。素材工具產生可編輯的遊戲資產，原生工具將 C++ 核心建置到 `bin/`。正式匯出排除測試、工具、報告、技術文件與原生 SDK。
 
 更細的操作入口見 [場景導覽](../scenes/README.md)、[測試說明](../tests/README.md)、[工具說明](../tools/README.md)與 [原生核心](../native/README.md)。
+
+Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。

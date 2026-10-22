@@ -11,12 +11,36 @@ var ghost: Node3D
 var _definition: Resource
 var _material: StandardMaterial3D
 var hint_anchor := Vector3.ZERO
+var upgrade_mode := false
+var upgrade_label: Label3D
+var relics: RunRelics
 
 func _ready() -> void:
 	_material = ground.material_override.duplicate()
 	ground.material_override = _material
+	upgrade_label = Label3D.new()
+	upgrade_label.font = preload("res://assets/fonts/NotoSansTC-Light.ttf")
+	upgrade_label.font_size = 40
+	upgrade_label.pixel_size = 0.011
+	upgrade_label.outline_size = 4
+	upgrade_label.outline_modulate = Color("304b44")
+	upgrade_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	upgrade_label.no_depth_test = true
+	add_child(upgrade_label)
+	upgrade_label.hide()
+
+func show_upgrade(map: GridMap, tower: DefenseTower, error: String) -> void:
+	show_at(map, BuildCard.from_parts(tower.definition, tower.definition.first_tile_preset()), Vector3i(tower.grid_cell.x, 0, tower.grid_cell.y), tower.rotation_steps, error.is_empty())
+	upgrade_mode = true
+	ground.mesh = null
+	upgrade_label.text = "Lv.%d → Lv.%d" % [tower.level, tower.level+1] if error.is_empty() else error
+	upgrade_label.modulate = Color("87e0b2") if error.is_empty() else Color("ff9b83")
+	upgrade_label.global_position = hint_anchor+Vector3.UP*0.3
+	upgrade_label.show()
 
 func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: bool) -> void:
+	upgrade_mode = false
+	upgrade_label.hide()
 	visible = true
 	global_transform = map.global_transform
 	_material.albedo_color = valid_color if valid else invalid_color
@@ -49,7 +73,7 @@ func _show_attack_area(map: GridMap, definition: Resource, cell: Vector3i, turns
 	if definition is TrafficStructureDefinition:
 		range_cells.assign(definition.effect_at(Vector2i(cell.x, cell.z), turns).cells.keys())
 	else:
-		range_cells = definition.attack_cells_at(Vector2i(cell.x, cell.z), turns)
+		range_cells = relics.preview_cells(definition, Vector2i(cell.x, cell.z), turns) if relics != null else definition.attack_cells_at(Vector2i(cell.x, cell.z), turns)
 	var mesh := ImmediateMesh.new()
 	if not range_cells.is_empty():
 		mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)

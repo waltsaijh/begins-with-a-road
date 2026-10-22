@@ -136,6 +136,11 @@ func verify() -> void:
 		scene._process(120.0)
 		check(is_equal_approx(scene.timeline.position_fraction(), node_position) and scene.current_wave == index, "Timeline moved before the active wave finished")
 		for i in range(1, enemies.size()): enemies[i]._process(10000)
+		if scene.choosing_relic:
+			check(cards.input_suspended and not wave.start_allowed, "Relic choice must lock preparation")
+			var choice: RelicDefinition = scene.relic_choice.offers.filter(func(r): return r.id != &"gold")[0]
+			scene.relic_choice.choose(choice)
+			await get_tree().create_timer(0.3).timeout
 		check(not wave.active and not cards.hand.stowed and not cards.input_suspended, "Wave end did not restore the hand/build phase")
 		check(shop.coins == expected_rewards[index], "Wave completion reward used the wrong value or was duplicated")
 		check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after a wave reward")

@@ -22,6 +22,7 @@ var _next := 1
 var _finished := false
 var _slow_multiplier := 1.0
 var _slow_remaining := 0.0
+var _frost: Array[Dictionary] = []
 ## A friendly can pause this immutable trip; it never replaces route/waypoints.
 var engaged_by: Node3D
 var melee_damage := 0.0
@@ -69,11 +70,42 @@ func apply_slow(multiplier: float, duration: float, icon: Texture2D = null) -> v
 
 func _speed_factor(delta: float) -> float:
 	var factor := _slow_multiplier
+	var intensity := 0.0
+	var cap := 0.0
+	for i in range(_frost.size()-1,-1,-1):
+		intensity += float(_frost[i].strength)
+		cap = maxf(cap, float(_frost[i].cap))
+		_frost[i].remaining -= delta
+		if _frost[i].remaining <= 0: _frost.remove_at(i)
+	if cap > 0: factor *= 1.0-cap*(1.0-exp(-intensity/cap))
+	if _frost.is_empty(): set_effect_icon(&"frost",null)
 	_slow_remaining = maxf(0.0, _slow_remaining-delta)
 	if _slow_remaining <= 0:
 		_slow_multiplier = 1.0
 		set_effect_icon(&"slow", null)
 	return factor
+
+func apply_frost(strength: float, duration: float, cap: float) -> void:
+	if not can_be_targeted() or not is_finite(strength) or not is_finite(duration) or strength <= 0 or duration <= 0 or not is_finite(cap) or cap <= 0 or cap >= 1: return
+	_frost.append({"strength":strength,"remaining":duration,"cap":cap})
+	set_effect_icon(&"frost",preload("res://assets/sprites/effects/slowness.png"))
+
+func knock_back(distance: float) -> void:
+	if not can_be_targeted() or not is_finite(distance) or distance <= 0 or waypoints.size() < 2: return
+	if is_instance_valid(engaged_by): engaged_by.release()
+	var remaining := distance
+	# Rewind the existing polyline cursor, including corners. Never mutate its data.
+	while remaining > 0 and _next > 0:
+		var previous := waypoints[_next-1]
+		var offset := previous-global_position
+		var length := offset.length()
+		var step := minf(length,remaining)
+		if length > 0.000001: global_position += offset*(step/length)
+		travelled_distance = maxf(0,travelled_distance-step)
+		remaining -= step
+		if step < length or _next == 1: break
+		_next -= 1
+	if _next < waypoints.size(): move_direction = (waypoints[_next]-global_position).normalized()
 
 func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> void:
 	if is_instance_valid(engaged_by): engaged_by.release()
@@ -87,6 +119,7 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> 
 	travelled_distance = 0.0
 	_slow_multiplier = 1.0
 	_slow_remaining = 0.0
+	_frost.clear()
 	effect_icons.clear()
 	skill_progress = -1.0
 	if not waypoints.is_empty():

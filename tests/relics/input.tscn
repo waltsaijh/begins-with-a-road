@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/relics/input.gd" id="1"]
+[node name="RelicInput" type="Node3D"]
+script = ExtResource("1")

@@ -2,6 +2,7 @@
 
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/ballista.tres" id="1_37xr8"]
 [ext_resource type="Resource" path="res://assets/data/towers/ranges/ballista.tres" id="2_guvrq"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="3_37xr8"]
 [ext_resource type="PackedScene" path="res://assets/models/towers/ballista.tscn" id="4_57dd7"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="5_1kgwr"]
 [ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="6_gmvhy"]

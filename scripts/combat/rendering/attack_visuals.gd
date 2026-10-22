@@ -63,7 +63,7 @@ func _process(delta: float) -> void:
 			_arrow(mesh, shot)
 			continue
 		var fraction: float = clampf(shot.age/shot.duration, 0.0, 1.0)
-		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*sin(fraction*PI)*shot.arc
+		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*(4.0*fraction*(1.0-fraction) if shot.get("mortar",false) else sin(fraction*PI))*shot.arc
 		var x: Vector3 = Vector3.RIGHT*shot.visual_size
 		var z: Vector3 = Vector3.BACK*shot.visual_size
 		var y: Vector3 = Vector3.UP*shot.visual_size

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicDefinition" format=3]
+[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/broadside.png" id="icon"]
+[ext_resource type="Resource" path="res://assets/data/towers/broadside.tres" id="tower"]
+[resource]
+script = ExtResource("script")
+id = &"crew_concentration"
+name_key = "relic.crew_concentration.name"
+description_key = "relic.crew_concentration.description"
+icon = ExtResource("icon")
+tower = ExtResource("tower")
+parameters = {"damage_multiplier": 2.5}

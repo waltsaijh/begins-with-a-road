@@ -129,6 +129,9 @@ func run() -> void:
 		if round_index > 0: check(wave.start_wave(),"next weighted wave starts")
 		wave._process(10000.0)
 		for enemy: Node3D in wave.living_enemies(): enemy._process(10000.0)
+		if level.choosing_relic:
+			level.relic_choice.choose(level.relic_choice.offers[0])
+			await get_tree().create_timer(0.3).timeout
 		await frames(6)
 		if round_index < 2: check(is_instance_valid(placed) and placed.remaining_waves == 2-round_index,"one decrement per complete wave")
 	check(not is_instance_valid(placed) and not is_instance_valid(narrow_instance),"expires after exactly third wave")
@@ -189,6 +192,9 @@ func run() -> void:
 	wave._process(10000.0)
 	for enemy: Node3D in wave.living_enemies(): enemy._process(10000.0)
 	await frames()
+	if level.choosing_relic:
+		level.relic_choice.choose(level.relic_choice.offers[0])
+		await get_tree().create_timer(0.3).timeout
 	check(level.finished and not flow.arrows.visible,"last wave stops preview")
 	check(last_structure.remaining_waves == 2,"final wave decrements even without a following wave")
 	level.queue_free()

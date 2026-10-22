@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://dyunxa6qn2fy2"]
 
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/mortar.tres" id="1_3eu6o"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="2_0bsys"]
 [ext_resource type="Texture2D" uid="uid://dnf66dbtgh3la" path="res://assets/sprites/towers/mortar.png" id="2_4m8w2"]
 [ext_resource type="PackedScene" path="res://assets/models/towers/mortar.tscn" id="3_0bsys"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="4_iyo7d"]

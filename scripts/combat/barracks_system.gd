@@ -48,20 +48,21 @@ func walk(unit: Node3D,destination: Vector3,delta: float) -> void:
 func effect(at: Vector3,kind: String) -> void: combat.visuals.restored_bursts.emit(at,kind)
 func _process(delta: float) -> void:
 	for tower: DefenseTower in combat.tower_map.towers.values():
-		if tower.definition.deployment == null or owners.has(tower) or tower.is_queued_for_deletion(): continue
-		owners[tower] = true
-		for slot in tower.definition.deployment.count:
+		if tower.deployment == null or tower.is_queued_for_deletion(): continue
+		var existing: int = owners.get(tower,0)
+		for slot in range(existing,tower.deployment.count):
 			var unit := Soldier.new()
 			add_child(unit)
 			unit.initialize(tower,slot,self)
 			units.append(unit)
+		owners[tower] = tower.deployment.count
 	var active: bool = combat.wave.active
 	if active and not units.is_empty():
 		combat._index.rebuild(combat.wave.living_enemies(),map)
 		combat.friendly_index_ready = true
 	for i in range(units.size()-1,-1,-1):
 		var unit := units[i]
-		if not is_instance_valid(unit.tower) or unit.tower.is_queued_for_deletion() or unit.tower.health <= 0:
+		if not is_instance_valid(unit.tower) or unit.tower.is_queued_for_deletion() or unit.tower.health <= 0 or unit.slot_index >= unit.tower.deployment.count:
 			unit.release()
 			unit.queue_free()
 			units.remove_at(i)

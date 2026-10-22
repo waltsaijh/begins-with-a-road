@@ -133,7 +133,10 @@ func verify() -> void:
 	await frames(3)
 	check(cards.cards.size() == count-1 and cards.selected == -1 and not cards.hand.is_dragging(), "Dropping on a valid tile did not consume exactly one card")
 	while scene.get_node("PortalMap").computing: await frames(1)
-	# Occupied tower cell rejects a second drop without changing the hand/map.
+	# A capped tower rejects a second drop without changing the hand/map.
+	var built: DefenseTower = cards.towers.upgrade_target(cell)
+	built.upgrade()
+	built.upgrade()
 	count = cards.cards.size()
 	var revision: int = scene.get_node("PortalMap").revision
 	drag_to(point)

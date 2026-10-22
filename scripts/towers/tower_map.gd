@@ -1,6 +1,8 @@
 extends Node3D
 ## Validate occupancy first, then commit geometry and influence together.
 signal placement_feedback(message: String)
+signal towers_changed
+signal tower_upgraded(tower: DefenseTower)
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
 const CombatSystem = preload("res://scripts/combat/combat_system.gd")
 @export var tower_scene: PackedScene = preload("res://scenes/towers/sentry.tscn")
@@ -15,6 +17,7 @@ var last_error := ""
 var input_enabled := true
 var combat: Node
 var traffic: TrafficStructures
+var relics: RunRelics
 
 func _ready() -> void:
 	controller = get_node_or_null("../PortalMap")
@@ -24,6 +27,13 @@ func _ready() -> void:
 		set_process_unhandled_input(false)
 		return
 	map = controller.map
+	relics = RunRelics.new()
+	relics.name = "Relics"
+	relics.tower_map = self
+	add_child(relics)
+	var hover := preload("res://scripts/towers/tower_hover.gd").new()
+	hover.tower_map = self
+	add_child(hover)
 	traffic = TrafficStructures.new()
 	traffic.name = "TrafficStructures"
 	traffic.tower_map = self
@@ -93,6 +103,7 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 		return "超出可建造範圍"
 	var at := Vector2i(cell.x, cell.z)
 	if card.traffic != null: return traffic.validate(card.traffic, at, turns)
+	if occupied.has(at): return upgrade_error(card, occupied[at])
 	var deployment_error := _validate_deployment(card.tower,at,turns)
 	if not deployment_error.is_empty(): return deployment_error
 	var additions := {}
@@ -108,6 +119,12 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 	if card.traffic != null:
 		_feedback("")
 		return traffic.place(card.traffic, Vector2i(cell.x,cell.z), turns)
+	var existing := upgrade_target(cell)
+	if existing != null:
+		if not existing.upgrade(): return null
+		_feedback("")
+		tower_upgraded.emit(existing)
+		return existing
 	var tower := DefenseTower.new()
 	tower.definition = card.tower
 	tower.rotation_steps = posmod(turns, 4)
@@ -116,6 +133,15 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 	for ground in card.ground_cells(at, turns):
 		additions[ground] = true
 	return _commit(tower, at, additions)
+
+func upgrade_target(cell: Vector3i) -> DefenseTower:
+	return occupied.get(Vector2i(cell.x, cell.z)) if cell.y == 0 else null
+
+func upgrade_error(card: BuildCard, tower: DefenseTower) -> String:
+	if card.tower != tower.definition: return "需要同種類防禦塔卡牌"
+	var cards := get_node_or_null("../CardPlacement")
+	if cards != null and cards.input_suspended: return "目前不能升級"
+	return tower.upgrade_error()
 
 func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 	var terminals: Array[Vector2i] = controller.terminal_cells()
@@ -178,7 +204,7 @@ func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> Defens
 	towers[at] = tower
 	for pos in footprint:
 		occupied[pos] = tower
-	var values := [tower.attack_offsets().duplicate(), tower.threat]
+	var values := [tower.influence_offsets().duplicate(), tower.threat]
 	_settings[at] = values
 	tower.influence_changed.connect(_on_influence_changed.bind(at))
 	tower.died.connect(_on_tower_died)
@@ -189,6 +215,7 @@ func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> Defens
 	if tile_visuals != null:
 		tile_visuals.follow_new_cell(cell, tower.get_node_or_null("Visual"))
 	_feedback("")
+	towers_changed.emit()
 	return tower
 
 func _on_tower_died(tower: Node3D) -> void:
@@ -210,11 +237,12 @@ func remove_tower(cell: Vector3i) -> bool:
 	_settings.erase(at)
 	tower.queue_free()
 	_feedback("")
+	towers_changed.emit()
 	return true
 
 func _on_influence_changed(at: Vector2i) -> void:
 	var tower: Node3D = towers[at]
-	var values := [tower.attack_offsets().duplicate(), tower.threat]
+	var values := [tower.influence_offsets().duplicate(), tower.threat]
 	_apply_change(at, _settings[at], values)
 	_settings[at] = values
 

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://assets/data/towers/ranges/barracks.tres" id="1_f0nwv"]
 [ext_resource type="Script" uid="uid://mdm1es5qha4r" path="res://scripts/towers/barracks_deployment.gd" id="2_3x4mj"]
 [ext_resource type="PackedScene" path="res://assets/models/allies/soldier.tscn" id="3_c38ft"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="4_3x4mj"]
 [ext_resource type="Texture2D" uid="uid://bjfn2536id2oa" path="res://assets/sprites/towers/barracks.png" id="4_gx47c"]
 [ext_resource type="PackedScene" path="res://assets/models/towers/barracks.tscn" id="5_wws40"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="6_hvhi4"]

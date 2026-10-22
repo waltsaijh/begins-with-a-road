@@ -54,6 +54,10 @@ func finish_wave(scene: Node) -> void:
 	for enemy in wave.living_enemies(): origins[Vector2i(enemy.route.cells[0])] = true
 	check(origins.size() == scene.get_node("PortalMap").start_nodes.size(), "Enemies did not actually spawn at every active entrance")
 	for enemy in wave.living_enemies(): enemy.take_damage(1000000)
+	if scene.choosing_relic:
+		check(not scene.choosing_start and scene.get_node("CardPlacement").input_suspended,"Relic precedes expansion")
+		scene.relic_choice.choose(scene.relic_choice.offers[0])
+		await get_tree().create_timer(0.3).timeout
 	scene.set_process(false)
 
 func recipe(profile: Troop) -> WaveDefinition:
@@ -107,9 +111,9 @@ func verify() -> void:
 	expansion.completed.connect(func(_index: int):
 		completions[0] += 1
 		scene.set_process(false))
-	finish_wave(scene)
+	await finish_wave(scene)
 	check(not scene.choosing_start and not expansion.active and controller.start_paths.size() == 1, "A non-final wave triggered an ACT expansion")
-	finish_wave(scene)
+	await finish_wave(scene)
 	check(scene.current_wave == 2 and scene.choosing_start and expansion.active and expansion.choices.size() == 3, "ACT end did not offer three directions")
 	check(cards.entry_selection_active and cards.input_suspended and cards.hand.stowed and cards.selected == -1 and not cards.preview.visible, "ACT choice did not stow/cancel the hand")
 	check(not scene.get_node("TowerMap").input_enabled and not shop.view.visible and not wave.start_allowed and not hud._callout_available, "ACT choice left construction/shop/early start available")
@@ -217,7 +221,7 @@ func verify() -> void:
 		check(assignments[entry.wave_index] == [entry.start_index, entry.route.route_index], "Global enemy ID changed entrance/route quotas")
 	scene._process(15)
 	check(not scene._wave_starting and not wave.active and is_zero_approx(scene.timeline.progress), "Preparation did not wait for a manual start after committing")
-	finish_wave(scene)
+	await finish_wave(scene)
 	check(scene.choosing_start and expansion.active and expansion.choices.size() == 3, "Second ACT did not offer another expansion")
 	expansion.choose_direction(2)
 	var second_cell: Vector2i = expansion.choices[2].paths.keys()[0]
@@ -228,7 +232,7 @@ func verify() -> void:
 	var starts := {}
 	for entry: Dictionary in schedule.pending: starts[entry.start_index] = true
 	check(starts.size() == 3 and schedule.pending.size() == 8, "Third ACT did not use all three entrances")
-	finish_wave(scene)
+	await finish_wave(scene)
 	check(scene.finished and not scene.choosing_start and not expansion.active and completions[0] == 2 and controller.start_paths.size() == 3, "Final ACT incorrectly requested another expansion")
 	check(level.starts.size() == 1 and level.acts[1].waves[0].groups[0].enemy_count == 8, "Runtime expansion modified authored level data")
 	scene.queue_free()

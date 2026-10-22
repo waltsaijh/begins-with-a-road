@@ -39,6 +39,9 @@ func _ready() -> void:
 	cards = cards.duplicate()
 	controller.graph_changed.connect(_invalidate)
 	towers.traffic.changed.connect(_invalidate)
+	towers.tower_upgraded.connect(func(_tower): _invalidate())
+	towers.relics.changed.connect(_invalidate)
+	preview.relics = towers.relics
 	preview.visibility_changed.connect(func():
 		if not preview.visible: set_traffic_candidate({}))
 	placement.cell_placed.connect(func(_cell: Vector3i): _invalidate())
@@ -243,10 +246,15 @@ func _process(delta: float) -> void:
 		_preview_error = towers.validate_card(cards[selected], cell, turns)
 		preview_traffic_at(cards[selected], cell, turns, _preview_error.is_empty())
 		if cards[selected].configuration_error().is_empty():
-			preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
+			var target: DefenseTower = towers.upgrade_target(cell) if cards[selected].tower != null else null
+			if target != null: preview.show_upgrade(placement.map, target, _preview_error)
+			else: preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
 		else:
 			preview.visible = false
 	if preview.visible:
+		if preview.upgrade_mode:
+			_reset_rotation_hint()
+			return
 		if cell != _hint_cell:
 			_reset_rotation_hint()
 			_hint_cell = cell
