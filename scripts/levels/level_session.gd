@@ -1,6 +1,7 @@
 extends Node3D
 ## Loads terrain before gameplay children become ready; owns finite progression.
 signal level_finished
+signal preparation_changed(available: bool)
 const TIMELINE_ADVANCE_SECONDS := 1.0
 const WAVE_START_SECONDS := 1.5
 @export var level: LevelDefinition
@@ -113,7 +114,9 @@ func _prepare_wave() -> void:
 	set_process(false)
 
 func _update_start_callout() -> void:
-	_hud.set_start_available(not finished and not choosing_start and not _wave.active and not _wave_starting)
+	var available: bool = not finished and not choosing_start and not _wave.active and not _wave_starting
+	_hud.set_start_available(available)
+	preparation_changed.emit(available)
 
 func _on_start_requested() -> void:
 	if choosing_start or get_tree().paused or _hud.pause_requested: return
@@ -159,6 +162,7 @@ func _on_wave_finished() -> void:
 		_wave.start_allowed = false
 		timeline.set_state(current_wave, 0.0, false)
 		level_finished.emit()
+		_update_start_callout()
 	else:
 		_prepare_wave()
 		if level.expand_starts_after_act and _is_act_boundary(current_wave):
