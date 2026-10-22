@@ -81,7 +81,9 @@ func display(segments: Dictionary, all_segments: Dictionary, map: GridMap) -> vo
 	flow_data = null
 	material_override.set_shader_parameter("flow_data", null)
 	if segments.is_empty(): return
-	var animation := _animation_phases(all_segments)
+	# Filtered traffic owns its animation graph; other entrances only supply
+	# stable lane positions and the common intensity scale.
+	var animation := _animation_phases(segments)
 	var phases: Dictionary = animation.phases
 	material_override.set_shader_parameter("stroke_period",maxf(animation.period,highlight_length*2.0))
 	var peak := 1

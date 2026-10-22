@@ -14,6 +14,7 @@ var _hover_motion: Tween
 var _background: Color
 var _border: Color
 var _border_width: float
+var _hovered := false
 
 func _ready() -> void:
 	_background = $Shape/Background.color
@@ -31,7 +32,11 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh_labels()
 
 func clear_hover() -> void:
-	_set_hover(false)
+	_animate_hover(false)
+
+func update_pointer_hover() -> void:
+	var control := get_viewport().gui_get_hovered_control()
+	_animate_hover(is_visible_in_tree() and not disabled and control != null and (control == self or is_ancestor_of(control)))
 
 func set_intel_height(height: float) -> void:
 	custom_minimum_size = Vector2(216, 44+height)
@@ -40,6 +45,11 @@ func set_intel_height(height: float) -> void:
 	_update_visuals()
 
 func _set_hover(hovered: bool) -> void:
+	_animate_hover(hovered and not disabled)
+
+func _animate_hover(hovered: bool) -> void:
+	if _hovered == hovered: return
+	_hovered = hovered
 	if _hover_motion != null: _hover_motion.kill()
 	_hover_motion = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	_hover_motion.tween_property(self, "hover_amount", 1.0 if hovered and not disabled else 0.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

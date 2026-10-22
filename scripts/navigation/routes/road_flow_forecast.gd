@@ -5,6 +5,8 @@ var all := {}
 var by_troop := {}
 var by_origin := {}
 var by_troop_origin := {}
+## Exact counts after the existing scheduler has assigned entrances.
+var counts_by_origin := {}
 
 static func troop_counts(definition: WaveDefinition) -> Dictionary:
 	var counts := {}
@@ -19,6 +21,8 @@ static func from_pending(pending: Array) -> RoadFlowForecast:
 	for member: Dictionary in pending:
 		var profile: Troop = member.profile
 		var origin: int = member.start_index
+		if not result.counts_by_origin.has(origin): result.counts_by_origin[origin] = {}
+		result.counts_by_origin[origin][profile] = int(result.counts_by_origin[origin].get(profile,0))+1
 		if not result.by_troop.has(profile):
 			result.by_troop[profile] = {}
 			result.by_troop_origin[profile] = {}

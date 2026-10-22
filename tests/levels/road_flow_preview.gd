@@ -22,8 +22,46 @@ func move_mouse(point: Vector2) -> void:
 	get_viewport().push_input(event, true)
 	await frames()
 
+func displayed_totals(hud: CanvasLayer) -> Dictionary:
+	var result := {}
+	for action: Button in hud.start_callouts:
+		var counts: Dictionary = action.get_node("NextWaveIntel").counts
+		for profile: Troop in counts:
+			result[profile] = int(result.get(profile,0))+int(counts[profile])
+	return result
+
+func click_now(point: Vector2) -> void:
+	var event := InputEventMouseButton.new()
+	event.position = point
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = true
+	get_viewport().push_input(event,true)
+	event = event.duplicate()
+	event.pressed = false
+	get_viewport().push_input(event,true)
+	# Camera click/drag arbitration replays ordinary clicks deferred.
+	await frames(2)
+
 func member(profile: Troop, origin: int, cells: Array) -> Dictionary:
 	return {"profile": profile, "start_index": origin, "route": {"cells": PackedVector2Array(cells)}}
+
+func check_rendered_scope(preview: Node, profile: Troop, origin: int) -> void:
+	var expected := {}
+	var segments: Dictionary = preview.forecast.by_origin[origin] if profile == null else preview.forecast.by_troop_origin[profile][origin]
+	for edge: Vector4i in segments:
+		expected[Vector2i(edge.x,edge.y)] = true
+		expected[Vector2i(edge.z,edge.w)] = true
+	check(preview.arrows.rendered_cells.size() == expected.size(), "Hover rendered cells from another entrance")
+	for cell: Vector2i in preview.arrows.rendered_cells:
+		check(expected.has(cell), "Hover leaked another entrance's road cell: %s" % cell)
+	# Compare the actual GPU input, including counts/widths and direction clocks,
+	# with a renderer receiving only this entrance's allocated trips.
+	var reference: MeshInstance3D = load("res://scenes/navigation/road_flow_renderer.tscn").instantiate()
+	add_child(reference)
+	reference.line_width = preview.arrows.line_width
+	reference.display(segments,preview.forecast.all,preview.controller.map)
+	check(reference.flow_data.get_image().get_data() == preview.arrows.flow_data.get_image().get_data(), "Hover GPU data mixes another entrance's counts or directions")
+	reference.queue_free()
 
 func statistics() -> void:
 	var a := Troop.new()
@@ -75,6 +113,12 @@ func ribbon_geometry() -> void:
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
 	check(is_equal_approx(data.get_pixel(1,row).g, minf(first.g, second.g)), "Hover moved reverse flow out of its original lane")
+	var isolated := {Vector4i(0,0,1,0): 2}
+	var unrelated := isolated.duplicate()
+	for x in 12: unrelated[Vector4i(x,4,x+1,4)] = 9
+	ribbon.display(isolated,unrelated,map)
+	var isolated_period: float = ribbon.material_override.get_shader_parameter("stroke_period")
+	check(is_equal_approx(isolated_period,maxf(4.0,ribbon.highlight_length*2.0)), "Other entrance still controls filtered animation clock")
 	var junction := {Vector4i(-1, 0, 0, 0): 5, Vector4i(0, 0, 1, 0): 5, Vector4i(0, 0, 0, 1): 5}
 	ribbon.display(junction, junction, map)
 	data = ribbon.flow_data.get_image()
@@ -115,7 +159,26 @@ func verify() -> void:
 	var vertex_count: int = preview.arrows.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size()
 	check(preview.arrows.mesh.get_surface_count() == 1 and vertex_count == preview.arrows.rendered_cells.size()*6, "Flow is not a single batch of disjoint cell patches")
 	var soldier: Troop = wave.definition.groups[0].troop
-	check(panel.counts[soldier] == 16 and panel.counts.size() == 3, "Cross-group count aggregation incorrect")
+	check(hud.start_callouts.size() == 2, "Each entrance did not get its own start action")
+	var second_panel: Control = hud.start_callouts[1].get_node("NextWaveIntel")
+	check(panel.counts[soldier] == 10 and panel.counts.size() == 2, "First entrance shows global rather than allocated counts")
+	check(second_panel.counts[soldier] == 6 and second_panel.counts.size() == 2, "Second entrance troop counts incorrect")
+	check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition), "Entrance counts do not sum to the wave")
+	# Even an authored entrance with no assigned groups has its own zero-count action.
+	var unused := Node3D.new()
+	unused.name = "UnusedTestEntrance"
+	scene.add_child(unused)
+	unused.global_position = controller.map.to_global(controller.map.map_to_local(Vector3i(4,0,4)))
+	controller.start_paths.append(controller.get_path_to(unused))
+	controller.rebuild()
+	await frames(10)
+	check(hud.start_callouts.size() == 3 and hud.start_callouts[2].get_node("NextWaveIntel").counts.is_empty(),"Unassigned entrance did not display its actual zero count")
+	check(hud.start_callouts[2].get_node("NextWaveIntel/Scroll/Items").get_child(0).text == "×0","Empty entrance count is not visible")
+	controller.start_paths.pop_back()
+	unused.queue_free()
+	controller.rebuild()
+	await frames(10)
+	check(hud.start_callouts.size() == 2,"Removed entrance retained its action")
 	var all_before: Dictionary = preview.forecast.all.duplicate()
 	var builds: int = preview.rebuild_count
 	var before := WaveSpawnSchedule.build(wave.definition, controller, 0, false)
@@ -131,7 +194,11 @@ func verify() -> void:
 		await move_mouse(item.body.get_global_rect().get_center())
 	else:
 		item.body.mouse_entered.emit()
-	check(panel.selected == soldier and preview.forecast.segments(panel.selected) == preview.forecast.by_troop[soldier], "Hover did not filter troop")
+	check(panel.selected == soldier and preview.selected_origin == 0 and not preview.forecast.by_troop_origin[soldier][0].is_empty(), "Hover did not filter troop and entrance")
+	check_rendered_scope(preview,soldier,0)
+	if rendered:
+		await get_tree().create_timer(0.4).timeout
+		check_rendered_scope(preview,soldier,0)
 	check(preview.rebuild_count == builds, "Hover regenerated schedule")
 	if rendered:
 		await RenderingServer.frame_post_draw
@@ -141,6 +208,27 @@ func verify() -> void:
 		item.body.mouse_exited.emit()
 	check(panel.selected == null and preview.forecast.segments() == all_before, "Mouse exit did not restore all flow")
 	check(preview.rebuild_count == builds, "Mouse exit regenerated schedule")
+	var second_item := second_panel.get_node("Scroll/Items").get_child(0)
+	if rendered:
+		await move_mouse(second_item.body.get_global_rect().get_center())
+	else:
+		second_item.body.mouse_entered.emit()
+	check(preview.selected_origin == 1 and second_panel.selected == soldier and panel.selected == null, "Second entrance hover did not isolate its own allocation")
+	check_rendered_scope(preview,soldier,1)
+	if rendered:
+		await get_tree().create_timer(0.4).timeout
+		check_rendered_scope(preview,soldier,1)
+	check(preview.rebuild_count == builds,"Second entrance hover rebuilt the schedule")
+	if rendered:
+		var action: Button = hud.start_callouts[1]
+		await move_mouse(action.get_node("Title").get_global_rect().get_center())
+		check(preview.selected_origin == 1 and second_panel.selected == null,"Title hover restored other entrances instead of this entrance")
+		check_rendered_scope(preview,null,1)
+		await move_mouse(second_item.body.get_global_rect().get_center())
+		check_rendered_scope(preview,soldier,1)
+		await move_mouse(Vector2(8,200))
+	else:
+		second_item.body.mouse_exited.emit()
 	for key in [KEY_F1, KEY_F2]:
 		var event := InputEventKey.new()
 		event.keycode = key
@@ -160,7 +248,7 @@ func verify() -> void:
 	await frames()
 	check(panel.get_parent() == hud.early_start and panel.size.x <= 216 and panel.size.y <= 114, "Troop list escaped the start button or expanded without bounds")
 	check(panel.get_node("Scroll").get_v_scroll_bar().max_value > panel.size.y, "Troop overflow is not scrollable")
-	panel.display(RoadFlowForecast.troop_counts(wave.definition))
+	panel.display(preview.forecast.counts_by_origin[0])
 	await frames()
 	var after := WaveSpawnSchedule.build(wave.definition, controller, 0, false)
 	check(RoadFlowForecast.from_pending(before.pending).all == RoadFlowForecast.from_pending(after.pending).all, "Hover altered quotas")
@@ -169,6 +257,7 @@ func verify() -> void:
 	other.score_threshold = 0
 	await frames()
 	check(preview.forecast.all.is_empty() and preview.arrows.mesh == null, "Invalid route retained/fabricated flow")
+	check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition),"Blocked route incorrectly zeroed scheduled entrance counts")
 	other.score_threshold = 25
 	await frames()
 	check(preview.arrows.mesh != null, "Non-selected troop change did not restore forecast")
@@ -183,7 +272,7 @@ func verify() -> void:
 	check(preview.rebuild_count > cost_builds and controller.revision == geometry_revision and preview.arrows.mesh != null, "Tile cost edit did not refresh without rebuilding geometry")
 	hud.set_paused(true)
 	await frames()
-	check(not panel.visible and not preview.arrows.visible, "Pause retained active preview")
+	check(not panel.visible and not second_panel.visible and not preview.arrows.visible, "Pause retained active preview")
 	hud.set_paused(false)
 	await frames()
 	check(panel.visible and preview.arrows.visible and panel.selected == null, "Resume did not restore neutral preview")
@@ -195,10 +284,21 @@ func verify() -> void:
 	for index in 2:
 		var expected := RoadFlowForecast.from_pending(WaveSpawnSchedule.build(wave.definition, controller, 0, false, wave.additional_start_indices).get("pending", []))
 		if index == 0:
-			panel.get_node("Scroll/Items").get_child(0).body.pressed.emit()
+			# The second entrance's row starts the same complete multi-entrance wave.
+			var body: Button = second_panel.get_node("Scroll/Items").get_child(0).body
+			if rendered:
+				await move_mouse(body.get_global_rect().get_center())
+				await click_now(body.get_global_rect().get_center())
+			else:
+				body.pressed.emit()
 		else:
 			scene._on_start_requested()
 		scene.set_process(false)
+		var opening_elapsed: float = scene._wave_start_elapsed
+		for action: Button in hud.start_callouts:
+			check(action.disabled and action.mouse_filter == Control.MOUSE_FILTER_IGNORE,"Opening failed to lock every entrance action")
+			action.pressed.emit() # Repeated requests cannot restart the opening.
+		check(scene._wave_start_elapsed == opening_elapsed,"Repeated entrance clicks reset or advanced opening")
 		check(not panel.visible and preview.arrows.mesh == null, "Opening retained prediction")
 		scene._advance_wave_start(1.5)
 		check(wave.active and not preview.arrows.visible, "Combat retained prediction")
@@ -208,7 +308,8 @@ func verify() -> void:
 		for enemy in wave.living_enemies(): enemy.take_damage(100000)
 		await frames()
 		if index == 0:
-			check(panel.visible and preview.arrows.mesh != null and panel.counts.size() == 2, "Wave completion did not refresh next wave")
+			check(panel.visible and second_panel.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion did not refresh per-entrance lists")
+			check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition),"Next wave retained stale entrance counts")
 		else:
 			check(scene.choosing_start and not panel.visible and preview.arrows.mesh == null, "ACT selection retained stale arrows")
 	var expansion: Node = scene.get_node("SpawnExpansion")
@@ -219,9 +320,20 @@ func verify() -> void:
 	await frames(10)
 	check(panel.visible and preview.arrows.mesh != null, "ACT completion failed to restore prediction")
 	check(controller.start_nodes.size() == 3 and preview.forecast.by_origin.size() == 3, "Added ACT entrance missing from prediction")
-	check(panel.counts.values().reduce(func(a: int, b: int): return a+b, 0) == 29, "New entrance changed troop totals")
+	check(hud.start_callouts.size() == 3 and displayed_totals(hud).values().reduce(func(a: int, b: int): return a+b, 0) == 29, "New entrance lacks an action or changed troop totals")
+	for i in 3:
+		check(hud.start_callouts[i].get_node("NextWaveIntel").counts == preview.forecast.counts_by_origin.get(i,{}),"ACT entrance displayed a count other than its allocated schedule")
 	var expanded_forecast: Dictionary = preview.forecast.all.duplicate()
-	scene._on_start_requested()
+	if rendered:
+		var camera: Camera3D = scene.get_node("Camera3D")
+		camera.focus = hud.start_markers[2].global_position
+		camera.update_pose()
+		await get_tree().create_timer(0.45).timeout
+		var title: Control = hud.start_callouts[2].get_node("Title")
+		await move_mouse(title.get_global_rect().get_center())
+		await click_now(title.get_global_rect().get_center())
+	else:
+		hud.start_callouts[2].pressed.emit()
 	scene.set_process(false)
 	scene._advance_wave_start(1.5)
 	check(RoadFlowForecast.from_pending(wave._pending).all == expanded_forecast, "Added entrance combat trips differ from prediction")
