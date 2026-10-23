@@ -31,4 +31,4 @@ godot --path . res://tests/traffic/input.tscn
 
 有限候選及 strict Score Threshold 保留，倍率不新增路線；幾何或整數配額限制會使設施在部分位置沒有可觀察影響。設定全零權重會使正式開波依既有安全規則拒絕；MVP 三設施都是正倍率。模型採本專案木材、石材與布面簡單幾何，平衡值仍需人工調整。
 
-本次驗收結果以 `.godot/test-results/traffic/acceptance.md` 和對應 log／JSON 為準。舊 route_planner 與 tile_placement 測試仍假設 main 為固定直路；troop_profiles 仍要求 Quickfeet 速度 1.5，與可編輯資源不符。不能為讓舊測試通過回退正式地形／數值。
+本次驗收結果以 `.godot/test-results/traffic/acceptance.md` 和對應 log／JSON 為準。舊 route_planner 與 tile_placement 測試仍假設 main 為固定直路；troop_profiles 已改用複製的獨立數值及動態 catalog，並區分 Cost 評分與硬性選路身份。不能為讓舊測試通過回退正式地形／數值。

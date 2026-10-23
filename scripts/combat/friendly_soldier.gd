@@ -90,6 +90,9 @@ func advance(delta: float) -> void:
 		release()
 		queue_free()
 		return
+	if tower.is_disabled():
+		release()
+		return
 	if dead:
 		respawn_timer = maxf(0,respawn_timer-delta)
 		visible = respawn_timer > settings.respawn_seconds-0.2
@@ -115,11 +118,15 @@ func advance(delta: float) -> void:
 	if target == null:
 		var candidates: Array[Node3D] = manager.combat._index.targets_near(home_position,settings.engage_radius)
 		candidates.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
+		var eligible: Array[Node3D] = []
 		for enemy in candidates:
 			if enemy.troop != null and enemy.troop.has_tag(&"flying"): continue
 			if is_instance_valid(enemy.engaged_by) or manager.path(home,manager.cell(enemy.global_position),home,settings.local_radius).is_empty(): continue
-			target = enemy
-			break
+			eligible.append(enemy)
+		var preferred: Node3D = manager.combat.enemy_abilities.preferred(tower,eligible)
+		if preferred != null:
+			target = preferred
+		elif not eligible.is_empty(): target = eligible[0]
 	var previous := global_position
 	if target == null: manager.walk(self,home_position,delta)
 	elif manager.distance(global_position,target.global_position) > settings.melee_distance:
@@ -141,6 +148,10 @@ func advance(delta: float) -> void:
 	if not dead and tower.has_relic(&"sharpshooter") and (not is_instance_valid(target) or target.engaged_by != self) and ranged_timer <= 0:
 		var ranged: Array[Node3D] = manager.combat._index.targets_near(global_position,tower.relic_value(&"sharpshooter", &"range"))
 		ranged.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
+		var preferred: Node3D = manager.combat.enemy_abilities.preferred(tower,ranged)
+		if preferred != null:
+			ranged.erase(preferred)
+			ranged.push_front(preferred)
 		if not ranged.is_empty():
 			var victim: Node3D = ranged[0]
 			manager.combat.visuals.add_beam(global_position+Vector3.UP*0.5,victim.global_position+Vector3.UP*0.25,Color("ead5a2"),0.035,0.18)

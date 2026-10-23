@@ -29,3 +29,5 @@
 節點名稱是程式讀取資料的介面，調整位置、尺寸、樣式與素材即可；如要重新命名節點，也需更新對應腳本路徑。動態集合請編輯其 `.tscn` 範本，而不是執行中的 Remote 複本。場景內顏色若由資料覆寫（塔 accent、目前 ACT、時間線進度），可在其根節點的 Inspector 調整相關設定。
 
 Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
+
+Phase 4 的 `enemies/components/enemy_intelligence.tscn` 提供左側固定入口與可重開的本局敵軍情報；下一波兵種列的 `?` 開啟同一介面，不觸發開波。入口位於遺物收藏按鈕下方，避免擋住菱形至下一波列表的連續 hover 路徑。文字與數值取 Troop，行為及驗證入口見 `docs/phase4.md`。

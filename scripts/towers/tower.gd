@@ -38,6 +38,40 @@ var patrol_distance := 0.0
 var rapid_remaining := 0
 var rapid_next := 0.0
 var mortar_shots := 0
+var _disables := {}
+var _disable_icon: Sprite3D
+
+func apply_disable(source: Node3D, seconds: float) -> void:
+	if not is_instance_valid(source) or not source.can_be_targeted() or not is_finite(seconds) or seconds <= 0: return
+	var key := source.get_instance_id()
+	_disables[key] = {"source":weakref(source),"remaining":maxf(seconds,float(_disables.get(key,{}).get("remaining",0.0)))}
+	_refresh_disable_visual()
+
+func is_disabled() -> bool:
+	for key in _disables.keys():
+		var source: Node3D = _disables[key].source.get_ref()
+		if not is_instance_valid(source) or not source.can_be_targeted() or _disables[key].remaining <= 0: _disables.erase(key)
+	return not _disables.is_empty()
+
+func advance_disable(delta: float) -> void:
+	for state: Dictionary in _disables.values(): state.remaining -= delta
+	_refresh_disable_visual()
+
+func clear_disable() -> void:
+	_disables.clear()
+	_refresh_disable_visual()
+
+func _refresh_disable_visual() -> void:
+	var disabled := is_disabled()
+	if disabled and not is_instance_valid(_disable_icon):
+		_disable_icon = Sprite3D.new()
+		_disable_icon.texture = preload("res://assets/sprites/effects/disabled.svg")
+		_disable_icon.pixel_size = 0.009
+		_disable_icon.position.y = 1.4
+		_disable_icon.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_disable_icon.no_depth_test = true
+		add_child(_disable_icon)
+	if is_instance_valid(_disable_icon): _disable_icon.visible = disabled
 
 func effect(id: StringName) -> Dictionary: return relic_effects.get(id,{})
 func has_relic(id: StringName) -> bool: return relic_effects.has(id)

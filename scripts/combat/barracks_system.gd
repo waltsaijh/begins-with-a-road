@@ -58,7 +58,7 @@ func _process(delta: float) -> void:
 		owners[tower] = tower.deployment.count
 	var active: bool = combat.wave.active
 	if active and not units.is_empty():
-		combat._index.rebuild(combat.wave.living_enemies(),map)
+		if not combat.friendly_index_ready: combat._index.rebuild(combat.wave.living_enemies(),map)
 		combat.friendly_index_ready = true
 	for i in range(units.size()-1,-1,-1):
 		var unit := units[i]

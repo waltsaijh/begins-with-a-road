@@ -24,6 +24,9 @@ func targets(combat: Node, tower: Node3D) -> Array[Node3D]:
 
 func select_target(combat: Node, tower: Node3D) -> Node3D:
 	var valid := targets(combat,tower)
+	if mode != Mode.ALL:
+		var preferred: Node3D = combat.enemy_abilities.preferred(tower,valid)
+		if preferred != null: return preferred
 	return null if valid.is_empty() else valid[0]
 
 func fire(combat: Node, tower: Node3D, target: Node3D) -> void:

@@ -27,6 +27,12 @@ var _frost: Array[Dictionary] = []
 var engaged_by: Node3D
 var melee_damage := 0.0
 var melee_interval := 1.0
+var abilities := {}
+var heal_clock := 0.0
+var sabotage_clock := 0.0
+var cast_remaining := 0.0
+var cast_target: WeakRef
+var ability_visual: Node3D
 
 func can_be_targeted() -> bool:
 	return not _finished and not is_queued_for_deletion() and health > 0
@@ -39,6 +45,7 @@ func add_shield(amount: float) -> void:
 func take_damage(amount: float) -> void:
 	if not can_be_targeted() or not is_finite(amount) or amount <= 0:
 		return
+	amount *= 1.0-float(abilities.get("damage_reduction",0.0))
 	var absorbed := minf(maxf(0.0, shield), amount)
 	shield = maxf(0.0, shield-absorbed)
 	var applied := minf(health, amount-absorbed)
@@ -50,6 +57,12 @@ func take_damage(amount: float) -> void:
 		died.emit(self)
 		queue_free()
 	damaged.emit(self, absorbed+applied)
+
+func heal(amount: float) -> float:
+	if not can_be_targeted() or not is_finite(amount) or amount <= 0: return 0.0
+	var gained := minf(amount,max_health-health)
+	health += gained
+	return gained
 
 func set_effect_icon(id: StringName, icon: Texture2D) -> void:
 	if icon == null:
@@ -111,6 +124,11 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> 
 	if is_instance_valid(engaged_by): engaged_by.release()
 	melee_damage = troop.melee_damage if troop != null else 0.0
 	melee_interval = troop.melee_interval if troop != null else 1.0
+	if abilities.is_empty() and troop != null: abilities = troop.ability_snapshot()
+	heal_clock = float(abilities.get("heal_interval",3.0))
+	sabotage_clock = float(abilities.get("sabotage_interval",6.0))
+	cast_remaining = 0.0
+	cast_target = null
 	enemy_id = id
 	route = selected_route
 	waypoints = points.duplicate()

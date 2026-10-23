@@ -4,6 +4,7 @@ param(
     [string]$Python='python',[string]$MsvcTools='',[string]$WindowsSdk='',[string]$Emsdk='',[int]$Jobs=8
 )
 $ErrorActionPreference='Stop'
+$env:PYTHONUTF8='1'
 $project=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (-not (Test-Path "$project/native/godot-cpp/SConstruct")) { throw 'Install the pinned godot-cpp SDK described in native/README.md.' }
 if (Test-Path "$project/.godot/build_tools") { $env:PYTHONPATH="$project/.godot/build_tools"+[IO.Path]::PathSeparator+$env:PYTHONPATH }

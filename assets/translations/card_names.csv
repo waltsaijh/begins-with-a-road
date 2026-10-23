@@ -32,7 +32,7 @@ traffic.flag.name,Flag,旗幟
 traffic.barricade.name,Barricade,拒馬
 traffic.narrow_passage.name,Narrow Passage,窄口
 traffic.flag.effect,Attracts ground units,吸引地面單位
-traffic.barricade.effect,Non-heavy units avoid,非重型單位迴避
+traffic.barricade.effect,Small ground units avoid,小型地面單位迴避
 traffic.narrow_passage.effect,Large units avoid,大型單位迴避
 traffic.duration,Lasts {waves} waves,持續 {waves} 波
 traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
@@ -83,3 +83,9 @@ relic.reroll_discount.description,"Rerolls cost 1 less, down to zero. Up to 2 co
 relic.collection,Relics,本局遺物
 relic.choose,Choose a relic,選擇一件遺物
 relic.empty,No relics yet,尚未取得遺物
+troop.rat_swarm.name,Rat Swarm,鼠群
+troop.shield_guardian.name,Shield Guardian,盾衛兵
+troop.blood_mage.name,Blood Mage,血法師
+troop.winged_beast.name,Winged Beast,飛翼獸
+troop.scout.name,Scout,偵查兵
+troop.saboteur.name,Saboteur,爆破手

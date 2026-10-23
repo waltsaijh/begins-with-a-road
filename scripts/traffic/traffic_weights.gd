@@ -6,6 +6,7 @@ static func log_multipliers(routes: Array, profile: Troop, effects: Array) -> Pa
 	for candidate: Dictionary in routes:
 		var value := 0.0
 		for effect: Dictionary in effects:
+			if profile.has_tag(&"flying"): continue
 			var applies := true
 			for tag: StringName in effect.tags:
 				if not profile.has_tag(tag): applies = false

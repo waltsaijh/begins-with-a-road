@@ -53,6 +53,7 @@ func _model_height() -> float:
 	return height
 
 func advance(delta: float, walk_blend: float) -> void:
+	if is_instance_valid(instance) and instance.has_method("advance_motion"): instance.advance_motion(maxf(0,delta),walk_blend)
 	if animation != null and walk_blend > 0:
 		# Imported clips need not be marked looping in their import settings.
 		if not animation.is_playing(): animation.play(animation.assigned_animation)

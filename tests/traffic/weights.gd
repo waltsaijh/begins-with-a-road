@@ -23,11 +23,11 @@ func _initialize() -> void:
 	effect.cells[Vector2i.RIGHT] = true
 	var logs := TrafficWeights.log_multipliers(routes, quick, [effect])
 	check(is_equal_approx(exp(logs[0]), 0.5), "once per structure even repeated cells")
-	check(is_equal_approx(exp(TrafficWeights.log_multipliers(routes, soldier, [effect])[0]), 0.5), "barricade affects standard units")
+	check(TrafficWeights.log_multipliers(routes, soldier, [effect])[0] == 0.0, "barricade excludes standard units in Phase 4")
 	check(TrafficWeights.log_multipliers(routes, heavy, [effect])[0] == 0.0, "barricade excludes large units")
 	var armored_standard := Troop.new()
 	armored_standard.tags = [&"ground", &"armored"]
-	check(is_equal_approx(exp(TrafficWeights.log_multipliers(routes, armored_standard, [effect])[0]), 0.5), "armored alone does not imply heavy")
+	check(TrafficWeights.log_multipliers(routes, armored_standard, [effect])[0] == 0.0, "armored standard is neither small nor large")
 	var explicit_filter := effect.duplicate(true)
 	explicit_filter.tags = [&"ground"]
 	check(TrafficWeights.log_multipliers(routes, legacy, [explicit_filter])[0] == 0.0,"required and excluded tag filters compose")

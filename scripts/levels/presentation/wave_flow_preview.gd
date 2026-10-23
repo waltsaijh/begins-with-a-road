@@ -7,6 +7,7 @@ var candidate := {}
 var candidate_rebuild_count := 0
 var _candidate_dirty := false
 var _candidate_unavailable := false
+var _schedule_error := ""
 var _junctions := {}
 @export_range(1, 100, 1) var minimum_quota_change := 1
 var delta_overlay: Control
@@ -72,7 +73,11 @@ func _sync_callouts() -> void:
 		var callback := _filter.bind(i)
 		if not panels[i].filter_changed.is_connected(callback):
 			panels[i].filter_changed.connect(callback)
+		if not panels[i].info_requested.is_connected(_show_intelligence): panels[i].info_requested.connect(_show_intelligence)
 	if selected_origin >= panels.size(): selected_origin = -1
+
+func _show_intelligence(profile: Troop) -> void:
+	if session.enemy_intelligence != null: session.enemy_intelligence.show_profile(profile)
 
 func _clear_filters() -> void:
 	for entry in _panels(): entry.clear_filter()
@@ -107,6 +112,12 @@ func _process(_delta: float) -> void:
 		_sync_callouts()
 		var definition: WaveDefinition = wave.definition
 		var schedule := WaveSpawnSchedule.build(definition, controller, wave._next_enemy_id, false, wave.additional_start_indices) if definition != null else {}
+		_schedule_error = ""
+		if schedule.is_empty() and definition != null:
+			for group in definition.groups:
+				for origin in WaveSpawnSchedule.origins_for(group,wave.additional_start_indices):
+					var plan: Dictionary = controller.plan_for(group.troop,origin)
+					if not plan.get("valid",false): _schedule_error = str(plan.get("error","無法建立出兵路線"))
 		baseline = RoadFlowForecast.from_pending(schedule.get("pending", []))
 		forecast = baseline
 		_junctions = TrafficFlowDelta.junctions(controller.map,controller.blocked_cells)
@@ -150,7 +161,7 @@ func _sync_pointer_filter() -> void:
 		origin = i
 		for item in panels[i].get_node("Scroll/Items").get_children():
 			var body := item.get_node_or_null("Body")
-			if body != null and (hovered == body or body.is_ancestor_of(hovered)):
+			if body != null and (hovered == item or item.is_ancestor_of(hovered)):
 				profile = item.profile
 		break
 	var previous: Troop = panels[selected_origin].selected if selected_origin >= 0 and selected_origin < panels.size() else null
@@ -185,6 +196,9 @@ func _render_filter() -> void:
 	delta_overlay.markers = TrafficFlowDelta.compare(before,segments,_junctions,minimum_quota_change) if not candidate.is_empty() else {}
 	delta_overlay.hint = tr("traffic.no_change") if not candidate.is_empty() and baseline.all == forecast.all else ""
 	if not candidate.is_empty() and _candidate_unavailable: delta_overlay.hint = tr("traffic.unavailable")
+	if not _schedule_error.is_empty():
+		delta_overlay.hint = ("Unable to confirm the newest route. Simplify the roads and retry." if TranslationServer.get_locale().begins_with("en") else "無法確認最新路線，請簡化道路後重試。") if "Scout history" in _schedule_error else _schedule_error
+		delta_overlay.hint_point = controller.get_node(controller.start_paths[0]).global_position+Vector3.UP*0.5
 	if not candidate.is_empty():
 		var placement: Node = get_node("../CardPlacement")
 		delta_overlay.hint_point = placement.preview.hint_anchor
@@ -193,4 +207,4 @@ func _refresh_visibility() -> void:
 	var available: bool = preparation and not hud.pause_requested and not get_tree().paused
 	for action: Button in hud.start_callouts: action.set_intel_available(available)
 	arrows.visible = available and not debug_overlay.show_routes and not debug_overlay.show_parameters
-	delta_overlay.visible = arrows.visible and not candidate.is_empty()
+	delta_overlay.visible = arrows.visible and (not candidate.is_empty() or not _schedule_error.is_empty())

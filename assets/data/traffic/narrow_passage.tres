@@ -11,6 +11,6 @@ icon = ExtResource("3")
 card_price = 3
 duration_waves = 3
 placement = 1
-required_tags = Array[StringName]([&"large"])
+required_tags = Array[StringName]([&"large", &"ground"])
 weight_multiplier = 0.5
 influence_offsets = Array[Vector2i]([Vector2i(0, 0)])

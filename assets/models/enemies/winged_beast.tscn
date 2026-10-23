@@ -1,0 +1,142 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="mat1"]
+albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="mesh1"]
+radius = 0.17
+height = 0.32
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="mat2"]
+albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="mesh2"]
+radius = 0.14
+height = 0.28
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="mat3"]
+albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh3"]
+size = Vector3(0.2, 0.16, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="mat4"]
+albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh4"]
+size = Vector3(0.72, 0.08, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="mat5"]
+albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="mesh5"]
+radius = 0.025
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="mat6"]
+albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh6"]
+size = Vector3(0.06, 0.18, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="mat7"]
+albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh7"]
+size = Vector3(0.72, 0.08, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="mat8"]
+albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="mesh8"]
+radius = 0.025
+height = 0.05
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="mat9"]
+albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh9"]
+size = Vector3(0.06, 0.18, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="mat10"]
+albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh10"]
+size = Vector3(0.3, 0.06, 0.3)
+
+[node name="WingedBeast" type="Node3D"]
+script = ExtResource("1")
+flying = true
+
+[node name="Body" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.12, 0)
+mesh = SubResource("mesh1")
+material_override = SubResource("mat1")
+scale = Vector3(1, 1, 1.6176470588235294)
+
+[node name="Head" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.22, -0.29)
+mesh = SubResource("mesh2")
+material_override = SubResource("mat2")
+
+[node name="Beak" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.19, -0.49)
+mesh = SubResource("mesh3")
+material_override = SubResource("mat3")
+
+[node name="Wing-1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.43, 0.16, 0.05)
+mesh = SubResource("mesh4")
+material_override = SubResource("mat4")
+metadata/wing = -1
+
+[node name="Eye-1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.12, 0.28, -0.36)
+mesh = SubResource("mesh5")
+material_override = SubResource("mat5")
+
+[node name="Claw-1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.12, -0.09, 0.02)
+mesh = SubResource("mesh6")
+material_override = SubResource("mat6")
+
+[node name="Wing1" type="MeshInstance3D" parent="."]
+position = Vector3(0.43, 0.16, 0.05)
+mesh = SubResource("mesh7")
+material_override = SubResource("mat7")
+metadata/wing = 1
+
+[node name="Eye1" type="MeshInstance3D" parent="."]
+position = Vector3(0.12, 0.28, -0.36)
+mesh = SubResource("mesh8")
+material_override = SubResource("mat8")
+
+[node name="Claw1" type="MeshInstance3D" parent="."]
+position = Vector3(0.12, -0.09, 0.02)
+mesh = SubResource("mesh9")
+material_override = SubResource("mat9")
+
+[node name="Tail" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.14, 0.46)
+mesh = SubResource("mesh10")
+material_override = SubResource("mat10")

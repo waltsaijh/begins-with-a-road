@@ -1,5 +1,6 @@
 extends VBoxContainer
 signal filter_changed(profile: Troop)
+signal info_requested(profile: Troop)
 const Item = preload("res://scenes/levels/components/troop_intel_item.tscn")
 var counts := {}
 var selected: Troop
@@ -33,6 +34,7 @@ func display(value: Dictionary) -> void:
 		item.configure(profile, counts[profile])
 		item.filter_entered.connect(_enter_filter)
 		item.filter_exited.connect(_exit_filter)
+		item.info_requested.connect(func(profile: Troop): info_requested.emit(profile))
 		item.body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		item.body.pressed.connect(func():

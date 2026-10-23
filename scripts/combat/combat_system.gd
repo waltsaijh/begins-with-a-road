@@ -14,6 +14,7 @@ var visuals: Node3D
 var _index := SpatialIndex.new()
 var barracks: Node3D
 var friendly_index_ready := false
+var enemy_abilities: Node
 
 func _ready() -> void:
 	process_priority = 50
@@ -24,6 +25,9 @@ func _ready() -> void:
 	barracks = preload("res://scripts/combat/barracks_system.gd").new()
 	barracks.combat = self
 	add_child(barracks)
+	enemy_abilities = preload("res://scripts/combat/enemy_abilities.gd").new()
+	enemy_abilities.combat = self
+	add_child(enemy_abilities)
 	if is_instance_valid(wave) and wave.has_signal("wave_finished"):
 		wave.wave_finished.connect(func():
 			for tower: DefenseTower in tower_map.towers.values(): tower.rapid_remaining = 0)
@@ -59,7 +63,7 @@ func _process(delta: float) -> void:
 	if not enabled:
 		return
 	for tower: DefenseTower in tower_map.towers.values():
-		if tower.is_queued_for_deletion() or tower.health <= 0 or tower.attack == null:
+		if tower.is_queued_for_deletion() or tower.health <= 0 or tower.attack == null or tower.is_disabled():
 			continue
 		if wave.active: RelicCombat.advance(self,tower,step)
 		var target: Node3D = tower.attack.select_target(self,tower)
@@ -79,6 +83,8 @@ func _process(delta: float) -> void:
 		shots_fired += 1
 
 func default_target(tower: DefenseTower) -> Node3D:
+	var preferred: Node3D = enemy_abilities.preferred(tower,targets_for(tower))
+	if preferred != null: return preferred
 	if tower.definition != null and tower.definition.attack_area != null:
 		return _index.target_in_offsets(tower.grid_cell,tower.attack_offsets())
 	return _index.target_for(tower.grid_cell,tower.attack_radius*tower.range_multiplier+TowerConstants.AIM_LOOKAHEAD_TILES)

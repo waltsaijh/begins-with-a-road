@@ -148,7 +148,7 @@ Hover 沿卡牌自身上方提起 6 原始 px（正常顯示約 5 px）；手牌
 
 三份可編輯資源位於 `assets/data/traffic/`。旗幟的模型引用 `assets/models/traffic/flag_ground.tscn`，附一格石地與既有風格支柱，預覽與正式放置共用，隨設施到期／移除一起清除；基座屬於顯示，不加入道路導航。旗幟 NEAR_ROAD 要求 anchor 是空格，旋轉後 influence_offsets 中至少一格有未被塔占用的道路；拒馬、窄口 ON_ROAD 要求既有道路。所有設施拒絕端點、塔、兵營駐點與互斥設施。`occupancy_group`／`compatible_groups` 必須雙方明確允許才可同格。既有塔卡、直接道路新增及 ACT 路徑也會檢查設施占位。管理器從不呼叫 set_cell_item 或修改 blocked_cells，移除保留道路 item、orientation 與參數。
 
-Troop 的 `body_size` 是單選體型，`tags: Array[StringName]` 保存 ground／flying／armored 等可複合特性；`has_tag()` 對三個體型只看 body_size，避免 free tags 產生互斥體型。未設定的新舊資源預設 standard、ground。設施 required_tags 採全符合，excluded_tags 任一符合即排除，沒有隱含兵種 ID 判斷。拒馬排除 large，對 Soldier／Quickfeet 均套用 ×0.5，Heavy 不受影響。
+Troop 的 `body_size` 是單選體型，`tags: Array[StringName]` 保存 ground／flying／armored 等可複合特性；`has_tag()` 對三個體型只看 body_size，避免 free tags 產生互斥體型。未設定的新舊資源預設 standard、ground。設施 required_tags 採全符合，excluded_tags 任一符合即排除，沒有隱含兵種 ID 判斷。Phase 4 起拒馬要求 small＋ground，對 Quickfeet／鼠群／偵查兵套用 ×0.5；Soldier 與 Heavy 不受影響。窄口要求 large＋ground，flying 忽略地面設施。
 
 權重資料流：原生搜尋 → CandidateRoutes 的原始分數及 strict threshold → `TrafficWeights.log_multipliers()` → `Distribution.build()` → 原 CDF 的 index／total → WaveSpawnSchedule。每個設施只要與完整路線任一格相交就加入一次 log(multiplier)，不因重複格或範圍較大重複計算。減去最大 log weight 再 exp，避免乘積溢位。全零權重會回傳不可用；其餘結果皆有限非負。正式效果與候選效果的機率快取分離，不使搜尋池失效。
 
@@ -336,7 +336,7 @@ var route = controller.sample_for(profile, enemy_id, 1)
 
 ### 統一搜尋與評分
 
-所有兵種只需覆寫 evaluation，沒有 scoring_mode、shuffle_candidates 或額外的成本轉換覆寫。
+一般 Cost 兵種只需覆寫 evaluation；Phase 4 的硬性資格另走專屬候選。沒有 scoring_mode、shuffle_candidates 或額外的成本轉換覆寫。
 
 1. 共用以長度探索的有限節點路線池；依相同 search_budget／overlap_penalty 與起點重用幾何代表資料。
 2. 取得全圖原始分數陣列。如果最低分 m ≤ 0，搜尋成本設為 `evaluation + (1 - m)`；否則保留原正成本。這個共同平移保留地塊之間的偏好順序，讓所有搜尋成本為正。以此加入兵種偏好候選；若全部搜尋成本已為 1，直接重用中性池，避免重跑相同搜尋。
@@ -462,3 +462,15 @@ Highlight Length 的 Inspector 滑桿範圍為 0.10～20.0，Flow Speed 為 0～
 ## 塔牌疊加與遺物（Phase 3）
 
 完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物，再選遺物，最後才擴張或完成關卡；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
+
+## 敵軍協同與專用路線（Phase 4）
+
+六種新兵種仍由 TroopCatalog 自動發現。Route Rule 區分 COST／SHORTEST／NEWEST，硬性資格先於 Uniform／Softmax 與 TrafficWeights；飛行高度、群體大小、減傷、嘲諷、治療與癱瘓參數均在 Troop Inspector。普通 Cost 的有限池和 strict threshold 不變。拒馬目前只作用於 small＋ground；窄口只作用於 large＋ground；flying 不套地面設施倍率。
+
+WaveSpawnSchedule 先分配整群入口／路線，再展開獨立個體，固定所有行程、生命、速度與能力快照。群內短間隔、最後不足額群、跨 SpawnGroup 共用配額及不洗牌預覽共用此入口。一般兵種的批次與刻度語意保留；鼠群每群的開始間隔至少容納群內的 0.25 秒間隔。
+
+PortalMap 保存已提交路網歷史，與預覽／普通候選快取分開。原生 RoadSpecialRoutes 處理精確最短格距與最新完整選路的代表通路；歷史判定、非單調重接的預算限制與錯誤處理見 [Phase 4 詳細說明](phase4.md)。這些策略不重寫已開波的路線。流量仍從正式排程的每一名個體累加。
+
+EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結算治療、前搖與癱瘓。盾衛優先只套用到合法單體目標，全體範圍攻擊照常。來源死亡、離場、清波及重開清理所有癱瘓，重疊不累加；在途攻擊快照照常結算。
+
+情報列的 ? 打開敵軍情報，不觸發開波；首次登場以左側按鈕的新種類數提示。重開情報、暫停、遺物收藏互斥及真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。

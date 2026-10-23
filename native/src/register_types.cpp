@@ -1,10 +1,11 @@
 #include "portal_graph.hpp"
 #include "route_planner.hpp"
 #include "road_edit_guard.hpp"
+#include "special_routes.hpp"
 #include <godot_cpp/godot.hpp>
 using namespace godot;
 void initialize_road_graph(ModuleInitializationLevel level) {
-    if(level==MODULE_INITIALIZATION_LEVEL_SCENE) {GDREGISTER_CLASS(RoadPortalGraph);GDREGISTER_CLASS(RoadRoutePlanner);GDREGISTER_CLASS(RoadEditGuard);}
+    if(level==MODULE_INITIALIZATION_LEVEL_SCENE) {GDREGISTER_CLASS(RoadPortalGraph);GDREGISTER_CLASS(RoadRoutePlanner);GDREGISTER_CLASS(RoadEditGuard);GDREGISTER_CLASS(RoadSpecialRoutes);}
 }
 void uninitialize_road_graph(ModuleInitializationLevel) {}
 extern "C" {

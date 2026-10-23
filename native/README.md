@@ -13,7 +13,7 @@ godot-cpp 固定 commit e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77，4.5 API；Pyt
 ./tools/build/build_native.ps1 -Platform web -Target template_release
 ```
 
-可提供 -Python、-MsvcTools、-WindowsSdk、-Emsdk。輸出 `bin/road_graph.editguard.*`，road_graph.gdextension 指向各平台版本；reloadable=false，需重啟 Godot 載入。舊已載入 DLL 保留，避免破壞正在開啟的編輯器。
+可提供 -Python、-MsvcTools、-WindowsSdk、-Emsdk。輸出 `bin/road_graph.editguard.phase4.*`，road_graph.gdextension 指向各平台版本；reloadable=false，需重啟 Godot 載入。舊已載入 DLL 保留，避免破壞正在開啟的編輯器。
 
 ## 資料與 API
 
@@ -64,3 +64,15 @@ F1 顯示本波各兵種已分配的完整路線，F2 讀取地塊 Resource 顯�
 RoadEditGuard.prepare(cells, ports, terminals) 在完整快照後建立迭代 Tarjan block-cut forest，凍結連接所有起終點的有效地塊為不同 anchor，其餘連通塊至多有一個 anchor。多起點共用檢查。RoadEditGuard.add_cell(Vector2i) 以四鄰格與 union-by-size／path-compression 並查集維護暫緩地塊；只有合併不同 anchor 才回傳 true，需要完整重建。相同接點的死路環不會誤觸發。重建前 guard 已標記 dirty，之後需重新 prepare。初始化 O(V+E)，新增攤銷 O(alpha(V)) 與 hash 查詢，不做路徑列舉。
 
 新增操作遵循 TilePlacement 的自動四向接口刷新；刪除、接口任意修改、移動起終點等操作請呼叫 PortalMap.rebuild()。檢查只影響新增幾何，不攔截塔或兵種成本變更。暫緩地塊仍有 TileRecord；參數顯示與原生 ordered 成本快照分開，避免新增死路導致成本陣列錯位或無效重算。
+
+## Phase 4：專用道路候選
+
+`RoadSpecialRoutes.plan(cells, ports, start, goal, history, shortest, work_limit=200000)` 接收同一份雙向接口快照，回傳 `valid / paths / birth_wave / distance / work / history_monotone`。格座標排序保證重建順序不改結果，去重完整格序列。
+
+shortest 模式以兩端 BFS 距離取得真正最短路 DAG，每條 DAG 有向邊建立一條完整最短代表，不讀成本或普通搜尋預算。時間 O(EV)、代表最多 E，不列舉指數個最短走法。
+
+newest 模式的 history 每項包含 cells、ports、starts、goal、wave。誕生是最早完整容納該行程及端點的歷史快照。將歷史投影到當前有效邊後若單調增長，每條邊以頂點容量 1 的兩單位最大流找一條簡單 s–t 通路，保證任何能形成新選擇的邊至少有一個代表，死路不算；保留最高誕生波次的代表。兩次增廣、每邊 O(V+E)，總 O(E(V+E))，加歷史包含檢查。它是有限代表池，不是所有簡單路線的等機率分布。
+
+反覆刪除／恢復會破壞單調性，改以有工作上限的簡單路徑查證；若無法完整驗證就回傳 valid=false，不輸出可能過時的候選。這是明確的原型限制，不宣稱通用大圖上限；UI 會顯示無法確認新路。歷史與幾何結果在 GDScript 端依每次提交及入口快取，預覽不建立歷史。重開清除歷史。
+
+Phase 4 使用新的輸出檔名，保留舊已載入 DLL；重新建置後需重啟編輯器載入新擴充。Windows 工具固定 Python UTF-8，避免中文 linker 診斷導致 SCons cp950 解碼失敗。SDK 未修改。

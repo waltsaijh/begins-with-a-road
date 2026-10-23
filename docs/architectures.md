@@ -142,3 +142,5 @@ scripts/
 更細的操作入口見 [場景導覽](../scenes/README.md)、[測試說明](../tests/README.md)、[工具說明](../tools/README.md)與 [原生核心](../native/README.md)。
 
 Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。
+
+Phase 4 沿用 `enemies/troops` 資料型別；`spawning` 將整群配額展開為個體。`navigation/routes` 保存每局物理路網歷史與硬性候選快取，原生核心提供最短格距及新通路查證；不把候選索引當作持久身份。`combat` 的敵軍能力協調器在塔／友軍前處理治療與癱瘓，共用敵人空間索引。`enemies/presentation` 管理首次提示與可重開情報，`enemies/rendering` 管理共用步態與能力環，詳細規則見 [Phase 4](phase4.md)。

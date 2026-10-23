@@ -19,6 +19,7 @@ var choosing_start := false
 var choosing_relic := false
 var _settling_wave := false
 var relic_choice: CanvasLayer
+var enemy_intelligence: CanvasLayer
 @onready var expansion: Node3D = $SpawnExpansion
 
 func _enter_tree() -> void:
@@ -92,6 +93,9 @@ func _ready() -> void:
 	add_child(relic_choice)
 	relic_choice.setup(get_node("TowerMap").relics)
 	relic_choice.selected.connect(_on_relic_selected)
+	enemy_intelligence = preload("res://scenes/enemies/components/enemy_intelligence.tscn").instantiate()
+	add_child(enemy_intelligence)
+	enemy_intelligence.setup(self)
 	timeline = get_node("LevelHUD/Header/WaveTimeline")
 	timeline.configure(level)
 	var shop: Node = get_node("CardPlacement/Shop")
@@ -111,6 +115,7 @@ func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
 
 func _prepare_wave() -> void:
+	get_node("PortalMap").route_history.wave = current_wave+1
 	_wave_starting = false
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = false

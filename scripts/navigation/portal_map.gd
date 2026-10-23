@@ -30,8 +30,11 @@ var _edit_guard_ready := false
 var blocked_cells := {}
 var traffic_effects: Array = []
 var _traffic_distributions := {}
+var route_history := preload("res://scripts/navigation/routes/route_history.gd").new()
+var _special_routes := preload("res://scripts/navigation/routes/special_routes.gd").new()
 
 func set_traffic_effects(effects: Array) -> void:
+	_special_routes.invalidate()
 	traffic_effects = effects.duplicate(true)
 	_traffic_distributions.clear()
 	plan_changed.emit()
@@ -44,6 +47,7 @@ func _traffic_distribution(profile: Troop, start_index: int, effects: Array) -> 
 	return _traffic_distributions[cache_key]
 
 func clear_traffic_preview_cache() -> void:
+	_special_routes.invalidate()
 	_traffic_distributions.clear()
 
 
@@ -81,6 +85,7 @@ func _on_cell_placed(cell: Vector3i) -> void:
 	rebuild()
 
 func rebuild() -> void:
+	_special_routes.invalidate()
 	_traffic_distributions.clear()
 	_edit_guard_ready = false
 	revision += 1
@@ -102,6 +107,8 @@ func _build() -> void:
 	if ClassDB.class_exists("RoadPortalGraph"):
 		var builder: RefCounted = ClassDB.instantiate("RoadPortalGraph")
 		var snapshot := Snapshot.capture(map, blocked_cells)
+		route_history.record(snapshot,terminal_cells())
+		_special_routes.history = route_history
 		var starts: Array[Vector2i] = []
 		for path in start_paths:
 			var marker := get_node_or_null(path) as Node3D
@@ -165,6 +172,10 @@ func plan_for(profile: Troop, start_index := 0, modifiers: Variant = null) -> Di
 		return {"valid": false, "error": "尚未建立移動圖"}
 	if start_index < 0 or start_index >= start_nodes.size():
 		return {"valid": false, "error": "起點索引超出範圍"}
+	if profile.route_rule != Troop.RouteRule.COST:
+		var callback := _on_costs_changed.bind(profile.get_instance_id())
+		if not profile.changed.is_connected(callback): profile.changed.connect(callback)
+		return _special_routes.plan_for(profile,start_index,traffic_effects if modifiers == null else modifiers)
 	var began := Time.get_ticks_usec()
 	var evaluated := tile_parameters.evaluate(profile)
 	evaluation_us = Time.get_ticks_usec()-began
@@ -183,6 +194,7 @@ func plan_for(profile: Troop, start_index := 0, modifiers: Variant = null) -> Di
 
 func sample_for(profile: Troop, seed: int, start_index := 0, route_index := -1) -> Dictionary:
 	if planner == null or profile == null: return {}
+	if profile.route_rule != Troop.RouteRule.COST: return _special_routes.route_for(profile,start_index,traffic_effects,0,1,seed,route_index)
 	if traffic_effects.is_empty(): return _candidate_routes.sample(_profile_key(profile,start_index),seed,route_index)
 	var entry := plan_for(profile,start_index)
 	if not entry.get("reachable",false): return {}
@@ -193,11 +205,14 @@ func sample_for(profile: Troop, seed: int, start_index := 0, route_index := -1) 
 	return result
 
 func debug_graph_for(profile: Troop, start_index := 0) -> Dictionary:
+	if profile.route_rule != Troop.RouteRule.COST: return {"nodes":PackedInt32Array(),"edges":[]}
 	var entry := plan_for(profile, start_index)
 	return _candidate_routes.debug_graph(_profile_key(profile, start_index)) if entry.get("valid", false) else {}
 
 ## Deterministic wave allocation through cumulative probability intervals.
 func allocate_route_for(profile: Troop, index: int, total: int, start_index := 0, modifiers: Variant = null) -> Dictionary:
+	if profile != null and profile.route_rule != Troop.RouteRule.COST:
+		return _special_routes.route_for(profile,start_index,traffic_effects if modifiers == null else modifiers,index,total)
 	var entry := plan_for(profile, start_index, modifiers)
 	if not entry.get("reachable", false):
 		return {}
@@ -243,6 +258,7 @@ func _apply_region_paths() -> void:
 		region.route_visible_links = PackedInt32Array()
 
 func _on_costs_changed(id: int) -> void:
+	_special_routes.invalidate()
 	_traffic_distributions.clear()
 	if id == 0:
 		_candidate_routes.invalidate()

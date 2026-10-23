@@ -24,3 +24,5 @@ Web 功能驗證可使用 `web/export_test.ps1 -Godot <Godot執行檔>`，預設
 `web/verify_enemy_web.cjs` 讀取已匯出的測試與對應原生 log，比對 Windows／Web 結果。設定 `PLAYWRIGHT_MODULE`、`BENCHMARK_PYTHON`、`BENCHMARK_BROWSER` 後執行；`--directory=<匯出目錄>` 可指定服務位置。預設比對 enemies，原生輸出需存為 `.godot/enemy_tests.out`。其他選項與檔名見該腳本的 suites 表；多場景驗證需先將各測試以對應 HTML 名稱匯出至同一目錄。JSON、截圖寫入 `.godot/test-results/<功能>/`，log 放 `.godot/`。
 
 已完成的一次性 benchmark 收集與彙整工具已清除，歷史結論見 [效能摘要](../reports/performance_2026-10-20.md)。
+
+Phase 4 六種敵軍的低面數場景與 SVG 圖示由 `python tools/assets/build_synergy_models.py` 產生；只使用 Python 標準函式庫，不讀取原型專案。重建前檢查手動修改，資料與模型責任見 [兵種](../assets/data/troops/README.md) 與 [敵人模型](../assets/models/enemies/README.md)。

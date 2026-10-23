@@ -18,12 +18,16 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 			candidates.sort_custom(func(a,b):
 				if tagged(a,&"large") != tagged(b,&"large"): return tagged(a,&"large")
 				return a.enemy_id < b.enemy_id)
+			var preferred: Node3D = combat.enemy_abilities.preferred(tower,candidates)
+			if preferred != null:
+				candidates.erase(preferred)
+				candidates.push_front(preferred)
 			if not candidates.is_empty():
 				var victim: Node3D = candidates[0]
 				tower.prepare_shot(victim)
 				combat.visuals.add_beam(tower.muzzle_position(),victim.global_position+Vector3.UP*0.3,Color("f7de80"),0.1,0.35)
 				combat.visuals.restored_bursts.emit(victim.global_position,"respawn")
-				victim.take_damage(victim.health+victim.shield)
+				victim.take_damage((victim.health+victim.shield)/maxf(0.000001,1.0-float(victim.abilities.get("damage_reduction",0.0))))
 				tower.relic_clocks[&"hunting"] = combat.elapsed+tower.relic_value(&"hunting", &"period")
 	if tower.has_relic(&"rapid_fire"):
 		var ready: float = tower.relic_clocks.get(&"rapid_fire",combat.elapsed+tower.relic_value(&"rapid_fire", &"period"))
@@ -38,8 +42,12 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 			candidates.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
 			for side in [-1,1]:
 				if side < 0 and tower.has_relic(&"crew_concentration"): continue
-				for victim in candidates:
-					if signf(tower.patrol_visual().to_local(victim.global_position).x) != side: continue
+				var side_targets: Array[Node3D] = candidates.filter(func(enemy): return signf(tower.patrol_visual().to_local(enemy.global_position).x) == side)
+				var preferred: Node3D = combat.enemy_abilities.preferred(tower,side_targets)
+				if preferred != null:
+					side_targets.erase(preferred)
+					side_targets.push_front(preferred)
+				for victim in side_targets:
 					tower.prepare_shot(victim)
 					tower.attack.fire(combat,tower,victim)
 					tower.present_shot(victim,combat.visuals)

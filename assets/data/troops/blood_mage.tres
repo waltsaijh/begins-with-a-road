@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/blood_mage.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/blood_mage.svg" id="3"]
+[resource]
+script = ExtResource("1")
+troop_name = "blood_mage"
+name_key = "troop.blood_mage.name"
+sort_order = 12
+body_size = "standard"
+tags = Array[StringName]([&"ground", &"support"])
+max_health = 65.0
+speed_multiplier = 0.85
+melee_damage = 3.0
+route_selection = 0
+model = ExtResource("2")
+icon = ExtResource("3")
+debug_color = Color(0.61, 0.27, 0.38, 1)
+ability_text = "每 3 秒治療 2.5 格內友軍 18 生命，不超過上限；不主動追隨友軍。"
+ability_text_en = "Heals allies within 2.5 tiles for 18 every 3 seconds, capped at maximum health. Does not follow allies."
+heal_amount = 18.0
+heal_interval = 3.0
+heal_radius = 2.5

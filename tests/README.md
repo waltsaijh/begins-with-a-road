@@ -61,3 +61,5 @@ godot --editor --path . -- --test-card-resource-refresh
 `traffic/` 驗證 Phase 2 標籤、權重、三波設施、雙池商店與真實輸入／流量差；入口及人工步驟見 [traffic/README.md](traffic/README.md)。
 
 Phase 3 的分段自動化與人工操作見 [relics/README.md](relics/README.md)；獨立 `relics/playground.tscn` 提供六塔、同種手牌及逐件授予遺物。現有 ACT／流量／交通設施回歸已在 ACT 邊界先完成遺物選擇。
+
+Phase 4 `synergy/` 的 routing／combat 回歸與實際渲染 input 驗證六種敵軍、整群分流、最短／最新路線、嘲諷／治療／飛行／癱瘓及預覽一致性。F6 開啟 `tests/synergy/playground.tscn` 可操作 A–D 四種雙入口協同波次；詳見 [synergy/README.md](synergy/README.md)。
