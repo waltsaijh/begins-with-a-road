@@ -163,164 +163,170 @@ _surfaces = [{
 [node name="Weapon" type="Node3D" unique_id=767476813]
 script = ExtResource("1_ij88y")
 kind = 3
+moving_body_path = NodePath("Airship")
 shot_sound = ExtResource("2_7wevm")
 metadata/art_kind = 3
 metadata/battery_side = 0
 metadata/recoil_rest = Vector3(0, 0, 0)
-metadata/muzzle_paths = Array[NodePath]([NodePath("RecoilAssembly/PortBattery/SideMuzzle"), NodePath("RecoilAssembly/PortBattery/@Node3D@64"), NodePath("RecoilAssembly/PortBattery/@Node3D@67"), NodePath("RecoilAssembly/StarboardBattery/SideMuzzle"), NodePath("RecoilAssembly/StarboardBattery/@Node3D@73"), NodePath("RecoilAssembly/StarboardBattery/@Node3D@76")])
+metadata/muzzle_paths = Array[NodePath]([NodePath("Airship/RecoilAssembly/PortBattery/SideMuzzle"), NodePath("Airship/RecoilAssembly/PortBattery/@Node3D@64"), NodePath("Airship/RecoilAssembly/PortBattery/@Node3D@67"), NodePath("Airship/RecoilAssembly/StarboardBattery/SideMuzzle"), NodePath("Airship/RecoilAssembly/StarboardBattery/@Node3D@73"), NodePath("Airship/RecoilAssembly/StarboardBattery/@Node3D@76")])
 
-[node name="@MeshInstance3D@49" type="MeshInstance3D" parent="." unique_id=1642433083]
+[node name="FixedBase" type="Node3D" parent="."]
+
+[node name="Airship" type="Node3D" parent="."]
+position = Vector3(0, 0.18, 0)
+
+[node name="Plinth" type="MeshInstance3D" parent="FixedBase" unique_id=1642433083]
 transform = Transform3D(0.76, 0, 0, 0, 0.12, 0, 0, 0, 0.76, 0, 0.06, 0)
 material_override = SubResource("StandardMaterial3D_hayu7")
 mesh = SubResource("ArrayMesh_bw3v0")
 
-[node name="@MeshInstance3D@50" type="MeshInstance3D" parent="." unique_id=545983349]
+[node name="Rim" type="MeshInstance3D" parent="FixedBase" unique_id=545983349]
 transform = Transform3D(0.7296, 0, 0, 0, 0.07, 0, 0, 0, 0.7296, 0, 0.155, 0)
 material_override = SubResource("StandardMaterial3D_etmj1")
 mesh = SubResource("ArrayMesh_slwrn")
 
-[node name="RecoilAssembly" type="Node3D" parent="." unique_id=1538137492]
+[node name="RecoilAssembly" type="Node3D" parent="Airship" unique_id=1538137492]
 
-[node name="PortBattery" type="Node3D" parent="RecoilAssembly" unique_id=1777386009]
+[node name="PortBattery" type="Node3D" parent="Airship/RecoilAssembly" unique_id=1777386009]
 metadata/side = -1
 
-[node name="@MeshInstance3D@59" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=1988475224]
+[node name="@MeshInstance3D@59" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=1988475224]
 transform = Transform3D(0.045, 0, 0, 0, 0.16, 0, 0, 0, 0.61, -0.25, 0.51, 0)
 material_override = SubResource("StandardMaterial3D_b8owl")
 mesh = SubResource("ArrayMesh_r3v4u")
 
-[node name="@MeshInstance3D@60" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=789842731]
+[node name="@MeshInstance3D@60" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=789842731]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, -0.36, 0.52, -0.2)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@61" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=1655738047]
+[node name="@MeshInstance3D@61" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=1655738047]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, -0.47, 0.52, -0.2)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="SideMuzzle" type="Node3D" parent="RecoilAssembly/PortBattery" unique_id=289065122]
+[node name="SideMuzzle" type="Node3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=289065122]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.49, 0.52, -0.2)
 
-[node name="@MeshInstance3D@62" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=1902130804]
+[node name="@MeshInstance3D@62" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=1902130804]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, -0.36, 0.52, 0)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@63" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=158795206]
+[node name="@MeshInstance3D@63" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=158795206]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, -0.47, 0.52, 0)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@Node3D@64" type="Node3D" parent="RecoilAssembly/PortBattery" unique_id=252727017]
+[node name="@Node3D@64" type="Node3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=252727017]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.49, 0.52, 0)
 
-[node name="@MeshInstance3D@65" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=459195986]
+[node name="@MeshInstance3D@65" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=459195986]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, -0.36, 0.52, 0.2)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@66" type="MeshInstance3D" parent="RecoilAssembly/PortBattery" unique_id=2120706464]
+[node name="@MeshInstance3D@66" type="MeshInstance3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=2120706464]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, -0.47, 0.52, 0.2)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@Node3D@67" type="Node3D" parent="RecoilAssembly/PortBattery" unique_id=692498895]
+[node name="@Node3D@67" type="Node3D" parent="Airship/RecoilAssembly/PortBattery" unique_id=692498895]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.49, 0.52, 0.2)
 
-[node name="StarboardBattery" type="Node3D" parent="RecoilAssembly" unique_id=755688242]
+[node name="StarboardBattery" type="Node3D" parent="Airship/RecoilAssembly" unique_id=755688242]
 metadata/side = 1
 
-[node name="@MeshInstance3D@68" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=1612516749]
+[node name="@MeshInstance3D@68" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1612516749]
 transform = Transform3D(0.045, 0, 0, 0, 0.16, 0, 0, 0, 0.61, 0.25, 0.51, 0)
 material_override = SubResource("StandardMaterial3D_b8owl")
 mesh = SubResource("ArrayMesh_r3v4u")
 
-[node name="@MeshInstance3D@69" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=2119978490]
+[node name="@MeshInstance3D@69" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=2119978490]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, 0.36, 0.52, -0.2)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@70" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=1115494132]
+[node name="@MeshInstance3D@70" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1115494132]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, 0.47, 0.52, -0.2)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="SideMuzzle" type="Node3D" parent="RecoilAssembly/StarboardBattery" unique_id=1770204392]
+[node name="SideMuzzle" type="Node3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1770204392]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49, 0.52, -0.2)
 
-[node name="@MeshInstance3D@71" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=781348181]
+[node name="@MeshInstance3D@71" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=781348181]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, 0.36, 0.52, 0)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@72" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=1116317609]
+[node name="@MeshInstance3D@72" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1116317609]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, 0.47, 0.52, 0)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@Node3D@73" type="Node3D" parent="RecoilAssembly/StarboardBattery" unique_id=810881407]
+[node name="@Node3D@73" type="Node3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=810881407]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49, 0.52, 0)
 
-[node name="@MeshInstance3D@74" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=500652797]
+[node name="@MeshInstance3D@74" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=500652797]
 transform = Transform3D(-4.5896957e-09, -0.22, 0, 0.105, -9.616506e-09, 0, 0, 0, 0.105, 0.36, 0.52, 0.2)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@MeshInstance3D@75" type="MeshInstance3D" parent="RecoilAssembly/StarboardBattery" unique_id=1909734117]
+[node name="@MeshInstance3D@75" type="MeshInstance3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1909734117]
 transform = Transform3D(-5.6824803e-09, -0.035, 0, 0.13, -1.5298985e-09, 0, 0, 0, 0.13, 0.47, 0.52, 0.2)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("CylinderMesh_ia32n")
 
-[node name="@Node3D@76" type="Node3D" parent="RecoilAssembly/StarboardBattery" unique_id=1895265721]
+[node name="@Node3D@76" type="Node3D" parent="Airship/RecoilAssembly/StarboardBattery" unique_id=1895265721]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.49, 0.52, 0.2)
 
-[node name="@MeshInstance3D@51" type="MeshInstance3D" parent="." unique_id=540033788]
+[node name="PortPylon" type="MeshInstance3D" parent="FixedBase" unique_id=540033788]
 transform = Transform3D(0.075, 0, 0, 0, 0.28, 0, 0, 0, 0.1, -0.19, 0.33, 0)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("ArrayMesh_cusiq")
 
-[node name="@MeshInstance3D@52" type="MeshInstance3D" parent="." unique_id=437165432]
+[node name="PortSupport" type="MeshInstance3D" parent="FixedBase" unique_id=437165432]
 transform = Transform3D(0.18, 0, 0, 0, 0.17, 0, 0, 0, 0.25, -0.19, 0.28, 0)
 material_override = SubResource("StandardMaterial3D_b8owl")
 mesh = SubResource("CylinderMesh_dsyhd")
 
-[node name="@MeshInstance3D@53" type="MeshInstance3D" parent="." unique_id=1229273159]
+[node name="StarboardPylon" type="MeshInstance3D" parent="FixedBase" unique_id=1229273159]
 transform = Transform3D(0.075, 0, 0, 0, 0.28, 0, 0, 0, 0.1, 0.19, 0.33, 0)
 material_override = SubResource("StandardMaterial3D_gfp52")
 mesh = SubResource("ArrayMesh_cusiq")
 
-[node name="@MeshInstance3D@54" type="MeshInstance3D" parent="." unique_id=1647053041]
+[node name="StarboardSupport" type="MeshInstance3D" parent="FixedBase" unique_id=1647053041]
 transform = Transform3D(0.18, 0, 0, 0, 0.17, 0, 0, 0, 0.25, 0.19, 0.28, 0)
 material_override = SubResource("StandardMaterial3D_b8owl")
 mesh = SubResource("CylinderMesh_dsyhd")
 
-[node name="@MeshInstance3D@55" type="MeshInstance3D" parent="." unique_id=1266701415]
+[node name="Gondola" type="MeshInstance3D" parent="Airship" unique_id=1266701415]
 transform = Transform3D(0.46, 0, 0, 0, 0.14, 0, 0, 0, 0.66, 0, 0.48, 0)
 material_override = SubResource("StandardMaterial3D_t1c04")
 mesh = SubResource("ArrayMesh_mcjl5")
 
-[node name="@MeshInstance3D@56" type="MeshInstance3D" parent="." unique_id=285103589]
+[node name="GondolaRim" type="MeshInstance3D" parent="Airship" unique_id=285103589]
 transform = Transform3D(0.48, 0, 0, 0, 0.045, 0, 0, 0, 0.7, 0, 0.575, 0)
 material_override = SubResource("StandardMaterial3D_3ye5s")
 mesh = SubResource("ArrayMesh_t3hvu")
 
-[node name="AirshipEnvelope" type="MeshInstance3D" parent="." unique_id=903341811]
+[node name="AirshipEnvelope" type="MeshInstance3D" parent="Airship" unique_id=903341811]
 transform = Transform3D(0.31, 0, 0, 0, -1.6173214e-08, -0.31, 0, 0.37, -1.35505305e-08, 0, 0.77, 0)
 material_override = SubResource("StandardMaterial3D_f73jg")
 mesh = SubResource("CapsuleMesh_xxnny")
 
-[node name="@MeshInstance3D@58" type="MeshInstance3D" parent="." unique_id=1695561703]
+[node name="EnvelopeCap" type="MeshInstance3D" parent="Airship" unique_id=1695561703]
 transform = Transform3D(0.26, 0, 0, 0, 0.025, 0, 0, 0, 0.08, 0, 0.925, 0)
 material_override = SubResource("StandardMaterial3D_eydi3")
 mesh = SubResource("ArrayMesh_js011")
 
-[node name="@MeshInstance3D@77" type="MeshInstance3D" parent="." unique_id=1346216749]
+[node name="TailFin" type="MeshInstance3D" parent="Airship" unique_id=1346216749]
 transform = Transform3D(0.07, 0, 0, 0, 0.18, 0, 0, 0, 0.14, 0, 0.85, 0.3)
 material_override = SubResource("StandardMaterial3D_eydi3")
 mesh = SubResource("ArrayMesh_js011")
 
-[node name="@MeshInstance3D@78" type="MeshInstance3D" parent="." unique_id=711220183]
+[node name="TailWing" type="MeshInstance3D" parent="Airship" unique_id=711220183]
 transform = Transform3D(0.32, 0, 0, 0, 0.04, 0, 0, 0, 0.14, 0, 0.73, 0.29)
 material_override = SubResource("StandardMaterial3D_b8owl")
 mesh = SubResource("ArrayMesh_r3v4u")

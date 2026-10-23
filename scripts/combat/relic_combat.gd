@@ -8,7 +8,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 		if reach > 0:
 			tower.patrol_distance += delta*tower.relic_value(&"departure", &"speed")
 			var at := fposmod(tower.patrol_distance+reach,4.0*reach)
-			tower._visual.position.x = (at-reach if at < 2.0*reach else 3.0*reach-at)*combat.map.cell_size.x
+			tower.set_patrol_offset((at-reach if at < 2.0*reach else 3.0*reach-at)*combat.map.cell_size.x)
 	if tower.has_relic(&"hunting"):
 		var ready: float = tower.relic_clocks.get(&"hunting",combat.elapsed+tower.relic_value(&"hunting", &"period"))
 		tower.relic_clocks[&"hunting"] = ready
@@ -39,7 +39,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 			for side in [-1,1]:
 				if side < 0 and tower.has_relic(&"crew_concentration"): continue
 				for victim in candidates:
-					if signf(tower._visual.to_local(victim.global_position).x) != side: continue
+					if signf(tower.patrol_visual().to_local(victim.global_position).x) != side: continue
 					tower.prepare_shot(victim)
 					tower.attack.fire(combat,tower,victim)
 					tower.present_shot(victim,combat.visuals)

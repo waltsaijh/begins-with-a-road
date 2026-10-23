@@ -67,7 +67,7 @@ func refresh_towers() -> void:
 			if not tower.relic_effects.has(id): tower.relic_clocks.erase(id)
 		if previous_patrol and not tower.has_relic(&"departure"):
 			tower.patrol_distance = 0.0
-			if tower._visual != null: tower._visual.position.x = 0.0
+			tower.set_patrol_offset(0.0)
 		if not tower.has_relic(&"rapid_fire"): tower.rapid_remaining = 0
 		tower.support_bonus = 0.0
 		var fuel := catalog.find(&"fuel_supply")

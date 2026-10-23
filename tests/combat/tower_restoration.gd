@@ -77,7 +77,7 @@ func verify() -> void:
 		check(definition.first_tile_preset() != null,"Restored tower has no eligible preset: "+key)
 		var visual := definition.model.instantiate()
 		add_child(visual)
-		check(visual.get_node_or_null("RecoilAssembly") != null,"Original recoil assembly lost: "+key)
+		check(visual.motion_root().get_node_or_null("RecoilAssembly") != null,"Original recoil assembly lost: "+key)
 		if key != "barracks": check(visual.shot_sound != null,"Original synthesized shot missing: "+key)
 		visual.queue_free()
 	verify_restored_attacks()

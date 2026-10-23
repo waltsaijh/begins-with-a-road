@@ -37,6 +37,8 @@ BarracksSystem 在敵人移動後、塔攻擊前更新友軍，沿可行道路�
 
 `restored_tower_visual.gd` 保留各塔後座，`restored_bursts.gd` 移植原視覺爆散曲線與迫擊砲落地呈現；其小型美術 helper 與原協調系統分離。音效共用六聲道播放器、同種最短 25 ms 間隔，使用實際時間；兵營原本沒有專屬射擊音，不新增音效設定。
 
+空艇模型 `broadside.tscn` 已手動拆成 FixedBase（底座／支架）與 Airship（艇身／吊艙／六支砲管及 RecoilAssembly），砲口 paths 隨階層同步更新。moving_body_path 指向 Airship；「出發」與右舷判斷均使用此移動原點，後座仍只推動左右砲組。原型重建工具不包含這次手動分層，重建前須保留此變更。
+
 卡面圖示由原塔模型渲染，沒有以新圖像替代。圖示與場景內模型是否符合桌遊視覺仍可用驗收場景人工檢查。
 
 ## 驗證入口

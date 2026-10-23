@@ -82,6 +82,34 @@ func verify() -> void:
 	left(point,false)
 	await frames()
 	check(tower.level == 2 and cards.cards.size() == count-1 and cards.get_node("Shop").coins == coins and map.get_used_cells() == used, "Real drop upgrades once, consumes one card and preserves roads/gold")
+	# Six cards can still lack one tower type when another type is duplicated.
+	var retained: BuildCard = cards.cards[0]
+	cards.add_card(BuildCard.from_parts(retained.tower,retained.tile_preset))
+	var existing_cards: Array = cards.cards.duplicate()
+	var refill_count: int = cards.cards.size()
+	var refill_key := InputEventKey.new()
+	refill_key.physical_keycode = KEY_B
+	refill_key.pressed = true
+	get_viewport().push_input(refill_key,true)
+	await frames()
+	check(cards.cards.size() == refill_count+1 and is_instance_valid(session), "B fills only the missing tower type even when hand already has six cards")
+	for card in existing_cards: check(cards.cards.has(card), "Refill preserves existing card instances and duplicates")
+	refill_key.echo = true
+	get_viewport().push_input(refill_key,true)
+	await frames()
+	check(cards.cards.size() == refill_count+1, "Holding refill key does not repeat grants")
+	refill_key.echo = false
+	refill_key.pressed = false
+	get_viewport().push_input(refill_key,true)
+	await click_control(refill_button)
+	check(cards.cards.size() == refill_count+1 and relic_feedback.text == "手牌已齊全，無需補牌", "Refill button leaves a complete hand unchanged")
+	for index in cards.cards.size():
+		if cards.cards[index].tower == tower.definition:
+			cards.select_card(index)
+			break
+	check(cards.place_selected(ANCHORS[0]) == tower, "Consume replenished mortar card through a real upgrade")
+	await click_control(refill_button)
+	check(cards.cards.size() == refill_count+1 and relic_feedback.text == "已補入 1 張缺少的塔牌", "Refill button replenishes exactly the consumed tower type")
 	# The manual tool uses the real acquisition path, with no reward or currency cost.
 	var manager: RunRelics = session.get_node("TowerMap").relics
 	await select_manual_relic(manager.catalog.entries.find(manager.catalog.find(&"protagonist")))
@@ -112,6 +140,33 @@ func verify() -> void:
 	await click_control(picker)
 	render_viewport.size = Vector2i(1280,800)
 	await frames()
+	# Inspect the actual baked airship at close range, including its firing markers.
+	var ship: DefenseTower = session.get_node("TowerMap").upgrade_target(ANCHORS[3])
+	var base: Node3D = ship._visual.get_node("FixedBase")
+	var base_transform := base.global_transform
+	var flight: Node3D = ship.patrol_visual()
+	var docked := flight.position
+	manager.acquire(manager.catalog.find(&"departure"))
+	preload("res://scripts/combat/relic_combat.gd").advance(session.get_node("TowerMap").combat,ship,1)
+	check(flight.position.x > docked.x and base.global_transform == base_transform, "Rendered cruise moves airship but leaves base fixed")
+	for muzzle in ship._visual.muzzles(): check(flight.is_ancestor_of(muzzle), "Rendered firing markers are attached to airship")
+	var camera_focus: Vector3 = camera.focus
+	var camera_size := camera.size
+	camera.focus = ship.global_position+Vector3.UP*0.65
+	camera.size = 3.0
+	camera.update_pose()
+	relic_panel.hide()
+	await frames()
+	await snapshot("airship_patrol")
+	manager.remove(manager.catalog.find(&"departure"))
+	check(flight.position == docked and base.global_transform == base_transform, "Removing cruise returns airship without moving base")
+	await frames()
+	await snapshot("airship_docked")
+	camera.focus = camera_focus
+	camera.size = camera_size
+	camera.update_pose()
+	relic_panel.show()
+	await frames()
 	# ACT completion must wait for a real card click and preserve the lock on pause.
 	session._on_start_requested()
 	session._advance_wave_start(1.5)
@@ -129,6 +184,8 @@ func verify() -> void:
 	var hud: CanvasLayer = session.get_node("LevelHUD")
 	hud.set_paused(true)
 	check(not choice.choose(choice.offers[0]), "Paused reward cannot acquire")
+	var paused_cards: int = cards.cards.size()
+	check(not refill() and cards.cards.size() == paused_cards, "Paused test tool cannot refill cards")
 	check(not grant_selected_relic() and not remove_selected_relic() and int(manager.held.get(&"gold",0)) == 1, "Paused manual tool cannot acquire or remove")
 	await snapshot("paused_reward")
 	hud.set_paused(false)

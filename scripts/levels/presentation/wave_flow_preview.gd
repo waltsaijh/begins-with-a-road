@@ -142,8 +142,11 @@ func _sync_pointer_filter() -> void:
 	var panels := _panels()
 	for i in hud.start_callouts.size():
 		var action: Button = hud.start_callouts[i]
-		if hovered == null or not action.is_visible_in_tree() or action.disabled: continue
-		if hovered != action and not action.is_ancestor_of(hovered): continue
+		if not action.is_visible_in_tree() or action.disabled: continue
+		# The unpainted bridge is still inside the expanded callout even when GUI
+		# hover temporarily has no Control owner while crossing into the panel.
+		var owned := hovered != null and (hovered == action or action.is_ancestor_of(hovered))
+		if not owned and not (hovered == null and bool(action.get("_hovered"))): continue
 		origin = i
 		for item in panels[i].get_node("Scroll/Items").get_children():
 			var body := item.get_node_or_null("Body")
@@ -188,6 +191,6 @@ func _render_filter() -> void:
 
 func _refresh_visibility() -> void:
 	var available: bool = preparation and not hud.pause_requested and not get_tree().paused
-	for entry in _panels(): entry.visible = available
+	for action: Button in hud.start_callouts: action.set_intel_available(available)
 	arrows.visible = available and not debug_overlay.show_routes and not debug_overlay.show_parameters
 	delta_overlay.visible = arrows.visible and not candidate.is_empty()

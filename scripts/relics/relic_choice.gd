@@ -1,6 +1,7 @@
 extends CanvasLayer
 signal selected(relic: RelicDefinition)
 const Card = preload("res://scenes/relics/components/relic_card.tscn")
+const IconMask = preload("res://assets/shaders/ui_icon_mask.gdshader")
 var relics: RunRelics
 var offers: Array[RelicDefinition] = []
 var choosing := false
@@ -33,9 +34,34 @@ func begin() -> bool:
 		card.get_node("Contents/Icon").texture = relic.icon
 		card.get_node("Contents/Title").text = tr(relic.name_key)
 		card.get_node("Contents/Description").text = tr(relic.description_key)
+		_color_card(card,relic)
 		card.pressed.connect(choose.bind(relic))
 	modal.show()
 	return true
+
+func _color_card(card: Button, relic: RelicDefinition) -> void:
+	var accent := relic.presentation_color()
+	accent.a = 1.0
+	var paper: Color = card.get_theme_stylebox("normal").bg_color
+	# Each offer owns its StyleBoxes, retaining the scene-authored shape/margins.
+	# Also tint disabled, since selection feedback disables all three cards.
+	for state: StringName in [&"normal",&"hover",&"pressed",&"disabled"]:
+		var style: StyleBoxFlat = card.get_theme_stylebox("hover" if state in [&"hover",&"pressed"] else "normal").duplicate()
+		var strength := 0.38 if state == &"pressed" else (0.30 if state == &"hover" else 0.18)
+		style.bg_color = paper.lerp(accent,strength)
+		style.border_color = accent.darkened(0.18)
+		card.add_theme_stylebox_override(state,style)
+	var focus: StyleBoxFlat = card.get_theme_stylebox("normal").duplicate()
+	focus.bg_color = Color.TRANSPARENT
+	card.add_theme_stylebox_override("focus",focus)
+	card.get_node("Contents/Title").add_theme_color_override("font_color",accent.darkened(0.65))
+	var icon: TextureRect = card.get_node("Contents/Icon")
+	if relic.tower != null:
+		# Tower art is an alpha mask; use the same tint as hand/shop tower icons.
+		var material := ShaderMaterial.new()
+		material.shader = IconMask
+		icon.material = material
+		icon.self_modulate = accent.darkened(0.45)
 
 func choose(relic: RelicDefinition) -> bool:
 	if not choosing or _committing or get_tree().paused or not offers.has(relic): return false

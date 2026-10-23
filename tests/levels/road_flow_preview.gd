@@ -22,6 +22,31 @@ func move_mouse(point: Vector2) -> void:
 	get_viewport().push_input(event, true)
 	await frames()
 
+func traverse_callout(action: Button, x_offset: float) -> void:
+	await move_mouse(Vector2(8,200))
+	await move_mouse(action.get_global_rect().get_center())
+	var start := action.get_global_rect().get_center()
+	var end := action.get_global_transform_with_canvas()*Vector2(action.size.x*0.5+x_offset,-20)
+	var preview: Node = action.get_parent().get_parent().get_parent().get_node("WaveFlowPreview")
+	var expected_origin: int = action.get_parent().get_parent().start_callouts.find(action)
+	for step in range(1,33):
+		var event := InputEventMouseMotion.new()
+		event.position = start.lerp(end,float(step)/32.0)
+		get_viewport().push_input(event,true)
+		await frames(2)
+		check(action.get_node("NextWaveIntel").visible,"Continuous diamond-to-details hover collapsed at step %d, offset %s" % [step,x_offset])
+		check(preview.selected_origin == expected_origin,"Crossing callout bridge lost entrance scope at step %d, offset %s" % [step,x_offset])
+	await move_mouse(action.get_node("Title").get_global_rect().get_center())
+	check(action.get_node("NextWaveIntel").visible,"Moving from details to title collapsed the callout")
+	var title_center: Vector2 = action.get_node("Title").get_global_rect().get_center()
+	var icon_center := action.get_global_rect().get_center()
+	for step in range(1,33):
+		var event := InputEventMouseMotion.new()
+		event.position = title_center.lerp(icon_center,float(step)/32.0)
+		get_viewport().push_input(event,true)
+		await frames(1)
+		check(action.get_node("NextWaveIntel").visible,"Continuous details-to-diamond hover collapsed at step %d" % step)
+
 func displayed_totals(hud: CanvasLayer) -> Dictionary:
 	var result := {}
 	for action: Button in hud.start_callouts:
@@ -154,7 +179,7 @@ func verify() -> void:
 	var wave: Node = scene.get_node("EnemyWave")
 	var controller: Node = scene.get_node("PortalMap")
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
-	check(panel.visible and preview.arrows.visible and preview.arrows.mesh != null, "Initial preview missing")
+	check(not panel.visible and hud.early_start.visible and preview.arrows.visible and preview.arrows.mesh != null, "Initial icon or prediction missing, or idle details remained visible")
 	check(controller.start_nodes.size() == 2 and preview.forecast.by_origin.size() == 2, "Multi-entrance flow missing")
 	var vertex_count: int = preview.arrows.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size()
 	check(preview.arrows.mesh.get_surface_count() == 1 and vertex_count == preview.arrows.rendered_cells.size()*6, "Flow is not a single batch of disjoint cell patches")
@@ -191,6 +216,13 @@ func verify() -> void:
 	builds = preview.rebuild_count
 	var item := panel.get_node("Scroll/Items").get_child(0)
 	if rendered:
+		check(not panel.visible and not second_panel.visible and hud.early_start.get_node("Exclamation").visible,"Idle entrances should show diamonds without troop details")
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png(Artifacts.path("levels/wave_diamonds_idle.png"))
+		for offset in [0.0,-65.0,65.0]: await traverse_callout(hud.early_start,offset)
+		await move_mouse(Vector2(8,200))
+		await move_mouse(hud.early_start.get_global_rect().get_center())
+		check(panel.visible and not second_panel.visible,"Diamond hover should reveal only its own entrance details")
 		await move_mouse(item.body.get_global_rect().get_center())
 	else:
 		item.body.mouse_entered.emit()
@@ -210,6 +242,7 @@ func verify() -> void:
 	check(preview.rebuild_count == builds, "Mouse exit regenerated schedule")
 	var second_item := second_panel.get_node("Scroll/Items").get_child(0)
 	if rendered:
+		await move_mouse(hud.start_callouts[1].get_global_rect().get_center())
 		await move_mouse(second_item.body.get_global_rect().get_center())
 	else:
 		second_item.body.mouse_entered.emit()
@@ -235,7 +268,7 @@ func verify() -> void:
 		event.pressed = true
 		scene.get_node("PortalOverlay")._unhandled_key_input(event)
 		await frames()
-		check(panel.visible and not preview.arrows.visible, "Debug layer did not take precedence over player arrows")
+		check(not panel.visible and not preview.arrows.visible, "Debug layer did not take precedence over player arrows or revealed idle details")
 		scene.get_node("PortalOverlay")._unhandled_key_input(event)
 		await frames()
 		check(preview.arrows.visible, "Closing debug layer did not restore arrows")
@@ -245,9 +278,11 @@ func verify() -> void:
 		profile.troop_name = "Long troop name %d" % i
 		overflow[profile] = i+1
 	panel.display(overflow)
+	if rendered: await move_mouse(hud.early_start.get_global_rect().get_center())
 	await frames()
 	check(panel.get_parent() == hud.early_start and panel.size.x <= 216 and panel.size.y <= 114, "Troop list escaped the start button or expanded without bounds")
-	check(panel.get_node("Scroll").get_v_scroll_bar().max_value > panel.size.y, "Troop overflow is not scrollable")
+	if rendered: check(panel.get_node("Scroll").get_v_scroll_bar().max_value > panel.size.y, "Troop overflow is not scrollable")
+	else: check(panel.get_node("Scroll").custom_minimum_size.y == 114, "Hidden troop overflow exceeded its three-row configuration")
 	panel.display(preview.forecast.counts_by_origin[0])
 	await frames()
 	var after := WaveSpawnSchedule.build(wave.definition, controller, 0, false)
@@ -275,7 +310,7 @@ func verify() -> void:
 	check(not panel.visible and not second_panel.visible and not preview.arrows.visible, "Pause retained active preview")
 	hud.set_paused(false)
 	await frames()
-	check(panel.visible and preview.arrows.visible and panel.selected == null, "Resume did not restore neutral preview")
+	check(not panel.visible and preview.arrows.visible and panel.selected == null, "Resume did not restore neutral preview and collapsed details")
 	if rendered: await visual_check(scene)
 	# Start, finish, ACT expansion and teardown through real session entry points.
 	wave.set_process(false)
@@ -287,6 +322,7 @@ func verify() -> void:
 			# The second entrance's row starts the same complete multi-entrance wave.
 			var body: Button = second_panel.get_node("Scroll/Items").get_child(0).body
 			if rendered:
+				await move_mouse(hud.start_callouts[1].get_global_rect().get_center())
 				await move_mouse(body.get_global_rect().get_center())
 				await click_now(body.get_global_rect().get_center())
 			else:
@@ -312,7 +348,7 @@ func verify() -> void:
 			scene.relic_choice.choose(scene.relic_choice.offers[0])
 			await get_tree().create_timer(0.3).timeout
 		if index == 0:
-			check(panel.visible and second_panel.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion did not refresh per-entrance lists")
+			check(not panel.visible and not second_panel.visible and hud.early_start.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion did not refresh collapsed per-entrance lists")
 			check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition),"Next wave retained stale entrance counts")
 		else:
 			check(scene.choosing_start and not panel.visible and preview.arrows.mesh == null, "ACT selection retained stale arrows")
@@ -322,7 +358,7 @@ func verify() -> void:
 	check(expansion.commit(Vector3i(new_cell.x, 0, new_cell.y)), "ACT entrance commit failed")
 	check(not panel.visible and preview.arrows.mesh == null, "Entrance rebuild exposed stale prediction")
 	await frames(10)
-	check(panel.visible and preview.arrows.mesh != null, "ACT completion failed to restore prediction")
+	check(hud.early_start.visible and not panel.visible and preview.arrows.mesh != null, "ACT completion failed to restore prediction and collapsed details")
 	check(controller.start_nodes.size() == 3 and preview.forecast.by_origin.size() == 3, "Added ACT entrance missing from prediction")
 	check(hud.start_callouts.size() == 3 and displayed_totals(hud).values().reduce(func(a: int, b: int): return a+b, 0) == 29, "New entrance lacks an action or changed troop totals")
 	for i in 3:
@@ -334,6 +370,7 @@ func verify() -> void:
 		camera.update_pose()
 		await get_tree().create_timer(0.45).timeout
 		var title: Control = hud.start_callouts[2].get_node("Title")
+		await move_mouse(hud.start_callouts[2].get_global_rect().get_center())
 		await move_mouse(title.get_global_rect().get_center())
 		await click_now(title.get_global_rect().get_center())
 	else:

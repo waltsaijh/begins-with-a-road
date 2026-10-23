@@ -10,6 +10,7 @@ var relic_list: ItemList
 var selected_relic_index := 0
 var grant_button: Button
 var remove_button: Button
+var refill_button: Button
 var relic_description: Label
 var relic_feedback: Label
 var relic_panel: VBoxContainer
@@ -100,10 +101,14 @@ func setup() -> void:
 		relic_panel.visible = not relic_panel.visible
 		toggle.text = "自由增添／移除遺物（測試） " + ("▾" if relic_panel.visible else "▸"))
 	hint = Label.new()
-	hint.text = "F7 全部專屬 / F8 補六張塔牌\nF9 清完本波 → 三選一"
+	hint.text = "F7 全部專屬 / B 補齊塔牌\nF9 清完本波 → 三選一"
 	hint.add_theme_font_size_override("font_size",16)
 	hint.add_theme_color_override("font_color",Color("34504e"))
 	relic_panel.add_child(hint)
+	refill_button = Button.new()
+	refill_button.text = "補齊缺少的塔牌（B）"
+	refill_button.pressed.connect(refill)
+	relic_panel.add_child(refill_button)
 	# Keep the list in the same viewport: native popup windows do not share the
 	# camera's deferred press/release delivery or embedded-game focus reliably.
 	picker = Button.new()
@@ -187,10 +192,20 @@ func remove_selected_relic() -> bool:
 	relic_feedback.text = ("已移除一份：" if success else "尚未持有：") + tr(relic.name_key)
 	return success
 
-func refill() -> void:
+func refill() -> bool:
+	if get_tree().paused or not is_instance_valid(session): return false
+	var placement: Node = session.get_node("CardPlacement")
+	var present := {}
+	for card: BuildCard in placement.cards:
+		if card.tower != null: present[card.tower] = true
+	var added := 0
 	for key in KEYS:
 		var definition: TowerDefinition = load("res://assets/data/towers/"+key+".tres")
-		session.get_node("CardPlacement").add_card(BuildCard.from_parts(definition,definition.first_tile_preset()))
+		if present.has(definition): continue
+		if placement.add_card(BuildCard.from_parts(definition,definition.first_tile_preset())): added += 1
+	if is_instance_valid(relic_feedback):
+		relic_feedback.text = "手牌已齊全，無需補牌" if added == 0 else "已補入 %d 張缺少的塔牌" % added
+	return true
 
 func all_exclusives() -> void:
 	var relics: RunRelics = session.get_node("TowerMap").relics
@@ -205,10 +220,14 @@ func finish_wave() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo or get_tree().paused: return
-	match event.keycode:
+	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed: return
+	var key: int = event.physical_keycode if event.physical_keycode else event.keycode
+	match key:
 		KEY_F7: all_exclusives()
-		KEY_F8: refill()
+		KEY_B: refill()
 		KEY_F9: finish_wave()
+		_: return
+	get_viewport().set_input_as_handled()
 
 func snapshot(label: String) -> void:
 	if DisplayServer.get_name() == "headless": return

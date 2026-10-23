@@ -181,9 +181,14 @@ func verify_broadside() -> void:
 	acquire(&"rapid_fire")
 	acquire(&"crew_concentration")
 	var anchor := ship.global_transform
+	var base: Node3D = ship._visual.get_node("FixedBase")
+	var base_transform := base.global_transform
+	var muzzle_before: Vector3 = ship._visual.muzzle_position()
 	var before := map.get_used_cells()
 	Rules.advance(combat,ship,1)
-	check(ship._visual.position.x > 0 and ship.global_transform == anchor and map.get_used_cells() == before, "Cruise moves combat visual only, retaining anchor/orientation/roads")
+	check(ship.patrol_visual().position.x > 0 and ship.global_transform == anchor and base.global_transform == base_transform and map.get_used_cells() == before, "Cruise moves airship while retaining fixed base/anchor/orientation/roads")
+	check(ship._visual.muzzle_position() != muzzle_before and ship.combat_origin() == ship.patrol_visual().global_position, "Muzzles and attack origin travel with airship")
+	for muzzle in ship._visual.muzzles(): check(ship.patrol_visual().is_ancestor_of(muzzle), "All six barrels are mounted on airship")
 	var preview_cells := relics.preview_cells(ship.definition,ship.grid_cell,ship.rotation_steps)
 	for offset in ship.influence_offsets(): check(ship.grid_cell+offset in preview_cells, "Patrol preview and threat share the reachable firing footprint")
 	for turns in 4:
@@ -205,7 +210,7 @@ func verify_broadside() -> void:
 	var removal_anchor := ship.global_transform
 	ship.rapid_remaining = 2
 	check(relics.remove(relics.catalog.find(&"departure")) and relics.remove(relics.catalog.find(&"rapid_fire")), "Cruise and rapid fire can be removed")
-	check(is_zero_approx(ship._visual.position.x) and ship.rapid_remaining == 0 and not ship.relic_clocks.has(&"rapid_fire") and ship.global_transform == removal_anchor, "Removing cruise restores model and cancels burst without moving anchor")
+	check(is_zero_approx(ship.patrol_visual().position.x) and ship.rapid_remaining == 0 and not ship.relic_clocks.has(&"rapid_fire") and ship.global_transform == removal_anchor, "Removing cruise restores model and cancels burst without moving anchor")
 	acquire(&"departure")
 	acquire(&"rapid_fire")
 

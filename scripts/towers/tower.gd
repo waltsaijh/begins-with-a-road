@@ -44,12 +44,20 @@ func has_relic(id: StringName) -> bool: return relic_effects.has(id)
 func relic_value(id: StringName, key: StringName, fallback := 0.0) -> float: return float(effect(id).get(key,fallback))
 
 func combat_origin() -> Vector3:
-	return _visual.global_position if has_relic(&"departure") and _visual != null else global_position
+	return patrol_visual().global_position if has_relic(&"departure") and _visual != null else global_position
+
+func patrol_visual() -> Node3D:
+	return _visual.motion_root() if _visual != null and _visual.has_method("motion_root") else _visual
+
+func set_patrol_offset(offset: float) -> void:
+	if _visual == null: return
+	if _visual.has_method("set_patrol_offset"): _visual.set_patrol_offset(offset)
+	else: _visual.position.x = offset
 
 func can_attack_target(target: Node3D) -> bool:
 	if attack is VolleyAttack and attack.mortar_visual and target.troop != null and target.troop.has_tag(&"flying") and not has_relic(&"air_strike"): return false
 	if has_relic(&"crew_concentration"):
-		var origin := _visual if _visual != null else self
+		var origin := patrol_visual() if _visual != null else self
 		if origin.to_local(target.global_position).x <= 0: return false
 	return true
 var next_attack_time := 0.0
