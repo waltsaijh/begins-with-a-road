@@ -43,7 +43,7 @@ tile_costs 是與 graph.tiles 同序的 PackedFloat64Array，空陣列為全 1�
 
 正成本最短路不會重複 vertex，但可重訪同一寬區或重用其他路段已經走過的地塊。方向聯集可能有環；已移除 choose_next，敵人須出生時抽取完整路線，而非在聯集中任意選邊。
 
-sample_route 的 route_index=-1 先以 seed 從池條目偽隨機選擇；非負值指定池索引，越界或小於 -1 回傳空。兩種模式都再從區塊內全部同成本走法抽樣，原二參數呼叫的 seed 結果保持一致。回傳 nodes/edges/cells/length/score/best_score/route_index。原生層不追蹤敵人流量，亦非全體逐格路線均勻抽樣；正式遊戲的 PortalMap.allocate_route_for 在 GDScript 端對 threshold 內完整候選依 Troop.route_selection 建立 Uniform 等機率或 Softmax(-score / route_temperature) 表，再以波內序號 / 總數對應累積機率區間，固定路線配額後打亂出發順序；soldier 預設 Uniform，其餘 Softmax；原生 sample_route 的選擇規則保持原樣。EnemyWave 出生前取好本波全部行程（預設 64 隻、每次 1 隻），不在移動時重新查圖。最短路資料只在區塊內以局部 DAG 壓縮同分走法，並未用此 DAG 限制全域道路方向。
+sample_route 的 route_index=-1 先以 seed 從池條目偽隨機選擇；非負值指定池索引，越界或小於 -1 回傳空。兩種模式都再從區塊內全部同成本走法抽樣，原二參數呼叫的 seed 結果保持一致。回傳 nodes/edges/cells/length/score/best_score/route_index。原生層不追蹤敵人流量，亦非全體逐格路線均勻抽樣；正式遊戲的 PortalMap.allocate_route_for 在 GDScript 端對 threshold 內完整候選依 Troop.route_selection 建立 Uniform 等機率或 Softmax(-score / route_temperature) 表，再以波內序號 / 總數對應累積機率區間，固定路線配額後打亂出發順序；Soldier 及新六兵基準 Uniform、Quickfeet／Heavy 基準 Softmax；原生 sample_route 的選擇規則保持原樣。EnemyWave 出生前取好本波全部行程（64 隻、每次 1 隻為獨立舊場景預設；正式關卡使用 WaveSpawnSchedule 配方），不在移動時重新查圖。最短路資料只在區塊內以局部 DAG 壓縮同分走法，並未用此 DAG 限制全域道路方向。
 
 ## 摘要與複雜度
 
@@ -76,3 +76,9 @@ newest 模式的 history 每項包含 cells、ports、starts、goal、wave。誕
 反覆刪除／恢復會破壞單調性，改以有工作上限的簡單路徑查證；若無法完整驗證就回傳 valid=false，不輸出可能過時的候選。這是明確的原型限制，不宣稱通用大圖上限；UI 會顯示無法確認新路。歷史與幾何結果在 GDScript 端依每次提交及入口快取，預覽不建立歷史。重開清除歷史。
 
 Phase 4 使用新的輸出檔名，保留舊已載入 DLL；重新建置後需重啟編輯器載入新擴充。Windows 工具固定 Python UTF-8，避免中文 linker 診斷導致 SCons cp950 解碼失敗。SDK 未修改。
+
+## 交接與建置證據
+
+本機 `native/godot-cpp` 的 commit 已核對為上述固定版本，extension_api.json 為 4.5 API；遊戲使用 Godot 4.7.2。SDK 及 `bin/` 均在 .gitignore，新 clone 必須另外取得 SDK 與建置產物。當前本機 SDK 的 origin 是正式專案內 SDK 的本機來源路徑，Sandbox 自己持有完整 SDK；建置不需修改該來源或讀取其他遊戲內容。
+
+Windows phase4 debug／release 的歷史成功 log 位於 `.godot/phase4-native-{debug,release}.log`。2026-10-23 Offboarding 核對兩個 DLL 存在並以 debug 載入通過代表性回歸，沒有重建或進行 release runtime 驗證；現版 Web wasm／瀏覽器仍為 NOT RUN。準確版本、限制及當次測試見 [HANDOFF](../docs/HANDOFF.md)。

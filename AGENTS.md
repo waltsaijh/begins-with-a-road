@@ -8,6 +8,7 @@
 - [README.md](README.md)：供人類閱讀，說明核心遊戲體驗、目標、目前進度及基本操作。
 - [docs/architectures.md](docs/architectures.md)：說明專案結構與系統責任，維持目錄／模組層級，不列逐檔清單。
 - [docs/systems.md](docs/systems.md)：上述共識的詳細補充，保存演算法、UI 行為、參數語意及驗證入口。修改相關系統前一併閱讀對應章節。
+- [docs/HANDOFF.md](docs/HANDOFF.md)：階段交接入口，保存核對日期／HEAD、完成範圍、重要檔案、已知限制及本次／歷史／未執行的測試。新工作階段先核對實際 Git 狀態，不把快照當永久現況。
 - `reports/` 是歷史證據，不是目前設定或本次測試結果。遊戲數值以目前 Resource、場景覆寫及程式為準，不從舊報告恢復平衡值。
 - 區分正式關卡與獨立試驗場景。舊試驗場景的自動生怪、右鍵單塔工具或起點切換，不代表正式關卡操作。
 - `card-tower-defense` 是部分素材的原型來源，並非本專案執行依賴；不要將該專案的路線分配、階段規則或其他約定直接套用到這裡。
@@ -92,7 +93,7 @@
 
 ## Routing Sandbox Phase 4：敵軍協同與硬性選路
 
-- 沿用 Troop／TroopCatalog，新增鼠群（small ground swarm）、盾衛兵（large ground armored guardian）、血法師（standard ground support）、飛翼獸（standard flying）、偵查兵（small ground scout）、爆破手（standard ground saboteur）。能力、模型、圖示、體型、Tags、Route Rule 與 Uniform／Softmax 均為 Resource 設定；初版數值是原型，詳見 docs/phase4.md。未修改原三兵種平衡或 Frontier／正式 ACT。
+- 沿用 Troop／TroopCatalog，新增鼠群（small ground swarm）、盾衛兵（large ground armored guardian）、血法師（standard ground support）、飛翼獸（standard flying）、偵查兵（small ground scout）、爆破手（standard ground saboteur）。能力、模型、圖示、體型、Tags、Route Rule 與 Uniform／Softmax 均為 Resource 設定；初版數值是原型，詳見 docs/phase4.md。原三兵種平衡保持各自現行資源；目前 Frontier ACT 1／Wave 2 已配置 1 名盾衛兵，其餘五種新兵種尚未配置，完整正式編成／平衡仍待後續工作。
 - 鼠群預設 5 隻一群；每個 WaveSpawnGroup 在尾端可不足額，不跨編輯群組拼群。入口和路線均按群分配，同兵種同入口跨群組共用整波「群」配額；只洗牌整群，尾群保持尾端。每隻仍有獨立生命及完整固定行程。群內 1 刻度（0.25 秒）；群首間隔為 max(interval_ticks, cohort_size × cohort_interval_ticks)，鼠群模式不使用 batch_size 分拆群。一般兵種原刻度／batch_size 語意不變。預覽、列表與正式出兵共用 WaveSpawnSchedule，顯示總個體數。
 - Route Rule COST 保留有限候選、原始評分、strict threshold、Uniform／Softmax。SHORTEST／NEWEST 使用獨立硬性候選，優先於 Cost／threshold；合格候選以等基礎分數進入同一配額及交通倍率流程。新六兵基準 Uniform，盾衛不使用追友或威脅尋路；血法師與爆破手不追友。飛翼獸對所有地面交通倍率免疫。
 - 飛翼獸由原生格子 BFS 找真正最短距離，每條最短 DAG 有向邊提供一條代表完整路線，去重後分流，不受普通 search_budget／Cost 候選限制。仍沿四向合法道路，以 1.2 格高度的固定 waypoints 飛行；不被兵營近戰攔截。普通迫擊砲索敵與爆炸都排除 flying；空中打擊解鎖三維球形命中。其他射擊塔與神射手可對空。
@@ -150,5 +151,11 @@
 - 已完成的一次性極端負載、狀態 A/B 與複雜路網 256 混兵場景及專用 benchmark 工具已清除，仍有價值的數字見 [2026-10-20 歷史摘要](reports/performance_2026-10-20.md)。該摘要不是目前版本的執行證據，也不再提供已移除的重現入口。
 - 未來量測使用合成地形與獨立實例，不改正式關卡或數值；同時記錄平均、P95／P99、一次性規劃／生成停頓及當次原始樣本。headless Windows 不用來推估渲染幀率，Web 的 rAF 上限、實際 GPU 及建置模式需明列。
 - 遠景必須確認相機 near／far 與實際地形／模型均在取景內，不能只看頭頂 overlay 的可見座標。
-- 這台筆電的 Godot 預設使用 RTX 3050，Edge 預設使用 AMD 內顯；比較平台前確認實際 GPU，可透過瀏覽器啟動參數作獨顯對照，不修改系統設定。
+- 2026-10-20 歷史量測記錄 Godot 使用 RTX 3050、Edge 使用 AMD 內顯；2026-10-23 本次 Windows 渲染 log 為 RTX 4060 Laptop。每次比較以當次 log 確認實際 GPU，不沿用舊機器描述；可透過瀏覽器啟動參數作獨顯對照，不修改系統設定。
 - 狀態已採單一 2D MultiMesh；投影、buffer 填寫與模型更新仍有 CPU 成本，不能從節點數推論所有成本已消失。大型多入口規劃仍有同步停頓；不據短測宣稱通用敵人上限或長時間無記憶體洩漏。
+
+## Phase 1–4 交接與後續範圍
+
+- 交接快照與啟動檢查集中在 docs/HANDOFF.md；文件修正不代表功能變更。測試須區分本次 PASS、歷史 PASS 未重跑、FAIL 與 NOT RUN，不能沿用舊報告當新證據。
+- 目前仍是 Routing Sandbox，尚未整合到正式專案／main。未來 Phase 5 的五 ACT、Frontier 新兵完整編成、協同強度、遺物節奏、風險事件、Gold／商店變更與長局難度曲線皆待討論，沒有在 Offboarding 實作或核准數值。
+- Offboarding 僅允許必要文件與非破壞性驗證；保留既有未提交成果，不自行 commit／merge／rebase／push／reset／clean／刪檔，不修改正式或舊專案。後續功能工作須依新的使用者指令界定範圍。

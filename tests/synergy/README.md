@@ -35,4 +35,4 @@ godot --path . res://tests/synergy/input.tscn
 
 相關回歸包含 `relics/{stacking,rewards,mechanisms,input}`、`combat/tower_restoration`、`traffic/{weights,integration,input}`、`levels/{wave_spawn_groups,level_flow,level_teardown,road_flow_preview,pause_menu}`、`navigation/{route_distribution,multiple_starts,waypoint_routes}` 與 `enemies/{troop_profiles,enemy_status}`。
 
-當次結果位於 `.godot/test-results/synergy/{routing,combat,input}.json` 及 `acceptance.md`，log 位於 `.godot/phase4-*.log`。Headless 不代表像素驗證；本次 Windows 實際渲染使用 RTX 4060 Laptop、Compatibility。Web 建置／瀏覽器及長時間平衡／效能尚未執行。
+測試會更新 `.godot/test-results/synergy/{routing,combat,input}.json`，執行前應保留需要比較的舊結果。`acceptance.md` 與 `.godot/phase4-*.log` 為 Phase 4 開發階段的歷史驗收，不能視為每次回歸的結果。2026-10-23 Offboarding 本次重跑 routing／combat，未重跑 input；獨立 log、版本與環境見 [HANDOFF](../../docs/HANDOFF.md)。Headless 不代表像素驗證；現版 Web wasm／瀏覽器與長時間平衡／效能尚未驗證。

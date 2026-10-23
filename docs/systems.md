@@ -1,8 +1,8 @@
 # 遊戲系統與實作說明
 
-本文件保留系統責任、演算法與功能細節；開發共識見 [AGENTS.md](../AGENTS.md)，專案結構見 [architectures.md](architectures.md)，遊戲體驗見 [首頁](../README.md)。正式關卡與獨立試驗場景的行為分開描述；下文的 64 隻自動生怪及單塔工具屬於獨立試驗流程。兵種與塔的即時數值以 `assets/data/` 為準，歷史摘要放在 `reports/`，當次測試 JSON／截圖放在 `.godot/test-results/`，不能將舊摘要視為目前通過證據。
+本文件保留系統責任、演算法與功能細節；開發共識見 [AGENTS.md](../AGENTS.md)，專案結構見 [architectures.md](architectures.md)，遊戲體驗見 [首頁](../README.md)，接手快照／本次驗證見 [HANDOFF](HANDOFF.md)。正式關卡與獨立試驗場景的行為分開描述；下文的 64 隻自動生怪及單塔工具屬於獨立試驗流程。兵種與塔的即時數值以 `assets/data/` 為準，歷史摘要放在 `reports/`，當次測試 JSON／截圖放在 `.godot/test-results/`，不能將舊摘要視為目前通過證據。
 
-目前共用一張保留雙向道路與環的入口圖。所有兵種統一使用有限候選池：先以正成本探索，再依原始 evaluation 加總與 threshold 篩選。所有兵種在出生前決定完整行程，三者皆可對 threshold 內候選選擇 Uniform 等機率或 Softmax(-score / route_temperature) 加權機率；soldier 預設 Uniform，其餘預設 Softmax。每波以波內序號／總數對應累積機率區間分配，固定配額後打亂出發順序。場景自動生成一波 64 隻敵人，到終點後刪除；兵種與 Uniform／Softmax 由波次 Resource 設定，關卡起點上方的對話框手動開始下一波。沒有全域 DAG、ZDD 或 Yen。
+目前共用保留雙向道路與環的路網。一般 COST 兵種先用正成本探索有限候選，再依原始 evaluation 與 strict threshold 篩選；Phase 4 的 SHORTEST／NEWEST 依同一已提交路網生成硬性候選，不使用普通 Cost 池或 cutoff。合格候選共用 Uniform／Softmax、交通權重與確定性配額；Soldier 及新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax。WaveSpawnSchedule 在開波前固定完整行程與數值，鼠群以整群分配後展開個體，只打亂出發順序。正式關卡依 Resource 的人數與刻度手動開波；64 隻自動出兵只屬獨立舊場景。普通導航不使用全域 DAG、ZDD 或 Yen，最短路硬規則的 DAG 僅用於合法最短代表。
 
 腳本責任如下；場景仍使用原本的 TilePlacement／PortalMap／PortalOverlay 節點名稱。
 
@@ -280,7 +280,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 入口圖
 
-所有兵種共用正成本候選探索，再以原始 evaluation 加總與套用 threshold。搜尋成本與最終評分分開處理。
+一般 COST 兵種共用正成本候選探索，再以原始 evaluation 加總與套用 threshold。搜尋成本與最終評分分開處理；SHORTEST／NEWEST 見 Phase 4，勿套普通池的完整性假設。
 
 四方向且模型接口相接才算道路邊；石地與斜角不連通。每四格完整形成 2×2 方圈時，視為可換道的填滿面。無洞的連續寬區直接合併成一筆區段資料；有洞的寬區則沿掃描線在分開／匯合處切分，1 對 1 相接的區段持續合併，不因寬度變化切成多個矩形。
 
@@ -332,7 +332,7 @@ var route = controller.sample_for(profile, enemy_id, 1)
 
 兵種為 `assets/data/troops/*.tres`，可在 Inspector 新增、修改、刪除；資料與模型匯入說明見 `assets/data/troops/README.md`。`TroopCatalog.all()` 自動發現目錄及子目錄中的資源，`find(id)` 取得共用設定。波次編輯器用資源身分辨識兵種，選單及時間軸顯示各自 icon；不再以 GDScript 類別區分。速度乘上 EnemyWave.move_speed，基準為 2.5，各兵種的實際速度為基準乘上其資源中的速度倍率。開波時固定當波血量、速度與完整路線。關卡儲存 Troop Path，移除兵種後仍可開啟關卡修正群組，缺少兵種的波次不會開始。
 
-關卡依波次 Resource 設定兵種，F1 同時顯示本波所有兵種，不再顯示兵種下拉選單。也可直接設定 EnemyWave.troop；null 沿用 PortalMap。各兵種使用自己的 route_selection（soldier 預設 Uniform，其餘 Softmax）對保留候選建立配額；Uniform 等機率，Softmax 使用 route_temperature（預設 4）。soldier 的 INF 僅代表不依長短排除候選，Softmax 仍會偏好較短者；它不代表窮舉全圖所有路線。
+關卡依波次 Resource 設定兵種，F1 同時顯示本波所有兵種，不再顯示兵種下拉選單。也可直接設定 EnemyWave.troop；null 沿用 PortalMap。各兵種使用自己的 route_selection（Soldier 與新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax）對保留候選建立配額；Uniform 等機率，Softmax 使用 route_temperature（預設 4）。soldier 的 INF 僅代表不依長短排除候選，Softmax 仍會偏好較短者；它不代表窮舉全圖所有路線。
 
 ### 統一搜尋與評分
 

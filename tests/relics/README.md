@@ -1,6 +1,6 @@
 # Phase 3：疊塔、遺物與構築驗收
 
-本目錄提供獨立合成地形，不寫回 Frontier、塔／兵種 Resource 或舊專案。F5 仍是原三 ACT 正式關卡。當次結果和截圖放在 `.godot/test-results/relics/`，原始 log 在 `.godot/phase3-*.log`。
+本目錄提供獨立合成地形，不寫回 Frontier、塔／兵種 Resource 或舊專案。F5 仍是原三 ACT 正式關卡。結果和截圖放在 `.godot/test-results/relics/`；`.godot/phase3-*.log` 是 Phase 3 歷史驗收，後續回歸使用各次獨立 log。
 
 ## 人工驗收
 
@@ -36,4 +36,4 @@ godot --path . res://tests/relics/playground.tscn -- --smoke
 
 3A–3E 均有實作與驗證入口，停在人工驗收。倍率仍是 MVP，沒有做長局平衡或新增專屬遺物。專屬圖示沿用其塔種圖示，通用遺物使用新的簡單 SVG。Windows Compatibility 已渲染；Web 匯出／瀏覽器、長時間壓測及人工美術／手感核准需另行驗收，不能把 headless 結果當成這些項目已通過。
 
-詳細規則與數值見 [Phase 3 系統](../../docs/phase3.md)。當次 PASS／FAIL／NOT RUN 與環境見 `.godot/test-results/relics/acceptance.md`。
+詳細規則與數值見 [Phase 3 系統](../../docs/phase3.md)。Phase 3 歷史 PASS／FAIL／NOT RUN 與環境見 `.godot/test-results/relics/acceptance.md`；本次 Offboarding 及歷史未重跑項目見 [HANDOFF](../../docs/HANDOFF.md)。

@@ -1,6 +1,6 @@
 # Phase 4：敵軍協同與專屬選路
 
-這是 Routing Sandbox 的原型實作，六種兵種由現有 Troop／TroopCatalog 管理，未加入 Frontier 的正式 ACT。數值以 `assets/data/troops/*.tres` 為準；以下是本階段交付值，不代表正式平衡。
+這是 Routing Sandbox 的原型實作，六種兵種由現有 Troop／TroopCatalog 管理；目前 Frontier ACT 1／Wave 2 已配置 1 名盾衛兵，其餘五種尚未配置，完整正式編成／平衡尚待後續工作。數值以 `assets/data/troops/*.tres` 為準；以下是本階段交付值，不代表正式平衡。
 
 ## 兵種設定與資料來源
 
@@ -60,8 +60,8 @@
 
 ## 驗收與限制
 
-可玩入口、A–D 操作及回歸命令見 [測試說明](../tests/synergy/README.md)。當次 JSON、截圖與驗收結果寫入 `.godot/test-results/synergy/`；不把舊測試結果當成本次證據。
+可玩入口、A–D 操作及回歸命令見 [測試說明](../tests/synergy/README.md)，目前 HEAD、程式索引及各次驗證分界見 [HANDOFF](HANDOFF.md)。當次 JSON、截圖與驗收結果寫入 `.godot/test-results/synergy/`；不把舊測試結果當成本次證據。
 
 需後續平衡：群體大小／間隔、盾衛減傷與嘲諷半徑、治療頻率與範圍、飛行速度、癱瘓冷卻／持續時間及多人接力效果。分流效果會受地形、有限代表與整數配額限制；測試場景有意提供可分支路網，不代表任何地圖都能同幅度分離。
 
-新增原生類別需重啟 Godot editor。擴充輸出改為 `road_graph.editguard.phase4.*`，可與先前被 editor 載入的 DLL 共存；Windows debug／release 已建置。維持 C++17、Compatibility 與單執行緒 Web 設計，但本次沒有 Emscripten SDK，Web wasm 建置及瀏覽器驗證未執行，不能將 Windows PASS 當成 Web PASS。
+新增原生類別需重啟 Godot editor。擴充輸出改為 `road_graph.editguard.phase4.*`，可與先前被 editor 載入的 DLL 共存；Windows debug／release 在 Phase 4 開發階段已建置，Offboarding 本次只核對現有產物及 debug 載入、未重建。維持 C++17、Compatibility 與單執行緒 Web 設計；Phase 4 的 Web wasm 建置及瀏覽器尚未驗證，不能將 Windows PASS 當成 Web PASS。

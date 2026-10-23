@@ -6,6 +6,8 @@
 | --- | --- |
 | `cards/` | 卡牌命名、配置、放置、輸入、商店與旋轉提示 |
 | `relics/` | Phase 3 疊加升級、21 件遺物、抽取、協同、真實迫擊砲與實際拖放／三選一 |
+| `traffic/` | Phase 2 三種臨時設施、選路倍率、壽命、預覽差異及商店 |
+| `synergy/` | Phase 4 六新兵、群體分配、硬性選路、敵軍能力及 A–D 可玩場景 |
 | `combat/` | 塔、障礙物、索敵、攻擊、實際繪製與特效 |
 | `enemies/` | 兵種資源、移動、MultiMesh、狀態與視覺避讓 |
 | `levels/` | 波次排程、ACT 擴張、地形端點、時間線、暫停、清理與鏡頭 |
@@ -63,3 +65,26 @@ godot --editor --path . -- --test-card-resource-refresh
 Phase 3 的分段自動化與人工操作見 [relics/README.md](relics/README.md)；獨立 `relics/playground.tscn` 提供六塔、同種手牌及逐件授予遺物。現有 ACT／流量／交通設施回歸已在 ACT 邊界先完成遺物選擇。
 
 Phase 4 `synergy/` 的 routing／combat 回歸與實際渲染 input 驗證六種敵軍、整群分流、最短／最新路線、嘲諷／治療／飛行／癱瘓及預覽一致性。F6 開啟 `tests/synergy/playground.tscn` 可操作 A–D 四種雙入口協同波次；詳見 [synergy/README.md](synergy/README.md)。
+
+## Phase 1–4 接手時的代表性回歸
+
+目前版本、2026-10-23 Offboarding 的本次 PASS、歷史 PASS 未重跑及 NOT RUN 集中在 [HANDOFF](../docs/HANDOFF.md)。下列命令是既有測試入口，不表示之後的每個版本都已通過：
+
+```powershell
+godot --headless --path . res://tests/navigation/route_distribution.tscn
+godot --headless --path . res://tests/navigation/multiple_starts.tscn
+godot --headless --path . --script res://tests/traffic/weights.gd
+godot --headless --path . res://tests/traffic/integration.tscn
+godot --headless --path . res://tests/combat/tower_restoration.tscn
+godot --headless --path . res://tests/relics/stacking.tscn
+godot --headless --path . res://tests/relics/rewards.tscn
+godot --headless --path . res://tests/relics/mechanisms.tscn
+godot --headless --path . res://tests/synergy/routing.tscn
+godot --headless --path . res://tests/synergy/combat.tscn
+godot --path . res://tests/levels/road_flow_preview.tscn
+godot --path . res://scenes/level.tscn --quit-after 180
+```
+
+每次用不同的 `--log-file` 保存原始輸出；測試的固定 JSON／截圖位置可能覆寫前次產物，必要時先複製保存。Windows GUI 執行檔可用 `Start-Process -PassThru -Wait -WindowStyle Hidden` 等待。判定須同時檢查退出碼、完成標記、斷言與 GDScript error；正式關卡最後一項只有有限啟動 Smoke，不代表完成九波或驗證完整 Run。
+
+本次原始結果在 `.godot/offboarding-2026-10-23/`，前次 synergy／traffic／relics 產物先複製至其中 `prior-results/`。本次沒有重建 native、執行 release 專用測試或重跑全部 input／editor；Web wasm／瀏覽器、長局平衡及效能仍未驗證。不要把歷史 471 項 Phase 4 結果寫成本次總數。
