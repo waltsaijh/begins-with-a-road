@@ -1,15 +1,18 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://cp1mo65yr16j3"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://bpv7ahtcwlsvs" path="res://assets/sprites/troops/quickfeet.png" id="1_0cwrg"]
+[ext_resource type="Texture2D" uid="uid://c628wohk7k5ce" path="res://assets/sprites/troops/quickfeet.png" id="1_0cwrg"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/runner.tscn" id="3"]
 
 [resource]
 script = ExtResource("1")
+body_size = "small"
 troop_name = "quickfeet"
 name_key = "troop.quickfeet.name"
 sort_order = 10
 icon = ExtResource("1_0cwrg")
+melee_damage = 3.0
+melee_interval = 0.8
 debug_color = Color(1, 0.7607843, 0.2784314, 1)
 max_health = 50.0
 speed_multiplier = 1.3

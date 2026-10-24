@@ -5,6 +5,9 @@
 | 目錄 | 範圍 |
 | --- | --- |
 | `cards/` | 卡牌命名、配置、放置、輸入、商店與旋轉提示 |
+| `relics/` | Phase 3 疊加升級、21 件遺物、抽取、協同、真實迫擊砲與實際拖放／三選一 |
+| `traffic/` | Phase 2 三種臨時設施、選路倍率、壽命、預覽差異及商店 |
+| `synergy/` | Phase 4 六新兵、群體分配、硬性選路、敵軍能力及 A–D 可玩場景 |
 | `combat/` | 塔、障礙物、索敵、攻擊、實際繪製與特效 |
 | `enemies/` | 兵種資源、移動、MultiMesh、狀態與視覺避讓 |
 | `levels/` | 波次排程、ACT 擴張、地形端點、時間線、暫停、清理與鏡頭 |
@@ -47,6 +50,8 @@ godot --editor --path . -- --test-card-resource-refresh
 
 `level_teardown` 驗證不同倍速、按鈕／內部開始入口，以及開場等待、尚未出生與存活敵人的關卡清理。一般渲染模式加 `-- --window-close` 會啟動 2x 手動開波視窗，可手動關閉檢查退出錯誤；加 `--4x`／`--direct` 可切換其他情境。
 
+`combat/tower_restoration.tscn` 驗證恢復五塔資源／模型／音效、舊塔優先索敵、延遲落地爆炸不重複傷害、全體／單體／方向區分、四向手牌預覽／消耗放置、兵營雙友軍與駐點、反擊、固定行程暫停／繼續、死亡／5 秒重生／塔移除、等權塔種與每塔候選權重。可 headless 或實際渲染。人工 F6 開啟 `combat/tower_restoration_playground.tscn`；加 `-- --smoke` 自動開波並輸出準備／戰鬥截圖至 `.godot/test-results/combat/`。測試資源不寫回 Frontier。商店 UI 回歸使用獨立價格，避免正式塔售價影響動畫／交易測試。
+
 `enemies/enemy_status` 驗證同類減速取最佳強度與最長剩餘時間合併，涵蓋兩種施加順序、到期、短／長刷新及敵人重用；另使用 fixtures 內的舊版繪製進行像素比較，包含分散與重疊順序、不同圖示、圖集／容量成長、樣式烘焙、移除與重用；headless 會略過像素比較。`cards/card_preview` 與 `combat/combat_preview` 雖名為 preview，仍驗證實際輸入提交及攻擊繪製，供 Web 比對使用。
 
 過去的壓測數字僅保留於 [歷史摘要](../reports/performance_2026-10-20.md)，不代表本次回歸結果。未來若需要新的負載量測，依當時問題建立測試並保存當次方法與樣本。
@@ -58,3 +63,32 @@ godot --editor --path . -- --test-card-resource-refresh
 `combat/attack_area` 驗證格子資源儲存重載、Sentry 例圖、四向旋轉、預覽／索敵／威脅一致、非圓形遠角目標、範圍外近敵不搶目標、Resource 修改失效、新道路稀疏影響與圓形備援。預覽截圖與結果寫入 `.godot/test-results/combat/`。原有 combat／towers 的圓形回歸使用獨立範本，避免設計師修改 Sentry 範圍影響測試。
 
 `--test-card-resource-refresh` 透過已啟用的編輯器外掛啟動測試，驗證修改塔範圍 offsets 時的新舊商店卡面、腳本熱更新、部分節點重建與離場通知。測試只修改複製的 Resource，不儲存正式塔資料；結果寫入 `.godot/test-results/editor/`。可使用 headless 編輯器驗證節點生命週期。若正式專案的 GDExtension 被另一個編輯器鎖住，使用預先完成匯入的隔離專案副本（保留 assets、scripts、scenes、addons、測試 fixtures 及本測試，啟用相同編輯器外掛），勿移除正式專案的擴充或關閉使用者的編輯器。
+
+`traffic/` 驗證 Phase 2 標籤、權重、三波設施、雙池商店與真實輸入／流量差；入口及人工步驟見 [traffic/README.md](traffic/README.md)。
+
+Phase 3 的分段自動化與人工操作見 [relics/README.md](relics/README.md)；獨立 `relics/playground.tscn` 提供六塔、同種手牌及逐件授予遺物。現有 ACT／流量／交通設施回歸已在 ACT 邊界先完成遺物選擇。
+
+Phase 4 `synergy/` 的 routing／combat 回歸與實際渲染 input 驗證六種敵軍、整群分流、最短／最新路線、嘲諷／治療／飛行／癱瘓及預覽一致性。F6 開啟 `tests/synergy/playground.tscn` 可操作 A–D 四種雙入口協同波次；詳見 [synergy/README.md](synergy/README.md)。
+
+## Phase 1–4 接手時的代表性回歸
+
+目前版本、2026-10-23 Offboarding 的本次 PASS、歷史 PASS 未重跑及 NOT RUN 集中在 [HANDOFF](../docs/HANDOFF.md)。下列命令是既有測試入口，不表示之後的每個版本都已通過：
+
+```powershell
+godot --headless --path . res://tests/navigation/route_distribution.tscn
+godot --headless --path . res://tests/navigation/multiple_starts.tscn
+godot --headless --path . --script res://tests/traffic/weights.gd
+godot --headless --path . res://tests/traffic/integration.tscn
+godot --headless --path . res://tests/combat/tower_restoration.tscn
+godot --headless --path . res://tests/relics/stacking.tscn
+godot --headless --path . res://tests/relics/rewards.tscn
+godot --headless --path . res://tests/relics/mechanisms.tscn
+godot --headless --path . res://tests/synergy/routing.tscn
+godot --headless --path . res://tests/synergy/combat.tscn
+godot --path . res://tests/levels/road_flow_preview.tscn
+godot --path . res://scenes/level.tscn --quit-after 180
+```
+
+每次用不同的 `--log-file` 保存原始輸出；測試的固定 JSON／截圖位置可能覆寫前次產物，必要時先複製保存。Windows GUI 執行檔可用 `Start-Process -PassThru -Wait -WindowStyle Hidden` 等待。判定須同時檢查退出碼、完成標記、斷言與 GDScript error；正式關卡最後一項只有有限啟動 Smoke，不代表完成九波或驗證完整 Run。
+
+本次原始結果在 `.godot/offboarding-2026-10-23/`，前次 synergy／traffic／relics 產物先複製至其中 `prior-results/`。本次沒有重建 native、執行 release 專用測試或重跑全部 input／editor；Web wasm／瀏覽器、長局平衡及效能仍未驗證。不要把歷史 471 項 Phase 4 結果寫成本次總數。

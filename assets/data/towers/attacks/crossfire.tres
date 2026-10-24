@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="VolleyAttack" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/effects/hit_effect.gd" id="1_nyksx"]
+[ext_resource type="Script" path="res://scripts/combat/attacks/volley_attack.gd" id="2_7kdr1"]
+
+[resource]
+script = ExtResource("2_7kdr1")
+mode = 2
+color = Color(1, 0.9529412, 0.6901961, 1)

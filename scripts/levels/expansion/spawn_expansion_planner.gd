@@ -10,6 +10,7 @@ const MIN_START_DISTANCE := 6
 static func generate(controller: Node, depth: int, band: int) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var map: GridMap = controller.map
+	var reserved := _traffic_cells(controller)
 	var terminals: Array[Vector2i] = controller.terminal_cells()
 	if terminals.is_empty() or controller.computing: return result
 	var snapshot := Snapshot.capture(map, controller.blocked_cells)
@@ -47,6 +48,7 @@ static func generate(controller: Node, depth: int, band: int) -> Array[Dictionar
 		if int(distances[cell]) >= depth: continue
 		for offset in DIRECTIONS:
 			var next: Vector2i = cell+offset
+			if reserved.has(next): continue
 			if distances.has(next) or absi(next.x) >= 32767 or absi(next.y) >= 32767: continue
 			if map.get_cell_item(Vector3i(next.x, 0, next.y)) != GridMap.INVALID_CELL_ITEM: continue
 			parent[next] = cell
@@ -89,12 +91,18 @@ static func generate(controller: Node, depth: int, band: int) -> Array[Dictionar
 static func valid(controller: Node, cell: Vector2i, path: Array) -> bool:
 	if controller.computing or path.is_empty() or path[0] != cell: return false
 	var additions := {}
+	var reserved := _traffic_cells(controller)
 	for point: Vector2i in path:
+		if reserved.has(point): return false
 		if controller.map.get_cell_item(Vector3i(point.x, 0, point.y)) != GridMap.INVALID_CELL_ITEM: return false
 		additions[point] = true
 	var terminals: Array[Vector2i] = controller.terminal_cells()
 	terminals.append(cell)
 	return Snapshot.connects_terminals(Snapshot.capture(controller.map, controller.blocked_cells, additions), terminals)
+
+static func _traffic_cells(controller: Node) -> Dictionary:
+	var towers := controller.get_node_or_null("../TowerMap")
+	return towers.traffic.occupied if towers != null and towers.traffic != null else {}
 
 static func _distance(a: Vector2i, b: Vector2i) -> int:
 	return absi(a.x-b.x)+absi(a.y-b.y)

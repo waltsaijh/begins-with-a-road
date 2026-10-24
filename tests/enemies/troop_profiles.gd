@@ -30,6 +30,8 @@ func verify() -> void:
 	var quick: Troop = (TroopCatalog.find("quickfeet").duplicate() as Troop)
 	var heavy: Troop = (TroopCatalog.find("heavy").duplicate() as Troop)
 	# Isolate the frozen-stat checks from editable game balance.
+	quick.max_health = 50
+	quick.speed_multiplier = 1.5
 	heavy.max_health = 500
 	heavy.speed_multiplier = 0.5
 	check(soldier.max_health == 100 and soldier.speed_multiplier == 1 and is_inf(soldier.score_threshold), "Soldier defaults incorrect")
@@ -49,8 +51,9 @@ func verify() -> void:
 	var controller: Node = scene.get_node("PortalMap")
 	check(controller.troop == TroopCatalog.find("soldier") and scene.get_node("EnemyWave").available_troops[0] == controller.troop, "Map and wave did not share the troop definition")
 	var catalog := TroopCatalog.all()
+	var catalog_size := catalog.size()
 	catalog.clear()
-	check(TroopCatalog.all().size() == 3, "Caller modified the shared troop registry")
+	check(TroopCatalog.all().size() == catalog_size, "Caller modified the shared troop registry")
 	var danger: Resource = controller.tile_parameters.get_tile(Vector2i(2, 0))
 	danger.threat = 50
 	await get_tree().process_frame
@@ -161,7 +164,10 @@ func verify() -> void:
 				check(plan.get("reachable", false), "Troop lost a test-map origin")
 				for i in mini(plan.get("routes", 0), 8):
 					var route: Dictionary = controller.sample_for(profile, i, origin, i)
-					check(not route.is_empty() and route.score == actual_score(controller, profile, route), "Test-map score not exact")
+					if profile.route_rule == Troop.RouteRule.COST:
+						check(not route.is_empty() and route.score == actual_score(controller, profile, route), "Test-map score not exact")
+					else:
+						check(not route.is_empty() and route.identity == str(route.cells), "Hard-rule route lost physical identity")
 				cases.append({"scene": name, "origin": origin, "troop": profile.troop_name, "routes": plan.get("routes", 0), "score": plan.get("score", 0), "candidates": plan.get("candidate_routes", plan.get("routes", 0)), "solve_us": elapsed})
 		scene.queue_free()
 		await get_tree().process_frame

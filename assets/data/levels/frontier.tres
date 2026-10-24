@@ -12,34 +12,28 @@ troop_path = "res://assets/data/troops/soldier.tres"
 enemy_count = 4
 interval_ticks = 2
 
+[sub_resource type="Resource" id="Wave1"]
+script = ExtResource("3")
+groups = Array[ExtResource("8")]([SubResource("Group1")])
+
 [sub_resource type="Resource" id="Resource_pntgv"]
 script = ExtResource("8")
-troop_path = "res://assets/data/troops/heavy.tres"
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 4
 
 [sub_resource type="Resource" id="Resource_6ru0y"]
 script = ExtResource("8")
-troop_path = "res://assets/data/troops/quickfeet.tres"
-enemy_count = 2
-
-[sub_resource type="Resource" id="Wave1"]
-script = ExtResource("3")
-groups = Array[ExtResource("8")]([SubResource("Group1"), SubResource("Resource_pntgv"), SubResource("Resource_6ru0y")])
-
-[sub_resource type="Resource" id="Group2"]
-script = ExtResource("8")
-troop_path = "res://assets/data/troops/soldier.tres"
-enemy_count = 12
-interval_ticks = 2
+troop_path = "res://assets/data/troops/shield_guardian.tres"
+enemy_count = 1
 
 [sub_resource type="Resource" id="Wave2"]
 script = ExtResource("3")
-groups = Array[ExtResource("8")]([SubResource("Group2")])
+groups = Array[ExtResource("8")]([SubResource("Resource_pntgv"), SubResource("Resource_6ru0y")])
 
 [sub_resource type="Resource" id="Group3"]
 script = ExtResource("8")
 troop_path = "res://assets/data/troops/quickfeet.tres"
-start_tick = 4
-enemy_count = 4
+start_tick = 3
 interval_ticks = 6
 
 [sub_resource type="Resource" id="Resource_edcdy"]

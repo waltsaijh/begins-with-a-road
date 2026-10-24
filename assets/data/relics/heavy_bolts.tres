@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RelicDefinition" format=3]
+[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/ballista.png" id="icon"]
+[ext_resource type="Resource" path="res://assets/data/towers/ballista.tres" id="tower"]
+[resource]
+script = ExtResource("script")
+id = &"heavy_bolts"
+name_key = "relic.heavy_bolts.name"
+description_key = "relic.heavy_bolts.description"
+icon = ExtResource("icon")
+tower = ExtResource("tower")
+parameters = {"distance": 0.3}

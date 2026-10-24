@@ -64,7 +64,7 @@ var hovered := false
 	set(value):
 		show_shortcut = value
 		_refresh()
-var _tower: TowerDefinition
+var _tower: Resource
 @export_group("Selection Motion")
 @export_range(0.0, 2.0, 0.05) var selected_sway_degrees := 0.6
 @export_range(1.0, 8.0, 0.1) var selected_sway_period := 3.6
@@ -154,14 +154,14 @@ func _refresh() -> void:
 	var animate := not Engine.is_editor_hint() and visuals != null and (selected or _sway_amount > 0.0)
 	if animate and not is_processing(): _sway_last_usec = Time.get_ticks_usec()
 	set_process(animate)
-	var definition := card.tower if card != null else null
+	var definition := card.visual_definition() if card != null else null
 	if _tower != definition:
 		if is_instance_valid(_tower) and _tower.changed.is_connected(_refresh):
 			_tower.changed.disconnect(_refresh)
 		_tower = definition
 		if _tower != null:
 			_tower.changed.connect(_refresh)
-	var accent := _tower.accent_color if _tower != null else Color.WHITE
+	var accent: Color = _tower.accent_color if _tower != null else Color.WHITE
 	background.texture = card.background_texture if card != null and card.background_texture != null else default_background
 	frame.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
 	frame.self_modulate = accent.lightened(0.15) if hovered else accent
@@ -175,7 +175,7 @@ func _refresh() -> void:
 	var shop := presentation == Presentation.SHOP
 	shortcut.visible = not shop and show_shortcut
 	var prefix := card.localized_prefix() if card != null and not shop else ""
-	var tower_name := _tower.localized_name() if _tower != null else tr("card.unassigned")
+	var tower_name: String = _tower.localized_name() if _tower != null else tr("card.unassigned")
 	title.show_name_parts(prefix, tower_name, TranslationServer.get_locale().get_slice("_", 0) == "en", shop)
 	price.visible = shop and card != null
 	gold.texture = coin_texture

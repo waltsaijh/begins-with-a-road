@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://bbbau5u7i34ve"]
+
+[ext_resource type="Resource" path="res://assets/data/towers/attacks/crossfire.tres" id="1_7cxd6"]
+[ext_resource type="Texture2D" uid="uid://cs0oo8natsp6e" path="res://assets/sprites/towers/crossfire.png" id="2_dc2h6"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="2_st668"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/crossfire.tscn" id="3_st668"]
+[ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="4_fbig6"]
+[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="5_kljqr"]
+
+[sub_resource type="Resource" id="Resource_klffx"]
+script = ExtResource("5_kljqr")
+preset_path = "res://assets/data/tile_presets/crossfire_01.tres"
+
+[sub_resource type="Resource" id="Resource_jttb1"]
+script = ExtResource("5_kljqr")
+preset_path = "res://assets/data/tile_presets/crossfire_02.tres"
+
+[sub_resource type="Resource" id="Resource_afwhe"]
+script = ExtResource("5_kljqr")
+preset_path = "res://assets/data/tile_presets/crossfire_03.tres"
+
+[sub_resource type="Resource" id="Resource_pqa2a"]
+script = ExtResource("5_kljqr")
+preset_path = "res://assets/data/tile_presets/crossfire_04.tres"
+
+[resource]
+script = ExtResource("4_fbig6")
+name_key = "tower.crossfire.name"
+model = ExtResource("3_st668")
+card_price = 13
+icon = ExtResource("2_dc2h6")
+accent_color = Color(0.9490196, 0.5529412, 0.59607846, 1)
+footprint = Array[Vector2i]([Vector2i(0, 0)])
+attack_radius = 2.0
+default_damage = 4.0
+attack_interval = 0.8
+attack = ExtResource("1_7cxd6")
+tile_preset_candidates = Array[ExtResource("5_kljqr")]([SubResource("Resource_klffx"), SubResource("Resource_jttb1"), SubResource("Resource_afwhe"), SubResource("Resource_pqa2a")])

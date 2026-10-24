@@ -4,10 +4,21 @@
 [ext_resource type="PackedScene" uid="uid://dgsr4e3yjcfiv" path="res://scenes/cards/card_shop_view.tscn" id="2"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="3"]
 [ext_resource type="Resource" uid="uid://ctxkqyv56ojbu" path="res://assets/data/towers/sentry.tres" id="4"]
+[ext_resource type="Resource" path="res://assets/data/towers/mortar.tres" id="5"]
+[ext_resource type="Resource" path="res://assets/data/towers/ballista.tres" id="6"]
+[ext_resource type="Resource" path="res://assets/data/towers/broadside.tres" id="7"]
+[ext_resource type="Resource" path="res://assets/data/towers/crossfire.tres" id="8"]
+[ext_resource type="Resource" path="res://assets/data/towers/barracks.tres" id="9"]
+
+[ext_resource type="Resource" path="res://assets/data/traffic/flag.tres" id="t0"]
+[ext_resource type="Resource" path="res://assets/data/traffic/barricade.tres" id="t1"]
+[ext_resource type="Resource" path="res://assets/data/traffic/narrow_passage.tres" id="t2"]
+[ext_resource type="Script" path="res://scripts/traffic/traffic_structure_definition.gd" id="ts"]
 
 [node name="Shop" type="Node" unique_id=391105648]
 script = ExtResource("1")
-catalog = Array[ExtResource("3")]([ExtResource("4")])
+traffic_catalog = Array[ExtResource("ts")]([ExtResource("t0"), ExtResource("t1"), ExtResource("t2")])
+catalog = Array[ExtResource("3")]([ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")])
 
 [node name="View" parent="." unique_id=2045110041 instance=ExtResource("2")]
 offset = Vector2(0, 5)

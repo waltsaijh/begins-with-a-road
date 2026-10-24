@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://beedd2c1ijjsr"]
+
+[ext_resource type="Resource" path="res://assets/data/towers/ranges/barracks.tres" id="1_f0nwv"]
+[ext_resource type="Script" uid="uid://mdm1es5qha4r" path="res://scripts/towers/barracks_deployment.gd" id="2_3x4mj"]
+[ext_resource type="PackedScene" path="res://assets/models/allies/soldier.tscn" id="3_c38ft"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="4_3x4mj"]
+[ext_resource type="Texture2D" uid="uid://bjfn2536id2oa" path="res://assets/sprites/towers/barracks.png" id="4_gx47c"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/barracks.tscn" id="5_wws40"]
+[ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="6_hvhi4"]
+[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="7_unot2"]
+
+[sub_resource type="Resource" id="Resource_u5wrp"]
+script = ExtResource("2_3x4mj")
+unit_model = ExtResource("3_c38ft")
+
+[sub_resource type="Resource" id="Resource_5v8q0"]
+script = ExtResource("7_unot2")
+preset_path = "res://assets/data/tile_presets/barracks_01.tres"
+
+[resource]
+script = ExtResource("6_hvhi4")
+name_key = "tower.barracks.name"
+model = ExtResource("5_wws40")
+deployment = SubResource("Resource_u5wrp")
+card_price = 15
+icon = ExtResource("4_gx47c")
+accent_color = Color(0.4627451, 0.8117647, 0.8784314, 1)
+footprint = Array[Vector2i]([Vector2i(0, 0)])
+attack_area = ExtResource("1_f0nwv")
+attack_radius = 1.5
+default_damage = 4.0
+tile_preset_candidates = Array[ExtResource("7_unot2")]([SubResource("Resource_5v8q0")])

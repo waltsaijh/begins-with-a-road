@@ -19,7 +19,7 @@
 
 ## 尋路
 
-**Path Evaluation** 用資料描述評分，不必寫 evaluation 函式：
+預設 **Route Rule = COST**，此模式的 **Path Evaluation** 用資料描述評分，不必寫 evaluation 函式：
 
 `Path Base Cost + threat × Threat Weight + num_towers_around × Tower Count Weight + movement_multiplier × Movement Weight + damage_per_second × Damage Weight + cover × Cover Weight`
 
@@ -42,7 +42,7 @@
 
 Soldier 的 `grunt.tscn` 使用 MultiMesh 與 GPU 步態；Quickfeet／Heavy 的場景以實例顯示並保留自己的材質與 AnimationPlayer。不同模型可以出現在同一波。自訂場景各自產生繪製成本，適合保留完整的匯入模型／骨架動畫。
 
-Icon 是獨立 Texture2D，直接選取 PNG 即可，不受模型匯入方式影響。
+Icon 是獨立 Texture2D，可選取 PNG 或 SVG，不受模型匯入方式影響。
 
 ## 刪除
 
@@ -53,3 +53,23 @@ Icon 是獨立 Texture2D，直接選取 PNG 即可，不受模型匯入方式影
 ## 避讓
 
 視覺位移以約 0.8 秒的平滑阻尼過渡，完成後保留側向位置，不在鄰兵離開後歸零。轉彎期間不互相碰撞，並保留現有位移；避讓不修改邏輯位置、行走速度與固定路線。過渡速度可在 `EnemyRenderConstants.VISUAL_OFFSET_SMOOTH_TIME` 調整，目前為 0.35；這是阻尼時間尺度，並非固定總時長。
+
+## 多標籤
+
+Body Size 單選 small／standard／large；Tags 是可複合 StringName 清單，例如 ground、flying、armored、uncontrollable。消費端使用 `has_tag()`；不要把體型塞入 Tags，三個體型的查詢只以 Body Size 為準。未設定資源安全預設 standard＋ground。
+
+Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large＋ground＋armored。這些資料不修改既有生命、速度、攻擊或固定行程；臨時設施依 required_tags 選擇對象。
+
+## Phase 4 六兵種
+
+新增 rat_swarm、shield_guardian、blood_mage、winged_beast、scout、saboteur；完整數值／Tag／能力與限制見 [Phase 4](../../../docs/phase4.md)。
+
+- **Route Rule**：COST 沿用原候選／評分；SHORTEST 直接使用合法路網的實際最短格距；NEWEST 依本局已提交道路歷史選最新有效批次。後兩者不使用普通 Search Budget／Score Threshold，再套 Uniform／Softmax 及適用設施倍率。
+- **Cohort Size／Cohort Interval Ticks**：大於 1 時以整群分配入口／路線，尾群可不足額；個體仍獨立。每 tick 為 0.25 秒；群模式使用群間 interval，取代 Batch Size 的並發規則。
+- **Damage Reduction／Taunt**：減傷比例、嘲諷半徑與穩定優先級。
+- **Heal**：回復量、間隔、範圍。多來源獨立，不復活或超過上限。
+- **Sabotage**：選塔範圍、冷卻、前搖與持續時間。重疊取最大剩餘時間，來源死亡移除。
+- **Flight Height**：固定 waypoints 的道路上方高度；flying Tag 決定對空與地面設施資格。
+- **Ability Text／Ability Text En**：情報介面的繁中／英文能力說明；改數值時一併更新描述。
+
+以上參數於開波快照，暫停停止能力時鐘，原三兵種的預設值維持既有行為。

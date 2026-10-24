@@ -6,10 +6,32 @@ var impacts: Array[Node3D]:
 	get: return $ImpactEffects.active
 @onready var _instance: MeshInstance3D = $Geometry
 var _visible_last_frame := false
+var restored_bursts: Node3D
+var _shot_players: Array[AudioStreamPlayer] = []
+var _last_shot := {}
 
 func _ready() -> void:
 	process_priority = 100
 	_instance.global_transform = Transform3D.IDENTITY
+	restored_bursts = preload("res://scripts/combat/rendering/restored_bursts.gd").new()
+	add_child(restored_bursts)
+	# Prototype's shared six-voice / 25 ms-per-kind budget, real-time cosmetic only.
+	for i in 6:
+		var voice := AudioStreamPlayer.new()
+		voice.volume_db = -20
+		add_child(voice)
+		_shot_players.append(voice)
+
+func play_restored_shot(kind: int,stream: AudioStream) -> void:
+	if stream == null: return
+	var now := Time.get_ticks_usec()
+	if now-int(_last_shot.get(kind,-25000)) < 25000: return
+	for voice in _shot_players:
+		if not voice.playing:
+			voice.stream = stream
+			voice.play()
+			_last_shot[kind] = now
+			return
 
 func add_beam(start: Vector3, end: Vector3, color: Color, width: float, duration: float) -> void:
 	beams.append({"start": start, "end": end, "color": color, "width": width, "duration": duration, "age": 0.0})
@@ -41,7 +63,7 @@ func _process(delta: float) -> void:
 			_arrow(mesh, shot)
 			continue
 		var fraction: float = clampf(shot.age/shot.duration, 0.0, 1.0)
-		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*sin(fraction*PI)*shot.arc
+		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*(4.0*fraction*(1.0-fraction) if shot.get("mortar",false) else sin(fraction*PI))*shot.arc
 		var x: Vector3 = Vector3.RIGHT*shot.visual_size
 		var z: Vector3 = Vector3.BACK*shot.visual_size
 		var y: Vector3 = Vector3.UP*shot.visual_size

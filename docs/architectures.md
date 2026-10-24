@@ -1,6 +1,6 @@
 # 專案結構
 
-本文件提供目錄與系統層級的導覽。遊戲體驗與目標見 [README](../README.md)，開發共識與維護規則見 [AGENTS](../AGENTS.md)，實作細節見 [系統說明](systems.md)。
+本文件提供目錄與系統層級的導覽。遊戲體驗與目標見 [README](../README.md)，開發共識與維護規則見 [AGENTS](../AGENTS.md)，實作細節見 [系統說明](systems.md)，版本／測試與接手順序見 [交接文件](HANDOFF.md)。
 
 ## 目錄分工
 
@@ -27,6 +27,8 @@
 | 地圖 `map` | 格子資料、道路接口與批次變更；外觀變種和浮起動畫獨立管理 |
 | 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額與除錯顯示 |
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
+| 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
+| 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與收藏 UI |
 | 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果 |
 | 鏡頭與環境 `camera`／`environment` | 鏡頭平移、縮放與旋轉、雲海與環境呈現 |
 
@@ -62,6 +64,8 @@ scripts/
 ├── navigation/              道路快照、原生介接與重建協調
 │   ├── routes/              候選行程、兵種評分與配額機率
 │   └── visualization/       F1／F2 路線與地塊除錯顯示
+├── relics/                  本局遺物、獎勵抽取與選擇／收藏 UI
+├── traffic/                 臨時設施資料、實例、權重及預覽差異
 └── towers/                  塔種、塔實例、占格與地圖提交
 ```
 
@@ -69,7 +73,7 @@ scripts/
 
 | 範圍 | 責任與主要協作 |
 | --- | --- |
-| `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，協調手牌、商店及開波權限 |
+| `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，包含清波後等待砲彈、ACT 遺物選擇，再協調手牌、商店及開波權限 |
 | `levels/definitions/` | `LevelDefinition` → `ActDefinition` → `WaveDefinition` → `WaveSpawnGroup` 保存可編輯配方與設定驗證；編輯器外掛、關卡和生成系統共用這些型別 |
 | `levels/expansion/` | 依已提交道路搜尋新入口候選，處理方向選擇、預覽和新增道路／端點；完成後由 session 恢復下一波準備 |
 | `levels/presentation/` | 將 session 進度投影到時間線、起點對話框、餘額與下一波兵種列；協調準備期流量預覽、處理倍速、暫停過渡、選單與玩家意圖 |
@@ -82,7 +86,7 @@ scripts/
 | 範圍 | 責任與主要協作 |
 | --- | --- |
 | `cards/` | 管理手牌庫存、選卡與旋轉狀態，送出預覽／放置意圖，依關卡階段及商店狀態切換輸入；成功提交後才消耗卡牌 |
-| `cards/definitions/` | `BuildCard` 組合塔種、價格與 `TilePreset`；候選資源保存各塔的地塊檔案引用與相對權重 |
+| `cards/definitions/` | `BuildCard` 組合塔種與 `TilePreset`，或單獨輔助設施定義，保存價格快照；候選資源保存各塔的地塊檔案引用與相對權重 |
 | `cards/shop/` | 保存金幣及商品庫存，處理波次獎勵、購買、重刷與抽牌 RNG，將結果交給手牌與商店畫面 |
 | `cards/presentation/` | 卡面、名稱、地塊示意、扇形布局、手牌／商品動畫，以及世界中的放置模型和旋轉提示 |
 | `towers/` | `TowerDefinition` 提供塔種設定，`DefenseTower` 保存實例狀態；`TowerMap` 驗證整組地塊、占格、端點、BFS 連通性及固定行程，提交塔與道路並更新威脅 |
@@ -90,18 +94,20 @@ scripts/
 | `map/tile/` | 管理格座標與接口契約、道路批次變更及鄰格刷新；`TileParameters` 保存單格資料，store 維護每張地圖的資料集合、塔覆蓋與按兵種快取的成本陣列 |
 | `map/tile/appearance/` | 根據已提交道路選擇合法柱子／木橋外觀，以獨立顯示 GridMap 播放差異格的浮起動畫；邏輯道路立即可用 |
 | `navigation/` | 從 GridMap 和障礙取得 packed snapshot，協調原生建圖、額外端點、編輯檢查、revision 及快取失效，向生成器與除錯層提供計畫 API |
-| `navigation/routes/` | 共用有限幾何候選，加入兵種偏好候選、原始評分與 threshold 篩選，再建立 Uniform／Softmax 機率表及固定配額，回傳完整逐格行程；從已分配行程累加兵種／入口／有向區段流量 |
+| `navigation/routes/` | 一般 Cost 共用有限幾何候選、兵種探索、原始評分及 strict threshold；硬性規則依已提交路網歷史生成最短／最新代表。共用 Uniform／Softmax、交通權重、固定配額及完整逐格行程；流量從已分配行程累加 |
 | `navigation/visualization/` | 讀取當波行程與地塊資料，繪製 F1／F2、圖例及參數，另從完整配額行程保留抵達相位、以查表及批次網格顯示玩家流量筆觸；局部路線輔助資料也留在此呈現邊界 |
 
 地塊資料集合在 `map/tile/` 實作，執行時由 `PortalMap` 為每張地圖持有一份；導航消費其成本陣列，塔系統透過控制器提交覆蓋變更。store 快取評分輸入，實際路線探索由導航及原生核心完成，檔案位置與實例持有者在這裡分開說明。
 
 ### 戰鬥、敵人與呈現
 
+兵營由 combat 根目錄的 BarracksSystem 協調，FriendlySoldier 保存生命、駐點與接戰實例狀態；TowerDefinition 引用 BarracksDeployment 資料。Enemy 只保存接戰持有者並暫停既定行程，不重新尋路；TowerMap 負責駐點放置限制。恢復塔的共用即時單體／範圍／全體策略位於 combat/attacks，純視覺與聲音仍由 rendering 層處理。資源與來源說明見 [塔資料](../assets/data/towers/README.md)。
+
 | 範圍 | 責任與主要協作 |
 | --- | --- |
 | `enemies/` | 每隻敵人持有生命／護盾、狀態效果、位置與完整固定行程，沿行程移動並發出抵達、受傷及死亡通知；共用邏輯預設留在本層 |
 | `enemies/troops/` | `Troop` 描述數值、路線偏好、模型與圖示，`TroopCatalog` 發現並共用資源，供波次編輯器、生成器和導航使用 |
-| `combat/` | 在移動完成後建立一次敵人格子索引，執行索敵、瞄準、冷卻及飛行攻擊結算；塔與 AOE 共用該索引 |
+| `combat/` | EnemyAbilities 在移動後建立共用敵人格子索引並處理能力，兵營與塔接續索敵、瞄準、冷卻及飛行攻擊結算；AOE 亦共用該索引 |
 | `combat/attacks/` | 箭矢、光束及拋射物描述投遞策略，`AttackPayload` 保存發射時的傷害／效果快照，讓飛行中的攻擊可獨立於來源塔結算 |
 | `combat/effects/` | 描述命中後對敵人施加的規則效果，例如減速的倍率、期限及對應狀態圖示 |
 | `combat/rendering/` | 把已存在的飛行／命中資料轉成軌跡、箭矢、AOE 與死亡爆散，管理特效回收及動畫 |
@@ -119,6 +125,8 @@ scripts/
 
 新增內容優先沿用對應功能與上述責任邊界。共用常數跟隨所屬功能，Resource 型別跟隨其資料領域；可編輯的 `.tres` 實例仍放 `assets/data/`。UI、渲染、測試與工具各自透過現有介面協作，搬移腳本時同步更新明確路徑並保留 UID。
 
+`traffic/` 由 TowerMap 持有設施管理器，另存占位及效果，不加入導航障礙或戰鬥塔列表。PortalMap 保存正式效果與獨立配額快取；候選探索仍歸 navigation/routes。CardPlacement 將唯讀候選效果送至既有 WaveFlowPreview，沿用出生排程、流量統計與渲染器。資料／模型／圖示位於 assets 對應的 traffic 子目錄，岔路標記外觀在 scenes/traffic/components；驗證位於 tests/traffic。
+
 ## 資料與責任邊界
 
 遊戲設定由 `assets/data/` 的 Resource 提供，場景組合可編輯的節點與外觀，GDScript 協調規則與流程。C++ 處理道路幾何與搜尋，不持有商店、關卡進度或敵人流量。血量、位置、冷卻與固定行程等即時狀態由各遊戲實體保存，不寫回共用設定。
@@ -132,3 +140,7 @@ scripts/
 測試依功能分類；JSON、截圖與 log 放在已忽略的 `.godot/`，`reports/` 只保存需要長期參考的摘要。一次性壓測與重複純預覽場景已清除，保留功能與實際繪製回歸。素材工具產生可編輯的遊戲資產，原生工具將 C++ 核心建置到 `bin/`。正式匯出排除測試、工具、報告、技術文件與原生 SDK。
 
 更細的操作入口見 [場景導覽](../scenes/README.md)、[測試說明](../tests/README.md)、[工具說明](../tools/README.md)與 [原生核心](../native/README.md)。
+
+Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。
+
+Phase 4 沿用 `enemies/troops` 資料型別；`spawning` 將整群配額展開為個體。`navigation/routes` 保存每局物理路網歷史與硬性候選快取，原生核心提供最短格距及新通路查證；不把候選索引當作持久身份。`combat` 的敵軍能力協調器在塔／友軍前處理治療與癱瘓，共用敵人空間索引。`enemies/presentation` 管理首次提示與可重開情報，`enemies/rendering` 管理共用步態與能力環，詳細規則見 [Phase 4](phase4.md)。

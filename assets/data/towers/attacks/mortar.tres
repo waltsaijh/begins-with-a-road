@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="VolleyAttack" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/effects/hit_effect.gd" id="1_t7a1f"]
+[ext_resource type="Script" path="res://scripts/combat/attacks/volley_attack.gd" id="2_drcii"]
+
+[resource]
+script = ExtResource("2_drcii")
+mode = 1
+mortar_visual = true
+color = Color(1, 0.76862746, 0.42745098, 1)

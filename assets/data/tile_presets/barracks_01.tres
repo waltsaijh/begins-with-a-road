@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="TilePreset" format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/tile_preset.gd" id="1_fymid"]
+
+[resource]
+script = ExtResource("1_fymid")

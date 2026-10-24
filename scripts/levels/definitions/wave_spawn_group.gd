@@ -31,6 +31,8 @@ var troop: Troop:
 
 @warning_ignore("integer_division")
 func spawn_tick(index: int) -> int:
+	if troop != null and troop.cohort_size > 1:
+		return start_tick+(index/troop.cohort_size)*maxi(interval_ticks, troop.cohort_size*troop.cohort_interval_ticks)+(index%troop.cohort_size)*troop.cohort_interval_ticks
 	return start_tick+(index/batch_size)*interval_ticks
 
 func end_tick() -> int:
@@ -38,6 +40,11 @@ func end_tick() -> int:
 
 func count_at(tick: int) -> int:
 	if tick < start_tick or batch_size < 1: return 0
+	if troop != null and troop.cohort_size > 1:
+		var count := 0
+		for i in enemy_count:
+			if spawn_tick(i) <= tick: count += 1
+		return count
 	if interval_ticks == 0: return enemy_count
 	@warning_ignore("integer_division")
 	var batches := (tick-start_tick)/interval_ticks+1

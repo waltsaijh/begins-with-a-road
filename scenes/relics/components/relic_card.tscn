@@ -1,0 +1,59 @@
+[gd_scene load_steps=3 format=3]
+[sub_resource type="StyleBoxFlat" id="normal"]
+bg_color = Color(0.98, 0.97, 0.95, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.43, 0.52, 0.49, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_left = 12
+corner_radius_bottom_right = 12
+[sub_resource type="StyleBoxFlat" id="hover"]
+bg_color = Color(0.83, 0.92, 0.84, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.32, 0.64, 0.52, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_left = 12
+corner_radius_bottom_right = 12
+[node name="RelicCard" type="Button"]
+custom_minimum_size = Vector2(260, 330)
+theme_override_styles/normal = SubResource("normal")
+theme_override_styles/hover = SubResource("hover")
+theme_override_styles/pressed = SubResource("hover")
+theme_override_styles/focus = SubResource("hover")
+[node name="Contents" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = -24.0
+mouse_filter = 2
+theme_override_constants/separation = 18
+[node name="Icon" type="TextureRect" parent="Contents"]
+custom_minimum_size = Vector2(100,100)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Title" type="Label" parent="Contents"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.15,0.25,0.23,1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 2
+[node name="Description" type="Label" parent="Contents"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.23,0.30,0.27,1)
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 2

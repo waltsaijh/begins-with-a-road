@@ -27,7 +27,8 @@ func show_recipe(value: BuildCard, rotation_steps: int, color: Color) -> void:
 
 func _refresh() -> void:
 	if not is_node_ready(): return
-	var cells: Array = card.ground_cells(Vector2i.ZERO, turns) if card != null else []
+	queue_redraw()
+	var cells: Array = card.ground_cells(Vector2i.ZERO, turns) if card != null and card.traffic == null else []
 	while _views.size() < cells.size():
 		var view := cell_scene.instantiate() as Control
 		add_child(view)
@@ -50,3 +51,11 @@ func _refresh() -> void:
 		view.size = Vector2.ONE*width
 		view.get_node("Tower").visible = cells[i] in blocked
 		view.get_node("Tower/Accent").self_modulate = accent
+
+func _draw() -> void:
+	if card == null or card.traffic == null: return
+	var font := get_theme_font("font", "Label")
+	var font_size := 12
+	var lines := tr(card.traffic.effect_key)+"\n"+tr("traffic.duration").format({"waves": card.traffic.duration_waves})
+	var top := maxf(0.0,(size.y-font.get_height(font_size)*2)*0.5)+font.get_ascent(font_size)
+	draw_multiline_string(font,Vector2(0,top),lines,HORIZONTAL_ALIGNMENT_CENTER,size.x,font_size,2,Color("36443c"))

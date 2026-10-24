@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://vos1edwuv5af"]
+
+[ext_resource type="Script" uid="uid://wfho8ycnjduj" path="res://tests/relics/playground.gd" id="1"]
+
+[node name="Phase3Playground" type="Node3D" unique_id=152243897]
+script = ExtResource("1")

@@ -232,3 +232,17 @@ func debug_graph(key: String) -> Dictionary:
 		packed_edges.append({"id": edge.id, "from": edge.from, "to": edge.to, "cost": edge.cost, "links": links})
 	plan.debug = {"nodes": PackedInt32Array(nodes.keys()), "edges": packed_edges}
 	return plan.debug.duplicate(true)
+
+func modified_distribution(key: String, profile: Troop, effects: Array) -> Dictionary:
+	if not _plans.has(key): return {"valid": false}
+	var current: Dictionary = _plans[key]
+	var scores := PackedFloat64Array()
+	for candidate: Dictionary in current.routes: scores.append(candidate.score)
+	return Distribution.build(scores, profile.route_temperature, profile.route_selection, TrafficWeights.log_multipliers(current.routes, profile, effects))
+
+func allocate_modified(key: String, index: int, total: int, distribution: Dictionary) -> Dictionary:
+	if not distribution.get("valid", false): return {}
+	var selected := Distribution.allocate(distribution.cdf, index, total)
+	var result := sample(key, 0, selected) if selected >= 0 else {}
+	if not result.is_empty(): result.selection_probability = distribution.probabilities[selected]
+	return result

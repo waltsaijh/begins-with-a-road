@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/saboteur.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/saboteur.svg" id="3"]
+[resource]
+script = ExtResource("1")
+troop_name = "saboteur"
+name_key = "troop.saboteur.name"
+sort_order = 15
+body_size = "standard"
+tags = Array[StringName]([&"ground", &"saboteur"])
+max_health = 75.0
+speed_multiplier = 0.9
+melee_damage = 5.0
+route_selection = 0
+model = ExtResource("2")
+icon = ExtResource("3")
+debug_color = Color(0.74, 0.52, 0.23, 1)
+ability_text = "每 6 秒選附近 3 格內一塔，前搖 1 秒後癱瘓 2.5 秒。重疊取剩餘時間最大值；來源死亡即解除。"
+ability_text_en = "Every 6 seconds targets a tower within 3 tiles, winds up for 1 second, then disables it for 2.5 seconds. Overlaps use the longest remaining time; source death removes its effect."
+sabotage_radius = 3.0
+sabotage_interval = 6.0
+sabotage_windup = 1.0
+sabotage_duration = 2.5

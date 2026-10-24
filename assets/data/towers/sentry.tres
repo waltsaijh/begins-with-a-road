@@ -3,9 +3,10 @@
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://d267iu2yunnih" path="res://assets/sprites/towers/sentry.png" id="1_yfivi"]
 [ext_resource type="PackedScene" uid="uid://c3ps5lqrpn65o" path="res://assets/models/towers/sentry.tscn" id="2"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="3_55upa"]
 [ext_resource type="Resource" uid="uid://cuw4f0ui2jsep" path="res://assets/data/towers/attacks/sentry_arrow.tres" id="3_attack"]
 [ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="4_candidate"]
-[ext_resource type="Resource" path="res://assets/data/towers/ranges/sentry_forward.tres" id="5_area"]
+[ext_resource type="Resource" uid="uid://doxum7q1mrfsw" path="res://assets/data/towers/ranges/sentry_forward.tres" id="5_area"]
 
 [sub_resource type="Resource" id="corner_candidate"]
 script = ExtResource("4_candidate")

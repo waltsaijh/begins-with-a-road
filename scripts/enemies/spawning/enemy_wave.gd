@@ -114,6 +114,14 @@ func start_wave() -> bool:
 func _prepare_legacy_wave() -> bool:
 	var profile: Troop = troop if troop != null else controller.troop
 	var origin: int = controller.active_start if start_index < 0 else start_index
+	if profile.cohort_size > 1:
+		var recipe := _legacy_cohort_definition(profile,origin)
+		var schedule := WaveSpawnSchedule.build(recipe,controller,_next_enemy_id,true)
+		if schedule.is_empty(): return false
+		_pending.assign(schedule.pending)
+		pool_size = schedule.pool_size
+		_scheduled = true
+		return true
 	var plan: Dictionary = controller.plan_for(profile, origin)
 	pool_size = plan.get("routes", 0)
 	if not plan.get("valid", false) or pool_size == 0:
@@ -135,11 +143,22 @@ func _prepare_legacy_wave() -> bool:
 			return false
 		var points := PackedVector3Array()
 		for cell: Vector2 in route.cells:
-			points.append(map.to_global(map.map_to_local(Vector3i(int(cell.x), 0, int(cell.y)))+Vector3.UP*EnemyConstants.GROUND_OFFSET))
-		_pending.append({"id": id, "wave_index": i, "route": route, "points": points})
+			points.append(map.to_global(map.map_to_local(Vector3i(int(cell.x), 0, int(cell.y)))+Vector3.UP*(EnemyConstants.GROUND_OFFSET+profile.flight_height*map.cell_size.y)))
+		_pending.append({"id": id, "wave_index": i, "route": route, "points": points, "abilities":profile.ability_snapshot()})
 	# Randomness changes departure timing only; route quotas are already fixed.
 	_pending.shuffle()
 	return true
+
+func _legacy_cohort_definition(profile: Troop, origin: int) -> WaveDefinition:
+	var recipe := WaveDefinition.new()
+	recipe.move_speed = move_speed
+	var group := WaveSpawnGroup.new()
+	group.troop = profile
+	group.enemy_count = enemy_count
+	group.start_index = origin
+	group.interval_ticks = maxi(1,roundi(spawn_interval/WaveSpawnGroup.TICK_SECONDS))
+	recipe.groups = [group]
+	return recipe
 
 func has_committed_routes() -> bool:
 	return not _committed_routes.is_empty()
@@ -156,6 +175,11 @@ func routes_for_display() -> Array[Dictionary]:
 	else:
 		var profile: Troop = troop if troop != null else controller.troop
 		var origin: int = controller.active_start if start_index < 0 else start_index
+		if profile.cohort_size > 1:
+			var schedule := WaveSpawnSchedule.build(_legacy_cohort_definition(profile,origin),controller,_next_enemy_id,false)
+			for data: Dictionary in schedule.get("pending",[]):
+				result.append({"troop":profile.troop_name,"color":profile.debug_color,"cells":data.route.cells})
+			return result
 		for i in enemy_count:
 			var route: Dictionary = controller.allocate_route_for(profile, i, enemy_count, origin)
 			if route.is_empty(): return []
@@ -202,6 +226,7 @@ func _spawn_entry(data: Dictionary) -> void:
 	enemy.max_shield = data.get("shield", _wave_shield)
 	enemy.shield = enemy.max_shield
 	enemy.move_speed = data.get("speed", _wave_speed)
+	enemy.abilities = data.get("abilities",enemy.troop.ability_snapshot()).duplicate(true)
 	enemy.arrived.connect(_on_arrived)
 	enemy.died.connect(_on_enemy_died)
 	enemy.tree_exiting.connect(_on_enemy_exiting.bind(enemy), CONNECT_ONE_SHOT)

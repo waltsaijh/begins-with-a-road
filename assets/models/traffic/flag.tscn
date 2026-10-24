@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/traffic/flag_ground.tscn" id="1_ground"]
+
+[sub_resource type="StandardMaterial3D" id="wood"]
+albedo_color = Color(0.39, 0.27, 0.16, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="cloth"]
+albedo_color = Color(0.72, 0.34, 0.25, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="stone"]
+albedo_color = Color(0.57, 0.57, 0.48, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="mesh0"]
+material = SubResource("stone")
+size = Vector3(0.3, 0.15, 0.3)
+
+[sub_resource type="BoxMesh" id="mesh1"]
+material = SubResource("wood")
+size = Vector3(0.07, 1.0, 0.07)
+
+[sub_resource type="BoxMesh" id="mesh2"]
+material = SubResource("cloth")
+size = Vector3(0.42, 0.27, 0.035)
+
+[node name="flag" type="Node3D"]
+
+[node name="Ground" parent="." instance=ExtResource("1_ground")]
+position = Vector3(0, -0.025, 0)
+
+[node name="Part0" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.075, 0)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("mesh0")
+
+[node name="Part1" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.5, 0)
+rotation_degrees = Vector3(0, 0, 0)
+mesh = SubResource("mesh1")
+
+[node name="Part2" type="MeshInstance3D" parent="."]
+position = Vector3(0.22, 0.80, 0)
+rotation_degrees = Vector3(0, 0, -6)
+mesh = SubResource("mesh2")

@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://wi7jm2k8d4eq"]
+
+[ext_resource type="Resource" path="res://assets/data/towers/attacks/broadside.tres" id="1_xpn7g"]
+[ext_resource type="Resource" path="res://assets/data/towers/ranges/broadside.tres" id="2_av4gk"]
+[ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="3_xpn7g"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/broadside.tscn" id="4_ggahg"]
+[ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="5_l6yb8"]
+[ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="6_odhbd"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_x372t"]
+load_path = "res://.godot/imported/broadside.png-ab16d214a207d3612e0de0c01811c8ac.ctex"
+
+[sub_resource type="Resource" id="Resource_1ljdw"]
+script = ExtResource("6_odhbd")
+preset_path = "res://assets/data/tile_presets/broadside_01.tres"
+
+[sub_resource type="Resource" id="Resource_nf4w8"]
+script = ExtResource("6_odhbd")
+preset_path = "res://assets/data/tile_presets/broadside_02.tres"
+
+[sub_resource type="Resource" id="Resource_ilwns"]
+script = ExtResource("6_odhbd")
+preset_path = "res://assets/data/tile_presets/broadside_03.tres"
+
+[sub_resource type="Resource" id="Resource_3g8r7"]
+script = ExtResource("6_odhbd")
+preset_path = "res://assets/data/tile_presets/broadside_04.tres"
+
+[resource]
+script = ExtResource("5_l6yb8")
+name_key = "tower.broadside.name"
+model = ExtResource("4_ggahg")
+card_price = 12
+icon = SubResource("CompressedTexture2D_x372t")
+accent_color = Color(0.7882353, 0.63529414, 0.92941177, 1)
+footprint = Array[Vector2i]([Vector2i(0, 0)])
+attack_area = ExtResource("2_av4gk")
+default_damage = 8.0
+attack = ExtResource("1_xpn7g")
+tile_preset_candidates = Array[ExtResource("6_odhbd")]([SubResource("Resource_1ljdw"), SubResource("Resource_nf4w8"), SubResource("Resource_ilwns"), SubResource("Resource_3g8r7")])

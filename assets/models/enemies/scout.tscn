@@ -1,0 +1,139 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="mat1"]
+albedo_color = Color(0.45098, 0.552941, 0.411765, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderMesh" id="mesh1"]
+top_radius = 0.19
+bottom_radius = 0.23
+height = 0.48
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="mat2"]
+albedo_color = Color(0.803922, 0.721569, 0.576471, 1)
+roughness = 0.95
+
+[sub_resource type="SphereMesh" id="mesh2"]
+radius = 0.15
+height = 0.3
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="mat3"]
+albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh3"]
+size = Vector3(0.11, 0.25, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="mat4"]
+albedo_color = Color(0.45098, 0.552941, 0.411765, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh4"]
+size = Vector3(0.12, 0.34, 0.13)
+
+[sub_resource type="StandardMaterial3D" id="mat5"]
+albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh5"]
+size = Vector3(0.11, 0.25, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="mat6"]
+albedo_color = Color(0.45098, 0.552941, 0.411765, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh6"]
+size = Vector3(0.12, 0.34, 0.13)
+
+[sub_resource type="StandardMaterial3D" id="mat7"]
+albedo_color = Color(0.45098, 0.552941, 0.411765, 1)
+roughness = 0.95
+
+[sub_resource type="CylinderMesh" id="mesh7"]
+top_radius = 0.08
+bottom_radius = 0.2
+height = 0.25
+radial_segments = 8
+
+[sub_resource type="StandardMaterial3D" id="mat8"]
+albedo_color = Color(0.92549, 0.894118, 0.807843, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh8"]
+size = Vector3(0.08, 0.28, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="mat9"]
+albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh9"]
+size = Vector3(0.1, 0.1, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="mat10"]
+albedo_color = Color(0.380392, 0.439216, 0.458824, 1)
+roughness = 0.95
+
+[sub_resource type="PrismMesh" id="mesh10"]
+size = Vector3(0.06, 0.32, 0.07)
+
+[node name="Scout" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Coat" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.4, 0)
+mesh = SubResource("mesh1")
+material_override = SubResource("mat1")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.78, -0.01)
+mesh = SubResource("mesh2")
+material_override = SubResource("mat2")
+
+[node name="Leg-1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.1, 0.13, 0)
+mesh = SubResource("mesh3")
+material_override = SubResource("mat3")
+metadata/gait = -1
+
+[node name="Arm-1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.23, 0.45, 0)
+mesh = SubResource("mesh4")
+material_override = SubResource("mat4")
+metadata/gait = 1
+
+[node name="Leg1" type="MeshInstance3D" parent="."]
+position = Vector3(0.1, 0.13, 0)
+mesh = SubResource("mesh5")
+material_override = SubResource("mat5")
+metadata/gait = 1
+
+[node name="Arm1" type="MeshInstance3D" parent="."]
+position = Vector3(0.23, 0.45, 0)
+mesh = SubResource("mesh6")
+material_override = SubResource("mat6")
+metadata/gait = -1
+
+[node name="Hood" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.86, 0.03)
+mesh = SubResource("mesh7")
+material_override = SubResource("mat7")
+
+[node name="Feather" type="MeshInstance3D" parent="."]
+position = Vector3(0.1, 1.02, 0.04)
+mesh = SubResource("mesh8")
+material_override = SubResource("mat8")
+
+[node name="Telescope" type="MeshInstance3D" parent="."]
+position = Vector3(0.2, 0.64, -0.19)
+mesh = SubResource("mesh9")
+material_override = SubResource("mat9")
+
+[node name="Dagger" type="MeshInstance3D" parent="."]
+position = Vector3(-0.24, 0.28, -0.14)
+mesh = SubResource("mesh10")
+material_override = SubResource("mat10")

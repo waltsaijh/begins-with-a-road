@@ -1,0 +1,254 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/towers/restored_tower_visual.gd" id="1_21cu3"]
+[ext_resource type="AudioStream" path="res://assets/audio/towers/crossfire.tres" id="2_8v2my"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hayu7"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.49019608, 0.5372549, 0.5686275, 1)
+metallic_specular = 0.12
+roughness = 0.98
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_bw3v0"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("7+/v/wAAAAAAAAAA4ODg/6uqKj8AAAAA7+/v/6uqqj4AAAAA4ODg/wAAgD8AAAAA7+/v/wAAAAAAAAA/4ODg/6uqKj8AAAA/7+/v/6uqqj4AAAA/4ODg/wAAgD8AAAA/7+/v/6uqqj4AAAAA7+/v/wAAAAAAAAA/7+/v/6uqKj8AAAAA7+/v/6uqqj4AAAA/7+/v/6uqqj4AAAA/7+/v/wAAAAAAAIA/7+/v/6uqKj8AAAA/7+/v/6uqqj4AAIA//////6uqqj4AAAA/vLy8/6uqKj8AAAA//////6uqKj8AAAA/vLy8/wAAgD8AAAA//////6uqqj4AAIA/vLy8/6uqKj8AAIA//////6uqKj8AAIA/vLy8/wAAgD8AAIA/"),
+"format": 34359742495,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAQAAgAGAAQAAQADAAUAAwAHAAUACAAKAAwACgAOAAwACQALAA0ACwAPAA0AEAASABQAEgAWABQAEQATABUAEwAXABUA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC//3//f////7//////AAD/v/9//3////+//////wAA/7//f/9/////v/////8AAP+//3//f////7//////AAD/v///AID/////AAAAgP9//7///wCA/////wAAAID/f/+///8AgP////8AAACA/3//v///AID/////AAAAgP9//78AgP//AAD/vwCAAAD///+/AID//wAA/78AgAAA////vwCA//8AAP+/AIAAAP///78AgP//AAD/vwCAAAD///+/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_etmj1"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.80784315, 0.78431374, 0.69803923, 1)
+metallic_specular = 0.12
+roughness = 0.98
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_slwrn"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("7+/v/wAAAAAAAAAA4ODg/6uqKj8AAAAA7+/v/6uqqj4AAAAA4ODg/wAAgD8AAAAA7+/v/wAAAAAAAAA/4ODg/6uqKj8AAAA/7+/v/6uqqj4AAAA/4ODg/wAAgD8AAAA/7+/v/6uqqj4AAAAA7+/v/wAAAAAAAAA/7+/v/6uqKj8AAAAA7+/v/6uqqj4AAAA/7+/v/6uqqj4AAAA/7+/v/wAAAAAAAIA/7+/v/6uqKj8AAAA/7+/v/6uqqj4AAIA//////6uqqj4AAAA/vLy8/6uqKj8AAAA//////6uqKj8AAAA/vLy8/wAAgD8AAAA//////6uqqj4AAIA/vLy8/6uqKj8AAIA//////6uqKj8AAIA/vLy8/wAAgD8AAIA/"),
+"format": 34359742495,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAQAAgAGAAQAAQADAAUAAwAHAAUACAAKAAwACgAOAAwACQALAA0ACwAPAA0AEAASABQAEgAWABQAEQATABUAEwAXABUA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC//3//f////7//////AAD/v/9//3////+//////wAA/7//f/9/////v/////8AAP+//3//f////7//////AAD/v///AID/////AAAAgP9//7///wCA/////wAAAID/f/+///8AgP////8AAACA/3//v///AID/////AAAAgP9//78AgP//AAD/vwCAAAD///+/AID//wAA/78AgAAA////vwCA//8AAP+/AIAAAP///78AgP//AAD/vwCAAAD///+/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eydi3"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.34509805, 0.45882353, 0.56078434, 1)
+metallic_specular = 0.12
+roughness = 0.98
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_js011"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("7+/v/wAAAAAAAAAA4ODg/6uqKj8AAAAA7+/v/6uqqj4AAAAA4ODg/wAAgD8AAAAA7+/v/wAAAAAAAAA/4ODg/6uqKj8AAAA/7+/v/6uqqj4AAAA/4ODg/wAAgD8AAAA/7+/v/6uqqj4AAAAA7+/v/wAAAAAAAAA/7+/v/6uqKj8AAAAA7+/v/6uqqj4AAAA/7+/v/6uqqj4AAAA/7+/v/wAAAAAAAIA/7+/v/6uqKj8AAAA/7+/v/6uqqj4AAIA//////6uqqj4AAAA/vLy8/6uqKj8AAAA//////6uqKj8AAAA/vLy8/wAAgD8AAAA//////6uqqj4AAIA/vLy8/6uqKj8AAIA//////6uqKj8AAIA/vLy8/wAAgD8AAIA/"),
+"format": 34359742495,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAQAAgAGAAQAAQADAAUAAwAHAAUACAAKAAwACgAOAAwACQALAA0ACwAPAA0AEAASABQAEgAWABQAEQATABUAEwAXABUA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC//3//f////7//////AAD/v/9//3////+//////wAA/7//f/9/////v/////8AAP+//3//f////7//////AAD/v///AID/////AAAAgP9//7///wCA/////wAAAID/f/+///8AgP////8AAACA/3//v///AID/////AAAAgP9//78AgP//AAD/vwCAAAD///+/AID//wAA/78AgAAA////vwCA//8AAP+/AIAAAP///78AgP//AAD/vwCAAAD///+/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3ye5s"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.6666667, 0.5803922, 0.4117647, 1)
+metallic = 0.18
+metallic_specular = 0.25
+roughness = 0.82
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_t3hvu"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("7+/v/wAAAAAAAAAA4ODg/6uqKj8AAAAA7+/v/6uqqj4AAAAA4ODg/wAAgD8AAAAA7+/v/wAAAAAAAAA/4ODg/6uqKj8AAAA/7+/v/6uqqj4AAAA/4ODg/wAAgD8AAAA/7+/v/6uqqj4AAAAA7+/v/wAAAAAAAAA/7+/v/6uqKj8AAAAA7+/v/6uqqj4AAAA/7+/v/6uqqj4AAAA/7+/v/wAAAAAAAIA/7+/v/6uqKj8AAAA/7+/v/6uqqj4AAIA//////6uqqj4AAAA/vLy8/6uqKj8AAAA//////6uqKj8AAAA/vLy8/wAAgD8AAAA//////6uqqj4AAIA/vLy8/6uqKj8AAIA//////6uqKj8AAIA/vLy8/wAAgD8AAIA/"),
+"format": 34359742495,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAQAAgAGAAQAAQADAAUAAwAHAAUACAAKAAwACgAOAAwACQALAA0ACwAPAA0AEAASABQAEgAWABQAEQATABUAEwAXABUA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC//3//f////7//////AAD/v/9//3////+//////wAA/7//f/9/////v/////8AAP+//3//f////7//////AAD/v///AID/////AAAAgP9//7///wCA/////wAAAID/f/+///8AgP////8AAACA/3//v///AID/////AAAAgP9//78AgP//AAD/vwCAAAD///+/AID//wAA/78AgAAA////vwCA//8AAP+/AIAAAP///78AgP//AAD/vwCAAAD///+/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qyhue"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.60784316, 0.84705883, 0.8745098, 1)
+metallic_specular = 0.12
+roughness = 0.98
+emission_enabled = true
+emission = Color(0.60784316, 0.84705883, 0.8745098, 1)
+emission_energy_multiplier = 0.25
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_30fvd"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("/////wAAAAAAAAAA/////6uqKj8AAAAA/////6uqqj4AAAAA/////wAAgD8AAAAA/////wAAAAAAAAA//////6uqKj8AAAA//////6uqqj4AAAA//////wAAgD8AAAA//////6uqqj4AAAAA/////wAAAAAAAAA//////6uqKj8AAAAA/////6uqqj4AAAA//////6uqqj4AAAA//////wAAAAAAAIA//////6uqKj8AAAA//////6uqqj4AAIA//////6uqqj4AAAA//////6uqKj8AAAA//////6uqKj8AAAA//////wAAgD8AAAA//////6uqqj4AAIA//////6uqKj8AAIA//////6uqKj8AAIA//////wAAgD8AAIA/"),
+"format": 34359742495,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAQAAgAGAAQAAQADAAUAAwAHAAUACAAKAAwACgAOAAwACQALAA0ACwAPAA0AEAASABQAEgAWABQAEQATABUAEwAXABUA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAvwAAAD8AAAA/AAAAPwAAAD8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAL8AAAC/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAD8AAAA/AAAAvwAAAD8AAAC/AAAAPwAAAD8AAAC/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAvwAAAL8AAAC/AAAAPwAAAL8AAAC/AAAAvwAAAL8AAAA/AAAAPwAAAD8AAAA/AAAAvwAAAL8AAAA/AAAAvwAAAD8AAAA/AAAAPwAAAL8AAAA/AAAAPwAAAD8AAAC/AAAAvwAAAL8AAAC/AAAAvwAAAD8AAAC/AAAAPwAAAL8AAAC//3//f////7//////AAD/v/9//3////+//////wAA/7//f/9/////v/////8AAP+//3//f////7//////AAD/v///AID/////AAAAgP9//7///wCA/////wAAAID/f/+///8AgP////8AAACA/3//v///AID/////AAAAgP9//78AgP//AAD/vwCAAAD///+/AID//wAA/78AgAAA////vwCA//8AAP+/AIAAAP///78AgP//AAD/vwCAAAD///+/")
+}]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ia32n"]
+height = 1.0
+radial_segments = 10
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_cd1pt"]
+height = 1.0
+radial_segments = 5
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xin3b"]
+top_radius = 0.0
+height = 1.0
+radial_segments = 5
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b8owl"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.23921569, 0.3254902, 0.42352942, 1)
+metallic_specular = 0.12
+roughness = 0.98
+
+[node name="Weapon" type="Node3D" unique_id=909756716]
+script = ExtResource("1_21cu3")
+kind = 4
+shot_sound = ExtResource("2_8v2my")
+metadata/art_kind = 4
+metadata/recoil_rest = Vector3(0, 0.37, 0)
+metadata/muzzle_paths = Array[NodePath]([NodePath("RecoilAssembly/RadialEmitter/EmitterFace"), NodePath("RecoilAssembly/@Node3D@85/EmitterFace"), NodePath("RecoilAssembly/@Node3D@89/EmitterFace"), NodePath("RecoilAssembly/@Node3D@93/EmitterFace")])
+
+[node name="@MeshInstance3D@79" type="MeshInstance3D" parent="." unique_id=431631564]
+transform = Transform3D(0.76, 0, 0, 0, 0.12, 0, 0, 0, 0.76, 0, 0.06, 0)
+material_override = SubResource("StandardMaterial3D_hayu7")
+mesh = SubResource("ArrayMesh_bw3v0")
+
+[node name="@MeshInstance3D@80" type="MeshInstance3D" parent="." unique_id=686576048]
+transform = Transform3D(0.7296, 0, 0, 0, 0.07, 0, 0, 0, 0.7296, 0, 0.155, 0)
+material_override = SubResource("StandardMaterial3D_etmj1")
+mesh = SubResource("ArrayMesh_slwrn")
+
+[node name="RecoilAssembly" type="Node3D" parent="." unique_id=1215260813]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37, 0)
+
+[node name="RadialEmitter" type="Node3D" parent="RecoilAssembly" unique_id=525434281]
+
+[node name="@MeshInstance3D@82" type="MeshInstance3D" parent="RecoilAssembly/RadialEmitter" unique_id=523746140]
+transform = Transform3D(0.16, 0, 0, 0, 0.12, 0, 0, 0, 0.29, 0, 0.04, -0.26)
+material_override = SubResource("StandardMaterial3D_eydi3")
+mesh = SubResource("ArrayMesh_js011")
+
+[node name="@MeshInstance3D@83" type="MeshInstance3D" parent="RecoilAssembly/RadialEmitter" unique_id=265863571]
+transform = Transform3D(0.18, 0, 0, 0, 0.14, 0, 0, 0, 0.055, 0, 0.04, -0.4)
+material_override = SubResource("StandardMaterial3D_3ye5s")
+mesh = SubResource("ArrayMesh_t3hvu")
+
+[node name="@MeshInstance3D@84" type="MeshInstance3D" parent="RecoilAssembly/RadialEmitter" unique_id=2022073101]
+transform = Transform3D(0.1, 0, 0, 0, 0.055, 0, 0, 0, 0.01, 0, 0.04, -0.435)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("ArrayMesh_30fvd")
+
+[node name="EmitterFace" type="Node3D" parent="RecoilAssembly/RadialEmitter" unique_id=1829694702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.44)
+
+[node name="@Node3D@85" type="Node3D" parent="RecoilAssembly" unique_id=557872482]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="@MeshInstance3D@86" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@85" unique_id=940078003]
+transform = Transform3D(0.16, 0, 0, 0, 0.12, 0, 0, 0, 0.29, 0, 0.04, -0.26)
+material_override = SubResource("StandardMaterial3D_eydi3")
+mesh = SubResource("ArrayMesh_js011")
+
+[node name="@MeshInstance3D@87" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@85" unique_id=1013712651]
+transform = Transform3D(0.18, 0, 0, 0, 0.14, 0, 0, 0, 0.055, 0, 0.04, -0.4)
+material_override = SubResource("StandardMaterial3D_3ye5s")
+mesh = SubResource("ArrayMesh_t3hvu")
+
+[node name="@MeshInstance3D@88" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@85" unique_id=192066158]
+transform = Transform3D(0.1, 0, 0, 0, 0.055, 0, 0, 0, 0.01, 0, 0.04, -0.435)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("ArrayMesh_30fvd")
+
+[node name="EmitterFace" type="Node3D" parent="RecoilAssembly/@Node3D@85" unique_id=765348028]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.44)
+
+[node name="@Node3D@89" type="Node3D" parent="RecoilAssembly" unique_id=571069020]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="@MeshInstance3D@90" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@89" unique_id=1673001752]
+transform = Transform3D(0.16, 0, 0, 0, 0.12, 0, 0, 0, 0.29, 0, 0.04, -0.26)
+material_override = SubResource("StandardMaterial3D_eydi3")
+mesh = SubResource("ArrayMesh_js011")
+
+[node name="@MeshInstance3D@91" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@89" unique_id=1136382059]
+transform = Transform3D(0.18, 0, 0, 0, 0.14, 0, 0, 0, 0.055, 0, 0.04, -0.4)
+material_override = SubResource("StandardMaterial3D_3ye5s")
+mesh = SubResource("ArrayMesh_t3hvu")
+
+[node name="@MeshInstance3D@92" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@89" unique_id=217019356]
+transform = Transform3D(0.1, 0, 0, 0, 0.055, 0, 0, 0, 0.01, 0, 0.04, -0.435)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("ArrayMesh_30fvd")
+
+[node name="EmitterFace" type="Node3D" parent="RecoilAssembly/@Node3D@89" unique_id=1715268091]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.44)
+
+[node name="@Node3D@93" type="Node3D" parent="RecoilAssembly" unique_id=1653854546]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 0, 0, 0)
+
+[node name="@MeshInstance3D@94" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@93" unique_id=265446595]
+transform = Transform3D(0.16, 0, 0, 0, 0.12, 0, 0, 0, 0.29, 0, 0.04, -0.26)
+material_override = SubResource("StandardMaterial3D_eydi3")
+mesh = SubResource("ArrayMesh_js011")
+
+[node name="@MeshInstance3D@95" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@93" unique_id=1104293860]
+transform = Transform3D(0.18, 0, 0, 0, 0.14, 0, 0, 0, 0.055, 0, 0.04, -0.4)
+material_override = SubResource("StandardMaterial3D_3ye5s")
+mesh = SubResource("ArrayMesh_t3hvu")
+
+[node name="@MeshInstance3D@96" type="MeshInstance3D" parent="RecoilAssembly/@Node3D@93" unique_id=1645563731]
+transform = Transform3D(0.1, 0, 0, 0, 0.055, 0, 0, 0, 0.01, 0, 0.04, -0.435)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("ArrayMesh_30fvd")
+
+[node name="EmitterFace" type="Node3D" parent="RecoilAssembly/@Node3D@93" unique_id=12152968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.44)
+
+[node name="@MeshInstance3D@97" type="MeshInstance3D" parent="RecoilAssembly" unique_id=1110191709]
+transform = Transform3D(0.23, 0, 0, 0, 0.13, 0, 0, 0, 0.23, 0, 0.13, 0)
+material_override = SubResource("StandardMaterial3D_3ye5s")
+mesh = SubResource("CylinderMesh_ia32n")
+
+[node name="@MeshInstance3D@98" type="MeshInstance3D" parent="RecoilAssembly" unique_id=1435641356]
+transform = Transform3D(0.18, 0, 0, 0, 0.120000005, 0, 0, 0, 0.18, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("CylinderMesh_cd1pt")
+
+[node name="@MeshInstance3D@99" type="MeshInstance3D" parent="RecoilAssembly" unique_id=1588448792]
+transform = Transform3D(0.18, 0, 0, 0, 0.11000001, 0, 0, 0, 0.18, 0, 0.41000003, 0)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("CylinderMesh_xin3b")
+
+[node name="@MeshInstance3D@100" type="MeshInstance3D" parent="RecoilAssembly" unique_id=395105947]
+transform = Transform3D(0.18, 0, 0, 0, -0.060000002, 1.57361e-08, 0, -5.245367e-09, -0.18, 0, 0.21400002, 0)
+material_override = SubResource("StandardMaterial3D_qyhue")
+mesh = SubResource("CylinderMesh_xin3b")
+
+[node name="@MeshInstance3D@81" type="MeshInstance3D" parent="." unique_id=1124384162]
+transform = Transform3D(0.44, 0, 0, 0, 0.16, 0, 0, 0, 0.44, 0, 0.27, 0)
+material_override = SubResource("StandardMaterial3D_b8owl")
+mesh = SubResource("CylinderMesh_ia32n")
