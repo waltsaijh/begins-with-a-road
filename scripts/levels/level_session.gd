@@ -62,12 +62,6 @@ func _enter_tree() -> void:
 	get_node("PortalMap").start_paths = paths
 	for act in level.acts:
 		_waves.append_array(act.waves)
-	# Include custom profiles used only in later ACTs, not just catalog entries.
-	var enemy_wave: Node = get_node("EnemyWave")
-	for definition in _waves:
-		for group in definition.groups:
-			if not enemy_wave.available_troops.has(group.troop):
-				enemy_wave.available_troops.append(group.troop)
 	_valid = true
 
 func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, map: GridMap) -> Node3D:
@@ -98,7 +92,6 @@ func _ready() -> void:
 	_on_balance_changed(shop.coins)
 	_wave.wave_started.connect(_on_wave_started)
 	_wave.wave_finished.connect(_on_wave_finished)
-	_wave.presentation_prepared.connect(_update_start_callout)
 	expansion.completed.connect(_on_start_added)
 	if _wave.controls != null:
 		# Formal levels own the opening transition; standalone maps start immediately.
@@ -120,14 +113,14 @@ func _prepare_wave() -> void:
 	set_process(false)
 
 func _update_start_callout() -> void:
-	_hud.set_start_available(_wave.presentation_ready and not finished and not choosing_start and not _wave.active and not _wave_starting)
+	_hud.set_start_available(not finished and not choosing_start and not _wave.active and not _wave_starting)
 
 func _on_start_requested() -> void:
 	if choosing_start or get_tree().paused or _hud.pause_requested: return
 	_begin_wave_start()
 
 func _begin_wave_start() -> void:
-	if not _wave.presentation_ready or finished or choosing_start or _wave.active or _wave_starting or not _wave.start_allowed: return
+	if finished or choosing_start or _wave.active or _wave_starting or not _wave.start_allowed: return
 	_wave_starting = true
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true

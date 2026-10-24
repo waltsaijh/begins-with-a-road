@@ -72,7 +72,6 @@ func setup() -> void:
 		definition.groups.append(group)
 	wave.definition = definition
 	wave.enemy_spawned.connect(_on_enemy_spawned)
-	if not wave.presentation_ready: await wave.presentation_prepared
 	ready_to_start = true
 	_busy = false
 	start_button.disabled = false

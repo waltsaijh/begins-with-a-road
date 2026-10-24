@@ -8,9 +8,6 @@ const EnemyScene = preload("res://scenes/enemies/enemy.tscn")
 const VisualBatch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
 const Controls = preload("res://scenes/enemies/components/enemy_wave_controls.tscn")
 const Waypoints = preload("res://scripts/enemies/spawning/route_waypoints.gd")
-const RenderWarmup = preload("res://scripts/enemies/rendering/enemy_render_warmup.gd")
-signal presentation_prepared
-var presentation_ready := true
 @export var auto_start := true
 @export_range(1, 200, 1, "or_greater") var enemy_count := EnemyConstants.WAVE_SIZE
 ## Enemies emitted together per interval; the last batch is capped by the total.
@@ -54,14 +51,12 @@ var _committed_routes: Array[Dictionary] = []
 var visuals: MultiMeshInstance3D
 
 func _ready() -> void:
-	presentation_ready = DisplayServer.get_name() == "headless"
 	visuals = VisualBatch.new()
 	visuals.name = "EnemyMultiMesh"
 	add_child(visuals)
 	controller = get_node_or_null("../PortalMap")
 	# Geometry-only fixtures deliberately remove the map controller.
 	if controller == null:
-		presentation_ready = true
 		set_process(false)
 		return
 	visuals.map = controller.map
@@ -77,27 +72,14 @@ func _ready() -> void:
 		controls.spawn_requested.connect(start_wave)
 	controller.plan_changed.connect(_on_plan_ready)
 	_on_plan_ready()
-	if not presentation_ready: _prepare_presentation.call_deferred()
-
-func _prepare_presentation() -> void:
-	var profiles: Array[Troop] = available_troops.duplicate()
-	if troop != null: profiles.append(troop)
-	if definition != null:
-		for group in definition.groups: profiles.append(group.troop)
-	var warmup := RenderWarmup.new()
-	add_child(warmup)
-	await warmup.prepare(visuals, profiles, get_parent())
-	presentation_ready = true
-	presentation_prepared.emit()
-	_on_plan_ready()
 
 func _on_plan_ready() -> void:
 	_update_button()
-	if presentation_ready and auto_start and not _auto_started and controller.plan.get("routes", 0) > 0:
+	if auto_start and not _auto_started and controller.plan.get("routes", 0) > 0:
 		start_wave.call_deferred()
 
 func start_wave() -> bool:
-	if not presentation_ready or not start_allowed or active or controller == null or controller.computing:
+	if not start_allowed or active or controller == null or controller.computing:
 		return false
 	_scheduled = definition != null
 	if _scheduled:
@@ -276,7 +258,7 @@ func _update_button() -> void:
 	var profile: Troop = troop if troop != null else controller.troop
 	var origin: int = controller.active_start if start_index < 0 else start_index
 	var ready := false
-	if presentation_ready and start_allowed and not active and not controller.computing:
+	if start_allowed and not active and not controller.computing:
 		if definition != null:
 			ready = definition.configuration_error().is_empty()
 			if ready:

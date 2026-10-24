@@ -61,11 +61,9 @@ godot --editor --path . -- --test-card-resource-refresh
 
 ## 手動重現 256 混兵場景
 
-`godot --path . res://tests/enemies/render_warmup.tscn` 使用實際渲染驗證載入鎖定、代表模型繪製、RNG／正式敵群隔離、清理與恢復開波，並檢查正式關卡入口及中途離場。畫面保存於 `.godot/test-results/enemies/render_warmup*.png`。Headless 只檢查跳過預熱時的功能行為，不能驗證 shader 已編譯。
-
 開啟 `tests/enemies/mixed_256.tscn` 後按 F6，或執行 `godot --path . res://tests/enemies/mixed_256.tscn`。這是獨立試驗場，不修改正式入口；載入完成後手動按「開始一局」，不會自動生怪。
 
-有畫面時會先顯示等待介面，逐一預熱兵種模型、動畫及狀態顯示，再開放開始按鈕。首次顯示成本移至這個等待階段；仍可用再次開波比較剩餘的批量建立成本。
+本分支已移除與 `feat/outer_game_ui` 重複的顯示預熱及等待遮罩，完成建池後即可手動開波。首次模型／材質使用成本可能仍在首次出兵發生；不要套用舊預熱報告的數字。顯示準備回歸由 `feat/outer_game_ui` 的啟動與轉場測試負責。
 
 場景沿用 Web 報告的 32×32／801 道路格、16 座 Sentry、Soldier 86／Quickfeet 85／Heavy 85，同刻生成。兵種使用測試副本：生命 1,000,000、速度倍率 0.45、波次速度 2.5，其餘跟隨目前 Resource。鏡頭支援原有拖曳旋轉、平移與縮放，F1／F2 可查看路線與威脅，建造輸入鎖定。
 

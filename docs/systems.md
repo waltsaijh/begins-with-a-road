@@ -422,13 +422,11 @@ python tools/web/serve_web.py
 
 ## 效能量測的分段與對照
 
-### 敵人首次顯示預熱
+### 顯示預熱與實驗分支
 
-有實際渲染的關卡在允許操作前，由 EnemyWave 呼叫獨立的 `enemies/rendering/enemy_render_warmup.gd`，透過原有 renderer 在目前相機前逐一繪製兵種代表與頭頂狀態。正式關卡也收集所有 ACT 中的自訂兵種。代表不加入出生排程／戰鬥名單，不分配路線、不消耗 RNG；模型動畫推進與真正繪製完成後移除。一般移動迴圈沒有新增工作。Headless 跳過 GPU 預熱。
+舊版由 EnemyWave 自動執行的兵種顯示預熱、LoadingOverlay 場景、processing 鎖定及 presentation_ready／presentation_prepared 已移除，避免與已 PR 的 `feat/outer_game_ui` 啟動預熱及地圖轉場載入重複。整合時由該分支的 DisplayWarmup、Boot 與 ScreenTransition 負責顯示準備；本分支維持路線建池、配額與移動資料優化。
 
-等待介面為可編輯的 `scenes/levels/components/loading_overlay.tscn`，顯示完成的兵種數，完成後以實際 0.25 秒淡出。其腳本只處理顯示與攔截輸入；預熱模組暫停關卡的 processing 並保存／還原原模式，波次另以 `presentation_ready` 拒絕提早開波。關閉場景會一起移除預熱節點與遮罩。本分支仍直接進入 level，尚無地圖選擇場景；日後轉場可沿用此等待介面。
-
-這是將首次模型／材質繪製提前到載入期間，並非離線 shader bake，也不消除大量實例同幀建立的成本。等待進度代表已準備兵種數，不是精確剩餘秒數；單一材質的同步編譯仍可能暫停等待畫面。新增特效或執行期才更換的材質不保證已涵蓋。
+此分支單獨執行仍直接進入 level，不再等待或顯示 GPU 預熱進度。開波維持道路計畫、start_allowed、戰鬥／ACT 階段及 1.5 秒正式開場等待等原有檢查。移除的是顯示載入流程，不是 C++ 候選池或其快取；不能把歷史預熱報告當成目前的首次出兵表現。
 
 `tests/enemies/mixed_256.tscn` 保留報告相同負載供手動重現，啟動時建立合成地圖、16 塔與三兵種測試副本，完成建池後等使用者按開始，不含自動量測。清場重開使用正常敵人離場路徑，等待刪除完成並清除飛行攻擊／效果，再以相同 EnemyWave 與候選快取建立下一批；不重新建立地圖或偷偷重載 renderer。「重新載入場景」則重建整個場景，Web 頁面冷啟動仍須重新整理瀏覽器。操作入口見 [測試說明](../tests/README.md)。
 
