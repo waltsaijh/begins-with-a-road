@@ -58,6 +58,27 @@ func verify() -> void:
 	var history: UndoRedo = manager.get_history_undo_redo(history_id)
 	check(history.undo() and panel.current_group().batch_size == 1, "Native editor Undo did not restore a field")
 	check(history.redo() and panel.current_group().batch_size == 3, "Native editor Redo did not reapply a field")
+	# Reproduce a live pre-ACT dock after its tool script has reloaded. The root
+	# remains an Undo/Redo target and must keep the unsaved document intact.
+	var panel_id := panel.get_instance_id()
+	var saved_signature: String = panel._saved_signatures[document]
+	var pending := preload("res://tests/fixtures/level_fixture.gd").level("editor_pending")
+	panel._pending_level = pending
+	var stale_navigation := panel.get_node("ActNavigation")
+	panel.remove_child(stale_navigation)
+	stale_navigation.free()
+	for unique_name in ["AddWave", "DeleteWave"]:
+		var stale := panel.get_node("%"+unique_name)
+		stale.get_parent().remove_child(stale)
+		stale.free()
+	check(not panel._view_ready(), "Legacy dock fixture still had the current ACT controls")
+	panel._refresh()
+	check(panel._view_ready() and panel.get_instance_id() == panel_id, "Hot reload did not repair the existing dock")
+	check(panel.level == document and panel.is_dirty(document) and panel._saved_signatures[document] == saved_signature and panel._pending_level == pending, "Dock repair discarded unsaved or pending resource state")
+	check(panel.selected_act == 0 and panel.selected_wave == 0 and panel.selected_group == 0, "Dock repair lost the editor selection")
+	check(history.undo() and panel.current_group().batch_size == 1, "Dock repair broke the previous Undo target")
+	check(history.redo() and panel.current_group().batch_size == 3, "Dock repair broke Redo")
+	panel._pending_level = null
 	check(panel.get_node("%ExpandAfterAct").button_pressed,"Existing ACT checkbox did not start checked")
 	panel.get_node("%ExpandAfterAct").button_pressed = false
 	check(not document.acts[0].add_start_after_completion,"Checkbox did not update the selected ACT")
@@ -168,5 +189,5 @@ func verify() -> void:
 	manager.clear_history(history_id)
 	panel._saved_signatures.erase(document)
 	panel.edit_level(original)
-	print("WAVE_EDITOR_CHECK:"+JSON.stringify({"failures": failures, "real_plugin": true, "act_wave_add_delete": true, "per_act_checkbox": true, "empty_recovery": true, "edit_groups": true, "integer_drag": true, "native_undo_redo": true, "save_reload": true, "preview": true, "hot_reload_defaults": true, "refresh_recovery": true}))
+	print("WAVE_EDITOR_CHECK:"+JSON.stringify({"failures": failures, "real_plugin": true, "act_wave_add_delete": true, "per_act_checkbox": true, "empty_recovery": true, "edit_groups": true, "integer_drag": true, "native_undo_redo": true, "save_reload": true, "preview": true, "hot_reload_defaults": true, "refresh_recovery": true, "stale_dock_recovery": true}))
 	get_tree().quit(1 if failures else 0)

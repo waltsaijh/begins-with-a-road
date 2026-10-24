@@ -1,6 +1,8 @@
 @tool
 extends VBoxContainer
 ## Scene-authored editor surface. Resource edits participate in Godot Undo/Redo.
+const VIEW_PATH := "res://addons/wave_editor/wave_editor.tscn"
+const VIEW_CONTROLS := [&"ActPicker", &"AddAct", &"DeleteAct", &"AddWave", &"DeleteWave", &"ExpandAfterAct"]
 var editor_plugin: EditorPlugin
 var level: LevelDefinition
 var selected_act := 0
@@ -14,8 +16,62 @@ var _pending_level: LevelDefinition
 var _watched: Array[Resource] = []
 var _profiles: Array[Troop] = []
 var _local_undo := UndoRedo.new()
+var _rebuilding_view := false
 
 func _ready() -> void:
+	if _view_ready():
+		_bind_view()
+	elif not _ensure_view():
+		return
+	_refresh()
+
+func _view_ready() -> bool:
+	for control in VIEW_CONTROLS:
+		if get_node_or_null(NodePath("%"+str(control))) == null: return false
+	return true
+
+## Tool scripts reload independently of an existing dock's scene tree. Keep the
+## panel itself (and Undo/Redo targets), replacing only a stale authored view.
+func _ensure_view() -> bool:
+	if _view_ready(): return true
+	if _rebuilding_view or not is_inside_tree() or is_queued_for_deletion(): return false
+	_rebuilding_view = true
+	var source := ResourceLoader.load(VIEW_PATH, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE) as PackedScene
+	if source == null:
+		_rebuilding_view = false
+		return false
+	var fresh := source.instantiate()
+	if fresh.get_node_or_null("%ActPicker") == null:
+		fresh._local_undo.free()
+		fresh.free()
+		_rebuilding_view = false
+		return false
+	for previous in get_children():
+		var owned: Array[Node] = []
+		_collect_view_owners(previous, self, owned)
+		for node in owned: node.owner = null
+		remove_child(previous)
+		previous.queue_free()
+	for child in fresh.get_children():
+		var owned: Array[Node] = []
+		_collect_view_owners(child, fresh, owned)
+		for node in owned: node.owner = null
+		fresh.remove_child(child)
+		add_child(child)
+		for node in owned: node.owner = self
+	fresh._local_undo.free()
+	fresh.free()
+	_refreshing = false
+	_refresh_frame = -1
+	_bind_view()
+	_rebuilding_view = false
+	return _view_ready()
+
+func _collect_view_owners(node: Node, view: Node, owned: Array[Node]) -> void:
+	if node.owner == view: owned.append(node)
+	for child in node.get_children(): _collect_view_owners(child, view, owned)
+
+func _bind_view() -> void:
 	%Open.pressed.connect(func(): %OpenDialog.popup_centered_ratio(0.65))
 	%OpenDialog.file_selected.connect(_open_path)
 	%SaveDialog.file_selected.connect(_save_path)
@@ -45,7 +101,6 @@ func _ready() -> void:
 		if not _refreshing and current_wave() != null: _change(current_wave(), "move_speed", value, "修改波次移動速度"))
 	%PreviewSlider.value_changed.connect(_seek)
 	%PreviewTick.value_changed.connect(_seek)
-	_refresh()
 
 func current_act() -> ActDefinition:
 	return level.acts[selected_act] if level != null and selected_act >= 0 and selected_act < level.acts.size() else null
@@ -219,6 +274,7 @@ func _seek(value: float) -> void:
 	_refresh_preview()
 
 func _refresh_preview() -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or _rebuilding_view: return
 	var wave := current_wave()
 	var maximum := maxi(120, wave.last_spawn_tick()) if wave != null else 120
 	preview_tick = clampi(preview_tick, 0, maximum)
@@ -239,7 +295,8 @@ func _refresh_preview() -> void:
 	%Schedule.configure(wave, selected_group, preview_tick)
 
 func _refresh() -> void:
-	if not is_node_ready(): return
+	if not is_inside_tree() or not is_node_ready() or is_queued_for_deletion(): return
+	if not _ensure_view(): return
 	var frame := Engine.get_process_frames()
 	# A script error/hot reload may have interrupted the previous refresh.
 	# Guard recursion within this frame without permanently freezing the panel.

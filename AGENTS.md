@@ -104,6 +104,7 @@
 - 塔名與地塊前綴分開保存翻譯 key，完整卡名依語言組合；支援英文及繁體中文，缺少語言時回退 zh_TW。不要硬存完整卡名。
 - 卡面、價格、端點、時間線及特效的共用範本放各功能 `components/`；外觀優先由可編輯場景／資源提供。詳細字級、動畫與素材規格見系統文件與各目錄 README。
 - `@tool` 卡面接收 Resource.changed 時，編輯器更新需合併延後並確認必要子節點已完成重建；離場實例忽略通知。卡面相容已開啟場景的舊根節點 artwork 與新版 Visuals，不為熱更新直接修改編輯中的場景樹。
+- 波次編輯器的 tool 腳本熱重載不代表既有 dock 的節點樹已更新。缺少 ACT／波次控制項時，從目前保存的場景重建該 dock 的子介面，保留根節點、關卡 Resource、選取、待切換資料、dirty 簽章及 Undo／Redo 目標；重新登記 unique owner 並連接新控制項，離場通知不存取 UI。舊 `enemy_walk.gdshader` 路徑只作編輯器分頁相容入口，與正式 solid_color shader 共用同一份 include 實作，不新增執行期材質。
 - 共用常數使用 `class_name XxxConstants`、`extends RefCounted` 及大寫 const，不為常數建立 Autoload 或逐實例 Resource。場景 export 覆寫優先於預設。
 - 原型素材透過離線工具產生；遊戲不能依賴另一專案路徑。重建素材前檢查手動修改，更新 tile library 不等於重設地圖；`--demo` 會覆寫示範地形。
 

@@ -8,6 +8,8 @@ func check(value: bool, message: String):
 		failures += 1
 		push_error(message)
 func verify():
+	check(Baker.MATERIAL.shader.resource_path == "res://assets/shaders/solid_color.gdshader", "Shared runtime material changed to the compatibility shader")
+	check(load("res://assets/shaders/enemy_walk.gdshader") is Shader, "Old shader editor path cannot be restored")
 	var library := load("res://assets/models/mesh_library.tres") as MeshLibrary
 	var counts := []
 	for id in library.get_item_list():
@@ -79,6 +81,12 @@ func pixels() -> Array:
 		var original := await capture()
 		node.mesh=Baker.mesh(box)
 		var converted := await capture()
+		var legacy := ShaderMaterial.new()
+		legacy.shader = load("res://assets/shaders/enemy_walk.gdshader")
+		node.material_override = legacy
+		var compatibility := await capture()
+		check(compatibility.get_data() == converted.get_data(), "Compatibility shader diverged from the shared material")
+		node.material_override = null
 		var error := 0.0
 		var count := 0
 		var background := original.get_pixel(0,0)
