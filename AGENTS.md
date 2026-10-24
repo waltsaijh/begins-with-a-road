@@ -108,6 +108,8 @@
 
 ## 效能測試共識
 
+- `experiment/optimize_graph` 合併 main 後的現況量測見 [2026-10-24 Windows／Web](reports/merged_graph_performance_2026-10-24.md)：32×32／801 道路格／16 塔／256 混兵，各三輪、每輪首次與再次開波。Windows RTX 的兩波平均約 12.29／12.27 ms，Web AMD 約 20.86／20.28 ms；冷建池約 33.62／37.39 ms。Web 首次出兵至首個繪製幀約 4.87 s，再次約 0.13 s，本分支無顯示預熱。這是獨立試驗場的現況，未做版本 A/B，未量測準備期中心線；不同 GPU／建置與歷史版本不能直接相減。Web 原生擴充須重建至包含批次候選 API 的版本，不可沿用其他分支的舊 wasm。
+
 - `experiment/optimize_graph`（原 `experiment/reduced_graph`） 只保留尋路、候選建池、批次配額與移動資料優化；重複的 EnemyWave 自動顯示預熱、presentation_ready／presentation_prepared、關卡 processing 鎖定及 LoadingOverlay 已移除。顯示預熱與載入呈現由已 PR 的 `feat/outer_game_ui` 集中負責，整合時保留該分支的 DisplayWarmup／啟動與轉場流程，不恢復這裡的舊版本。此分支單獨執行沒有顯示預熱遮罩，首次模型／材質使用成本可能仍在首次出兵發生；歷史預熱數字不是目前行為。
 
 - 完整行程相位修正（接點裁切前版本）的 Web 對照見 [2026-10-24 流量亮段](reports/road_flow_continuity_2026-10-24.md)：25×21、255 道路格、雙入口、256 人下一波配額，量測準備期預覽而非 256 名存活敵人。相位表使用 RGBA8 雙 16-bit 距離，避免 Web 浮點紋理讀回截斷；Windows／Web 均保留應亮起與應透明的像素驗證。平均／P99 與同步重建成本分開記錄，不據此宣稱戰鬥或載入效能改善。
