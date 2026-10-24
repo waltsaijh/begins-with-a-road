@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/levels/presentation/start_wave_callout.gd" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="2"]
 [ext_resource type="Theme" path="res://assets/themes/level_controls.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/levels/components/next_wave_intel.tscn" id="4_intel"]
 
 [node name="EarlyStart" type="Button"]
 custom_minimum_size = Vector2(128, 46)
@@ -37,4 +38,6 @@ theme_override_font_sizes/font_size = 13
 text = "Start next wave"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="NextWaveIntel" parent="." instance=ExtResource("4_intel")]
 

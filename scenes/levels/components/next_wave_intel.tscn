@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/presentation/next_wave_intel.gd" id="1"]
+
+[node name="NextWaveIntel" type="VBoxContainer"]
+visible = false
+anchors_preset = -1
+anchor_right = 1.0
+offset_left = 8.0
+offset_right = -8.0
+offset_top = 32.0
+offset_bottom = 68.0
+mouse_filter = 2
+theme_override_constants/separation = 2
+script = ExtResource("1")
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="Items" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+mouse_filter = 2

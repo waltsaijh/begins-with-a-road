@@ -2,6 +2,9 @@ extends CanvasLayer
 ## Pause UI keeps processing while the rest of the scene is paused.
 signal exit_requested
 const SPEEDS := [1.0, 2.0, 4.0]
+const StartCallout = preload("res://scenes/levels/components/start_wave_callout.tscn")
+var start_callouts: Array[Button] = []
+var start_markers: Array[Node3D] = []
 const PauseIcon = preload("res://assets/sprites/interface/pause.png")
 const SPEED_ICONS: Array[Texture2D] = [
 	preload("res://assets/sprites/interface/speed_1x.png"),
@@ -39,6 +42,8 @@ var _callout_reveal := 0.0:
 @onready var _cards: Node = get_node_or_null("../CardPlacement")
 
 func _ready() -> void:
+	start_callouts = [early_start]
+	start_markers = [start_marker]
 	speed_button.pressed.connect(cycle_speed)
 	pause_button.pressed.connect(func(): set_paused(not pause_requested))
 	resume_button.pressed.connect(set_paused.bind(false))
@@ -55,7 +60,9 @@ func _process(_delta: float) -> void:
 
 func set_start_available(available: bool) -> void:
 	if not is_inside_tree(): return
-	early_start.mouse_filter = Control.MOUSE_FILTER_STOP if available else Control.MOUSE_FILTER_IGNORE
+	for action in start_callouts:
+		action.mouse_filter = Control.MOUSE_FILTER_STOP if available else Control.MOUSE_FILTER_IGNORE
+		if not available: action.disabled = true
 	if _callout_available != available:
 		_callout_available = available
 		_animate_callout(available)
@@ -63,11 +70,34 @@ func set_start_available(available: bool) -> void:
 
 func _animate_callout(reveal: bool) -> void:
 	if _callout_motion != null: _callout_motion.kill()
-	if not reveal: early_start.call("clear_hover")
+	if not reveal:
+		for action in start_callouts: action.call("clear_hover")
 	var target := 1.0 if reveal else 0.0
 	if is_equal_approx(_callout_reveal, target): return
 	_callout_motion = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
 	_callout_motion.tween_property(self, "_callout_reveal", target, start_reveal_seconds if reveal else start_retract_seconds).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT if reveal else Tween.EASE_IN)
+
+func sync_start_callouts(markers: Array[Node3D]) -> void:
+	if markers.is_empty(): return
+	while start_callouts.size() > markers.size():
+		var action := start_callouts.pop_back() as Button
+		action.get_parent().remove_child(action)
+		action.queue_free()
+	while start_callouts.size() < markers.size():
+		var action := StartCallout.instantiate() as Button
+		action.name = "EarlyStart%d" % (start_callouts.size()+1)
+		action.disabled = early_start.disabled
+		$WorldActions.add_child(action)
+		action.pressed.connect(_request_from_callout)
+		start_callouts.append(action)
+	start_markers = markers.duplicate()
+	start_marker = start_markers[0]
+	_position_callout()
+
+func _request_from_callout() -> void:
+	# All entrances share the existing single wave action and opening guard.
+	if not _callout_available or pause_requested or get_tree().paused or early_start.disabled: return
+	early_start.pressed.emit()
 
 func _position_callout() -> void:
 	if not is_inside_tree(): return
@@ -75,24 +105,33 @@ func _position_callout() -> void:
 	if viewport == null or not is_instance_valid(early_start): return
 	if pause_requested: early_start.disabled = true
 	var camera := viewport.get_camera_3d()
-	if _callout_reveal <= 0.001 or not is_instance_valid(start_marker) or camera == null:
-		early_start.hide()
+	for i in start_callouts.size():
+		var action := start_callouts[i]
+		var marker: Node3D = start_markers[i]
+		if i > 0: action.disabled = early_start.disabled or not _callout_available or pause_requested
+		action.mouse_filter = Control.MOUSE_FILTER_STOP if _callout_available and not pause_requested else Control.MOUSE_FILTER_IGNORE
+		_position_one_callout(action,marker,camera,viewport)
+		action.call("update_pointer_hover")
+
+func _position_one_callout(action: Button, marker: Node3D, camera: Camera3D, viewport: Viewport) -> void:
+	if _callout_reveal <= 0.001 or not is_instance_valid(marker) or camera == null:
+		action.hide()
 		return
-	var anchor := start_marker.global_position+Vector3.UP*start_anchor_height
+	var anchor := marker.global_position+Vector3.UP*start_anchor_height
 	if camera.is_position_behind(anchor):
-		early_start.hide()
+		action.hide()
 		return
 	var point := camera.unproject_position(anchor)
-	var rest := point-Vector2(early_start.size.x*0.5, early_start.size.y+start_anchor_gap)
-	var tower := camera.unproject_position(start_marker.global_position+Vector3.UP*start_collapse_height)
-	var hover: float = early_start.get("hover_amount")
-	var center := tower.lerp(rest+early_start.size*0.5, _callout_reveal)-Vector2(0, hover*2.0)
-	early_start.pivot_offset = early_start.size*0.5
-	early_start.position = center-early_start.size*0.5
-	early_start.scale = Vector2.ONE*maxf(0.001, _callout_reveal)*lerpf(1.0, 1.035, hover)
-	early_start.modulate.a = minf(1.0, _callout_reveal*2.0)
-	# Let the viewport clip partial bubbles instead of hiding the whole control.
-	early_start.visible = viewport.get_visible_rect().intersects(early_start.get_global_rect())
+	var rest := point-Vector2(action.size.x*0.5, action.size.y+start_anchor_gap)
+	var tower := camera.unproject_position(marker.global_position+Vector3.UP*start_collapse_height)
+	var hover: float = action.get("hover_amount")
+	var center := tower.lerp(rest+action.size*0.5, _callout_reveal)-Vector2(0, hover*2.0)
+	action.pivot_offset = action.size*0.5
+	action.position = center-action.size*0.5
+	action.scale = Vector2.ONE*maxf(0.001, _callout_reveal)*lerpf(1.0, 1.035, hover)
+	action.modulate.a = minf(1.0, _callout_reveal*2.0)
+	# Each entrance independently follows/clips against the moving camera.
+	action.visible = viewport.get_visible_rect().intersects(action.get_global_rect())
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _update_labels()

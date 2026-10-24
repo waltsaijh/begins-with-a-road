@@ -38,7 +38,10 @@ func verify() -> void:
 	check(recipe.end_tick() == 2 and recipe.count_at(2) == 5, "Zero interval is not an instantaneous group")
 	recipe.start_tick = -1
 	check(not recipe.configuration_error().is_empty(), "Negative schedule accepted")
-	var scene: Node3D = load("res://scenes/main.tscn").instantiate()
+	# Scheduling must not depend on the designer's current terrain/endpoints.
+	var bridge: Array[Vector2i] = []
+	for x in 24: bridge.append(Vector2i(x,0))
+	var scene: Node3D = Fixture.scene_for(bridge,Vector2i.ZERO,Vector2i(23,0))
 	var wave: Node = scene.get_node("EnemyWave")
 	wave.auto_start = false
 	wave.show_button = false
