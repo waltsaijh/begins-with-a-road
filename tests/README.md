@@ -22,6 +22,8 @@ godot --headless --path . res://tests/levels/terrain_endpoints.tscn
 godot --headless --path . res://tests/levels/wave_spawn_groups.tscn
 godot --headless --path . res://tests/levels/road_flow_preview.tscn
 godot --path . res://tests/levels/road_flow_preview.tscn
+godot --headless --path . res://tests/levels/road_flow_continuity.tscn
+godot --path . res://tests/levels/road_flow_continuity.tscn
 godot --headless --path . res://tests/levels/level_teardown.tscn
 godot --headless --path . --script res://tests/navigation/portal_graph.gd
 godot --path . res://tests/cards/card_shop.tscn
@@ -39,7 +41,9 @@ godot --editor --path . -- --test-card-resource-refresh
 
 `pause_navigation`、`level_hud` 與 `pause_menu` 驗證立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
 
-`road_flow_preview` 驗證跨群組加總、兵種 Hover／移開、按鈕標題保留入口篩選、雙入口同兵種的實際 GPU 線段／流量資料隔離、篩選動畫相位獨立、分岔／合流／環路／雙向區段、多入口的獨立按鈕／實際配額、零配額入口、任一按鈕實際點擊開波、無有效路線、非選取兵種成本與幾何失效、RNG／正式配額一致性、列表溢出，以及開波、清波、ACT 選入口、暫停、重開和卸載。渲染模式額外送入實際滑鼠事件並比較明暗漸變相位及無中心線畫面，並驗證動畫不改變 mesh、直段／圓角、雙向側向位置與複製重合線形的像素一致性（允許一階 8-bit 輸出量化差異），輸出 `levels/road_flow_*.png`；headless 不宣稱像素通過。人工驗收可在 editor 開啟 `tests/levels/road_flow_playground.tscn` 按 F6：開始下一波按鈕內有三兵種，下方為兩入口環路，hover 篩選、移開恢復，按開始下一波確認中心線收起；F1／F2 暫時讓出玩家中心線。測試地形及波次為獨立實例，不修改 Frontier。
+`road_flow_preview` 驗證跨群組加總、兵種 Hover／移開、按鈕標題保留入口篩選、雙入口同兵種的實際 GPU 線段／流量資料隔離、篩選動畫相位獨立、分岔／合流／環路／雙向區段、多入口的獨立按鈕／實際配額、零配額入口、任一按鈕實際點擊開波、無有效路線、非選取兵種成本與幾何失效、RNG／正式配額一致性、列表溢出，以及開波、清波、ACT 選入口、暫停、重開和卸載。渲染模式額外送入實際滑鼠事件並比較明暗漸變相位及無中心線畫面，並驗證動畫不改變 mesh、直段／圓角、雙向中央位置與複製重合線形的像素一致性（允許一階 8-bit 輸出量化差異），輸出 `levels/road_flow_*.png`；headless 不宣稱像素通過。人工驗收可在 editor 開啟 `tests/levels/road_flow_playground.tscn` 按 F6：開始下一波按鈕內有三兵種，下方為兩入口環路，hover 篩選、移開恢復，按開始下一波確認中心線收起；F1／F2 暫時讓出玩家中心線。測試地形及波次為獨立實例，不修改 Frontier。
+
+`road_flow_continuity` 使用獨立 viewport，驗證四種朝向的路口解析圓角、原直角區透明、接合無縫、雙向中央重合與獨立行進相位、重合透明度聯集、真正端點圓頭與 48 primitive 滿容量十字接點，四種朝向的 1／16 流量差之細→粗／粗→細線寬實測及接點透明度連續性，以及長短支路匯流後的完整相位、環路重訪同一條有向邊、雙向重疊、70 個抵達時間不截斷、週期邊界及篩選快取。渲染模式在每次行程經過的邊中點與終點直接取樣，確認亮段確實顯示到終點；另取樣軟尾與不應亮起的時刻，並以獨立最小距離計算檢查查表的小數時刻。Web 由瀏覽器保存 console JSON，略過不可寫入 res 的檔案輸出。輸出 `levels/flow_continuity_*.json/png`；headless 不宣稱像素驗證。
 
 `level_teardown` 驗證不同倍速、按鈕／內部開始入口，以及開場等待、尚未出生與存活敵人的關卡清理。一般渲染模式加 `-- --window-close` 會啟動 2x 手動開波視窗，可手動關閉檢查退出錯誤；加 `--4x`／`--direct` 可切換其他情境。
 

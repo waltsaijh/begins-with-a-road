@@ -124,11 +124,12 @@ func _filter(profile: Troop, origin: int) -> void:
 func _render_filter() -> void:
 	if not preparation or _dirty: return
 	var segments: Dictionary = forecast.all
+	var profile: Troop
 	var panels := _panels()
 	if selected_origin >= 0 and selected_origin < panels.size():
-		var profile: Troop = panels[selected_origin].selected
+		profile = panels[selected_origin].selected
 		segments = forecast.by_origin.get(selected_origin,{}) if profile == null else forecast.by_troop_origin.get(profile,{}).get(selected_origin,{})
-	arrows.display(segments,forecast.all,controller.map)
+	arrows.display(segments,forecast.all,controller.map,forecast.animation(profile,selected_origin))
 
 func _refresh_visibility() -> void:
 	var available: bool = preparation and not hud.pause_requested and not get_tree().paused
