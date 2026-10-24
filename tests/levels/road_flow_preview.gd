@@ -84,7 +84,8 @@ func check_rendered_scope(preview: Node, profile: Troop, origin: int) -> void:
 	var reference: MeshInstance3D = load("res://scenes/navigation/road_flow_renderer.tscn").instantiate()
 	add_child(reference)
 	reference.line_width = preview.arrows.line_width
-	reference.display(segments,preview.forecast.all,preview.controller.map)
+	reference.display(segments,preview.forecast.all,preview.controller.map,preview.forecast.animation(profile,origin))
+	check(reference.phase_data.get_image().get_data() == preview.arrows.phase_data.get_image().get_data(), "Hover clocks mix another entrance")
 	check(reference.flow_data.get_image().get_data() == preview.arrows.flow_data.get_image().get_data(), "Hover GPU data mixes another entrance's counts or directions")
 	reference.queue_free()
 
@@ -106,6 +107,12 @@ func statistics() -> void:
 	check(forecast.by_troop_origin[a][0] == forecast.by_troop[a], "Troop/entrance breakdown incorrect")
 	check(RoadFlowForecast.from_pending([]).all.is_empty(), "Empty schedule fabricated flow")
 
+func geometry_clocks(segments: Dictionary) -> RoadFlowPhases:
+	var result := RoadFlowPhases.new()
+	for edge: Vector4i in segments:
+		result.add_trip(PackedVector2Array([Vector2(edge.x,edge.y),Vector2(edge.z,edge.w)]))
+	return result
+
 func ribbon_geometry() -> void:
 	var map := GridMap.new()
 	map.cell_size = Vector3.ONE
@@ -113,39 +120,41 @@ func ribbon_geometry() -> void:
 	var ribbon: MeshInstance3D = load("res://scenes/navigation/road_flow_renderer.tscn").instantiate()
 	add_child(ribbon)
 	var bend := {Vector4i(0, 0, 1, 0): 5, Vector4i(1, 0, 1, 1): 5}
-	ribbon.display(bend, bend, map)
+	var bend_clock := RoadFlowPhases.new()
+	bend_clock.add_trip(PackedVector2Array([Vector2(0,0),Vector2(1,0),Vector2(1,1)]))
+	ribbon.display(bend, bend, map, bend_clock)
 	var vertices: PackedVector3Array = ribbon.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
 	check(vertices.size() == 18 and ribbon.rendered_cells.size() == 3, "Bend did not use three non-overlapping cell patches")
 	var data: Image = ribbon.flow_data.get_image()
 	var row: int = ribbon.rendered_cells.find(Vector2i(1, 0))
-	check(int(data.get_pixel(0, row).r) == 10, "Corner did not contain two straight pieces and a rounded arc")
+	check(int(data.get_pixel(0, row).r) == 3, "Corner did not contain two straight pieces and one exact arc")
 	var first := data.get_pixel(1, row)
 	check(is_equal_approx(first.g, first.a), "Approach to corner is curved instead of straight")
 	var traffic := {Vector4i(0, 0, 1, 0): 1, Vector4i(0, 1, 1, 1): 12}
-	ribbon.display(traffic, traffic, map)
+	ribbon.display(traffic, traffic, map, geometry_clocks(traffic))
 	data = ribbon.flow_data.get_image()
 	var low := data.get_pixel(2, ribbon.rendered_cells.find(Vector2i(0, 0)))
 	var high := data.get_pixel(2, ribbon.rendered_cells.find(Vector2i(0, 1)))
 	check(high.a > low.a and high.r > low.r, "Heavy traffic did not retain thicker/darker static lines")
 	var bidirectional := {Vector4i(0, 0, 1, 0): 5, Vector4i(1, 0, 0, 0): 5}
-	ribbon.display(bidirectional, bidirectional, map)
+	ribbon.display(bidirectional, bidirectional, map, geometry_clocks(bidirectional))
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
 	first = data.get_pixel(1, row)
-	var second := data.get_pixel(3, row)
-	check(int(data.get_pixel(0,row).r) == 2 and first.g*second.g < 0, "Opposite traffic did not use two distinct lanes")
-	ribbon.display({Vector4i(1, 0, 0, 0): 5}, bidirectional, map)
+	var second := data.get_pixel(4, row)
+	check(int(data.get_pixel(0,row).r) == 2 and is_zero_approx(first.g) and is_zero_approx(second.g) and is_zero_approx(first.a) and is_zero_approx(second.a), "Opposite traffic did not overlap the road center")
+	ribbon.display({Vector4i(1, 0, 0, 0): 5}, bidirectional, map, geometry_clocks({Vector4i(1,0,0,0):5}))
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
-	check(is_equal_approx(data.get_pixel(1,row).g, minf(first.g, second.g)), "Hover moved reverse flow out of its original lane")
+	check(is_equal_approx(data.get_pixel(1,row).g, minf(first.g, second.g)), "Hover moved reverse flow away from the center")
 	var isolated := {Vector4i(0,0,1,0): 2}
 	var unrelated := isolated.duplicate()
 	for x in 12: unrelated[Vector4i(x,4,x+1,4)] = 9
-	ribbon.display(isolated,unrelated,map)
+	ribbon.display(isolated,unrelated,map,geometry_clocks(isolated))
 	var isolated_period: float = ribbon.material_override.get_shader_parameter("stroke_period")
-	check(is_equal_approx(isolated_period,maxf(4.0,ribbon.highlight_length*2.0)), "Other entrance still controls filtered animation clock")
+	check(is_equal_approx(isolated_period,maxf(4.0,ceilf(ribbon.highlight_length*2.0))), "Other entrance still controls filtered animation clock")
 	var junction := {Vector4i(-1, 0, 0, 0): 5, Vector4i(0, 0, 1, 0): 5, Vector4i(0, 0, 0, 1): 5}
-	ribbon.display(junction, junction, map)
+	ribbon.display(junction, junction, map, geometry_clocks(junction))
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
 	check(ribbon.rendered_cells.count(Vector2i.ZERO) == 1 and int(data.get_pixel(0,row).r) == 3, "Junction uses stacked transparent patches")
@@ -419,9 +428,10 @@ func visual_check(scene: Node3D) -> void:
 	var repeated_data := original_data.duplicate() as Image
 	for row in repeated_data.get_height():
 		var count := int(repeated_data.get_pixel(0,row).r)
-		if count == 0 or count >= 24: continue
-		repeated_data.set_pixel(1+count*2,row,repeated_data.get_pixel(1,row))
-		repeated_data.set_pixel(2+count*2,row,repeated_data.get_pixel(2,row))
+		if count == 0 or count >= preview.arrows.MAX_PIECES: continue
+		repeated_data.set_pixel(1+count*3,row,repeated_data.get_pixel(1,row))
+		repeated_data.set_pixel(2+count*3,row,repeated_data.get_pixel(2,row))
+		repeated_data.set_pixel(3+count*3,row,repeated_data.get_pixel(3,row))
 		repeated_data.set_pixel(0,row,Color(count+1,0,0,0))
 	preview.arrows.flow_data.update(repeated_data)
 	await frames()

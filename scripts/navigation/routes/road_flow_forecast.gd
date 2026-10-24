@@ -7,6 +7,8 @@ var by_origin := {}
 var by_troop_origin := {}
 ## Exact counts after the existing scheduler has assigned entrances.
 var counts_by_origin := {}
+var _trips := {}
+var _animations := {}
 
 static func troop_counts(definition: WaveDefinition) -> Dictionary:
 	var counts := {}
@@ -29,6 +31,10 @@ static func from_pending(pending: Array) -> RoadFlowForecast:
 		if not result.by_origin.has(origin): result.by_origin[origin] = {}
 		if not result.by_troop_origin[profile].has(origin): result.by_troop_origin[profile][origin] = {}
 		var cells: PackedVector2Array = member.route.cells
+		# Identical allocated trips retain their traffic count, but need only one clock.
+		if not result._trips.has(origin): result._trips[origin] = {}
+		if not result._trips[origin].has(profile): result._trips[origin][profile] = {}
+		result._trips[origin][profile][cells] = true
 		for i in range(1, cells.size()):
 			var a := Vector2i(cells[i-1])
 			var b := Vector2i(cells[i])
@@ -41,3 +47,17 @@ static func from_pending(pending: Array) -> RoadFlowForecast:
 
 func segments(profile: Troop = null) -> Dictionary:
 	return all if profile == null else by_troop.get(profile, {})
+
+func animation(profile: Troop = null, origin := -1) -> RoadFlowPhases:
+	var key := [profile,origin]
+	if _animations.has(key): return _animations[key]
+	var trips := {}
+	for entry: int in _trips:
+		if origin >= 0 and entry != origin: continue
+		for troop: Troop in _trips[entry]:
+			if profile != null and troop != profile: continue
+			trips.merge(_trips[entry][troop])
+	var result := RoadFlowPhases.new()
+	for cells: PackedVector2Array in trips: result.add_trip(cells)
+	_animations[key] = result
+	return result

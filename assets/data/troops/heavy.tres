@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://difa3b4yeashm"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dgqnbmyfw0uds" path="res://assets/sprites/troops/heavy.png" id="1_jymb2"]
+[ext_resource type="Texture2D" uid="uid://bowu4k2ecwa4n" path="res://assets/sprites/troops/heavy.png" id="1_jymb2"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/brute.tscn" id="3"]
 
 [resource]

@@ -1,6 +1,7 @@
 extends Node
 const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const TestCards = preload("res://tests/fixtures/card_fixture.gd")
+const TestLevel = preload("res://tests/levels/road_flow_fixture.gd")
 class TestViewport extends SubViewport:
 	signal mouse_entered
 	signal mouse_exited
@@ -70,10 +71,16 @@ func verify() -> void:
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
 	scene = load("res://scenes/level.tscn").instantiate()
+	# Input coverage needs legal placements independent of the editable Frontier.
+	scene.level = TestLevel.level()
 	scene.get_node("CardPlacement").cards = TestCards.starting_hand()
 	viewport.add_child(scene)
 	await frames(12)
 	while scene.get_node("PortalMap").computing: await frames(1)
+	# Match the other input fixtures: a hidden native window may lose focus
+	# during startup, and synthetic SubViewport input needs its own enter event.
+	await get_tree().create_timer(0.25,true,false,true).timeout
+	viewport.mouse_entered.emit()
 	cards = scene.get_node("CardPlacement")
 	camera = scene.get_node("Camera3D")
 	cards.hand.finish_animation()
@@ -135,6 +142,9 @@ func verify() -> void:
 	while scene.get_node("PortalMap").computing: await frames(1)
 	# A capped tower rejects a second drop without changing the hand/map.
 	var built: DefenseTower = cards.towers.upgrade_target(cell)
+	if built == null:
+		get_tree().quit(1)
+		return
 	built.upgrade()
 	built.upgrade()
 	count = cards.cards.size()

@@ -54,14 +54,23 @@ func run() -> void:
 	check(predicted.all != baseline.all,"candidate changes actual quota flow")
 	check(not flow.delta_overlay.markers.is_empty(),"actual changed junctions have markers")
 	check(traffic.instances.is_empty() and controller.traffic_effects.is_empty(),"preview does not commit any state")
+	check(flow.arrows.phase_data == predicted.animation().lookup_texture(),"candidate renderer uses candidate complete-trip clocks")
 	var rebuilds: int = flow.candidate_rebuild_count
 	for i in 10: cards.preview_traffic_at(barricade,Vector3i(2,0,0),0,true)
 	await frames()
 	check(flow.candidate_rebuild_count == rebuilds,"unchanged candidate cached")
 	await screenshot("candidate")
+	var profile: Troop = wave.definition.groups[0].troop
+	flow.panel.selected = profile
+	flow._filter(profile,0)
+	check(flow.arrows.phase_data == predicted.animation(profile,0).lookup_texture(),"candidate clocks follow troop and entrance filtering")
 	cards.set_traffic_candidate({})
 	check(flow.forecast.all == baseline.all and flow.delta_overlay.markers.is_empty(),"cancel restores baseline immediately")
-	var profile: Troop = wave.definition.groups[0].troop
+	check(flow.arrows.phase_data == baseline.animation(profile,0).lookup_texture(),"cancel restores filtered baseline clocks immediately")
+	flow.panel.selected = null
+	flow._filter(null,0)
+	check(flow.arrows.phase_data == baseline.animation().lookup_texture(),"leaving filter restores all baseline clocks")
+	check(flow.candidate_rebuild_count == rebuilds,"clock filtering does not rebuild the candidate schedule")
 	var saved_threshold: float = profile.score_threshold
 	profile.score_threshold = 1.0
 	await frames()

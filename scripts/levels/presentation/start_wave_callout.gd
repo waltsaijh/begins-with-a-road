@@ -29,7 +29,10 @@ func _ready() -> void:
 	resized.connect(_update_visuals)
 	button_down.connect(_update_visuals)
 	button_up.connect(_update_visuals)
-	get_viewport().mouse_exited.connect(_forget_pointer)
+	# Editor scene previews use a SubViewport without Window mouse signals.
+	var viewport := get_viewport()
+	if viewport.has_signal("mouse_exited"):
+		viewport.connect("mouse_exited",_forget_pointer)
 	_refresh_labels()
 	_update_visuals()
 

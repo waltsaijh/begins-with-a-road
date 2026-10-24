@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://cp1mo65yr16j3"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://bpv7ahtcwlsvs" path="res://assets/sprites/troops/quickfeet.png" id="1_0cwrg"]
+[ext_resource type="Texture2D" uid="uid://c628wohk7k5ce" path="res://assets/sprites/troops/quickfeet.png" id="1_0cwrg"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/runner.tscn" id="3"]
 
 [resource]

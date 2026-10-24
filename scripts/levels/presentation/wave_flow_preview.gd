@@ -184,14 +184,14 @@ func _filter(profile: Troop, origin: int) -> void:
 func _render_filter() -> void:
 	if not preparation or _dirty: return
 	var segments: Dictionary = forecast.all
+	var profile: Troop
 	var panels := _panels()
 	if selected_origin >= 0 and selected_origin < panels.size():
-		var profile: Troop = panels[selected_origin].selected
+		profile = panels[selected_origin].selected
 		segments = forecast.by_origin.get(selected_origin,{}) if profile == null else forecast.by_troop_origin.get(profile,{}).get(selected_origin,{})
-	arrows.display(segments,forecast.all,controller.map)
+	arrows.display(segments,forecast.all,controller.map,forecast.animation(profile,selected_origin))
 	var before: Dictionary = baseline.all
 	if selected_origin >= 0 and selected_origin < panels.size():
-		var profile: Troop = panels[selected_origin].selected
 		before = baseline.by_origin.get(selected_origin,{}) if profile == null else baseline.by_troop_origin.get(profile,{}).get(selected_origin,{})
 	delta_overlay.markers = TrafficFlowDelta.compare(before,segments,_junctions,minimum_quota_change) if not candidate.is_empty() else {}
 	delta_overlay.hint = tr("traffic.no_change") if not candidate.is_empty() and baseline.all == forecast.all else ""

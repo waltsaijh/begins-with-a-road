@@ -95,7 +95,7 @@ scripts/
 | `map/tile/appearance/` | 根據已提交道路選擇合法柱子／木橋外觀，以獨立顯示 GridMap 播放差異格的浮起動畫；邏輯道路立即可用 |
 | `navigation/` | 從 GridMap 和障礙取得 packed snapshot，協調原生建圖、額外端點、編輯檢查、revision 及快取失效，向生成器與除錯層提供計畫 API |
 | `navigation/routes/` | 一般 Cost 共用有限幾何候選、兵種探索、原始評分及 strict threshold；硬性規則依已提交路網歷史生成最短／最新代表。共用 Uniform／Softmax、交通權重、固定配額及完整逐格行程；流量從已分配行程累加 |
-| `navigation/visualization/` | 讀取當波行程與地塊資料，繪製 F1／F2、圖例及參數，另以批次網格顯示玩家道路流動筆觸；局部路線輔助資料也留在此呈現邊界 |
+| `navigation/visualization/` | 讀取當波行程與地塊資料，繪製 F1／F2、圖例及參數，另從完整配額行程保留抵達相位、以查表及批次網格顯示玩家流量筆觸；局部路線輔助資料也留在此呈現邊界 |
 
 地塊資料集合在 `map/tile/` 實作，執行時由 `PortalMap` 為每張地圖持有一份；導航消費其成本陣列，塔系統透過控制器提交覆蓋變更。store 快取評分輸入，實際路線探索由導航及原生核心完成，檔案位置與實例持有者在這裡分開說明。
 

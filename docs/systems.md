@@ -178,15 +178,17 @@ F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線�
 
 `wave_flow_preview.gd` 監聽 LevelSession.preparation_changed、EnemyWave.routes_changed、PortalMap.graph_changed／plan_changed 與 tile_parameters.costs_changed（包含非目前選取兵種）。失效先清除舊 mesh，待導航不在 computing 時合併重算一次。直接呼叫 `WaveSpawnSchedule.build(definition, controller, first_id, false, additional_starts)`；與開波共用跨群組、跨入口的完整配額流程，僅略過出發洗牌，不使用 global RNG，也不修改 pending／committed routes。預測是當前有限候選池的分配結果，不是所有可能道路的機率。
 
-`RoadFlowForecast` 對每份完整行程的相鄰格以 Vector4i(from.x, from.y, to.x, to.y) 計數，保留 all、by_troop、by_origin、by_troop_origin 四種彙總；相反方向不合併，重訪區段計入實際通過次數，非四鄰步驟略過。無有效排程時只顯示兵種清單、中心線清空。Hover 只讀已快取的「兵種＋入口」彙總並重建顯示 mesh，不重新取得行程或消耗 RNG；移至同一按鈕的標題、空白或捲軸時顯示該入口全部兵種，離開整個按鈕才恢復所有入口。每幀依實際 GUI 命中子控制項確認入口與兵種，避免列間切換暫時恢復全波。動畫相位只由篩選後區段建立，全體資料只提供穩定的雙向側位與共同強度尺度。
+`RoadFlowForecast` 對每份完整行程的相鄰格以 Vector4i(from.x, from.y, to.x, to.y) 計數，保留 all、by_troop、by_origin、by_troop_origin 四種彙總；相反方向不合併，重訪區段計入實際通過次數，非四鄰步驟略過。無有效排程時只顯示兵種清單、中心線清空。Hover 只讀已快取的「兵種＋入口」彙總並重建顯示 mesh，不重新取得行程或消耗 RNG；移至同一按鈕的標題、空白或捲軸時顯示該入口全部兵種，離開整個按鈕才恢復所有入口。每幀依實際 GUI 命中子控制項確認入口與兵種，避免列間切換暫時恢復全波。動畫相位只由篩選後的完整行程建立，全體資料只提供共同強度尺度，正反方向的幾何皆保持在道路中央。`RoadFlowForecast.animation` 依入口／兵種延後快取 `RoadFlowPhases`，相同行程只建立一份時鐘但保留全部流量計數。每條有向邊保留全部到達步數，每個實際連續轉彎另保留通過中央格的步數；不再對聯集網路做 BFS 取單一相位，避免長支路在匯流時中斷，或環路重訪消失。
 
-`scenes/navigation/road_flow_renderer.tscn` 保留有向區段及雙向分線，每個道路格只建立一個不重疊的 quad，整批一份 mesh／ShaderMaterial。格內線形以 RGBAF ImageTexture 保存端點、流量強度、方向相位及固定半寬，最多 24 個 primitives；直段在格內完全筆直，無分岔轉角格以半徑 0.22 的局部四分之一圓角銜接，圓角離開後仍為直線，不再對整段道路作 Bezier 彎曲。雙向道路各向行進方向右側偏移 0.10 格，hover 保留相同側向位置。shader 對同一格內線形計算聯集，以最大覆蓋透明度而非 alpha-over 合成，岔路重合不會額外加深；跨格 quad 不重疊，端點相位銜接。只保留一小段米白筆觸，高流量較粗、較清楚，前後漸淡至透明；道路其他位置完全沒有固定底線，沒有箭頭、虛線、粒子、Bloom 或 emission。surface_height 預設 0.075，保留深度測試、不寫深度、不投影。
+`scenes/navigation/road_flow_renderer.tscn` 保留有向區段，正反方向疊在道路中央，每個道路格只建立一個不重疊的 quad，整批一份 mesh／ShaderMaterial。格內線形以 RGBAF ImageTexture 保存端點、流量強度、局部進度、兩端流量強度與相位列／基準步數，每個 primitive 使用三個 texel：端點、兩端強度／相位，以及兩端裁切法線；相位基準步數／查表列放於整數部分，局部進度 [-0.5,1] 放於小數部分。最多 48 個 primitives；直段在格內完全筆直，每個實際 90 度轉向（包括匯流／分岔）皆以半徑 0.22 的局部四分之一圓角銜接，圓角離開後仍為直線，不再對整段道路作 Bezier 彎曲。雙向道路正反方向使用完全相同的中央幾何，hover 保持中央位置，兩方向仍各自使用流量、寬度與行進相位。每個實際相鄰轉向按該轉向的抵達相位建立線形；所有路口的 90 度轉向均由「直段＋解析四分之一圓弧＋直段」組成，不再因路口有第三條邊而退回直角。圓弧以負的終端強度標記，shader 依精確半徑與有向夾角計算距離及進度，取代八段折線；中央幾何令圓心可直接由兩個弧端點相加得到。共用切線裁切面連接直段與弧線，避免接縫與內部端帽突出。不同流量的進出邊不再以固定較小流量畫整段弧線：每段保存兩端強度，shader 以 smoothstep 插值強度，並用 `Line Width×0.5×lerp(0.4,1,strength)` 推導半寬；線寬及透明度在每個接點連續，邊界仍匹配原有向邊流量。只平滑樣式，不改變幾何或行程動畫相位；資料紋理／draw call／primitive 數不增加。只有完整行程的起點／終點使用圓頭，並保留獨立相位集合；格子邊界及內部接點不畫端帽。內部裁切不做透明度漸淡，避免聯集 max 在接縫變暗，外側輪廓及真正端點仍抗鋸齒。shader 對同一格內線形計算聯集，以最大覆蓋透明度而非 alpha-over 合成，岔路重合不會額外加深；跨格 quad 不重疊，端點相位銜接。只保留一小段米白筆觸，高流量較粗、較清楚，前後漸淡至透明；道路其他位置完全沒有固定底線，沒有箭頭、虛線、粒子、Bloom 或 emission。surface_height 預設 0.075，保留深度測試、不寫深度、不投影。
+
+相位查表把到達步數減去最小值後去重，相同抵達間距共用一列；單一到達時間的區段共用同一列。週期為 `max(4, 最長完整行程步數+1, ceil(2×Highlight Length))`。RGBA8 紋理每列每個整數時刻以兩組 16-bit 整數保存前後最近到達相位的距離（低／高 byte 分占兩個通道，避免 Web 浮點紋理讀回的截斷），shader 依小數部分精確還原最近距離，再沿用原 smoothstep 筆觸。每個有覆蓋的 primitive 固定查一次相位表，不隨路線數增加片元迴圈；透明區直接略過。相位紋理按篩選快取，hover 只首次建立該篩選的資料，不重設 shader 的 TIME。
 
 準備期顯示；開場等待、戰鬥、最後完成與 ACT 新入口選擇立即清空中心線。暫停隱藏清單／中心線並清除 hover，恢復後顯示未選兵種的預測與收合的菱形圖示，情報需再次 hover；重開或卸載由場景樹回收。F1／F2 開啟期間只暫時隱藏玩家中心線，避免與除錯線／威脅混淆，原功能完整保留。
 
-資料統計成本為已分配行程總步數，顯示重建依有流量道路格與有向區段，不每幀重算；shader 每格片元迭代實際 primitives，轉角最多 20，固定容量 24。此法增加少量片元距離計算以避免透明線段重疊加深。極大量群組仍可能造成同步預覽停頓，本階段沒有新增路線演算法或做容量上限宣稱。
+資料統計成本為已分配行程總步數，相位收集依去重行程總步數，查表建立／記憶體為週期乘以不同抵達間距列數；顯示重建依有流量道路格與有向區段，不每幀重算；shader 每格片元迭代實際 primitives，容量為每格最多 48（八個 90 度轉向各三段、四個直行及四個折返各兩段，加八個起終點半段），固定上限不隨路線數成長。此法增加少量片元距離計算以避免透明線段重疊加深。極大量群組仍可能造成同步預覽停頓，本階段沒有新增路線演算法或做容量上限宣稱。
 
-自動驗證 `tests/levels/road_flow_preview.tscn`；人工 F6 開啟 `tests/levels/road_flow_playground.tscn`，使用獨立雙入口、環路與三兵種資源，不改正式地形或波次。F5 仍進入原本 `scenes/level.tscn` 與 Frontier。截圖及原始測試 log 存 `.godot/`。
+自動驗證 `tests/levels/road_flow_preview.tscn` 與 `tests/levels/road_flow_continuity.tscn`；後者逐段檢查長短支路匯流、環路重走同邊、反向分線、抵達終點、週期接縫及 70 個抵達相位，實際渲染另取樣所有行程邊的中點與終點，以及亮段軟尾和遠離到達相位時保持透明；接點驗證另含四種朝向的突出區透明、路口圓弧及切線連通、雙向中央重合與獨立動畫、重合透明度聯集、真正端點圓頭與滿容量十字接點；另在四種朝向、流量 1／16 的雙向寬窄過渡上實測 56 個輪廓寬度，驗證弧線與直段接點樣式連續。結構資料從 CPU 幾何檢查，Web 浮點紋理讀回會截斷負法線與大於一的計數，實際 shader 行為由像素驗證。人工 F6 開啟 `tests/levels/road_flow_playground.tscn`，使用獨立雙入口、環路與三兵種資源，不改正式地形或波次。F5 仍進入原本 `scenes/level.tscn` 與 Frontier。截圖及原始測試 log 存 `.godot/`。
 
 ## 簡易敵人
 
@@ -449,13 +451,13 @@ python tools/web/serve_web.py
 | 欄位 | 預設 | 用途 |
 | --- | --- | --- |
 | Highlight Color | RGBA (0.953, 0.914, 0.804, 0.96) | 局部亮段顏色；RGB 改色，A 控制亮段對比與強度。 |
-| Highlight Length | 0.50 | 亮段長度（格）；越大亮段越長，間隔依現有流量網路長度配置，不會每兩格重複。 |
+| Highlight Length | 0.50 | 亮段長度（格）；越大亮段越長，間隔依最長完整行程步數配置，不會每兩格重複。 |
 | Line Width | 0.055 | 高流量線寬，單位為格；增大更粗，低流量自動較細。 |
 | Flow Speed | 0.28 | 筆觸滑行速率；0 停止筆觸，值越大越快。 |
 
 儲存場景後重新 F5／F6 即套用。這些 export 值會在每個 renderer 就緒時寫入其獨立 ShaderMaterial，請優先在根節點調整，不要只改 Material 的同名參數，否則開始遊戲時會被 export 值覆寫。Shader 原始碼位於 `assets/shaders/road_flow.gdshader`；phase_offset 供像素測試使用，不需手調。中心線的樣式改變不影響配額或實際敵人行程。
 
-米白筆觸不保留任何固定底線。只有有限長度的柔和細線沿道路前進，前後端以 smoothstep 完整漸淡至透明；不使用 glow／emission。渲染器只在現有有向流量網路上配置動畫時鐘，不修改路線、配額或 RNG；完整網路共用時鐘使 hover 不重置位置，間隔依顯示網路長度設定，避免每兩格重複一個亮段。Highlight Color／Highlight Length 控制筆觸外觀，Line Width／Flow Speed 的場景覆寫仍優先。
+米白筆觸不保留任何固定底線。只有有限長度的柔和細線沿道路前進，前後端以 smoothstep 完整漸淡至透明；不使用 glow／emission。渲染器從已分配的完整行程保留每次到達相位，不修改路線、配額或 RNG；全體／篩選重用同一 shader TIME，但分別使用各自完整行程的相位表及週期，間隔依最長完整行程設定，避免每兩格重複一個亮段。Highlight Color／Highlight Length 控制筆觸外觀，Line Width／Flow Speed 的場景覆寫仍優先。
 
 Highlight Length 的 Inspector 滑桿範圍為 0.10～20.0，Flow Speed 為 0～10.0；兩者皆允許直接輸入更大的數值。增加長度時，筆觸週期至少為長度的兩倍，保留前後透明區間，避免長筆觸重疊成永久底線。這些範圍不會重設場景既有數值。
 
