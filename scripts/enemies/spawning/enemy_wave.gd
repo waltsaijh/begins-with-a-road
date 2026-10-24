@@ -92,11 +92,13 @@ func start_wave() -> bool:
 		if not _prepare_legacy_wave(): return false
 	total = _pending.size()
 	_next_enemy_id += total
-	visuals.reserve(total)
+	var population := {}
 	_committed_routes.clear()
 	for data: Dictionary in _pending:
 		var profile: Troop = data.get("profile", _wave_troop)
+		population[profile] = int(population.get(profile,0))+1
 		_committed_routes.append({"troop": profile.troop_name, "color": profile.debug_color, "cells": data.route.cells})
+	visuals.reserve_population(population)
 	spawned = 0
 	alive = 0
 	completed = 0

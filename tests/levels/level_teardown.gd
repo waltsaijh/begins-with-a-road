@@ -1,4 +1,5 @@
 extends Node
+const Fixture = preload("res://tests/fixtures/level_fixture.gd")
 ## Exercise the same tree-exiting callbacks as closing a running game window.
 var failures := 0
 var cases := 0
@@ -13,14 +14,14 @@ func check(ok: bool, message: String) -> void:
 
 func definition() -> LevelDefinition:
 	var level := LevelDefinition.new()
-	level.expand_starts_after_act = false
-	level.use_terrain_endpoints = false
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
 	terrain.cell_center_y = false
 	terrain.position = Vector3(-12, 0, -0.5)
 	for x in 24: terrain.set_cell_item(Vector3i(x, 0, 0), 3)
+	Fixture.endpoint(terrain,Fixture.Start,Vector2i.ZERO,"Start")
+	Fixture.endpoint(terrain,Fixture.Goal,Vector2i(23,0),"Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()

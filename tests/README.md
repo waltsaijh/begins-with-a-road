@@ -1,6 +1,22 @@
 # 測試
 
+`godot --editor --path . -- --test-wave-editor` 在實際波次編輯器驗證 ACT／波次新增與刪除、各 ACT 獨立 checkbox（預設勾選）、原生 Undo／Redo 恢復資料及選取、刪到空白後重建、未儲存追蹤與儲存重載。`levels/act_spawn_expansion.tscn` 使用四個 ACT，檢查勾選／未勾選／再次勾選的混合邊界、下一波仍手動開始，以及最後 ACT 不額外擴張；不修改正式關卡。
+
+自動關卡目錄與 DAG：`godot --headless --path . --script tests/levels/level_catalog.gd`，驗證新增／巢狀／刪除檔案、逐層拓撲順序、跨父節點的 sibling ID 排序、掃描順序無關、菱形 AND 解鎖、重複邊、缺失／重複 ID、環及其後代、4096 節點長鏈、保存重載與壞檔保護。`godot --path . tests/menus/level_selection.tscn` 用兩份新 Level 檔驗證自動選項與前置／後代的 01／02 索引、單一延遲預覽、未解鎖按鈕／內部啟動攔截、雙語、實際通關後解鎖、共用場景選中資料與戰鬥中重新開始不誤記通關。可匯出此場景至 Web；第二次以 `?verify_reload=1` 開啟會額外驗證前次的隔離通關檔已持久保存。測試不覆寫玩家資料；輸出在 `.godot/test-results/levels/catalog/`、`.godot/test-results/menus/level_selection/`。
+
+Level 精簡契約亦由上述回歸驗證：ID／檔名推導標題與描述 key，實際選圖雙語切換；`levels/terrain_endpoints.tscn` 檢查缺失端點必須報錯、巢狀變換、模型及多入口保存重載，`levels/act_spawn_expansion.tscn` 檢查自訂端點高度沿用到新增入口與預覽，實際波次編輯器檢查儲存結果不再包含移除的 Level 欄位。
+
+Web 啟動頁交接回歸：`node tests/menus/web_loading_shell.cjs`，依環境提供 `PLAYWRIGHT_MODULE` 及可選 `BROWSER_EXECUTABLE`。驗證引擎完成／native draw 的兩種先後順序、已知／未知下載進度與失敗訊息保留；加 `--live` 連到正式本機匯出，`--url=...` 可改網址並擷取資源載入、native 載入與主選單畫面。產物在 `.godot/test-results/menus/loading_labels/`。`startup_loading.gd` 另外檢查換場景及主選單首次繪製期間持續保有正確階段 label。
+
+啟動預熱回歸：`godot --path . --script res://tests/menus/startup_loading.gd`。驗證三種正式兵種共用一個 GPU shader 代表、明確保留世界共用材質代表、透明材質不誤合併、共用主 viewport、RNG 隔離、資源保留、關卡不重複預熱及 MSAA 改變後補漏；headless 跳過像素／GPU 驗證。
+
+三種兵 GPU 模型回歸：`godot --path . --script res://tests/enemies/enemy_gpu_models.gd`，比對原動畫與 GPU 的頂點／法線／配色、Quickfeet 3 倍播放、停止姿勢、三批混合容量成長與 slot 回收。`godot --path . --script res://tests/enemies/enemy_gpu_render.gd` 以主 viewport 比對 Quickfeet／Heavy 原模型和 GPU 在三種姿勢的像素，必須使用實際 renderer；JSON 與截圖放 `.godot/test-results/enemies/`。
+
+選圖後載入與預熱回歸：`godot --path . --script res://tests/menus/scene_loading.gd`。使用真實主選單檢查未知階段、工作計數單調遞增、兵種代表實際繪製、背景輸入與開波鎖定、RNG／正式敵群隔離、清理及恢復開波；另以 fixtures/loading_target 驗證準備失敗與取消可回到主畫面，這兩個案例會印出預期的轉場錯誤。截圖在 `.godot/test-results/menus/loading_visuals.png`。一般主選單完整往返仍由 main_menu 回歸驗證。
+
 保留可驗證目前行為的功能回歸；一次性效能量測與重複截圖場景已清除。同一項的 `.gd`、`.gd.uid` 與 `.tscn` 保持在同一目錄。測試資料與預設值盡量獨立於使用者正在編輯的關卡與塔數值。
+
+`fixtures/test_artifacts.gd` 在本機寫入 `.godot/test-results/`；Web 匯出的 res:// 為唯讀，因此測試暫存改用瀏覽器內的 `user://test-results/`。瀏覽器 runner 可另外把 console 結果保存至本機 `.godot/test-results/`。正式匯出排除這些測試。
 
 | 目錄 | 範圍 |
 | --- | --- |
@@ -43,6 +59,8 @@ godot --editor --path . -- --test-card-resource-refresh
 `enemies/enemy_status` 驗證同類減速取最佳強度與最長剩餘時間合併，涵蓋兩種施加順序、到期、短／長刷新及敵人重用；另使用 fixtures 內的舊版繪製進行像素比較，包含分散與重疊順序、不同圖示、圖集／容量成長、樣式烘焙、移除與重用；headless 會略過像素比較。`cards/card_preview` 與 `combat/combat_preview` 雖名為 preview，仍驗證實際輸入提交及攻擊繪製，供 Web 比對使用。
 
 過去的壓測數字僅保留於 [歷史摘要](../reports/performance_2026-10-20.md)，不代表本次回歸結果。未來若需要新的負載量測，依當時問題建立測試並保存當次方法與樣本。
+
+`godot --path . --script tests/enemies/solid_material.gd` 核對道路／木橋的 surface 合併、塔／三兵種的材質身分、烘焙步態參數、特殊材質排除，以及原 StandardMaterial3D 與共用材質的實際像素差異；結果放 `.godot/test-results/rendering/shared_material/`。Headless 只驗證資料，不能替代像素檢查。工具由測試引用，正式匯出仍排除 tests／tools。
 
 `camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、中鍵跨過商店卡牌及卡牌上起拖／放開、中心死區、跨 UI 捕捉／放開、卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
 

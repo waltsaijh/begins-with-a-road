@@ -75,7 +75,7 @@ MeshLibrary ID：石地 0、直路 1、轉角 2、獨立道路地塊 3、道路�
 
 所有起終點必定設柱。首次以第一個起點開始，從已建好的入口節點中選出 3 格半徑外最近的一個，並要求與任何已選柱子距離都大於 3，再以新柱為中心繼續；更新時保留合法舊柱後再選取。距離採格心 XZ 平面的歐氏距離，等距以座標決定順序，終點與額外起點也參與排除距離。直路中央沒有入口就不額外插入柱子。柱子保留原道路頂面，沿用原型 terrain_mass 的分層折面語彙：倒角截面、略有起伏的石層，延伸至 Y=-4，並以不透明材質的顏色漸變融入雲海，不使用透明石柱。模型來源為 variants/pillar_support.tscn。
 
-木橋在不含入口／柱子的直線道路格中，保留合法舊橋後以固定 seed 洗牌補選，數量目標是 floor(道路格數/16)，任兩木橋格心距離必須大於 2。位置不足時保留實際可放數量，不放寬條件；屬隨機貪心配置，不保證達到所有可能擺法的最大數量。模型沿用原型 bridge_detail 的六塊交錯木色窄橋面、兩側扶手與立柱，再加橋面下的承重梁；預設沿 Z 軸。新增道路改成岔口時，原木橋會自動恢復成合適的石路。新增死路也會更新外觀，但不因此要求重建入口圖或路線池。烘焙器會依材質合併 surfaces，轉角由 5 個減至 3 個，木橋 14 個零件合併為 3 個 surfaces。
+木橋在不含入口／柱子的直線道路格中，保留合法舊橋後以固定 seed 洗牌補選，數量目標是 floor(道路格數/16)，任兩木橋格心距離必須大於 2。位置不足時保留實際可放數量，不放寬條件；屬隨機貪心配置，不保證達到所有可能擺法的最大數量。模型沿用原型 bridge_detail 的六塊交錯木色窄橋面、兩側扶手與立柱，再加橋面下的承重梁；預設沿 Z 軸。新增道路改成岔口時，原木橋會自動恢復成合適的石路。新增死路也會更新外觀，但不因此要求重建入口圖或路線池。烘焙器把純色寫入頂點並共用 solid_color.tres；一般石路／木橋各為 1 個 surface，帶柱道路為純色頂面與特殊柱底共 2 個 surfaces。
 
 `CloudLayer` 在 Y=-4 放置不透明底雲，Y=-3／-2 放置兩張半透明雲面，以不同雲形大小、密度、流速產生厚度與視差，流速為初版的 1.5 倍；兩層的最大透明度分別為 0.55／0.72。深度測試與 render_priority 讓雲不蓋過地面及除錯線。三層共用平面幾何及一張 256×256 無縫噪聲貼圖，貼圖在載入時生成一次；每個雲／柱底 fragment 僅取樣一次，不逐像素執行噪聲 hash 或多層 FBM。柱身的霧化範圍也改為 Y=-2～-4。沒有逐格雲物件、逐幀建圖或光線步進。雲面根據道路範圍加 padding 建立，新增格只有擴大邊界時才改尺寸。可隱藏 CloudLayer 整體停用雲海。depth 是底層深度，兩層雲面固定比底層高 1／2 格；若調整 depth，柱子材質 pillar_stone.tres 的 cloud_height／cloud_top 也應配合修改。
 
@@ -154,7 +154,7 @@ F3 與獨立流量圖層已移除。每個圖層各用一個 mesh，資料修改
 
 ## 簡易敵人
 
-正式 Soldier／Quickfeet／Heavy 分別使用 `assets/models/enemies/grunt.tscn`、`runner.tscn` 與 `brute.tscn`，模型、武器與配色沿用原型。Soldier 使用共用 GPU 步態；Runner 與 Brute 以場景實例播放循環 Walk，Quickfeet 動畫播放倍率為 3.0。模型動畫不改變既定路線或邏輯移速；資料仍由 Troop Resource 設定。模型說明與重建入口見 [模型說明](../assets/models/enemies/README.md)。
+正式 Soldier／Quickfeet／Heavy 的來源分別為 `assets/models/enemies/grunt.tscn`、`runner.tscn` 與 `brute.tscn`，保留模型、武器與配色。三者各有一個 MultiMesh、共用 `solid_color.gdshader`；Troop 的 GPU Model 引用離線烘焙的網格、支點與步態參數。Quickfeet／Heavy 由目前保存的來源場景直接烘焙，不重建原型；保留原 Walk 的 17 個線性插值關鍵影格、0.8／約 1.176 秒週期，以及 Quickfeet 3.0 播放倍率。模型動畫不改變既定路線或邏輯移速。模型說明與重建入口見 [模型說明](../assets/models/enemies/README.md)。
 
 避讓採平滑阻尼，約 0.8 秒到位，鄰兵離開後保留側向位置，不回彈到中央；轉彎時仍忽略接觸。內建 grunt 使用 MultiMesh，兵種可指定匯入的 GLB／glTF／TSCN 模型、動畫與 PNG 圖示；匯入模型保留自己的材質與骨架。
 
@@ -170,9 +170,9 @@ main、9x9、11x11big 三張場景都包含 EnemyWave。入口圖準備完成後
 
 各兵種／起點快取所選模式的機率表。先保留 `score - min_score < score_threshold` 的完整候選（等號排除；INF 停用門檻），Uniform 對每條保留候選給予 `1 / 候選數` 的機率；Softmax 計算 `p_i = exp(-(score_i - min_score) / route_temperature) / sum(weights)`。route_temperature 預設 4，越小越偏好低成本，設 INF 為等機率；等分候選的機率相同。soldier 預設 Uniform，quickfeet／heavy 預設 Softmax。每波以 `i / total`（i 從 0 開始）查找累積機率區間，固定各路線人數，再打亂出發順序；全域 enemy_id 不參與選路，相同計畫與總人數得到相同配額，預覽不影響實際分配。候選池有限，區塊內至多 4 個代表走法也分別計入候選權重。
 
-每波開始時便固定所有待生成者的逐格路線與世界座標，之後修改地圖／評分只影響未來波次；重新建立計畫會重建對應機率表。敵人每幀只花移動距離走下一段，不做尋路。內建 grunt 每波共用一個 MultiMeshInstance3D；每隻僅保留行程／位置的 Node3D。指定其他匯入模型時，各自實例化場景並保留 MeshInstance、Skeleton 與 AnimationPlayer。紅衣模型來自原型 art/enemies/miniature_humanoid.gd 的 grunt，以 tools/assets/build_enemy.gd 烘焙成單一 surface、637 三角形的共用 mesh，UV／UV2 保存四肢分類與旋轉支點，執行時不依賴原型專案。
+每波開始時便固定所有待生成者的逐格路線與世界座標，之後修改地圖／評分只影響未來波次；重新建立計畫會重建對應機率表。敵人每幀只花移動距離走下一段，不做尋路。三種正式模型依 GPU Model 各共用一個 MultiMeshInstance3D，每隻僅保留行程／位置 Node3D、相位與避讓資料，不建立逐隻 MeshInstance 或 AnimationPlayer。來源場景或選中動畫與 GPU Model 不符時，保留匯入場景的材質、Skeleton 與 AnimationPlayer，不繪製占位 grunt。網格均為單一 surface，UV／UV2 保存四肢分類與支點，烘焙工具不在執行時使用。
 
-assets/shaders/enemy_walk.gdshader 在 GPU 上依原型步態擺動腿／手臂、起伏與輕微側擺；每隻的相位依實際行進距離更新，停下時停止擺動，出生相位錯開。每幀由共用 MultiMesh 在邏輯移動後統一提交 transform 與 custom data；slot 以末尾搬移方式回收，容量預留並倍增，不會每次生怪或抵達都重建 buffer。轉角以 `lerp_angle` 和 `1-exp(-turn_sharpness*delta)` 平滑轉向，不改變既定路線與速度。Inspector 的 EnemyWave.turn_sharpness 越大轉得越快。
+assets/shaders/solid_color.gdshader 共用腿／手臂擺動、起伏與側擺公式，步態參數離線寫入網格 CUSTOM0，粗糙度／反光寫入 CUSTOM1；全部引用同一份 solid_color.tres，不按兵種複製材質或 shader。Soldier 相位依實際距離推進、出生錯開、停止時回中立；Quickfeet／Heavy 依模擬時間 × 動畫倍率 × 移動 blend 推進，停止時凍結當前姿勢，與原 AnimationPlayer 相同。shader 對兩者的 16 個關鍵影格間隔重現線性插值，不直接換成理想正弦。各網格持有獨立緊密 slot、容量與末尾搬移；頭頂狀態仍維持全敵群的獨立順序。開波依模型人口預留容量；移動後提交 transform／custom data，不重建網格、動畫或導航。轉角以 `lerp_angle` 和 `1-exp(-turn_sharpness*delta)` 平滑轉向，不改變既定路線與速度。Inspector 的 EnemyWave.turn_sharpness 越大轉得越快。
 
 共用預設參數集中在 `EnemyConstants`，其他 script 可直接使用 `EnemyConstants.MOVE_SPEED` 等值，不需 preload。波次數量／批次／間隔／速度／轉向速度仍可由 EnemyWave Inspector 覆寫；步幅、擺幅與起伏等顯示預設集中在 EnemyRenderConstants。這是編譯時常數，修改後重新執行生效。
 
@@ -322,19 +322,21 @@ F1 的路徑來自本波每隻敵人的完整行程，不受評分正負值影�
 
 ## 關卡、ACT 與波次
 
-F5 先進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。範例包含三個 ACT、每個三波。準備階段無時間限制，第一波及後續波次都由玩家點第一個起點上方的「開始下一波」對話框確認，沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
+F5 先完成啟動顯示預熱並進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。範例包含三個 ACT、每個三波。準備階段無時間限制，第一波及後續波次都由玩家點第一個起點上方的「開始下一波」對話框確認，沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
 
 介面場景是 `scenes/levels/level_hud.tscn`，包含頂部金幣、時間線、倍速與暫停，以及 `WorldActions/EarlyStart` 起點對話框；已實例化於 `level.tscn` 的 `LevelHUD`。時間線本身是 `scenes/levels/wave_timeline.tscn`，可直接在 2D 編輯器預覽。選取 WaveTimeline 後，可在 Inspector 的 Preview 調整波次索引、準備進度與戰鬥狀態，Appearance 可調字型、字級與顏色；執行時由關卡進度接管。時間線的節點數與 ACT 名稱來自 Level 資源。
 
-- `LevelDefinition`：地形 GridMap 場景、由地形端點讀取的入口／終點、相容舊地圖的座標、ACT 列表與是否在 ACT 之間擴張入口。準備時間、自動開始及開波額外獎勵欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
-- `ActDefinition`：ACT 名稱與有順序的波次列表。
+- `LevelDefinition`：穩定 ID、前置關卡 ID、必含端點的地形 GridMap 場景與 ACT 列表。標題／描述 key 由 ID 推導為 `ui.maps.title.<id>`／`ui.maps.description.<id>`，不保存額外名稱、翻譯 key、起終點座標、來源開關或 Marker Height。高度由 TerrainEndpoint.height_offset 控制，ACT 新入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。準備時間、自動開始、開波額外獎勵與全局 ACT 擴張欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
+- `ActDefinition`：ACT 名稱、有順序的波次列表與 `add_start_after_completion`（預設 true）。完成這個 ACT 後若還有下一個 ACT，勾選才進入新增出生點流程；取消則直接進入不限時、手動開始的下一波準備。最後 ACT 直接完成關卡，即使選項勾選也不額外擴張。不同 ACT 各自保存設定。
 - `WaveDefinition`：出生群組列表、共用移動速度與完成獎勵。
 - `WaveSpawnGroup`：兵種、開始刻度、總數、每批隻數、批次間隔刻度與入口索引。
 - `level_session.gd`：在遊戲節點 ready 前載入預設地形與端點，依序準備波次；完成最後一波後停用開波按鈕。
 
 可在 Inspector 開啟 frontier.tres 編輯，或另存一份關卡 Resource，指定到 level.tscn 根節點的 Level。地形使用可獨立編輯的 GridMap `.tscn`，不把地形資料混進敵人生成程式；範例引用 `scenes/maps/tile_map.tscn`。既有 main／9x9／11x11big 場景仍可獨立用於地圖與功能測試。
 
-Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT／波次、新增／複製／刪除群組，並編輯兵種、入口、開始時間、數量、每批隻數及批次間隔。拖曳色塊可移動開始時間；預覽滑桿顯示指定時刻各兵種的累計出生數。按「儲存關卡」寫回原檔，或使用 Godot 儲存操作一起儲存；編輯與拖曳支援原生復原／重做。未儲存時顯示星號，切換關卡可先儲存再切換。外掛已在專案設定啟用；若編輯器尚未重新載入設定，可在「專案 → 專案設定 → 外掛」啟用「波次編輯器」。介面場景位於 `addons/wave_editor/wave_editor.tscn`。
+Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇 ACT 及該 ACT 的波次。ACT 列提供新增／刪除 ACT 與「結束後新增出生點」checkbox，預設勾選；波次列提供新增／刪除波次，原有群組新增／複製／刪除及兵種、入口、開始時間、數量、每批隻數、批次間隔編輯保留。新增 ACT 附一個波次，新波次附一個使用預設兵種的獨立群組；新增 ACT 放在最後並選中，新波次插在目前波次之後。可以刪到沒有 ACT／波次，再透過新增按鈕重建，資料無效時禁止儲存；刪除 ACT 一併移除其波次，復原會完整恢復資料及原選取。
+
+拖曳色塊可移動開始時間；預覽滑桿顯示指定時刻各兵種的累計出生數。按「儲存關卡」寫回原檔，或使用 Godot 儲存操作一起儲存；ACT／波次／checkbox、群組編輯與拖曳皆支援原生復原／重做及未儲存狀態追蹤。切換關卡可先儲存再切換。外掛已在專案設定啟用；若編輯器尚未重新載入設定，可在「專案 → 專案設定 → 外掛」啟用「波次編輯器」。介面場景位於 `addons/wave_editor/wave_editor.tscn`。
 
 出生排程以開波為 0，所有時間保存為整數：`start_tick` 與 `interval_ticks`，每格固定 0.25 秒。例如開始 6 格 = 1.5 秒、間隔 2 格 = 0.5 秒。結束刻度由「開始 + (批次數 − 1) × 間隔」自動計算，間隔 0 表示同時出生。準備期與開波動畫獨立於出生排程。既有九波已轉成群組資料，原先 0.2 秒的出生間隔對齊為 1 格（0.25 秒）。
 
@@ -403,6 +405,8 @@ python tools/web/serve_web.py
 
 開啟 http://127.0.0.1:8765/index.html。伺服器提供 COOP／COEP 標頭，正式部署也需對應的跨來源隔離設定。
 
+Web 匯出引用 `assets/web/shell.html`，先以不依賴 WebGL 字型的頁面文字呈現「載入遊戲資源／啟動遊戲」。下載只有在位元組總量已知時顯示實際進度；未知時只顯示狀態。引擎啟動 promise 與 ScreenTransition 首個 `frame_post_draw` 通知都完成後，才在下一個 rAF 移除 HTML 遮罩；不在 canvas 尚未畫好時提早撤掉，也不因提早收到 draw 通知而隱藏啟動失敗資訊。頁面自帶英／繁中初始文字，沒有額外字型下載依賴。
+
 
 ## 設定頁面
 
@@ -421,13 +425,19 @@ python tools/web/serve_web.py
 設定頁面顯示時攔截非 UI 鍵盤操作與未處理事件，Tab／Shift+Tab 在頁面可見、可用的控制項內循環，方向鍵也不能離開頁面；Esc 僅關閉設定並吞掉該次輸入。透明根 Control 用 GUI 事件攔截全畫面點擊，讓列元件、捲軸及 hover 仍可正常處理事件。
 
 鏡頭的 `set_navigation_locked(bool)` 是通用宿主介面，與設定頁面沒有直接引用。LevelHUD 監看頁面可見性，在開啟時鎖定鏡頭並清掉已有角速度／按下手勢；鎖定也拒絕延後重播點擊。HUD 在設定顯示期間不執行原暫停輸入路由，讓頁面先處理 GUI。返回、程式解除暫停或 HUD 離場時解除鎖定；既有卡牌／交易鎖定與 SceneTree 暫停持續生效。`camera_orbit` 覆蓋設定返回後的正常鏡頭、卡牌及商店操作；`level_teardown` 覆蓋設定開啟時移除 HUD 的鎖定清理。
+## 共用模型材質
+
+道路、木橋、塔、端點非發光零件及正式三兵種共用 `assets/materials/solid_color.tres`。純色與原頂點色相乘後寫入 COLOR；CUSTOM1 保存原本粗糙度／反光，包含亮木板的差異。CUSTOM0 保存帶方向的四肢擺幅、起伏、側擺及關鍵影格間隔數 + 1；w=0 的靜態模型不執行步態。每幀相位與 blend 提交方式不變，不為材質整合新增節點、逐模型材質或移動時計算。來源 CPU 動畫仍保留，GPU Model 擺幅變更需重新烘焙。詳見 [材質格式與工具](../assets/materials/README.md)。
+
+轉換工具直接處理目前保存的場景與 MeshLibrary，不重生原型或改路網；保留變換、動畫、項目編號及特殊材質。每格純色面合為一個 surface，柱底另列。雲、柱底漸變／生長、端點發光、透明戰鬥特效與 2D UI 不套用共用不透明材質。啟動仍明確繪製普通 MeshInstance 與敵人 MultiMesh，因為同一材質的不同繪製路徑可能有不同引擎 program。
+
 ## 開始選單
 
-F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題／操作與右側折線雲橋構圖，使用目前專案內素材與 Compatibility 渲染。Home 的 VBox、Label、開始／設定／離開按鈕、SettingsVeil 與共用 SettingsPage 均明確保存於場景，文字仍使用翻譯 key，透過主 CanvasLayer 繪製；按鈕沿用設定頁的 Light 字重、僅變黑、不縮放的 hover 與底線互動，開始／設定／離開使用相同的青灰色一般狀態、黑色 hover 與深青色焦點，不為開始按鈕單獨覆寫金色。
+F5 先載入 `scenes/menus/boot.tscn`，完成共用顯示準備後以白色轉場進入 `scenes/menus/main_menu.tscn`。啟動場景明確保存相機、方向光、原敵人 renderer 與載入介面，與關卡引用同一份 `assets/data/rendering/level_environment.tres`；沒有關卡、敵群、導航或商店。主選單參考原型的左側徽記／標題／操作與右側折線雲橋構圖，使用目前專案內素材與 Compatibility 渲染。Home 的 VBox、Label、開始／設定／離開按鈕、SettingsVeil 與共用 SettingsPage 均明確保存於場景，文字仍使用翻譯 key，透過主 CanvasLayer 繪製；按鈕沿用設定頁的 Light 字重、僅變黑、不縮放的 hover 與底線互動，開始／設定／離開使用相同的青灰色一般狀態、黑色 hover 與深青色焦點，不為開始按鈕單獨覆寫金色。
 
 `scenes/menus/components/menu_stage.tscn` 是純顯示場景，明確保存 58 個道路模型實例、固定石柱、起終點、Camera3D、光源、Environment 及三張雲層 PlaneMesh。沒有 GridMap、路網建圖或遊戲控制器，不依賴原型專案路徑。可直接在 3D 編輯器移動／替換模型；Bridge 的 0.8 秒浮起與 Home 的 0.6 秒淡入由場景 AnimationPlayer 保存。相機無遊戲鏡頭輸入腳本。專用 `assets/shaders/menu_cloud_layer.gdshader` 重用共用噪聲，降低透視遠景的高頻紋理並漸淡到 Environment 色；其他兩層雲採低透明度，沒有體積霧或 Forward+ 依賴。
 
-`scripts/menus/main_menu.gd` 只連接明確節點的意圖與場景切換，沒有在執行時建立 UI／地形。開始遊戲開啟選圖頁，在原頁按「下一步」把描述區替換為本局設定，確認「開始作戰」後才依 MenuMapDefinition 的 Level Scene 路徑切換正式關卡；有重複點擊保護，回到 1x、未暫停的第一波準備。沒有存檔時不顯示繼續遊戲。正式關卡仍可直接以場景執行。
+`scripts/menus/main_menu.gd` 只連接明確節點的意圖與場景切換，沒有在執行時建立 UI／地形。開始遊戲開啟選圖頁，在原頁按「下一步」把描述區替換為本局設定，確認「開始作戰」後一次性交接選中 Level Resource，透過共用 level.tscn 執行；有重複點擊保護，回到 1x、未暫停的第一波準備。沒有存檔時不顯示繼續遊戲。正式關卡仍可直接以場景執行。
 
 開始選單實例化共用設定頁，透過同一個 GameSettings 介接層讀取／套用目前 viewport 設定。開啟設定時隱藏 Home，以實際 0.2 秒加強白色遮罩；設定頁攔截全畫面滑鼠與鍵盤焦點。返回／Esc 還原選單並將焦點交給設定按鈕，選單背景雲層持續顯示。語言、MSAA 與 AudioServer 靜音於本次執行跨關卡切換保留，沒有新增磁碟保存。桌面離開會關閉遊戲，Web 隱藏離開項目。
 
@@ -436,11 +446,15 @@ F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題�
 
 `scenes/menus/map_selection.tscn` 明確保存標題、徽記、地圖名稱、切換箭頭、索引、描述、關卡規模、固定本局選項與返回／下一步／開始作戰按鈕，使用主 CanvasLayer，不建立子 viewport。風格沿用透明背景、淡青文字、Light 字重、僅變黑、不縮放的 hover、底線與 0.35 秒淡入。返回／下一步／開始作戰均沿用共用按鈕的一般青灰色、黑色 hover 與深青色焦點，不設定金色的一般狀態覆寫；失焦及底線收回時回到一般青灰色。中間留給正交地形預覽；頁面沒有卡片填色或額外彈窗。單張地圖的左右箭頭使用透明停用樣式，只有多張時才啟用循環切換。
 
-選圖資料為 `assets/data/menu_maps/*.tres` 的 MenuMapDefinition，保存名稱／描述翻譯 key、Level Resource 與可執行場景路徑。ACT／波次數直接由 Level 計算。現有唯一正式選項為 frontier；獨立測試地圖不列入。`scripts/menus/map_selection.gd` 只更新固定控制項、選擇索引及流程步驟，發出 map_changed／launch_requested(definition, run_options)／back_requested；主選單協調預覽顯示、相機與真正關卡切換。
+選圖資料自動掃描 `assets/data/levels/` 及子目錄的 LevelDefinition，使用 ResourceLoader.list_directory 相容匯出後的 remap。Level 自己保存穩定 ID 與 Required To Complete Levels，標題／描述 key 由 ID 推導；不需單獨的選單 Resource 或遊戲場景。目錄產生 MenuMapDefinition 作為暫時顯示資料，ACT／波次數直接由 Level 計算，獨立測試場景不列入。`scripts/menus/map_selection.gd` 只更新固定控制項、選擇索引及流程步驟，發出 map_changed／launch_requested(definition, run_options)／back_requested；主選單協調預覽顯示、相機與真正關卡切換。
 
-`scenes/menus/components/frontier_preview.tscn` 直接實例化正式 Level 引用的 `scenes/maps/tile_map.tscn`，保留實際道路、起點與終點，另明確配置展示石柱與正交相機。MapPreviews 子節點順序就是選項順序，各預覽根節點使用 `map_preview.gd` 並指向自己的 MenuMapDefinition。預覽僅在啟用或視窗變更時讀取格子範圍來調整相機；不重建道路、改動地形、跑生成器、交易、路線規劃或波次。Top Clearance／Bottom Clearance／Horizontal Fraction 可在 Inspector 調整相機為 UI 保留的取景空間，Zoom 以自動取景為基準縮放顯示。目前邊境前哨的相機俯角維持 45°、水平旋轉為 0°，使地圖長軸在畫面中保持水平；場景明確設定 Zoom 為 1.0、Bottom Clearance 為 280px，預覽比原 1.25 倍縮小 20%；Footer 寬 900px、上緣距畫面底部 265px，地圖名稱／資訊區較前版上移 60px，底部操作仍靠近原畫面下緣，不改動正式地形。
+`scenes/menus/components/map_preview.tscn` 是單一延遲載入的預覽宿主與正交相機。選中時直接實例化該 Level 的 terrain，保留道路與端點。切換先釋放舊地形，不同時建立所有地圖。副本在進樹前移除腳本並停用處理與碰撞；不初始化關卡、交易、路線規劃或波次。格子範圍在換地圖時量一次，視窗改變只重算相機尺寸。Top Clearance／Bottom Clearance／Horizontal Fraction 可在 Inspector 調整相機為 UI 保留的取景空間，Zoom 以自動取景為基準縮放顯示。相機俯角維持 45°，X 較長時水平旋轉為 0°、Z 較長時為 -90°，使主要長軸水平；場景明確設定 Zoom 為 1.0、Bottom Clearance 為 280px，預覽比原 1.25 倍縮小 20%；Footer 寬 900px、上緣距畫面底部 265px，地圖名稱／資訊區較前版上移 60px，底部操作仍靠近原畫面下緣，不改動正式地形。
 
-選圖時隱藏主選單的裝飾折線橋，切到正交相機與真實初始地形；在選圖步驟按返回或 Esc 還原原透視橋景及開始遊戲焦點。本局設定中的返回或 Esc 先回選圖並保留暫定值；選圖再返回才還原主畫面。完成兩步並按開始作戰後，以選定選項的關卡場景載入，保留語言、MSAA、靜音及第一波手動準備規則。新增選項的具體步驟見 `assets/data/menu_maps/README.md`。
+選圖時隱藏主選單的裝飾折線橋，切到正交相機與真實初始地形；在選圖步驟按返回或 Esc 還原原透視橋景及開始遊戲焦點。本局設定中的返回或 Esc 先回選圖並保留暫定值；選圖再返回才還原主畫面。完成兩步並按開始作戰後，以選定選項的關卡場景載入，保留語言、MSAA、靜音及第一波手動準備規則。新增選項與前置 ID 的設定見 [關卡說明](../assets/data/levels/README.md)。
+
+LevelCatalog 建立 ID 字典及去重鄰接清單，以 Kahn O(V+E) 檢查前置關係並逐層產生拓撲列表：先列出無前置的根，每層按 ID 字典序排序，整層完成才進入下一層。所有前置先於後代，同層不受父節點、目錄掃描或通關狀態影響；含排序的完整建立成本為 O(V log V + E)。重複 ID、缺失前置、環與錯誤分支的後代鎖定，錯誤項目留在正常 DAG 後按 ID／資源路徑排列，其他分支正常。解鎖為全部直接前置已通關，通關事件以字典刷新狀態，不在每幀走圖。未解鎖可預覽，顯示缺少的前置名稱，下一步／開始與宿主啟動均攔截；草稿顯示資料尚未完成。空目錄顯示沒有關卡。
+
+LevelProgress 只在最後一波完成時保存穩定 Level Id 到 user://level_completion.cfg，跨次啟動保留；Web 為網站的持久檔案系統。只保存通關集合，不保存進行中局面；壞檔讀取不覆寫既有記憶體集合。LevelLaunch 只作一次性資料交接，在 LevelSession 進樹前套用，沒有改寫預設 PackedScene／Resource；重開關卡重新交接目前 Level，失敗及返回主選單清理待交接。
 
 `tests/menus/main_menu.gd` 也驗證開始遊戲不直接進關卡、三種尺寸的地形取景與操作、唯讀地形一致性、單地圖箭頭停用、雙語資訊、返回／Esc 相機恢復與選定 Level 的真正切換。選圖截圖位於 `.godot/test-results/menus/map_selection_*.png`。
 
@@ -453,6 +467,20 @@ F5 載入 `scenes/menus/main_menu.tscn`。參考原型的左側徽記／標題�
 實際渲染回歸另比較切換前後固定節點的位置與尺寸、相機 transform／size／v_offset、描述區內容不溢出，並驗證同場景與 viewport、三種尺寸、單選互斥與文字開關、雙語切換、逐步返回並保留值、最後一次性啟動意圖與新局預設；截圖為 `.godot/test-results/menus/run_setup_*.png`。
 
 ### 白色畫面過渡
+
+選圖最後按「開始作戰」時使用 `ScreenTransition.change_scene(path, &"prepare_for_play")`。完整白畫面呈現後先顯示「載入戰場」，等待 UI 繪製才同步載入目標；此階段沒有可靠百分比，因此隱藏進度條。一般主畫面／選圖切換及返回主畫面維持原本過渡。
+
+可選準備契約讓轉場層暫存並停用新場景的 processing，呼叫指定方法並接受 `report(completed, total, translation_key)`；轉場層不讀取 Level、EnemyWave 或 PortalMap。使用方法名稱而非來源節點回呼，避免選單釋放後失效。完成後還原 processing，再淡出白畫面與載入介面；準備失敗或目標離場時回到來源場景。輸入鎖定持續到淡出結束。
+
+LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池、尚未準備的顯示代表；這階段的總工作數已知，完成一項才推進一格。正常啟動後 Frontier 為 2 項；直接開選單、跳過啟動預熱則為 4 項。耗時不相等，因此條形不是時間估算。候選池只查詢 plan，不分配配額或打亂出發順序。準備期間拒絕開波，完成後仍為手動第一波準備。
+
+`enemies/rendering/display_warmup.gd` 是保留 Resource 與完成紀錄的 Autoload。`enemy_render_signatures.gd` 依有效材質的儲存設定、shader code、紋理身分、每個 surface 的頂點格式及 primitive、一般／MultiMesh、蒙皮／blend shape、陰影與 overlay 計算組合；排除網格形狀、模型名稱、變換動畫及 Resource 名稱。含腳本或非變換動畫軌的場景保守區分。三種正式 GPU 模型共用 shader 與頂點格式，僅 Soldier 作為繪製代表；各自步態參數不產生新的 shader source。啟動場景另以塔底座的純顯示網格實際繪製普通 MeshInstance 路徑，與敵人 MultiMesh 共用材質；因引擎可能依繪製方式分出 program，仍保留兩種繪製代表，不初始化塔或戰鬥。外部場景材質仍保守區分，不宣稱已枚舉引擎所有 shader 版本。
+
+完成紀錄以主 viewport、MSAA、Environment 設定、可見光源種類與陰影配置分組；改設定、新材質或不同配置會重新準備。代表 Resource 保留到執行結束，避免換場景釋放材質；不跨次啟動保存 GPU 編譯結果。獨立 `enemy_render_warmup.gd` 將代表放在目前相機前，使用原 renderer 推進模型／步態與頭頂狀態並等待實際 draw，再移除；目標 renderer 中途離場則取消，未完成項目不記入快取。代表不進入正式敵群，不操作行程、戰鬥或 RNG；不重建 256 個敵人，也不增加正常移動的工作。Headless 只完成工作計數；直接 F6 執行關卡不經選單準備契約。新特效或執行期更換材質未保證涵蓋；單個同步動作仍可能令載入 UI 暫停，沒有假動畫進度。
+
+載入外觀明確保存在 `scenes/interface/components/loading_display.tscn`，由啟動及轉場共用，為置中標題、階段文字、2px 細線 ProgressBar 與完成數，支援英／繁中。`tests/menus/startup_loading.gd` 驗證啟動代表去重、透明材質不誤合併、資源保留、關卡重用及 MSAA 改變補漏；`tests/menus/scene_loading.gd` 驗證直接開選單的補漏路徑、未知／已知進度、代表繪製、RNG／波次隔離、正常開波、清理及失敗／取消恢復；失敗案例會產生預期轉場錯誤訊息。
+
+Boot 的初始階段文字直接保存在場景，依序呈現整理資源及準備角色／狀態。預熱完成後呼叫 `ScreenTransition.change_scene(path, &"", &"ui.loading.menu")`，通用轉場在開始時即接手顯示「準備主選單」，先實際畫出文字才換場景，並保留至首次主選單繪製及淡入結束；來源介面在成功交接後才隱藏。第三個參數僅是可選翻譯 key，不讓轉場層依賴主選單規則。未知工作量清掉進度條及計數，避免顯示舊的完成值。一般未指定訊息的短過渡不變。
 
 主畫面與地圖選擇雙向切換、確認本局設定並進入遊戲，以及暫停選單「回到主畫面」，共用 `scenes/interface/screen_transition.tscn`。它是持續跨場景存在的 ScreenTransition Autoload，明確保存頂層 CanvasLayer 與全畫面白色 ColorRect；根節點 Duration 預設 0.5 秒。`scripts/interface/screen_transition.gd` 的 `run(action)` 在白畫面下執行呈現切換，`change_scene(path)` 切換真正場景，透過 started／covered／finished(error) signal 提供生命週期；呼叫者決定目的地及遊戲狀態，過渡層不引用選單、關卡或鏡頭。
 

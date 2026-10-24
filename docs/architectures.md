@@ -76,12 +76,16 @@ scripts/
 | 範圍 | 責任與主要協作 |
 | --- | --- |
 | `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，協調手牌、商店及開波權限 |
-| `levels/definitions/` | `LevelDefinition` → `ActDefinition` → `WaveDefinition` → `WaveSpawnGroup` 保存可編輯配方與設定驗證；編輯器外掛、關卡和生成系統共用這些型別 |
+| `levels/definitions/` | `LevelDefinition` → `ActDefinition` → `WaveDefinition` → `WaveSpawnGroup` 保存可編輯配方與設定驗證；Level 的翻譯 key 由 ID 推導，起終點只由地形端點提供，ACT 各自決定完成後是否擴張入口；編輯器外掛、關卡和生成系統共用這些型別 |
 | `levels/expansion/` | 依已提交道路搜尋新入口候選，處理方向選擇、預覽和新增道路／端點；完成後由 session 恢復下一波準備 |
 | `levels/presentation/` | 將 session 進度投影到時間線、起點對話框及餘額；處理倍速、暫停過渡、選單與玩家意圖 |
 | `enemies/spawning/` | 把波次配方與已準備的導航計畫轉成帶有整數出生刻度、路線及數值快照的排程，再實際生成敵人，追蹤待出生／存活／擊殺／抵達並判定清場 |
 
+`levels/` 也提供自動資源目錄、DAG 前置檢查、通關 ID 保存及一次性交接。`menus/` 接收目錄的顯示資料並延遲建立單一預覽；`LevelSession` 只在最後一波完成時回報通關，不依賴選單 UI。
+
 關卡決定「目前進行哪一波、何時允許開波」；出生模組決定「該波每位成員何時出生、採用哪份已固定資料」。出生排程與敵群放在一起，因此正式關卡與獨立測試場景可共用同一個生成入口。
+
+`menus/` 的獨立啟動場景先委託 `enemies/rendering/` 的持續顯示服務，依材質與繪製方式挑代表、使用既有 renderer 預熱並保留資源，再進主選單；不初始化遊戲模擬。選圖後的載入由 `interface/` 的持續轉場層透過目標場景指定方法協調；LevelSession 準備路線及尚未涵蓋的顯示組合。啟動與轉場共用載入 Control；轉場層不依賴敵人或導航模組。
 
 ### 建造、地圖與導航
 
@@ -111,11 +115,13 @@ scripts/
 | `combat/attacks/` | 箭矢、光束及拋射物描述投遞策略，`AttackPayload` 保存發射時的傷害／效果快照，讓飛行中的攻擊可獨立於來源塔結算 |
 | `combat/effects/` | 描述命中後對敵人施加的規則效果，例如減速的倍率、期限及對應狀態圖示 |
 | `combat/rendering/` | 把已存在的飛行／命中資料轉成軌跡、箭矢、AOE 與死亡爆散，管理特效回收及動畫 |
-| `enemies/rendering/` | 把邏輯位置轉成模型姿態、GPU 步態、側向避讓與 MultiMesh instance 資料；外部模型在此管理骨架／動畫及顯示轉換 |
+| `enemies/rendering/` | 把邏輯位置轉成模型姿態、GPU 步態、側向避讓與各網格獨立的 MultiMesh instance 資料；離線 GPU 模型 Resource 保存網格與步態參數，共用同一 shader。外部模型在此管理骨架／動畫及顯示轉換 |
 | `enemies/presentation/` | 依 renderer 提供的頭頂世界座標投影血條、護盾、技能與效果圖示；管理共用圖集、可重用 instance buffer 與單一 2D MultiMesh 提交。另提供獨立場景的開波按鈕。螢幕投影與 3D 模型渲染各自維護 |
 | `camera/`、`environment/` | 分別管理平移／縮放／環形拖曳旋轉／鏡頭邊界，以及雲海材質和範圍；維持獨立的小型功能目錄 |
 
 `presentation/` 集中螢幕介面與玩家操作回饋；`rendering/` 集中模型、幾何、姿態與世界特效。敵人的狀態顯示會讀取模型層提供的避讓後座標，因此兩者透過顯示資料協作。
+
+`assets/materials/` 與 `assets/shaders/` 提供道路、塔及敵人共用的不透明純色材質；各功能只引用 Resource，不在執行期轉換或複製。顏色、表面參數及剛體步態由 `tools/assets/` 離線寫入網格，保留特殊效果自己的材質。格式與重建流程見 [材質說明](../assets/materials/README.md)。
 
 ### 主要協作流程
 

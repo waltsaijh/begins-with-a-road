@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/menus/map_preview.gd" id="1"]
+
+[node name="MapPreview" type="Node3D"]
+visible = false
+script = ExtResource("1")
+bottom_clearance = 280.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+rotation_degrees = Vector3(-45, 0, 0)
+projection = 1
+size = 24.0
+near = 0.1
+far = 150.0

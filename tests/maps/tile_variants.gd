@@ -32,6 +32,9 @@ func verify() -> void:
 	reversed.reverse()
 	check(Layout.select(reversed, straight, entrances, terminals) == layout, "Stable seed must ignore cell iteration order")
 	check(Layout.select(roads, straight, entrances, roads).wood.is_empty(), "Mandatory endpoint supports must take priority over wood quota")
+	# Keep the old 24-cell quota example independent of the editable main map.
+	var bridge_ends: Array[Vector3i] = [Vector3i.ZERO,Vector3i(23,0,0)]
+	check(Layout.select(roads.slice(0,24),straight,{bridge_ends[0]:true,bridge_ends[1]:true},bridge_ends).wood.size()==1,"24-tile bridge should have one wood tile")
 	for scene_path in ["res://scenes/main.tscn", "res://scenes/9x9.tscn", "res://scenes/11x11big.tscn"]:
 		var scene: Node = load(scene_path).instantiate()
 		scene.get_node("EnemyWave").auto_start = false
@@ -80,7 +83,10 @@ func verify() -> void:
 		var shared_noise: Texture2D = cloud.material_override.get_shader_parameter("cloud_noise_texture")
 		check(shared_noise != null and cloud.get_node("MidMist").material_override.get_shader_parameter("cloud_noise_texture") == shared_noise and cloud.get_node("HighWisps").material_override.get_shader_parameter("cloud_noise_texture") == shared_noise, "All strata must share the precomputed noise texture")
 		if scene_path.ends_with("main.tscn"):
-			check(appearance.layout.wood.size() == 1, "24-tile bridge should have one wood tile")
+			check(not appearance.layout.wood.is_empty(), "Main map needs a wood bridge for the junction regression")
+			if appearance.layout.wood.is_empty():
+				scene.queue_free()
+				continue
 			var wood_cell: Vector3i = appearance.layout.wood[0]
 			var extension := wood_cell + Vector3i(0, 0, 1)
 			check(scene.get_node("TilePlacement").place_cell(extension), "Failed to attach dead-end tile")

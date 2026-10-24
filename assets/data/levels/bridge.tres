@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="LevelDefinition" format=3 uid="uid://trcjgmkgrcrr"]
+
+[ext_resource type="Script" uid="uid://cfka2isrnffdy" path="res://scripts/levels/definitions/act_definition.gd" id="1_fn762"]
+[ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/definitions/level_definition.gd" id="2_nllan"]
+[ext_resource type="Script" uid="uid://cvef4d4fr1kg7" path="res://scripts/levels/definitions/wave_definition.gd" id="2_q2umf"]
+[ext_resource type="Script" uid="uid://cahlwhgvymd6c" path="res://scripts/levels/definitions/wave_spawn_group.gd" id="3_f3616"]
+[ext_resource type="PackedScene" uid="uid://dfsnynou7piuy" path="res://scenes/maps/bridge.tscn" id="5_gv56x"]
+
+[sub_resource type="Resource" id="Resource_76kpm"]
+script = ExtResource("3_f3616")
+troop_path = "res://assets/data/troops/soldier.tres"
+
+[sub_resource type="Resource" id="Resource_6ru0y"]
+script = ExtResource("2_q2umf")
+groups = Array[ExtResource("3_f3616")]([SubResource("Resource_76kpm")])
+metadata/_custom_type_script = "uid://cvef4d4fr1kg7"
+
+[sub_resource type="Resource" id="Resource_pntgv"]
+script = ExtResource("1_fn762")
+waves = Array[ExtResource("2_q2umf")]([SubResource("Resource_6ru0y")])
+metadata/_custom_type_script = "uid://cfka2isrnffdy"
+
+[resource]
+script = ExtResource("2_nllan")
+level_id = "bridge"
+required_to_complete_levels = PackedStringArray("frontier")
+terrain = ExtResource("5_gv56x")
+acts = Array[ExtResource("1_fn762")]([SubResource("Resource_pntgv")])
+metadata/_custom_type_script = "uid://4q4c3cox24l5"

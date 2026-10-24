@@ -73,11 +73,17 @@ func verify() -> void:
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(_viewport)
 	var level := LevelDefinition.new()
-	level.terrain = load("res://scenes/maps/tile_map.tscn")
+	var authored := load("res://scenes/maps/tile_map.tscn").instantiate() as GridMap
+	var first := authored.get_node("Endpoints/Start") as TerrainEndpoint
+	first.height_offset = 0.125
+	level.terrain = PackedScene.new()
+	level.terrain.pack(authored)
+	authored.free()
 	var profile := TroopCatalog.find("soldier").duplicate() as Troop
-	for i in 3:
+	for i in 4:
 		var act := ActDefinition.new()
 		act.title = "ACT %d" % (i+1)
+		act.add_start_after_completion = i != 1
 		act.waves = [recipe(profile)]
 		if i == 0: act.waves.append(recipe(profile))
 		level.acts.append(act)
@@ -157,6 +163,7 @@ func verify() -> void:
 	expansion.set_process(false)
 	expansion.show_hover(cell)
 	check(expansion.hovered_cell == cell and expansion.get_node("World/EntrancePreview").visible and expansion.get_node("World/PathPreview").multimesh.instance_count == paths[picked].size(), "Hover did not preview the road and entrance")
+	check(is_equal_approx(expansion.get_node("World/EntrancePreview").position.y-map.map_to_local(cell).y,0.125), "Entrance preview did not inherit the terrain endpoint height")
 	await frames(2)
 	await save_frame(Artifacts.path("levels/act_expansion_position.png"))
 	TranslationServer.set_locale("en")
@@ -199,6 +206,7 @@ func verify() -> void:
 	check(not cards.input_suspended and not cards.hand.stowed and shop.view.visible and shop.available and wave.start_allowed, "Build phase did not resume with manual start and shop reward")
 	var marker: Node3D = controller.get_node(controller.start_paths[1])
 	check(map.local_to_map(map.to_local(marker.global_position)) == cell, "Entrance animation changed the logical graph marker")
+	check(is_equal_approx(map.to_local(marker.global_position).y-map.map_to_local(cell).y,0.125), "New ACT entrance did not inherit the terrain endpoint height")
 	var schedule := WaveSpawnSchedule.build(wave.definition, controller, 0, false, wave.additional_start_indices)
 	var hist := [0, 0]
 	var assignments := {}
@@ -218,7 +226,9 @@ func verify() -> void:
 	scene._process(15)
 	check(not scene._wave_starting and not wave.active and is_zero_approx(scene.timeline.progress), "Preparation did not wait for a manual start after committing")
 	finish_wave(scene)
-	check(scene.choosing_start and expansion.active and expansion.choices.size() == 3, "Second ACT did not offer another expansion")
+	check(not scene.choosing_start and not expansion.active and controller.start_nodes.size()==2 and scene.current_wave==3 and not wave.active,"Unchecked second ACT did not skip expansion and wait for manual start")
+	finish_wave(scene)
+	check(scene.choosing_start and expansion.active and expansion.choices.size() == 3, "Checked third ACT did not offer another expansion after an unchecked ACT")
 	expansion.choose_direction(2)
 	var second_cell: Vector2i = expansion.choices[2].paths.keys()[0]
 	check(expansion.commit(Vector3i(second_cell.x, 0, second_cell.y)), "Second ACT entrance failed to commit")
@@ -227,10 +237,10 @@ func verify() -> void:
 	schedule = WaveSpawnSchedule.build(wave.definition, controller, 0, false, wave.additional_start_indices)
 	var starts := {}
 	for entry: Dictionary in schedule.pending: starts[entry.start_index] = true
-	check(starts.size() == 3 and schedule.pending.size() == 8, "Third ACT did not use all three entrances")
+	check(starts.size() == 3 and schedule.pending.size() == 8, "Fourth ACT did not use all three entrances")
 	finish_wave(scene)
 	check(scene.finished and not scene.choosing_start and not expansion.active and completions[0] == 2 and controller.start_paths.size() == 3, "Final ACT incorrectly requested another expansion")
-	check(level.starts.size() == 1 and level.acts[1].waves[0].groups[0].enemy_count == 8, "Runtime expansion modified authored level data")
+	check(level.endpoint_layout().starts.size() == 1 and not level.acts[1].add_start_after_completion and level.acts[1].waves[0].groups[0].enemy_count == 8, "Runtime expansion modified authored level data")
 	scene.queue_free()
 	await frames(2)
 	print("ACT_SPAWN_EXPANSION_CHECK:"+JSON.stringify({"failures": failures, "two_stage_ui": true, "manual_start_only": true, "placement_lock": true, "pause_lock": true, "road_preview": true, "actual_new_spawns": true, "deterministic_quotas": true, "integer_quarter_ticks": true, "two_act_expansions": true, "final_act": true}))

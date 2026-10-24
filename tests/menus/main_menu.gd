@@ -46,7 +46,7 @@ func verify() -> void:
 		white_frames += 1
 		if white_frames == 1: image.save_png(Artifacts.path("menus/white_transition.png")))
 	TranslationServer.set_locale("zh_TW")
-	check(ProjectSettings.get_setting("application/run/main_scene") == "res://scenes/menus/main_menu.tscn", "F5 does not enter the start menu")
+	check(ProjectSettings.get_setting("application/run/main_scene") == "res://scenes/menus/boot.tscn", "F5 does not enter startup preparation")
 	var menu := load("res://scenes/menus/main_menu.tscn").instantiate() as Node3D
 	root.add_child(menu)
 	current_scene = menu
@@ -94,13 +94,15 @@ func verify() -> void:
 	check(current_scene == menu and selection.visible and menu._selecting and not menu.home.visible and not bridge.visible, "Start should open selection without starting gameplay")
 	check(root.get_camera_3d() == preview.camera and preview.camera.projection == Camera3D.PROJECTION_ORTHOGONAL, "Selection did not switch to the orthographic map preview")
 	check(preview.terrain.scene_file_path == definition.level.terrain.resource_path, "Preview does not reference the playable terrain")
-	check(selection.maps.size() == 1 and selection.previous_button.disabled and selection.next_button.disabled, "Unavailable maps must not appear playable")
+	check(selection.maps.size() == LevelCatalog.discover().size() and selection.previous_button.disabled == (selection.maps.size()<2) and selection.next_button.disabled == (selection.maps.size()<2), "Map catalog/navigation does not follow discovered Level files")
 	check(selection.previous_button.get_theme_stylebox("disabled") is StyleBoxEmpty, "Disabled map navigation should retain the transparent text style")
 	check(selection.get_node("Footer/Column/Details/Info/Summary").text == tr("ui.maps.summary") % [definition.level.acts.size(), definition.level.wave_count()], "Map summary did not follow actual level data")
 	var cells: Array[Vector3i] = preview.terrain.get_used_cells()
 	var original_cells := cells.duplicate()
+	var original_index:int=selection.selected
 	selection.select_map(1)
-	check(selection.selected == 0, "Single-map selection changed to an unavailable option")
+	check(selection.selected == posmod(original_index+1,selection.maps.size()), "Map navigation did not follow the catalog")
+	selection.select_map(-1)
 	await create_timer(0.4).timeout
 	for extent in [Vector2i(1280, 800), Vector2i(1000, 750), Vector2i(1600, 900)]:
 		root.size = extent
@@ -237,7 +239,7 @@ func verify() -> void:
 	check(current_scene.scene_file_path == "res://scenes/level.tscn" and previous.get_ref() == null, "Start did not replace the menu with the formal level")
 	var level := current_scene
 	check(level.level == definition.level, "Launched level differs from the selected map definition")
-	check(launch_payload.size() == 1 and launch_payload[0].map == definition and launch_payload[0].values == selected_options, "Begin did not emit the chosen map and run settings once")
+	check(launch_payload.size() == 1 and launch_payload[0].map.level == definition.level and launch_payload[0].values == selected_options, "Begin did not emit the chosen map and run settings once")
 	for i in 120:
 		if not level.get_node("PortalMap").computing: break
 		await frames(1)

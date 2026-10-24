@@ -27,15 +27,25 @@ func _ready() -> void:
 	_refresh()
 
 func configure(options: Array[MenuMapDefinition]) -> void:
+	var previous_id := maps[selected].id if not maps.is_empty() and selected < maps.size() else ""
 	maps = options.duplicate()
-	selected = clampi(selected, 0, maxi(0, maps.size()-1))
+	selected = -1
+	for i in maps.size():
+		if maps[i].id == previous_id: selected = i
+	if selected < 0:
+		for i in maps.size():
+			if maps[i].unlocked:
+				selected = i
+				break
+	selected = maxi(0,selected)
 	_refresh()
 
 func open() -> void:
 	show()
 	_set_step(Step.MAP)
 	if not maps.is_empty(): map_changed.emit(maps[selected])
-	start_button.grab_focus()
+	if start_button.disabled: back_button.grab_focus()
+	else: start_button.grab_focus()
 	$Entry.play("enter")
 
 func select_map(step: int) -> void:
@@ -97,15 +107,31 @@ func _set_step(step: Step) -> void:
 	var focus := get_viewport().gui_get_focus_owner()
 	if focus == null or not focus.is_visible_in_tree(): start_button.grab_focus()
 
+func refresh() -> void:
+	_refresh()
+
 func _refresh() -> void:
 	previous_button.disabled = current_step != Step.MAP or maps.size() < 2
 	next_button.disabled = current_step != Step.MAP or maps.size() < 2
-	start_button.disabled = maps.is_empty()
-	if maps.is_empty(): return
+	start_button.disabled = maps.is_empty() or not maps[selected].unlocked
+	if maps.is_empty():
+		$Footer/Column/MapRow/Name.text = "ui.maps.none"
+		$Footer/Column/Details/Info/Description.text = ""
+		$Footer/Column/Details/Info/Index.text = "00 / 00"
+		$Footer/Column/Details/Info/Summary.text = ""
+		return
 	var definition := maps[selected]
+	start_button.text = ("ui.maps.launch" if current_step == Step.OPTIONS else "ui.run.next") if definition.unlocked else "ui.maps.locked"
 	$Footer/Column/MapRow/Name.text = definition.title_key
 	$Footer/Column/Details/Info/Description.text = definition.description_key
 	$Footer/Column/Details/Info/Index.text = "%02d / %02d" % [selected+1, maps.size()]
+	if not definition.unlocked:
+		$Footer/Column/Details/Info/Index.text += " · "+tr("ui.maps.locked")
+		var names := PackedStringArray()
+		for title in definition.missing_titles: names.append(tr(title))
+		$Footer/Column/Details/Info/Description.text = tr(definition.problem) if not definition.problem.is_empty() else tr("ui.maps.requires") % ", ".join(names)
+	elif definition.completed:
+		$Footer/Column/Details/Info/Index.text += " · "+tr("ui.maps.completed")
 	$Footer/Column/Details/Info/Summary.text = tr("ui.maps.summary") % [definition.level.acts.size(), definition.level.wave_count()]
 
 func _notification(what: int) -> void:

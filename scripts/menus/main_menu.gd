@@ -2,6 +2,8 @@ extends Node3D
 ## Scene-authored presentation; only intents, transitions and settings hosting.
 const SettingsAdapter = preload("res://scripts/settings/game_settings.gd")
 @export_range(0.0, 1.0, 0.01) var settings_veil_alpha := 0.82
+@export_dir var levels_directory := LevelCatalog.DIRECTORY
+var catalog := LevelCatalog.new()
 var _starting := false
 var _selecting := false
 var _veil_motion: Tween
@@ -15,6 +17,7 @@ var _veil_motion: Tween
 @onready var map_previews: Node3D = $MapPreviews
 
 func _ready() -> void:
+	LevelLaunch.clear()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	start_button.pressed.connect(start_game)
@@ -27,9 +30,8 @@ func _ready() -> void:
 	map_selection.map_changed.connect(_on_map_changed)
 	map_selection.launch_requested.connect(_launch_map)
 	ScreenTransition.finished.connect(_on_transition_finished)
-	var definitions: Array[MenuMapDefinition] = []
-	for preview in map_previews.get_children(): definitions.append(preview.definition)
-	map_selection.configure(definitions)
+	_reload_catalog()
+	LevelProgress.changed.connect(_refresh_unlocks)
 	$Interface/Entry.play("enter")
 	$Stage/Entry.play("enter")
 	start_button.grab_focus()
@@ -39,10 +41,12 @@ func start_game() -> void:
 	ScreenTransition.run(_show_map_selection)
 
 func _show_map_selection() -> void:
+	_reload_catalog()
 	_selecting = true
 	home.hide()
 	$Stage/Bridge.hide()
 	map_previews.show()
+	map_previews.get_child(0).hide()
 	map_selection.open()
 
 func return_home() -> void:
@@ -59,22 +63,42 @@ func _show_home() -> void:
 	start_button.grab_focus()
 
 func _on_map_changed(definition: MenuMapDefinition) -> void:
-	for preview in map_previews.get_children():
-		preview.visible = preview.definition == definition
-		if preview.visible: preview.activate()
+	var preview := map_previews.get_child(0)
+	if preview.configure(definition):
+		preview.activate()
+	else:
+		preview.hide()
+		definition.problem = &"ui.maps.invalid"
+		definition.unlocked = false
+		map_selection.refresh()
+		$Stage/Camera3D.make_current()
+
+func _reload_catalog() -> void:
+	catalog.build(LevelCatalog.discover(levels_directory),LevelProgress.snapshot())
+	map_selection.configure(catalog.maps)
+	for diagnostic in catalog.diagnostics: push_warning("Level catalog: "+diagnostic)
+
+func _refresh_unlocks() -> void:
+	catalog.refresh(LevelProgress.snapshot())
+	map_selection.refresh()
 
 func _launch_map(definition: MenuMapDefinition, _run_options: Dictionary) -> void:
 	# Run options are UI prototypes until their gameplay rules are defined.
 	if _starting or settings_page.visible or not _selecting or ScreenTransition.active: return
-	if definition == null or definition.level == null or not ResourceLoader.exists(definition.level_scene):
+	_refresh_unlocks()
+	if definition == null or not catalog.maps.has(definition) or not definition.unlocked: return
+	if definition.level == null or not ResourceLoader.exists(definition.level_scene):
 		push_error("Map selection is missing a playable level")
 		return
 	_starting = true
-	if not ScreenTransition.change_scene(definition.level_scene):
+	LevelLaunch.select(definition.level)
+	if not ScreenTransition.change_scene(definition.level_scene, &"prepare_for_play"):
+		LevelLaunch.clear()
 		_starting = false
 
 func _on_transition_finished(error: int) -> void:
 	if error != OK and _starting:
+		LevelLaunch.clear()
 		_starting = false
 
 func open_settings() -> void:

@@ -225,7 +225,8 @@ func request_restart() -> void:
 	if not pause_requested or ScreenTransition.active: return
 	set_paused(false)
 	Engine.time_scale = 1.0
-	var error := get_tree().reload_current_scene()
+	var session := get_parent()
+	var error: int = session.restart_level() if session.has_method("restart_level") else get_tree().reload_current_scene()
 	if error != OK: push_error("Could not restart the current scene: %s" % error_string(error))
 
 func request_return_home() -> void:

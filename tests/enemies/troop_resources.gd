@@ -129,8 +129,7 @@ func verify() -> void:
 	batch._process(0.25)
 	check(appearance.animation.current_animation_position > 0.1, "Imported walk animation did not advance")
 	check(appearance.instance.global_position.distance_to(units[1].global_position) > 0.05 and batch.head_positions[1].y > 1, "Imported model adjustment/head position was not applied")
-	if DisplayServer.get_name() != "headless":
-		check(batch.multimesh.get_instance_transform(1).basis.get_scale().is_zero_approx(), "Imported enemy also drew a duplicate grunt")
+	check(batch.multimesh.visible_instance_count == 2, "Imported enemy also drew a duplicate grunt")
 	var moved_appearance: RefCounted = batch._appearances[2]
 	units[1].free()
 	check(batch._appearances[1] == moved_appearance and batch.units[1] == units[2], "Removing an imported model broke dense slot compaction")
