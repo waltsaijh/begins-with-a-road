@@ -5,6 +5,7 @@ extends SceneTree
 
 const SOURCES := TileConstants.BASE_NAMES
 const LIBRARY_PATH := "res://assets/models/mesh_library.tres"
+const SolidBaker = preload("res://tools/assets/solid_mesh_baker.gd")
 
 func _initialize() -> void:
 	var library := MeshLibrary.new()
@@ -46,7 +47,7 @@ func bake(model: Node3D) -> ArrayMesh:
 	var mesh := ArrayMesh.new()
 	for builder: SurfaceTool in surfaces.values():
 		builder.commit(mesh)
-	return mesh
+	return SolidBaker.mesh(mesh)
 
 func _collect(node: Node3D, parent: Transform3D, surfaces: Dictionary) -> void:
 	var pose := parent * node.transform

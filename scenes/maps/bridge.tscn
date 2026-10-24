@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dfsnynou7piuy"]
+
+[ext_resource type="MeshLibrary" uid="uid://c6ldhjihykf64" path="res://assets/models/mesh_library.tres" id="1_r2syp"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/start_point.tscn" id="2_2c83q"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/goal_point.tscn" id="3_ylrja"]
+
+[node name="TileMap" type="GridMap" unique_id=799912617]
+mesh_library = ExtResource("1_r2syp")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(0, 0, 2, 1, 0, 2, 2, 0, 1048577, 3, 0, 2, 4, 0, 1048577, 5, 0, 1048577, 6, 0, 1048577, 7, 0, 1048577, 8, 0, 1048577, 10, 0, 1048577, 11, 0, 1048577, 12, 0, 1048577, 13, 0, 1048577, 14, 0, 1048577, 15, 0, 1048577, 16, 0, 1048577, 17, 0, 1048577, 18, 0, 1048577, 20, 0, 1048577, 21, 0, 1048577, 22, 0, 1048577, 23, 0, 1048577, 9, 0, 1048589, 23, 65535, 2, 24, 65535, 2, 24, 0, 2, 24, 1, 2, 23, 1, 2, 3, 65535, 2, 4, 65535, 2, 3, 1, 2, 4, 1, 2, 2, 1, 2, 1, 1, 2, 0, 1, 2, 0, 65535, 2, 0, 65534, 2, 1, 65534, 2, 2, 65534, 2, 2, 65535, 2, 1, 65535, 2, 0, 2, 2, 1, 2, 2, 2, 2, 2, 19, 0, 1048589)
+}
+
+[node name="Endpoints" type="Node3D" parent="." unique_id=438963968]
+
+[node name="Start" parent="Endpoints" unique_id=66885260 instance=ExtResource("2_2c83q")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0.0305, 0.5)
+
+[node name="Goal" parent="Endpoints" unique_id=1252777644 instance=ExtResource("3_ylrja")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 23.5, 0.0305, 0.5)

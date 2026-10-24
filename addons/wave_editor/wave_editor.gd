@@ -3,10 +3,10 @@ extends VBoxContainer
 ## Scene-authored editor surface. Resource edits participate in Godot Undo/Redo.
 var editor_plugin: EditorPlugin
 var level: LevelDefinition
+var selected_act := 0
 var selected_wave := 0
 var selected_group := 0
 var preview_tick := 0
-var _waves: Array[WaveDefinition] = []
 var _refreshing := false
 var _refresh_frame := -1
 var _saved_signatures := {}
@@ -21,7 +21,15 @@ func _ready() -> void:
 	%SaveDialog.file_selected.connect(_save_path)
 	%SwitchDialog.confirmed.connect(_confirm_switch)
 	%Save.pressed.connect(save_current)
-	%WavePicker.item_selected.connect(func(index: int): selected_wave = index; selected_group = 0; preview_tick = 0; _refresh())
+	%ActPicker.item_selected.connect(select_act)
+	%WavePicker.item_selected.connect(select_wave)
+	%AddAct.pressed.connect(add_act)
+	%DeleteAct.pressed.connect(delete_act)
+	%AddWave.pressed.connect(add_wave)
+	%DeleteWave.pressed.connect(delete_wave)
+	%ExpandAfterAct.toggled.connect(func(value: bool):
+		if not _refreshing and current_act() != null:
+			_change(current_act(), "add_start_after_completion", value, "修改 ACT 結束後新增出生點"))
 	%Schedule.group_selected.connect(func(index: int): selected_group = index; _refresh())
 	%Schedule.group_moved.connect(_move_group)
 	%Add.pressed.connect(add_group)
@@ -39,8 +47,25 @@ func _ready() -> void:
 	%PreviewTick.value_changed.connect(_seek)
 	_refresh()
 
+func current_act() -> ActDefinition:
+	return level.acts[selected_act] if level != null and selected_act >= 0 and selected_act < level.acts.size() else null
+
 func current_wave() -> WaveDefinition:
-	return _waves[selected_wave] if selected_wave >= 0 and selected_wave < _waves.size() else null
+	var act := current_act()
+	return act.waves[selected_wave] if act != null and selected_wave >= 0 and selected_wave < act.waves.size() else null
+
+func select_act(index: int) -> void:
+	selected_act = index
+	selected_wave = 0
+	selected_group = 0
+	preview_tick = 0
+	_refresh()
+
+func select_wave(index: int) -> void:
+	selected_wave = index
+	selected_group = 0
+	preview_tick = 0
+	_refresh()
 
 func current_group() -> WaveSpawnGroup:
 	var wave := current_wave()
@@ -57,6 +82,7 @@ func request_level(value: LevelDefinition) -> void:
 func edit_level(value: LevelDefinition) -> void:
 	level = value
 	if level != null: level.repair_missing_defaults()
+	selected_act = 0
 	selected_wave = 0
 	selected_group = 0
 	preview_tick = 0
@@ -96,6 +122,45 @@ func _move_group(index: int, tick: int) -> void:
 	selected_group = index
 	_change(wave.groups[index], "start_tick", tick, "移動出生群組")
 
+func _new_wave() -> WaveDefinition:
+	var group := WaveSpawnGroup.new()
+	group.troop = TroopCatalog.default_troop()
+	var wave := WaveDefinition.new()
+	wave.groups = [group]
+	return wave
+
+func add_act() -> void:
+	if level == null: return
+	var act := ActDefinition.new()
+	var number := level.acts.size()+1
+	while level.acts.any(func(existing): return existing != null and existing.title == "ACT %d" % number): number += 1
+	act.title = "ACT %d" % number
+	act.waves = [_new_wave()]
+	var next := level.acts.duplicate()
+	next.append(act)
+	_change(level, "acts", next, "新增 ACT", Vector3i(next.size()-1,0,0))
+
+func delete_act() -> void:
+	if level == null or level.acts.is_empty(): return
+	var next := level.acts.duplicate()
+	next.remove_at(selected_act)
+	_change(level, "acts", next, "刪除 ACT", Vector3i(maxi(0,selected_act-1),0,0))
+
+func add_wave() -> void:
+	var act := current_act()
+	if act == null: return
+	var next := act.waves.duplicate()
+	var index := mini(selected_wave+1,next.size())
+	next.insert(index,_new_wave())
+	_change(act, "waves", next, "新增波次", Vector3i(selected_act,index,0))
+
+func delete_wave() -> void:
+	var act := current_act()
+	if act == null or act.waves.is_empty(): return
+	var next := act.waves.duplicate()
+	next.remove_at(selected_wave)
+	_change(act, "waves", next, "刪除波次", Vector3i(selected_act,maxi(0,selected_wave-1),0))
+
 func add_group() -> void:
 	var wave := current_wave()
 	if wave == null: return
@@ -104,8 +169,7 @@ func add_group() -> void:
 	group.start_tick = preview_tick
 	var next := wave.groups.duplicate()
 	next.append(group)
-	selected_group = next.size()-1
-	_change(wave, "groups", next, "新增出生群組")
+	_change(wave, "groups", next, "新增出生群組", Vector3i(selected_act,selected_wave,next.size()-1))
 
 func duplicate_group() -> void:
 	var wave := current_wave()
@@ -113,32 +177,37 @@ func duplicate_group() -> void:
 	if group == null: return
 	var next := wave.groups.duplicate()
 	next.insert(selected_group+1, group.duplicate(false))
-	selected_group += 1
-	_change(wave, "groups", next, "複製出生群組")
+	_change(wave, "groups", next, "複製出生群組", Vector3i(selected_act,selected_wave,selected_group+1))
 
 func delete_group() -> void:
 	var wave := current_wave()
 	if current_group() == null or wave.groups.size() < 2: return
 	var next := wave.groups.duplicate()
 	next.remove_at(selected_group)
-	selected_group = maxi(0, selected_group-1)
-	_change(wave, "groups", next, "刪除出生群組")
+	_change(wave, "groups", next, "刪除出生群組", Vector3i(selected_act,selected_wave,maxi(0,selected_group-1)))
 
-func _change(resource: Resource, property: String, value: Variant, title: String) -> void:
+func _change(resource: Resource, property: String, value: Variant, title: String, selection := Vector3i(-1,-1,-1)) -> void:
 	if resource.get(property) == value: return
+	var previous := Vector3i(selected_act,selected_wave,selected_group)
+	if selection == Vector3i(-1,-1,-1): selection = previous
 	if editor_plugin != null:
 		var undo := editor_plugin.get_undo_redo()
 		undo.create_action(title, UndoRedo.MERGE_DISABLE, level)
-		undo.add_do_method(self, "_apply_value", level, resource, property, value)
-		undo.add_undo_method(self, "_apply_value", level, resource, property, resource.get(property))
+		undo.add_do_method(self, "_apply_value", level, resource, property, value, selection)
+		undo.add_undo_method(self, "_apply_value", level, resource, property, resource.get(property), previous)
 		undo.commit_action()
 	else:
 		_local_undo.create_action(title)
-		_local_undo.add_do_method(_apply_value.bind(level, resource, property, value))
-		_local_undo.add_undo_method(_apply_value.bind(level, resource, property, resource.get(property)))
+		_local_undo.add_do_method(_apply_value.bind(level, resource, property, value, selection))
+		_local_undo.add_undo_method(_apply_value.bind(level, resource, property, resource.get(property), previous))
 		_local_undo.commit_action()
 
-func _apply_value(document: LevelDefinition, resource: Resource, property: String, value: Variant) -> void:
+func _apply_value(document: LevelDefinition, resource: Resource, property: String, value: Variant, selection: Vector3i) -> void:
+	if document == level:
+		selected_act = selection.x
+		selected_wave = selection.y
+		selected_group = selection.z
+		if property in ["acts","waves"]: preview_tick = 0
 	resource.set(property, value)
 	resource.emit_changed()
 	document.emit_changed()
@@ -177,16 +246,28 @@ func _refresh() -> void:
 	if _refreshing and _refresh_frame == frame: return
 	_refresh_frame = frame
 	_refreshing = true
-	_waves.clear()
+	%ActPicker.clear()
 	%WavePicker.clear()
 	if level != null:
-		for act in level.acts:
-			if act == null: continue
-			for i in act.waves.size():
-				%WavePicker.add_item("%s · 第 %d 波" % [act.title, i+1])
-				_waves.append(act.waves[i])
-	selected_wave = clampi(selected_wave, 0, maxi(0, _waves.size()-1))
-	if not _waves.is_empty(): %WavePicker.select(selected_wave)
+		level.repair_missing_defaults()
+		for i in level.acts.size():
+			var entry := level.acts[i]
+			%ActPicker.add_item(entry.title if entry != null else "ACT %d（未設定）" % (i+1))
+	selected_act = clampi(selected_act, 0, maxi(0, level.acts.size()-1)) if level != null else 0
+	var act := current_act()
+	if level != null and not level.acts.is_empty(): %ActPicker.select(selected_act)
+	if act != null:
+		for i in act.waves.size(): %WavePicker.add_item("第 %d 波%s" % [i+1,"（未設定）" if act.waves[i] == null else ""])
+	selected_wave = clampi(selected_wave, 0, maxi(0, act.waves.size()-1)) if act != null else 0
+	if act != null and not act.waves.is_empty(): %WavePicker.select(selected_wave)
+	%ActPicker.disabled = level == null or level.acts.is_empty()
+	%AddAct.disabled = level == null
+	%DeleteAct.disabled = level == null or level.acts.is_empty()
+	%WavePicker.disabled = act == null or act.waves.is_empty()
+	%AddWave.disabled = act == null
+	%DeleteWave.disabled = act == null or act.waves.is_empty()
+	%ExpandAfterAct.disabled = act == null
+	%ExpandAfterAct.set_pressed_no_signal(act.add_start_after_completion if act != null else true)
 	var wave := current_wave()
 	selected_group = clampi(selected_group, 0, maxi(0, wave.groups.size()-1)) if wave != null else 0
 	var group := current_group()
@@ -265,13 +346,13 @@ func _watch(resource: Resource) -> void:
 	resource.changed.connect(_refresh)
 
 func _signature(document: LevelDefinition) -> String:
-	var data := [document.title, document.terrain_endpoints_enabled(), document.starts, document.goal, document.marker_height, document.expand_starts_after_act, document.terrain.resource_path if document.terrain != null else ""]
+	var data := [document.level_id, document.required_to_complete_levels, document.terrain.resource_path if document.terrain != null else ""]
 	for act in document.acts:
 		if act == null: data.append(null); continue
-		data.append(act.title)
+		data.append([act.title, act.add_start_after_completion, act.waves.size()])
 		for wave in act.waves:
 			if wave == null: data.append(null); continue
-			data.append([wave.reward, wave.move_speed])
+			data.append([wave.reward, wave.move_speed, wave.groups.size()])
 			for group in wave.groups:
 				if group == null: data.append(null); continue
 				data.append([_profile_signature(group.troop), group.start_tick, group.enemy_count, group.batch_size, group.interval_ticks, group.start_index])

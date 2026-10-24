@@ -33,7 +33,7 @@ func _box(root: Node3D, title: String, size: Vector3, at: Vector3, material: Mat
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	mesh.material = material
-	node.mesh = mesh
+	node.mesh = preload("res://tools/assets/solid_mesh_baker.gd").mesh(mesh)
 	node.position = at
 	root.add_child(node, true)
 	node.owner = root

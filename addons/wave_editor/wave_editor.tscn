@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b4qcgdlju6iwg" path="res://addons/wave_editor/spawn_timeline.gd" id="2"]
 
 [node name="WaveEditor" type="VBoxContainer" unique_id=1724981974]
-custom_minimum_size = Vector2(650, 430)
+custom_minimum_size = Vector2(650, 470)
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
@@ -32,14 +32,60 @@ layout_mode = 2
 disabled = true
 text = "儲存關卡"
 
+[node name="ActNavigation" type="HFlowContainer" parent="."]
+layout_mode = 2
+theme_override_constants/h_separation = 12
+
+[node name="ActLabel" type="Label" parent="ActNavigation"]
+layout_mode = 2
+text = "ACT"
+
+[node name="ActPicker" type="OptionButton" parent="ActNavigation"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+disabled = true
+
+[node name="AddAct" type="Button" parent="ActNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "＋ 新增 ACT"
+
+[node name="DeleteAct" type="Button" parent="ActNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "刪除 ACT"
+
+[node name="ExpandAfterAct" type="CheckBox" parent="ActNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "此 ACT 結束後選擇新增一個出生點。最後一個 ACT 直接完成關卡。"
+disabled = true
+button_pressed = true
+text = "結束後新增出生點"
+
 [node name="Navigation" type="HFlowContainer" parent="." unique_id=580754942]
 layout_mode = 2
 theme_override_constants/h_separation = 12
 
 [node name="WavePicker" type="OptionButton" parent="Navigation" unique_id=231142822]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(170, 0)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
+
+[node name="AddWave" type="Button" parent="Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "＋ 新增波次"
+
+[node name="DeleteWave" type="Button" parent="Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "刪除波次"
 
 [node name="RewardLabel" type="Label" parent="Navigation" unique_id=91242071]
 layout_mode = 2

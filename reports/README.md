@@ -11,5 +11,13 @@
 - [2026-10-23 敵人首次顯示預熱（歷史，分支內舊實作已移除）](enemy_warmup_2026-10-23.md)
 - [2026-10-24 流量亮段連續性／Web 量測](road_flow_continuity_2026-10-24.md)
 - [2026-10-24 合併 main 後的 Windows／Web／256 混兵](merged_graph_performance_2026-10-24.md)
+- [2026-10-23 不透明純色模型共用材質與 Web 對照](shared_material_2026-10-23.md)
+
+- [2026-10-23 三種兵 GPU 動畫與 Web 對照](enemy_gpu_batches_2026-10-23.md)
+
+- [2026-10-23 主選單前共用顯示預熱](startup_warmup_2026-10-23.md)
+- [2026-10-23 從主選單進入的 32×32／256 混兵 Web 量測](menu_performance_2026-10-23.md)
+- [2026-10-23 載入介面與顯示預熱整合](loading_transition_2026-10-23.md)
+
 
 功能回歸入口見 [測試說明](../tests/README.md)。後續測試 JSON、截圖與本機 log 放在已忽略的 `.godot/`，需要長期保存的結論才整理成文件。遊戲數值以目前 Resource、場景與程式為準。
