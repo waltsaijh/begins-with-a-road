@@ -1,168 +1,94 @@
-# Routing Sandbox — Phase 1–4 交接
+# Routing Sandbox — Phase 5 交接
 
-核對日期：2026-10-23（Asia/Taipei）。本文件是新工作階段的起點；玩法共識看 [AGENTS](../AGENTS.md)，細節看 [systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。測試結果只對下述版本及環境成立。
+## 最新同步補註：2026-10-24
 
-## 1. 目標與 Design Pillars
+已完成 `origin/main`（`a5422c8`）→ `experiment/routing-sandbox` 的本地正常 merge，新 HEAD 為 `3fbad09d78085c9d646174cc9f4177fa46eba333`；原 Sandbox HEAD 為 `c33d425`，共同祖先為 `2fe5adc`。未 push，未移動本地 main 或修改正式 worktree。完整差異、衝突、修復與本次證據見 [Git 整合報告](../reports/git_integration_2026-10-24.md)。
 
-- 建造卡同時決定道路形狀與火力配置；路網必須保留所有入口到終點的通行。
-- 分流是主要戰術：兵種偏好、交通設施及敵軍協同，讓玩家能藉路線拆散火力掩護、治療與癱瘓威脅。
-- 預覽必須說真話：顯示正式配額的完整行程，不能把倍率、候選數或動畫當成實際敵軍數。
-- 準備期不限時、手動開波；戰鬥採固定行程，呈現與避讓不改導航或傷害權威。
-- 資料由 Resource 編輯，能力狀態屬實例；維持微縮沙盤、簡潔 UI、Compatibility 與單執行緒 Web 方向。
+Phase 5 原有 42 個 tracked 修改與 77 個 untracked 檔案已還原並保留未提交；安全 stash `d884400fc38ba15e429a5f1f9f2b260eb04948aa` 與 `.godot/merge-main-2026-10-24/original-files/` 仍保留。WIP 已在工作區，不要再次直接套用 stash。合併後 32 個代表性功能場景最終通過，另有正式入口 smoke、完整十五波渲染局／四次遺物／Boss／重開、獨立帳本及待提交樹的獨立驗證。Native runtime 已執行，Native build／Web／release／效能／真人未執行；初輪失敗與限制見整合報告。
 
-目前是三 ACT、每 ACT 三波的原型，最後一波完成後停止開波。完整基地生命／勝敗結算、存檔、五 ACT 與特殊事件尚未完成。
+以下是同步前的 Phase 5 實作交接與歷史量測；其中 `c33d425`、未進行 merge、29 項驗證等只描述該階段，不代表本次最新 Git 狀態或測試集合。
 
-## 2. Git 與工作目錄
+核對日期：2026-10-24（Asia/Taipei）。本文件描述本次實作與量測，後續仍須先核對實際 Git 狀態。完整 A–G 報告見 [Phase 5 最終證據](balance/phase5_final.md)，操作見 [README](../README.md)，共識見 [AGENTS](../AGENTS.md)。
 
-| 項目 | 交接時核對值 |
+## 1. 目前版本與範圍
+
+| 項目 | 核對結果 |
 |---|---|
-| 唯一可修改工作目錄 | `D:\games\begins-with-a-road-routing` |
-| 分支／HEAD | `experiment/routing-sandbox`／`2e2de2a`（ft:6個新敵人單位） |
-| Offboarding 開始狀態 | `git status --short`、`git diff --stat` 無輸出；`git diff --check` 通過 |
-| 前四筆提交 | `1e36ee5` UI／測試修正；`477580c` 疊塔與遺物；`297d6dd` 交通設施及塔；`0d78db6` 先前合併 |
-| 本次交付 | 必要 Markdown 文件變更；驗證產物在忽略的 `.godot/offboarding-2026-10-23/` |
-| 正式／舊專案 | `D:\games\begins-with-a-road`／`D:\games\card-tower-defense`，本次均未修改 |
+| 工作目錄 | `D:\games\begins-with-a-road-routing` |
+| 分支／HEAD | `experiment/routing-sandbox`；實驗起點 `c33d425`，本次 Phase 5 提交前 HEAD `3fbad09` |
+| 開始狀態 | 乾淨；實際 HEAD 已不是需求中的舊快照 `2e2de2a` |
+| 正式／舊專案 | `D:\games\begins-with-a-road`／`D:\games\card-tower-defense`，唯讀，未修改 |
+| Git 操作 | 使用者後續「GIT更新」授權將 Phase 5 成果提交本機；本次未 push、reset、clean 或丟棄既有成果 |
+| 引擎／原生 | Godot 4.7.2、Compatibility；沿用 phase4 Windows debug GDExtension，未改 C++／未重建 |
+| SDK | `native/godot-cpp`：`e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77` |
 
-本次沒有 commit、merge、rebase、push、reset、clean 或刪檔。開始時 Phase 1–4 已提交至上述 HEAD，不能沿用上一階段「1e36ee5＋未提交 Phase 4」的工作目錄描述。Sandbox 尚未整合到正式專案／main；有舊合併提交不表示本批成果已整合。
+上一版交接屬於 Phase 1–4 文件整理；其「三 ACT／只有盾衛試配／勝敗未完成／本次只改文件」已被本次功能工作取代。舊版本可在 `c33d425` 的 `docs/HANDOFF.md` 查閱，不把歷史測試當成這次已重跑。
 
-本次文件清單：新增 `docs/HANDOFF.md`；更新 `README.md`、`AGENTS.md`、`docs/{architectures,systems,phase3,phase4}.md`、`native/README.md`、`tests/README.md`、`tests/{traffic,relics,synergy}/README.md`，共 12 份 Markdown。遊戲程式、Resource、場景、SDK 與建置設定沒有變更。交付時 `git diff --check` 及修改文件的連結檢查通過。
+## 2. 正式玩法
 
-## 3. Phase 1–4 實作狀態
+F5 → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，五 ACT／十五波、九種既有普通兵與一隻最終攻城巨獸。不限時準備、手動開波、原 1.5 秒開場。第 3／6／9／12 波後各三選一，不發第五件遺物，不自動加入口。
 
-下表已核對現行原始碼，不只依據歷史報告。完成指功能實作與驗證入口存在，不代表正式平衡或所有平台驗收完成。
+防線生命 20，普通漏敵扣 1、巨獸漏敵敗北。敗北清除待出生／存活敵人且不發該波獎勵；勝利須等敵人及在途攻擊結束。兩種結果均鎖建造／交易／開波，結果按鈕重載場景恢復 1x、未暫停與全新狀態。沒有存檔、局外成長或新貨幣。
 
-| Phase | 已實作與目前行為 | 主要來源／既有測試 |
-|---|---|---|
-| 1 流量 | 每入口菱形驚嘆號，hover 展開實際兵種／個體數；列 hover 篩選入口與兵種，標題保留該入口全部。道路呈現沿有向流量滑行的米白短筆觸；不是永久箭頭。多入口共用正式排程配額。 | `start_wave_callout`、`next_wave_intel`、`wave_flow_preview`、`RoadFlowForecast`、`road_flow_renderer`；`tests/levels/road_flow_preview.tscn` |
-| 2 交通 | 互斥體型＋複合 Tags；旗幟 ground ×1.5、拒馬 small＋ground ×0.5、窄口 large＋ground ×0.5。每設施每完整路線作用一次，跨設施乘法。參與完整波次才扣壽命，第三波清理，跨 ACT 保留。商店上四塔／下二輔助；建造候選沿用正式配額，岔路 ↑／↓ 只表示個體流量差。 | `TrafficStructures`、`TrafficWeights`、`TrafficFlowDelta`、card shop；`tests/traffic/{weights.gd,integration.tscn,input.tscn}` |
-| 3 構築 | 同種塔牌原地升級、預設 Lv.3；TowerGrowth 與遺物分開。catalog 為 17 專屬＋4 通用。ACT 結束等待投射物後，通用／弱關聯／全池隨機三槽選一，再擴入口或結束。迫擊砲固定落點、延遲落地傷害；巡航、處決、貫穿、擊退、增援及全局效果均接入既有戰鬥。 | `TowerMap`、`TowerGrowth`、`RunRelics`、`RelicCombat`、`AttackPayload`；`tests/relics/{stacking,rewards,mechanisms,input}.tscn` |
-| 4 協同 | 鼠群按整群分入口／路線、尾群不足不補；盾衛合法單體嘲諷；血法師範圍治療且 Uniform；飛翼獸實際最短路／飛行／對空規則；偵查兵最新完整路線硬性資格；爆破手前搖及限時癱瘓。六模型／圖示／動畫、首次提示／可重開情報、預測均已接入。 | `Troop`、`WaveSpawnSchedule`、`RouteHistory`、`RoadSpecialRoutes`、`EnemyAbilities`；`tests/synergy/{routing,combat,input}.tscn` |
+初始三張免費塔牌、9 Gold、開場商店。擊殺收入仍為 0，波次獎勵依序 9/9/9、11/11/11、12/12/12、14/14/14、15/15/0，共 168。塔價 sentry/ballista/broadside/crossfire/mortar/barracks=9/8/8/10/9/8；傷害 12/30/16/8/24，兵營友軍6。間隔、幾何、成長、Lv.3 上限及原有 17 專屬遺物不變。
 
-**Frontier 的實際狀態**：`assets/data/levels/frontier.tres` 的 ACT 1／Wave 2 已有 1 名 `shield_guardian`，並有 Soldier 群組；其餘五種新兵種尚未配置進 Frontier。完整六兵編成、節奏與平衡整合尚未進行，不能寫成全部未加入或全部已整合。A–D 合成波次只在獨立 Playground。
+巨獸適配舊裝甲撞槌模型與雙塔癱瘓，1200 HP、速度倍率 .4、8 秒冷卻＋1.2 秒前搖、3 格內最多兩塔癱瘓 3 秒。模型在本專案內自足；不帶入舊管理器、動態插怪或威脅選路。沿固定行程，保留減速／冰霜／擊退／兵營攔截，狩獵不處決 boss。
 
-## 4. 執行、Playground 與 Editor 入口
+## 3. 系統與關鍵入口
 
-| 用途 | 入口與操作 |
+| 責任 | 位置 |
 |---|---|
-| 正式 F5 | `project.godot` → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，地形取 Resource 引用 |
-| Phase 1 | F6：`tests/levels/road_flow_playground.tscn`；驗證雙入口、hover 與流量 |
-| Phase 2 | F6：`tests/traffic/playground.tscn`；三設施、雙入口、壽命及候選分流 |
-| 六塔 | F6：`tests/combat/tower_restoration_playground.tscn` |
-| Phase 3 | F6：`tests/relics/playground.tscn`；F7 全專屬、B 補缺塔牌、F9 清波，右上逐件增添／移除遺物 |
-| Phase 4 | F6：`tests/synergy/playground.tscn`；右上 A–D、B 補缺塔／設施牌、D 的 N 建同波雙新路及空中打擊開關、F9 清波 |
-| 波次 Editor | Godot 底部「波次編輯器」；`addons/wave_editor/`，由 project.godot 啟用。真實 Editor 回歸：`--editor -- --test-wave-editor` |
-| 獨立舊入口 | `scenes/main.tscn`、`9x9.tscn`、`11x11big.tscn`；可能自動生怪／提供單塔工具，不是正式操作規則 |
+| 波次與正式數值 | `assets/data/levels/frontier.tres`、`assets/data/towers/`、`assets/data/troops/siege_behemoth.tres` |
+| 生命／勝敗／四次獎勵 | `scripts/levels/level_session.gd`、`scripts/levels/definitions/level_definition.gd` |
+| 結果、生命及 Boss UI | `scenes/levels/run_status.tscn`、`scripts/levels/presentation/run_status.gd` |
+| Boss 能力快照／多目標 | `scripts/enemies/troops/troop.gd`、`scripts/combat/enemy_abilities.gd` |
+| 出兵與終止／RNG | `scripts/enemies/spawning/{enemy_wave,wave_spawn_schedule}.gd` |
+| 開場商店／帳本事件 | `scripts/cards/shop/card_shop.gd`；原卡面價格快照與交易權威保留 |
+| 可選事件記錄 | `scripts/combat/balance_trace.gd`；各正式系統僅在啟用時發事件 |
+| 實際戰鬥實驗 | `tests/balance/{laboratory,full_run,counterfactual,rules,defeat_input}.tscn` |
+| 策略／預留地圖 | `tests/balance/{policy,holdout}.gd`；保留七策略與原先凍結的地圖 |
+| 獨立分析／重現 | `tools/balance/{analyze,report,replay_audit,verification}.py`、JSON manifests、PowerShell runners |
+| 模型離線生成 | `tools/assets/build_siege_behemoth.gd`，已烘焙模型不需重新生成即可執行 |
 
-一般操作、拖牌／旋轉／鏡頭／暫停見 [README](../README.md)。F1／F2 是除錯圖層；**F8 是 Godot 停止執行，不能綁補牌**。Playground 熱鍵與資源授予不能視為正式遊戲功能。
+原 Phase 1–4 架構仍見 [architectures](architectures.md)、[systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。未更改有限 Cost 候選、硬性 SHORTEST／NEWEST 資格、整群配額、預覽不消耗 RNG 或固定行程規則。
 
-## 5. 核心架構與資料流
+## 4. 證據與重現
 
-1. **建造**：TowerDefinition（塔、攻擊、成長、地塊候選）＋TilePreset（相對道路）→ BuildCard（含價格快照）；輔助卡改引用 TrafficStructureDefinition，與塔互斥。CardPlacement 意圖 → TowerMap 驗證整批道路／占格／所有入口 BFS／既有固定行程 → 原子提交 → TileParameters／PortalMap 失效。升級沿原實例，忽略新 TilePreset、不增路。
-2. **一般 Cost**：GridMap／障礙快照 → RoadPortalGraph → CandidateRoutes／RoadRoutePlanner 有限正成本探索 → 原始 signed score 與 strict threshold → RouteDistribution 的 Uniform／Softmax → TrafficWeights 的 log 倍率 → CDF。
-3. **硬性巡路**：同一已提交路網 → RouteHistory（端點、接口、wave 快照）→ RoadSpecialRoutes 精確最短格距／最新有效通路代表 → 同一分布與設施管線。硬性資格不受普通 Cost pool／threshold 漏路影響。
-4. **預覽與出兵**：Level／ACT／Wave／SpawnGroup → WaveSpawnSchedule，按兵種／入口跨群組分配，鼠群先分群 → 個體 pending。預覽 `shuffle_departures=false` → RoadFlowForecast → hover／流量／候選差；正式只打亂出發順序，固定行程、HP、shield、速度與能力快照。UI 不另抽配額。
-5. **戰鬥**：Enemy 移動後 → EnemyAbilities（priority 40）建立共用 EnemySpatialIndex、治療／癱瘓 → BarracksSystem（45）→ CombatSystem（50），共用同一索引；必要時有補建索引分支。合法候選內才做嘲諷排序。AttackPayload 保存發射時效果，模型／特效不決定傷害。
-6. **構築與階段**：TowerGrowth 基礎成長 → RunRelics 每局持有與效果 → 塔實例／RelicCombat／FriendlySoldier。LevelSession 清波後等投射物 → ACT 遺物選擇 → 擴入口／下一波或結束。交通壽命與死亡清理各由持有者處理。
+- [基準稽核](balance/phase5_baseline.md)：原始 1074 個載入參數、原始價格／Gold／Boss 依賴。
+- [方法](balance/phase5_methodology.md)：事先假設、七策略、凍結 holdout、敏感度及限制。
+- [迭代](balance/phase5_iterations.md)：包含無效價格假設、失敗候選、重現差異及否決理由。
+- [最終報告](balance/phase5_final.md)：參數、十五波、每項主張的條件／樣本／結果／不確定性。
+- [重現指令](balance/phase5_reproduction.md)：Godot 等待方式、參數、seed、Python 與 Matplotlib 依賴。
+- [真人驗收](balance/phase5_human_playtest.md)：尚未執行，不能把自動操作當真人結果。
 
-模組責任看 [architectures](architectures.md)，詳細演算法與參數看 [systems](systems.md)。
+`reports/phase5/independent_results.json` 有 675 筆原始 trace 的獨立重算：432 參考遭遇、144 基準重播、56 能力／交通遭遇、43 完整跑局。重播不是額外獨立樣本。原始 JSONL、log、截圖留在 `.godot/phase5/`，選定 trace/log 壓縮包為 `.godot/phase5/raw_evidence.zip`。`tools/balance/evidence.json` 是選取清單，`raw_manifest.json` 有 SHA-256；追蹤中的 reports 僅保留彙整與四張診斷圖。
 
-## 6. 重要程式檔案索引
+主驗證為七策略×兩 seed 的 14 局，加事先保留的四局，均完成；training 漏敵範圍 0–11，holdout Core/307 漏敵15。675 筆帳本／傷害／生命週期可重算，不代表 675 個種子或平衡通過率。原始 72 案例用原 RNG 重播後五項指標全吻合；新 RNG 造成五個迫擊砲結果不同，已標記。
 
-以下路徑相對專案根目錄；不搬移檔案、不更改 UID。
+正式遊玩可加 `-- --balance-trace=res://.godot/phase5/human.jsonl --balance-seed=23`。詳細記錄可獨立核算；summary 模式不能完整重算傷害。重開保留舊檔並用新後綴。平常預設不記錄。
 
-| 責任 | 主要檔案 |
+## 5. 驗證分類
+
+以 [verification.json](../reports/phase5/verification.json) 的場景、模式及 log 為準，不能把 assertion 數和測試場景數混加。
+
+| 分類 | 本次證據 |
 |---|---|
-| 關卡／排程 | `scripts/levels/level_session.gd`、`scripts/levels/definitions/{level_definition,act_definition,wave_definition,wave_spawn_group}.gd`、`scripts/enemies/spawning/{wave_spawn_schedule,enemy_wave}.gd` |
-| 卡片資料／提交／商店 | `scripts/cards/definitions/{build_card,tile_preset}.gd`、`scripts/cards/card_placement.gd`、`scripts/cards/shop/card_shop.gd`、`scripts/towers/tower_map.gd` |
-| 塔／成長 | `scripts/towers/{tower_definition,tower_growth,tower}.gd`、`assets/data/towers/` |
-| 普通導航／分布 | `scripts/navigation/portal_map.gd`、`scripts/navigation/routes/{candidate_routes,route_distribution}.gd`、`native/src/{portal_graph,route_planner}.cpp` |
-| 硬性導航 | `scripts/navigation/routes/{route_history,special_routes}.gd`、`native/src/special_routes.cpp`；原生類別 `RoadSpecialRoutes` |
-| 道路保護 | `scripts/navigation/road_graph_snapshot.gd`、`native/src/road_edit_guard.cpp`；地塊資料在 `scripts/map/tile/` |
-| 交通 | `scripts/traffic/{traffic_structure_definition,traffic_structure,traffic_structures,traffic_weights,traffic_flow_delta,traffic_delta_overlay}.gd`、`assets/data/traffic/` |
-| 流量／情報 | `scripts/levels/presentation/{wave_flow_preview,start_wave_callout,next_wave_intel,troop_intel_item}.gd`、`scripts/navigation/routes/road_flow_forecast.gd`、`scripts/navigation/visualization/road_flow_renderer.gd`、`scripts/enemies/presentation/enemy_intelligence.gd` |
-| 遺物 | `scripts/relics/{run_relics,relic_catalog,relic_definition,relic_choice}.gd`、`assets/data/relics/catalog.tres`、`scripts/combat/relic_combat.gd` |
-| 戰鬥／索引／接戰 | `scripts/combat/{combat_system,enemy_abilities,enemy_spatial_index,barracks_system,friendly_soldier}.gd`、`scripts/combat/attacks/attack_payload.gd`、`scripts/enemies/enemy.gd` |
-| 兵種／模型 | `scripts/enemies/troops/{troop,troop_catalog}.gd`、`assets/data/troops/`、`assets/models/enemies/`、`scripts/enemies/rendering/` |
-| 原生依賴／工具 | `road_graph.gdextension`、`native/SConstruct`、`native/src/register_types.cpp`、`tools/build/build_native.ps1`、`addons/wave_editor/plugin.gd` |
+| Current PASS | 29 項目前場景／模式檢查：21 headless、6 既有 rendered 輸入回歸、1 rendered 完整長局、1 rendered 敗北／重開 |
+| Current PASS | 獨立帳本675 trace、基準重播72/72；屬資料驗證，不灌入上述29項 |
+| Current FAIL | 上述最終回歸集合無未解失敗；敏感度敗北是有效量測結果，仍完整保留 |
+| Historical PASS only | 早期 Phase 1–4 未於本次重跑的 suite／release 結果；查原 acceptance 文件，不列本次 PASS |
+| NOT RUN | Windows release export、Web wasm／瀏覽器、效能／記憶體、真人、Phase5 波次編輯器互動 |
 
-## 7. 已定規則與不可破壞條件
+初輪回歸有六個舊數值／手動步進 fixture 失敗，原 log 保留；實際修正 fixture 後重跑通過，最後重要九項再驗證。沒有為了舊斷言改回正式資源。Phase5 規則有64檢查，包含15波、四次遺物、終局鎖定、敗北排程、Boss 狀態及清理。
 
-- 所有入口可達終點；四向接口、整數座標，斜角不通。道路幾何、兵種評分與流量權重各自失效。
-- Cost 保留 `score − min_score < threshold`，等號排除、0 無候選、INF 關閉 cutoff。搜尋用正成本不代表原始評分必須為正；有限池不保證全圖最優或所有同分路線。
-- Uniform／Softmax 是基礎分布，設施倍率其後正規化；不讓設施召回失去硬性資格或 threshold 排除的路線。倍率不等於敵人數變化。
-- 預覽不改正式效果、不消耗出發 RNG；敵人開波後不尋路，尚待出生個體也不能被重定向。
-- 鼠群整群分入口與路線；跨 SpawnGroup 不拼群，最後可不足 5 隻；列表與流量計個體數。
-- 偵查兵身份是端點＋完整物理格序列；初圖 wave 0，同波同齡，重搜／快取重建不是誕生，恢復相同行程保留首次出生。
-- 同塔升級只消耗一張同種卡，預設 Lv.3；「成為主角」可解除哨塔上限。不能增路、改方向、重設冷卻或寫回共用 TowerDefinition。
-- 嘲諷只重排合法單體目標，不擴射程／方向／對空；ALL 攻擊仍打全體。治療不復活、不超 max HP，多名法師各有時鐘。
-- 飛翼獸沿最短合法道路上空飛行；兵營近戰不攔截，普通迫擊砲不索敵也不濺傷，空中打擊解鎖；其他射擊塔及神射手可對空。
-- 癱瘓多來源各自計時、取最大剩餘值不加秒數；來源死亡移除該份效果，波次結束／卸載／重開清除。既有投射物繼續，塔等級／道路保留。
-- 準備不限時；開波有 1.5 秒等待，戰鬥／獎勵／擴入口鎖建造與交易；ACT 遺物先於入口擴張，最後 ACT 亦先選遺物。
-- 視覺避讓、浮起動畫與流動筆觸不改邏輯道路、route 或傷害；禁止以候選方向聯集讓敵人自由走邊。
+Rendered 完整局以真實 viewport 點擊15次開波、四次遺物與重新開始；建造策略仍走 API，不代表逐張拖牌的人類遊玩。敗北 fixture 用正常引擎幀與真實輸入驗證。Compatibility 在 RTX4060 Laptop 執行；sandbox shader-cache 建目錄警告保留，不影響已觀察的截圖／點擊。Editor import 的設定存檔錯誤不能算 editor 驗收。
 
-## 8. 引擎、建置與技術限制
+## 6. 已知限制與下一步
 
-本機核對 Godot **4.7.2**、Compatibility／OpenGL、RTX **4060 Laptop**。AGENTS 中舊效能比較所記 GPU 是當時環境，不能套成本次環境。
+六塔購買角色與後期難度仍只有部分支持。Broadside 全局使用率／有目標時間低；交通對鼠群有收益，但對血法師／硬性選路不保證有利；部分後期波次在14個訓練局都零漏敵，W12 Heavy/11 卻漏11。HP或速度增加20%、全塔同價9的單 seed 探針可敗北，不能稱已找到穩健最優解。普通兵種資源未改，壓力來自編成／重疊／波次速度。
 
-執行需要 GDExtension，不能只複製 GDScript。固定 `native/godot-cpp` commit `e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77`，內附 API 是 **4.5**、C++17；擴充 `compatibility_minimum=4.5`，目標引擎是 4.7.2，兩者不是同一個版本欄位。SDK、`bin/` 與 `.godot/` 均被忽略，新的 clone 不會自帶完整可執行依賴。
+目前停在最終人工接受。請依真人驗收表觀察首波購買可理解性、分流回報、Boss 前搖辨識、W12尖峰與後期是否仍需決策。若修改數值，先記錄工作樹與新配置，不覆寫這次原始證據，不拿 holdout 反覆調到通關後仍稱保留驗證。Phase 5 成果依後續 Git 更新指令提交本機，尚未整合到正式專案。
 
-Windows 工具為 Python 3、SCons 4.11.1、MSVC 14.44.35207、SDK 10.0.26100.0。本機引擎為 `C:\tools\Godot.exe`；可用 Python 在 `C:\Users\USER\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`，預設 python／py 別名不可直接假設可用。工具支援 `-Python/-MsvcTools/-WindowsSdk`，可從 x64 Developer PowerShell 執行；詳見 [native/README](../native/README.md)。
+## 7. 本機 Git 更新核對
 
-- `road_graph.gdextension` 指向 `bin/road_graph.editguard.phase4.*`，不是舊版無 phase4 前綴的輸出。`reloadable=false`，建置後重啟 Godot；勿刪除正在被其他 editor 載入的舊 DLL。
-- Windows debug／release 先前已成功建置；本次確認 debug DLL 584,704 bytes、release DLL 538,112 bytes 存在，debug 載入回歸通過；**本次未重建、未執行 release 專用執行測試**。歷史建置 log：`.godot/phase4-native-{debug,release}.log`。
-- Web 目標 Emscripten 4.0.20、`threads=no`，匯出 `extensions_support=true`、`thread_support=false`；需對應支援擴充的匯出樣板及 wasm。Phase 4 的 wasm／瀏覽器尚未驗證，不把舊 Web 結果推廣為現版本 PASS。
-- 非單調道路歷史（刪除／恢復／重接）最多 **200,000 次搜尋展開**；超限顯示提示並拒絕開波，避免錯選舊路。單調增建用每條可行邊的完整通路代表，最短路用 DAG 邊代表；都不宣稱枚舉所有簡單路線。
-- 大路網同步規劃可能停頓，歷史快照及代表集有記憶體成本；長局、反覆編輯、Web 與效能上限尚待量測。
-
-## 9. 已知問題與歷史測試陷阱
-
-| 項目 | 判讀與處理邊界 |
-|---|---|
-| 本次應用程式錯誤 | 代表性測試無 GDScript／斷言失敗；不等同整個專案無 Bug。Offboarding 沒有修改程式。 |
-| 渲染環境訊息 | sandbox 無法建立 `user://` shader cache，兩個渲染 log 有 `ERROR: Can't create shader cache folder`；GPU、實際滑鼠斷言與正常退出仍完成。這是快取限制，不得寫成零引擎錯誤訊息。 |
-| 原生 DLL 鎖定 | 歷史舊輸出曾被 editor 鎖住，改 phase4 輸出共存；不能為建置強制關閉使用者 editor。 |
-| Editor 權限 | 歷史普通 editor 無法寫 Roaming/Godot 設定；自包含 editor 驗證成功，尚有 profiler user:// 訊息。本次 editor 未重跑。 |
-| 舊 route_planner／tile_placement | 硬編可編輯 main 為固定直路及固定 score 等假設；未修復／未重跑，遇失敗先分辨 fixture 與正式資源，不能回退地圖來配合。 |
-| troop_profiles | 歷史固定三兵種與 Quickfeet 1.5 的測試已改獨立 fixture／動態 catalog；原正式數值未回退。本次未重跑此項。 |
-| hover／F8／遺物選單 | 先前菱形至面板收回、情報入口遮擋、F8 停遊戲、只有單項的選單均已有修正；本次 road_flow 實際 hover 重跑通過，遺物 input 與補牌工具本次未重跑。 |
-| 文件與數值 | 本次修正「新兵全部未進 Frontier」及「其餘兵種全 Softmax」等過時文字。數值以現行 Resource／場景覆寫為準，不從歷史報告恢復。 |
-
-## 10. 本次驗證、歷史結果與 NOT RUN
-
-本次在 **2e2de2a** 開始驗證，2026-10-23 20:41–20:43 +08:00，Windows Godot 4.7.2。原始 log／退出碼：`.godot/offboarding-2026-10-23/{headless-results,render-results}.json`，各測試 log 同目錄。測試會更新固定輸出位置，事先將原 `synergy/traffic/relics` 結果複製至該目錄的 `prior-results/`，未刪舊證據。
-
-| 分類 | 結果 | 本次範圍／完成標記 |
-|---|---|---|
-| Routing／多入口 | **本次 PASS** | `navigation/route_distribution.tscn`（ROUTE_DISTRIBUTION_CHECK）、`multiple_starts.tscn`（MULTISTART_CHECK）；退出 0，無斷言／script error |
-| Traffic | **本次 PASS** | `--script tests/traffic/weights.gd` 25 checks；`traffic/integration.tscn` 99 checks；PHASE2 標記 failures=[] |
-| Tower Restoration | **本次 PASS** | `combat/tower_restoration.tscn`，failures=0，headless |
-| Relics／Stacking | **本次 PASS** | `relics/{stacking,rewards,mechanisms}.tscn`；failures=[]，mechanisms 113 checks |
-| Synergy Routing | **本次 PASS** | `synergy/routing.tscn`，357 checks、failures=[]，含 128 小圖 oracle、群體、多入口及預覽一致性 |
-| Synergy Combat | **本次 PASS** | `synergy/combat.tscn`，47 checks、failures=[]，嘲諷／治療／對空／癱瘓 |
-| 實際渲染 Smoke／輸入 | **本次 PASS** | `levels/road_flow_preview.tscn`，rendered=true、failures=0，真實滑鼠／hover／GPU 流量／重開與 RNG |
-| 正式關卡啟動 | **本次 PASS（有限 Smoke）** | `scenes/level.tscn` 實際渲染 180 frames，退出 0、無 script error；沒有操作或跑完整九波 |
-| 功能 FAIL | **本次 0** | 上述 10 項 headless＋2 項 rendered；保留 shader cache 環境訊息，不將其藏成無錯誤 log |
-| 其餘已驗功能 | **歷史 PASS，本次未重跑** | Phase 4 `synergy/input` 67 checks；遺物／traffic input、pause_menu、level_flow、wave_spawn_groups、48-case teardown、waypoint_routes、troop_profiles、enemy_status 規則、實際 wave editor；見歷史 `.godot/phase4-*.log` 及 synergy/acceptance.md |
-| 全套與其他環境 | **NOT RUN** | 全套回歸、現版 Web wasm／瀏覽器、長局平衡／記憶體／效能、release runtime、本次 native 重建、本次 editor |
-
-歷史 Phase 4 合計 **471 checks**（357＋47＋67）；本次只重跑其中 routing／combat，不能把 471 寫成本次結果。歷史 acceptance.md 記的是當時 `1e36ee5` 加未提交實作，現已是提交 `2e2de2a`；原始檔如不在新環境，以上追蹤中的摘要仍保留判讀依據。
-
-## 11. 下一階段：Phase 5 尚未開始
-
-只記錄待討論方向，沒有本次實作或已核准平衡值：
-
-- 五 ACT 節奏與九種兵種的完整編成；補完 Frontier 的六新兵整合（目前只有一名盾衛試配）。
-- 鼠群／盾衛／血法師／爆破手的協同強度、對空與硬性選路在長局中的比例。
-- 遺物取得節奏、風險交換型特殊事件、Gold 經濟及商店規則變更。
-- 長局平衡、難度曲線與效能／Web 驗收；與正式專案／main 的整合計畫。
-
-建議起點是先確認五 ACT 的節奏與經濟／獎勵設計，再決定 Frontier 的資源配置；不要直接把 A–D 合成波次或所有新兵塞入正式關卡。新增事件、ACT、塔、遺物或重構需新指令。
-
-## 12. 新工作階段啟動與驗證
-
-1. 先讀本文件與 AGENTS，確認 cwd／分支／HEAD，執行 `git status --short`、`git branch --show-current`、`git log -5 --oneline`、`git diff --stat`、`git diff --check`。這份文件交付後的 Markdown 差異是預期成果，不要 reset／clean。
-2. 確認 Godot 4.7.2、SDK 固定 commit、phase4 DLL 與 `road_graph.gdextension`。依賴缺失時按 native/README 建置，保留原 DLL；重啟 editor 載入，不改正式或舊專案。
-3. 用 [tests/README](../tests/README.md) 的最小交接回歸命令重跑必要項目；每次使用新 log 路徑，先保留會被覆寫的歷史輸出。以退出碼、完成標記與錯誤共同判斷，不能只看程式啟動成功。
-4. F5 確認正式關卡，F6 選對 Playground；實際驗收 hover／拖牌／像素／動畫須渲染，波次編輯器須真實 editor。headless 不替代上述驗證。
-5. 需要 Windows PowerShell 等待 GUI Godot 結束時，使用 `Start-Process -FilePath $godotExe -ArgumentList ... -WindowStyle Hidden -PassThru -Wait`，檢查傳回的 ExitCode 及指定 log；直接 `& Godot.exe` 不作為已等待完成的證據。
-6. git diff 應只包含授權範圍。需要 Git checkpoint 時由使用者另行下令；本次文件與代表性檢查適合 checkpoint，但不代表可直接合併 main 或發布 Web。
+使用者後續要求「GIT更新」。當時分支 HEAD 已為 `3fbad09`，包含既有 `origin/main` 合併、流量呈現與兵種圖示更新；這些既有提交不由本次重做。Phase 5 原始實驗仍按原紀錄解讀，不把舊樣本換標為新 HEAD 重測。本次另於整合後工作樹重跑 `balance/rules`，結果 Current PASS，log 在 `.godot/phase5/git-update-checks/balance-rules.log`；`git diff --check` 通過。提交包含 Phase 5 程式、資源、實驗工具、彙整證據及文件，原始大型輸出仍保留在忽略的 `.godot/phase5/`。

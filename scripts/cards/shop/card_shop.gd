@@ -24,6 +24,7 @@ func setup(placement: Node3D, wave: Node) -> void:
 	_placement = placement
 	_wave = wave
 	coins = maxi(0, initial_coins)
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":coins,"balance":coins,"reason":"initial"},"shop")
 	_rng.seed = random_seed
 	view.open_requested.connect(open_shop)
 	view.close_requested.connect(close_shop)
@@ -40,6 +41,12 @@ func _on_wave_started() -> void:
 	_round += 1
 	hide_for_wave_start()
 
+func prepare_opening_shop() -> void:
+	available = _deal()
+	_refresh()
+	view.set_available(available)
+	if is_instance_valid(_wave.controls): _wave.controls.set_shop_present(available)
+
 func hide_for_wave_start() -> void:
 	available = false
 	close_shop()
@@ -50,7 +57,7 @@ func _on_wave_finished() -> void:
 	if not is_inside_tree() or not view.is_inside_tree() or _round <= _rewarded_round or _wave.active:
 		return
 	_rewarded_round = _round
-	coins += maxi(0, wave_reward)
+	grant_gold(maxi(0, wave_reward),"wave_reward")
 	available = _deal()
 	_refresh()
 	view.set_available(available)
@@ -119,6 +126,10 @@ func _accept_deal(next: Array[BuildCard]) -> void:
 	for card in offers:
 		prices.append(card.price if card != null else 0)
 		sold.append(0)
+	if BalanceTrace.enabled:
+		var entries: Array = []
+		for card in offers: entries.append({"card":card.visual_definition().resource_path,"price":card.price} if card != null else {})
+		BalanceTrace.event("shop_deal","shop",{"offers":entries},"shop")
 	deals += 1
 
 func open_shop() -> void:
@@ -147,6 +158,7 @@ func buy(index: int) -> bool:
 		sold[index] = 0
 		_refresh()
 		return false
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-prices[index],"balance":coins,"reason":"purchase","card":offers[index].visual_definition().resource_path},"shop")
 	_refresh()
 	return true
 
@@ -158,6 +170,7 @@ func reroll() -> bool:
 	var next := roll_offers()
 	if next.is_empty(): return false
 	coins -= maxi(0, reroll_price)
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-maxi(0,reroll_price),"balance":coins,"reason":"reroll"},"shop")
 	_accept_deal(next)
 	_refresh(true)
 	view.animate_reroll()
@@ -166,6 +179,11 @@ func reroll() -> bool:
 func _refresh(insert_offers := false) -> void:
 	view.show_offers(offers, prices, sold, coins, maxi(0, reroll_price), insert_offers)
 	balance_changed.emit(coins)
+
+func grant_gold(amount: int, reason: String) -> void:
+	coins += maxi(0,amount)
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":maxi(0,amount),"balance":coins,"reason":reason},"shop")
+	_refresh()
 
 func _exit_tree() -> void:
 	if is_instance_valid(_wave):

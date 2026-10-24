@@ -1,0 +1,38 @@
+[
+  {
+    "id": "holdout-generalist-101",
+    "args": [
+      "--policy=generalist",
+      "--seed=101",
+      "--map=frontier",
+      "--config=holdout"
+    ]
+  },
+  {
+    "id": "holdout-core-307",
+    "args": [
+      "--policy=core",
+      "--seed=307",
+      "--map=frontier",
+      "--config=holdout"
+    ]
+  },
+  {
+    "id": "holdout-swarm-101",
+    "args": [
+      "--policy=swarm",
+      "--seed=101",
+      "--map=holdout",
+      "--config=holdout"
+    ]
+  },
+  {
+    "id": "holdout-barracks-307",
+    "args": [
+      "--policy=barracks",
+      "--seed=307",
+      "--map=holdout",
+      "--config=holdout"
+    ]
+  }
+]

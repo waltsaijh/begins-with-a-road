@@ -1,6 +1,6 @@
 # Phase 4：敵軍協同與專屬選路
 
-這是 Routing Sandbox 的原型實作，六種兵種由現有 Troop／TroopCatalog 管理；目前 Frontier ACT 1／Wave 2 已配置 1 名盾衛兵，其餘五種尚未配置，完整正式編成／平衡尚待後續工作。數值以 `assets/data/troops/*.tres` 為準；以下是本階段交付值，不代表正式平衡。
+這是 Routing Sandbox 的原型實作，六種兵種由現有 Troop／TroopCatalog 管理；Phase 5 已將九種普通兵種整合到正式 Frontier 的十五波，詳見 [Phase 5](phase5.md)。數值以 `assets/data/troops/*.tres` 為準；以下是本階段交付值，不代表正式平衡。
 
 ## 兵種設定與資料來源
 

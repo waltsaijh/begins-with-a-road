@@ -25,6 +25,9 @@ func check(ok: bool, message: String) -> void:
 func world(at: Vector2i, height := 0.0) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*height)
 func build(key: String, at: Vector2i, turns := 0) -> DefenseTower:
 	var definition: TowerDefinition = load("res://assets/data/towers/"+key+".tres")
+	# Freeze numerical fixtures in this process; mechanism assertions predate tuning.
+	definition.default_damage = {"sentry":25.0,"mortar":8.0,"ballista":15.0,"broadside":8.0,"crossfire":4.0,"barracks":4.0}[key]
+	if definition.deployment != null: definition.deployment.damage = 4.0
 	var tower: DefenseTower = towers.place_card(BuildCard.from_parts(definition,definition.first_tile_preset()),Vector3i(at.x,0,at.y),turns)
 	check(tower != null, "Place "+key)
 	return tower
@@ -71,6 +74,7 @@ func run() -> void:
 	relics = towers.relics
 	combat.set_process(false)
 	combat.barracks.set_process(false)
+	combat.enemy_abilities.set_process(false)
 	combat.enabled = false
 	wave = Wave.new()
 	add_child(wave)

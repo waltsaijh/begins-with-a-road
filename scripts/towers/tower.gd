@@ -45,6 +45,7 @@ func apply_disable(source: Node3D, seconds: float) -> void:
 	if not is_instance_valid(source) or not source.can_be_targeted() or not is_finite(seconds) or seconds <= 0: return
 	var key := source.get_instance_id()
 	_disables[key] = {"source":weakref(source),"remaining":maxf(seconds,float(_disables.get(key,{}).get("remaining",0.0)))}
+	if BalanceTrace.enabled: BalanceTrace.event("disable",BalanceTrace.tower_id(self),{"source":source.enemy_id,"duration":seconds})
 	_refresh_disable_visual()
 
 func is_disabled() -> bool:

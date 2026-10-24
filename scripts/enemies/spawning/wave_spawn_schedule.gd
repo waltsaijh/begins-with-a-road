@@ -7,7 +7,7 @@ static func origins_for(group: WaveSpawnGroup, additional_starts: PackedInt32Arr
 		if not index in origins: origins.append(index)
 	return origins
 
-static func build(definition: WaveDefinition, controller: Node, first_id: int, shuffle_departures := true, additional_starts: PackedInt32Array = PackedInt32Array(), modifiers: Variant = null) -> Dictionary:
+static func build(definition: WaveDefinition, controller: Node, first_id: int, shuffle_departures := true, additional_starts: PackedInt32Array = PackedInt32Array(), modifiers: Variant = null, rng: RandomNumberGenerator = null) -> Dictionary:
 	if not definition.configuration_error().is_empty(): return {}
 	# Allocate entrances by troop + authored origin across the whole wave first.
 	# IDs never seed either entrance or route choice; only departures are shuffled.
@@ -54,7 +54,14 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 		# A short final cohort stays last: member counts/ticks never move across boundaries.
 		var tail: Array = []
 		if not cohorts.is_empty() and cohorts.back().size() < profile.cohort_size: tail = cohorts.pop_back()
-		if shuffle_departures: cohorts.shuffle()
+		if shuffle_departures:
+			if rng == null: cohorts.shuffle()
+			else:
+				for j in range(cohorts.size()-1,0,-1):
+					var index := rng.randi_range(0,j)
+					var swap: Array = cohorts[j]
+					cohorts[j] = cohorts[index]
+					cohorts[index] = swap
 		if not tail.is_empty(): cohorts.append(tail)
 		var slot := 0
 		for members in cohorts:

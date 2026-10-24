@@ -124,6 +124,7 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 		if not existing.upgrade(): return null
 		_feedback("")
 		tower_upgraded.emit(existing)
+		if BalanceTrace.enabled: BalanceTrace.event("upgrade",BalanceTrace.tower_id(existing),{"level":existing.level,"gold":0})
 		return existing
 	var tower := DefenseTower.new()
 	tower.definition = card.tower
@@ -216,6 +217,7 @@ func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> Defens
 		tile_visuals.follow_new_cell(cell, tower.get_node_or_null("Visual"))
 	_feedback("")
 	towers_changed.emit()
+	if BalanceTrace.enabled: BalanceTrace.event("build",BalanceTrace.tower_id(tower),{"level":tower.level,"turns":tower.rotation_steps})
 	return tower
 
 func _on_tower_died(tower: Node3D) -> void:

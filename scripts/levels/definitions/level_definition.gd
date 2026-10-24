@@ -14,6 +14,11 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var acts: Array[ActDefinition] = []
 ## Between ACTs, choose a direction and extend the road to one new entrance.
 @export var expand_starts_after_act := true
+## Zero keeps independent mechanic fixtures without a loss condition.
+@export_range(0, 100, 1) var base_health := 0
+@export var reward_final_act := false
+@export_range(0, 100, 1) var starting_gold := 0
+@export var opening_shop := false
 
 func wave_count() -> int:
 	var count := 0

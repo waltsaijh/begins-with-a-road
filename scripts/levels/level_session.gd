@@ -1,6 +1,7 @@
 extends Node3D
 ## Loads terrain before gameplay children become ready; owns finite progression.
 signal level_finished
+signal run_finished(victory: bool)
 signal preparation_changed(available: bool)
 const TIMELINE_ADVANCE_SECONDS := 1.0
 const WAVE_START_SECONDS := 1.5
@@ -20,9 +21,29 @@ var choosing_relic := false
 var _settling_wave := false
 var relic_choice: CanvasLayer
 var enemy_intelligence: CanvasLayer
+var base_health := 0
+var total_leaks := 0
+var total_kills := 0
+var victory := false
+var run_status: CanvasLayer
+var _owns_balance_trace := false
+var _balance_seed := -1
 @onready var expansion: Node3D = $SpawnExpansion
 
 func _enter_tree() -> void:
+	var trace_path := ""
+	var trace_detailed := true
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--balance-trace="): trace_path = argument.trim_prefix("--balance-trace=")
+		if argument.begins_with("--balance-seed="): _balance_seed = int(argument.trim_prefix("--balance-seed="))
+		if argument == "--balance-summary": trace_detailed = false
+	if not trace_path.is_empty() and not BalanceTrace.enabled:
+		if FileAccess.file_exists(trace_path): trace_path = trace_path.get_basename()+"_"+str(Time.get_ticks_usec())+".jsonl"
+		BalanceTrace.begin(trace_path,{"run_id":"interactive_"+str(Time.get_unix_time_from_system()),"kind":"interactive","config":"working_tree","seed":_balance_seed},trace_detailed)
+		_owns_balance_trace = BalanceTrace.enabled
+	if _balance_seed >= 0:
+		get_node("CardPlacement/Shop").random_seed = _balance_seed+1000
+		get_node("EnemyWave").spawn_seed = _balance_seed+2000
 	get_node("EnemyWave").auto_start = false
 	if level == null: return
 	var error := level.configuration_error()
@@ -68,6 +89,7 @@ func _enter_tree() -> void:
 	for act in level.acts:
 		_waves.append_array(act.waves)
 	_valid = true
+	if level.opening_shop or level.starting_gold > 0: get_node("CardPlacement/Shop").initial_coins = level.starting_gold
 
 func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, map: GridMap) -> Node3D:
 	var previous := get_node_or_null(NodePath(marker_name))
@@ -82,6 +104,7 @@ func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, 
 
 func _ready() -> void:
 	_wave = get_node("EnemyWave")
+	if _balance_seed >= 0: get_node("TowerMap").relics._rng.seed = _balance_seed+3000
 	if not _valid:
 		_wave.start_allowed = false
 		_wave._update_button()
@@ -89,6 +112,10 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_hud = get_node("LevelHUD")
+	base_health = level.base_health
+	run_status = preload("res://scenes/levels/run_status.tscn").instantiate()
+	add_child(run_status)
+	run_status.setup(self)
 	relic_choice = preload("res://scenes/relics/relic_choice.tscn").instantiate()
 	add_child(relic_choice)
 	relic_choice.setup(get_node("TowerMap").relics)
@@ -104,12 +131,15 @@ func _ready() -> void:
 	_on_balance_changed(shop.coins)
 	_wave.wave_started.connect(_on_wave_started)
 	_wave.wave_finished.connect(_on_wave_finished)
+	_wave.enemy_leaked.connect(_on_enemy_leaked)
+	_wave.enemy_killed.connect(func(_enemy): total_kills += 1)
 	expansion.completed.connect(_on_start_added)
 	if _wave.controls != null:
 		# Formal levels own the opening transition; standalone maps start immediately.
 		_wave.controls.spawn_requested.disconnect(_wave.start_wave)
 		_wave.controls.spawn_requested.connect(_on_start_requested)
 	_prepare_wave()
+	if level.opening_shop: shop.prepare_opening_shop()
 
 func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
@@ -136,6 +166,7 @@ func _on_start_requested() -> void:
 
 func _begin_wave_start() -> void:
 	if finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
+	if _owns_balance_trace: BalanceTrace.wave = current_wave+1
 	_wave_starting = true
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
@@ -170,6 +201,7 @@ func _on_wave_finished() -> void:
 	# after later siblings such as the HUD have already left the tree.
 	if not is_inside_tree() or is_queued_for_deletion(): return
 	if not is_instance_valid(_hud) or not _hud.is_inside_tree(): return
+	if finished: return
 	if _settling_wave: return
 	_settling_wave = true
 	_wave.start_allowed = false
@@ -184,7 +216,7 @@ func _finish_wave_transition() -> void:
 	_settling_wave = false
 	set_process(false)
 	current_wave += 1
-	if _is_act_boundary(current_wave):
+	if _is_act_boundary(current_wave) and (current_wave < _waves.size() or level.reward_final_act):
 		choosing_relic = true
 		_wave.start_allowed = false
 		get_node("CardPlacement").set_entry_selection(true)
@@ -202,12 +234,8 @@ func _on_relic_selected(_relic: RelicDefinition) -> void:
 
 func _continue_after_reward() -> void:
 	if current_wave == _waves.size():
-		get_node("CardPlacement").set_entry_selection(false)
-		finished = true
-		_wave.start_allowed = false
 		timeline.set_state(current_wave, 0.0, false)
-		level_finished.emit()
-		_update_start_callout()
+		_end_run(true)
 	else:
 		_wave.start_allowed = true
 		get_node("CardPlacement").set_entry_selection(false)
@@ -241,3 +269,38 @@ func _on_start_added(index: int) -> void:
 	_wave._update_button()
 	_update_start_callout()
 	set_process(false)
+
+func _on_enemy_leaked(enemy: Node3D) -> void:
+	if finished: return
+	total_leaks += 1
+	if level.base_health <= 0: return
+	base_health = maxi(0,base_health-int(enemy.abilities.get("base_damage",1)))
+	run_status.refresh()
+	if base_health == 0 or enemy.troop.has_tag(&"boss"): _end_run(false)
+
+func _end_run(won: bool) -> void:
+	if finished: return
+	finished = true
+	victory = won
+	_wave_starting = false
+	_settling_wave = false
+	_wave.start_allowed = false
+	get_node("CardPlacement").set_entry_selection(true)
+	get_node("CardPlacement/Shop").hide_for_wave_start()
+	if not won:
+		_wave.abort_wave()
+		get_node("TowerMap").combat.projectiles.clear()
+	get_node("TowerMap").combat.enemy_abilities.clear()
+	get_node("TowerMap").combat.barracks._process(0.0)
+	_update_start_callout()
+	set_process(false)
+	run_status.finish(won)
+	if BalanceTrace.enabled: BalanceTrace.event("victory" if won else "defeat","run",{"base_health":base_health,"kills":total_kills,"leaks":total_leaks,"completed_waves":current_wave})
+	if won: level_finished.emit()
+	run_finished.emit(won)
+	if _owns_balance_trace:
+		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"victory" if won else "defeat","base_health":base_health,"completed_waves":current_wave})
+
+func _exit_tree() -> void:
+	if _owns_balance_trace and BalanceTrace.enabled:
+		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"interrupted","completed_waves":current_wave})

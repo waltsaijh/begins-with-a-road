@@ -71,6 +71,8 @@ func verify() -> void:
 	var towers: Node3D = scene.get_node("TowerMap")
 	var combat: Node = towers.combat
 	combat.set_process(false)
+	combat.enemy_abilities.set_process(false)
+	combat.barracks.set_process(false)
 	var map: GridMap = scene.get_node("TileMap")
 	var records: RefCounted = scene.get_node("PortalMap").tile_parameters
 	var cards: Node3D = scene.get_node("CardPlacement")

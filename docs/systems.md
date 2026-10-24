@@ -360,21 +360,21 @@ F1 的路徑來自本波每隻敵人的完整行程，不受評分正負值影�
 
 ## 關卡、ACT 與波次
 
-F5 進入 `scenes/level.tscn`，關卡設定在 `assets/data/levels/frontier.tres`。範例包含三個 ACT、每個三波。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的菱形驚嘆號確認（hover 顯示「開始下一波」及兵種情報），沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
+F5 進入 `scenes/level.tscn`，關卡設定在 `assets/data/levels/frontier.tres`。正式 Frontier 包含五個 ACT、每個三波，不自動擴張入口；自訂關卡仍可明確啟用擴張。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的菱形驚嘆號確認（hover 顯示「開始下一波」及兵種情報），沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
 
 介面場景是 `scenes/levels/level_hud.tscn`，包含頂部金幣、時間線、倍速與暫停，以及 `WorldActions/EarlyStart` 起點對話框；已實例化於 `level.tscn` 的 `LevelHUD`。時間線本身是 `scenes/levels/wave_timeline.tscn`，可直接在 2D 編輯器預覽。選取 WaveTimeline 後，可在 Inspector 的 Preview 調整波次索引、準備進度與戰鬥狀態，Appearance 可調字型、字級與顏色；執行時由關卡進度接管。時間線的節點數與 ACT 名稱來自 Level 資源。
 
-- `LevelDefinition`：地形 GridMap 場景、由地形端點讀取的入口／終點、相容舊地圖的座標、ACT 列表與是否在 ACT 之間擴張入口。準備時間、自動開始及開波額外獎勵欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
+- `LevelDefinition`：地形 GridMap 場景、由地形端點讀取的入口／終點、相容舊地圖的座標、ACT 列表、是否擴張入口，以及 Phase 5 的 base_health／starting_gold／opening_shop／reward_final_act。準備時間、自動開始及開波額外獎勵欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
 - `ActDefinition`：ACT 名稱與有順序的波次列表。
 - `WaveDefinition`：出生群組列表、共用移動速度與完成獎勵。
 - `WaveSpawnGroup`：兵種、開始刻度、總數、每批隻數、批次間隔刻度與入口索引。
-- `level_session.gd`：在遊戲節點 ready 前載入預設地形與端點，依序準備波次；完成最後一波後停用開波按鈕。
+- `level_session.gd`：在遊戲節點 ready 前載入預設地形與端點，依序準備波次；管理防線生命、四次遺物、勝敗及清理。最後一波清完與在途攻擊結束後勝利；普通漏敵扣 1，boss 漏敵立即敗北，禁止因卸載或敗北取得波次獎勵。
 
 可在 Inspector 開啟 frontier.tres 編輯，或另存一份關卡 Resource，指定到 level.tscn 根節點的 Level。地形使用可獨立編輯的 GridMap `.tscn`，不把地形資料混進敵人生成程式；範例引用 `scenes/maps/tile_map.tscn`。既有 main／9x9／11x11big 場景仍可獨立用於地圖與功能測試。
 
 Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT／波次、新增／複製／刪除群組，並編輯兵種、入口、開始時間、數量、每批隻數及批次間隔。拖曳色塊可移動開始時間；預覽滑桿顯示指定時刻各兵種的累計出生數。按「儲存關卡」寫回原檔，或使用 Godot 儲存操作一起儲存；編輯與拖曳支援原生復原／重做。未儲存時顯示星號，切換關卡可先儲存再切換。外掛已在專案設定啟用；若編輯器尚未重新載入設定，可在「專案 → 專案設定 → 外掛」啟用「波次編輯器」。介面場景位於 `addons/wave_editor/wave_editor.tscn`。
 
-出生排程以開波為 0，所有時間保存為整數：`start_tick` 與 `interval_ticks`，每格固定 0.25 秒。例如開始 6 格 = 1.5 秒、間隔 2 格 = 0.5 秒。結束刻度由「開始 + (批次數 − 1) × 間隔」自動計算，間隔 0 表示同時出生。準備期與開波動畫獨立於出生排程。既有九波已轉成群組資料，原先 0.2 秒的出生間隔對齊為 1 格（0.25 秒）。
+出生排程以開波為 0，所有時間保存為整數：`start_tick` 與 `interval_ticks`，每格固定 0.25 秒。例如開始 6 格 = 1.5 秒、間隔 2 格 = 0.5 秒。結束刻度由「開始 + (批次數 − 1) × 間隔」自動計算，間隔 0 表示同時出生。準備期與開波動畫獨立於出生排程。目前十五波均使用群組資料，間隔與群內刻度以 Resource 為準。
 
 同波群組可重疊或留下空檔；即使當下無存活敵人，也要等未來群組全部出生並清場後才結束。同一兵種與入口跨群組共用整波的 `index / total` 路線配額，再只打亂各組內路線的出發順序。開波時固定路線、血量與速度，後續資料修改不會改寫待出生敵人。排程以絕對整數刻度判斷，慢幀會補上已到期的批次，不會把整段出生時間往後移。
 
@@ -463,7 +463,7 @@ Highlight Length 的 Inspector 滑桿範圍為 0.10～20.0，Flow Speed 為 0～
 
 ## 塔牌疊加與遺物（Phase 3）
 
-完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物，再選遺物，最後才擴張或完成關卡；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
+完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物；第 3／6／9／12 波後選遺物，最後 ACT 直接結算；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
 
 ## 敵軍協同與專用路線（Phase 4）
 

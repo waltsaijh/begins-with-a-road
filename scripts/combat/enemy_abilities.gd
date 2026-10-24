@@ -20,6 +20,7 @@ func clear() -> void:
 	for tower: DefenseTower in combat.tower_map.towers.values(): tower.clear_disable()
 	for enemy in combat.wave.living_enemies():
 		enemy.cast_target = null
+		enemy.cast_targets.clear()
 		enemy.cast_remaining = 0.0
 		enemy.skill_progress = -1.0
 		if is_instance_valid(enemy.ability_visual): enemy.ability_visual.stop_cast()
@@ -49,10 +50,16 @@ func advance(delta: float) -> void:
 			enemy.cast_remaining = maxf(0,enemy.cast_remaining-delta)
 			enemy.skill_progress = 1.0-enemy.cast_remaining/settings.sabotage_windup
 			_visual(enemy).casting(enemy.skill_progress)
-			combat.visuals.add_beam(enemy.global_position+Vector3.UP*0.5,target.global_position+Vector3.UP*0.8,Color("e0ac63"),0.025,0.12)
+			for reference: WeakRef in enemy.cast_targets:
+				var marked: DefenseTower = reference.get_ref()
+				if _legal_target(enemy,marked): combat.visuals.add_beam(enemy.global_position+Vector3.UP*0.5,marked.global_position+Vector3.UP*0.8,Color("e0ac63"),0.025,0.12)
 			if enemy.cast_remaining <= 0:
-				target.apply_disable(enemy,settings.sabotage_duration)
-				disables += 1
+				for reference: WeakRef in enemy.cast_targets:
+					var marked: DefenseTower = reference.get_ref()
+					if _legal_target(enemy,marked):
+						marked.apply_disable(enemy,settings.sabotage_duration)
+						disables += 1
+				if BalanceTrace.enabled and enemy.troop.has_tag(&"boss"): BalanceTrace.event("boss_phase",str(enemy.enemy_id),{"phase":"pulse"})
 				_cancel_cast(enemy)
 			continue
 		enemy.sabotage_clock -= delta
@@ -67,12 +74,16 @@ func advance(delta: float) -> void:
 			return a.grid_cell.x < b.grid_cell.x if a.grid_cell.x != b.grid_cell.x else a.grid_cell.y < b.grid_cell.y)
 		if not candidates.is_empty():
 			enemy.cast_target = weakref(candidates[0])
+			enemy.cast_targets.clear()
+			for index in mini(int(settings.get("sabotage_targets",1)),candidates.size()): enemy.cast_targets.append(weakref(candidates[index]))
+			if BalanceTrace.enabled and enemy.troop.has_tag(&"boss"): BalanceTrace.event("boss_phase",str(enemy.enemy_id),{"phase":"windup","targets":enemy.cast_targets.size()})
 			enemy.cast_remaining = settings.sabotage_windup
 			enemy.skill_progress = 0.0
 			_visual(enemy).casting(0.0)
 
 func _cancel_cast(enemy: Node3D) -> void:
 	enemy.cast_target = null
+	enemy.cast_targets.clear()
 	enemy.cast_remaining = 0.0
 	enemy.skill_progress = -1.0
 	enemy.sabotage_clock = enemy.abilities.sabotage_interval

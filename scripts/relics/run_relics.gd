@@ -19,10 +19,10 @@ func can_acquire(relic: RelicDefinition) -> bool:
 func acquire(relic: RelicDefinition) -> bool:
 	if not can_acquire(relic): return false
 	held[relic.id] = int(held.get(relic.id,0))+1
+	if BalanceTrace.enabled: BalanceTrace.event("relic",str(relic.id),{"count":held[relic.id]},"relic")
 	var shop := tower_map.get_node_or_null("../CardPlacement/Shop") if tower_map != null else null
 	if shop != null and relic.id == &"gold":
-		shop.coins += int(relic.parameters.amount)
-		shop._refresh()
+		shop.grant_gold(int(relic.parameters.amount),"relic_gold")
 	refresh_towers()
 	changed.emit()
 	acquired.emit(relic)

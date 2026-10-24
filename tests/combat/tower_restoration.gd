@@ -216,7 +216,7 @@ func verify_barracks() -> void:
 	get_tree().paused = false
 	check(unit.health == paused_health and foe.global_position == position,"Pause advanced friendly contact combat")
 	allies._process(1.0)
-	check(foe.health == 96 and unit.health == 35,"Friendly attack or enemy counterattack values incorrect")
+	check(foe.health == 100-unit.settings.damage and unit.health == 35,"Friendly attack or enemy counterattack values incorrect")
 	unit.take_damage(100)
 	check(unit.dead and foe.engaged_by == null,"Friendly death did not release enemy")
 	foe._process(0.1)
