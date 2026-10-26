@@ -390,6 +390,8 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`、選擇 ACT�
 
 開波對話框位於 `scenes/levels/components/start_wave_callout.tscn`，圖示為 48×48 正菱形內的驚嘆號，平時隱藏情報；hover 時在圖示上方展開寬 216px、高度依最多三列敵軍調整的面板，文字依語言顯示「開始下一波」／「Start next wave」，不加問號或顯示獎勵。每個入口各有一份範本實例，分別投影到對應入口上方，向下尖角指向入口，隨相機平移／縮放更新；部分超出視窗仍保留顯示，由視窗自然裁切，完全離開畫面才隱藏。邊框為固定完整輪廓（Shape/Border），無倒數裁切。Hover 以 0.15 秒過渡到淡青底色與較深邊框，略為放大並上浮。開波時以 0.24 秒二次 ease-in 縮小、移入起點塔；下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的對話框。
 
+展開面板的 Title 在面板頂部水平置中、垂直置頂，使用零錨點與固定 offsets，避免標題寬度額外加上 48px 父按鈕寬度。兵種 Body 最小高度由 36px 縮至 28px，Items 的列間距由 2px 縮至 0px；? 使用 24px 最小尺寸並垂直置中。NextWaveIntel 依各列實際最小高度及場景設定間距計算最多三列的顯示高度，不再使用每列固定 38px 的估計；空清單保留 28px 的 ×0 提示。
+
 開波不發金幣，只有清完每波時發放 WaveDefinition.reward。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
 
 水平線、波次圓點與 ACT 分隔線共用同一個由左至右的填色邊界，進度經過圖形時逐部分覆蓋，包含手動開波的 ease-in-out 動畫；填色終點對齊標記右緣，使該波開始時圓點或直線已完全填滿，戰鬥與下一段準備期之間不跳動。`wave_timeline.tscn` 的 Track／Progress 共用軌道與標記場景，Progress 以 Control 的 clip_contents 水平裁切，ACT Label 不受裁切。完整 UI 場景索引見 [scenes/UI_README.md](../scenes/UI_README.md)。

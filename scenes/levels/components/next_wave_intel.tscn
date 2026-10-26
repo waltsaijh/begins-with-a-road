@@ -9,13 +9,13 @@ anchor_right = 1.0
 offset_left = 8.0
 offset_right = -8.0
 offset_top = 32.0
-offset_bottom = 68.0
+offset_bottom = 60.0
 mouse_filter = 2
 theme_override_constants/separation = 2
 script = ExtResource("1")
 
 [node name="Scroll" type="ScrollContainer" parent="."]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 1
@@ -23,5 +23,5 @@ vertical_scroll_mode = 1
 [node name="Items" type="VBoxContainer" parent="Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 0
 mouse_filter = 2

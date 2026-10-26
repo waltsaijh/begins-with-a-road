@@ -16,7 +16,7 @@ var _border: Color
 var _border_width: float
 var _hovered := false
 var _intel_available := false
-var _intel_height := 38.0
+var _intel_height := 28.0
 var _pointer_position := Vector2.ZERO
 var _pointer_known := false
 
