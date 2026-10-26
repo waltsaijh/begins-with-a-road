@@ -123,11 +123,15 @@ func ribbon_geometry() -> void:
 	var bend_clock := RoadFlowPhases.new()
 	bend_clock.add_trip(PackedVector2Array([Vector2(0,0),Vector2(1,0),Vector2(1,1)]))
 	ribbon.display(bend, bend, map, bend_clock)
-	var vertices: PackedVector3Array = ribbon.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
-	check(vertices.size() == 18 and ribbon.rendered_cells.size() == 3, "Bend did not use three non-overlapping cell patches")
+	var geometry := ribbon.mesh as ArrayMesh
+	check(geometry.surface_get_array_len(0) == 18 and ribbon.rendered_cells.size() == 3, "Bend did not use three non-overlapping cell patches")
 	var data: Image = ribbon.flow_data.get_image()
 	var row: int = ribbon.rendered_cells.find(Vector2i(1, 0))
-	check(int(data.get_pixel(0, row).r) == 3, "Corner did not contain two straight pieces and one exact arc")
+	# Web float-texture readback clamps counts above one. Inspect the same CPU
+	# geometry that feeds the texture; actual shader output is tested by pixels.
+	var bend_pieces: Array = ribbon._cell_pieces(Vector2i(1,0), [Vector2i.ZERO,Vector2i(1,1)],
+		[[Vector4i(0,0,1,0),Vector4i(1,0,1,1),bend_clock.turns[Vector4i(0,0,1,0)][Vector4i(1,0,1,1)]]], bend, bend_clock, 5)
+	check(bend_pieces.size() == 3 and bend_pieces[1].arc, "Corner did not contain two straight pieces and one exact arc")
 	var first := data.get_pixel(1, row)
 	check(is_equal_approx(first.g, first.a), "Approach to corner is curved instead of straight")
 	var traffic := {Vector4i(0, 0, 1, 0): 1, Vector4i(0, 1, 1, 1): 12}
@@ -142,7 +146,8 @@ func ribbon_geometry() -> void:
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
 	first = data.get_pixel(1, row)
 	var second := data.get_pixel(4, row)
-	check(int(data.get_pixel(0,row).r) == 2 and is_zero_approx(first.g) and is_zero_approx(second.g) and is_zero_approx(first.a) and is_zero_approx(second.a), "Opposite traffic did not overlap the road center")
+	var opposite_pieces: Array = ribbon._cell_pieces(Vector2i.ZERO, [Vector2i(1,0)], [], bidirectional, geometry_clocks(bidirectional), 5)
+	check(opposite_pieces.size() == 2 and is_zero_approx(first.g) and is_zero_approx(second.g) and is_zero_approx(first.a) and is_zero_approx(second.a), "Opposite traffic did not overlap the road center")
 	ribbon.display({Vector4i(1, 0, 0, 0): 5}, bidirectional, map, geometry_clocks({Vector4i(1,0,0,0):5}))
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
@@ -157,7 +162,8 @@ func ribbon_geometry() -> void:
 	ribbon.display(junction, junction, map, geometry_clocks(junction))
 	data = ribbon.flow_data.get_image()
 	row = ribbon.rendered_cells.find(Vector2i.ZERO)
-	check(ribbon.rendered_cells.count(Vector2i.ZERO) == 1 and int(data.get_pixel(0,row).r) == 3, "Junction uses stacked transparent patches")
+	var junction_pieces: Array = ribbon._cell_pieces(Vector2i.ZERO, [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,1)], [], junction, geometry_clocks(junction), 5)
+	check(ribbon.rendered_cells.count(Vector2i.ZERO) == 1 and junction_pieces.size() == 3, "Junction uses stacked transparent patches")
 	ribbon.queue_free()
 	map.queue_free()
 
@@ -190,14 +196,41 @@ func verify() -> void:
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
 	check(not panel.visible and hud.early_start.visible and preview.arrows.visible and preview.arrows.mesh != null, "Initial icon or prediction missing, or idle details remained visible")
 	check(controller.start_nodes.size() == 2 and preview.forecast.by_origin.size() == 2, "Multi-entrance flow missing")
-	var vertex_count: int = preview.arrows.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX].size()
+	var vertex_count: int = (preview.arrows.mesh as ArrayMesh).surface_get_array_len(0)
 	check(preview.arrows.mesh.get_surface_count() == 1 and vertex_count == preview.arrows.rendered_cells.size()*6, "Flow is not a single batch of disjoint cell patches")
 	var soldier: Troop = wave.definition.groups[0].troop
 	check(hud.start_callouts.size() == 2, "Each entrance did not get its own start action")
 	var second_panel: Control = hud.start_callouts[1].get_node("NextWaveIntel")
+	for action: Button in hud.start_callouts:
+		var intel: Control = action.get_node("NextWaveIntel")
+		check(intel.position.y >= action.get_node("Title").get_rect().end.y, "Troop list overlaps the start title after export: intel=%s title=%s" % [intel.get_rect(),action.get_node("Title").get_rect()])
 	check(panel.counts[soldier] == 10 and panel.counts.size() == 2, "First entrance shows global rather than allocated counts")
 	check(second_panel.counts[soldier] == 6 and second_panel.counts.size() == 2, "Second entrance troop counts incorrect")
 	check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition), "Entrance counts do not sum to the wave")
+	# The shared loading contract must suspend every entrance and its forecast,
+	# while preserving the exact unshuffled quotas and departure RNG.
+	var forecast_before_loading: Dictionary = preview.forecast.all.duplicate()
+	var loading_checks := []
+	seed(80912)
+	var expected_after_loading := randi()
+	seed(80912)
+	var loading_error: int = await scene.prepare_for_play(func(_done: int, _total: int, _label: StringName):
+		loading_checks.append(not preview.preparation and not wave.start_allowed)
+		scene._begin_wave_start()
+		check(not scene._wave_starting and wave._pending.is_empty(), "Loading allowed a multi-entrance wave to start"))
+	check(loading_error == OK and not loading_checks.is_empty() and not loading_checks.has(false), "Loading did not lock the forecast with all entrance actions")
+	check(randi() == expected_after_loading, "Shared display preparation consumed departure RNG")
+	await frames(6)
+	check(preview.preparation and preview.forecast.all == forecast_before_loading and wave.alive == 0, "Loading changed quotas or failed to restore the forecast")
+	hud.set_paused(true)
+	hud.open_settings()
+	await frames()
+	for action: Button in hud.start_callouts:
+		check(not action.visible, "Settings left a background entrance callout visible")
+	check(not preview.arrows.visible, "Settings left the background flow visible")
+	hud.settings_page.close()
+	hud.set_paused(false)
+	await frames(6)
 	# Even an authored entrance with no assigned groups has its own zero-count action.
 	var unused := Node3D.new()
 	unused.name = "UnusedTestEntrance"
@@ -249,6 +282,19 @@ func verify() -> void:
 		item.body.mouse_exited.emit()
 	check(panel.selected == null and preview.forecast.segments() == all_before, "Mouse exit did not restore all flow")
 	check(preview.rebuild_count == builds, "Mouse exit regenerated schedule")
+	if rendered:
+		# GUI hover can temporarily be empty while the entrance stays expanded.
+		get_viewport().notify_mouse_exited()
+		check(get_viewport().gui_get_hovered_control() == null, "Null-hover fixture retained a GUI owner")
+		hud.early_start._hovered = true
+		preview.selected_origin = 0
+		panel.selected = soldier
+		preview._sync_pointer_filter()
+		check(preview.selected_origin == 0 and panel.selected == null, "Null GUI hover lost the entrance or retained its troop filter")
+		check_rendered_scope(preview,null,0)
+		check(preview.rebuild_count == builds, "Null GUI hover regenerated the schedule")
+		hud.early_start.clear_hover()
+		preview._sync_pointer_filter()
 	var second_item := second_panel.get_node("Scroll/Items").get_child(0)
 	if rendered:
 		await move_mouse(hud.start_callouts[1].get_global_rect().get_center())
@@ -423,35 +469,38 @@ func visual_check(scene: Node3D) -> void:
 	await RenderingServer.frame_post_draw
 	var all_image := get_viewport().get_texture().get_image()
 	all_image.save_png(Artifacts.path("levels/road_flow_pixels.png"))
-	# Repeated pieces must match within one 8-bit output step, never alpha-over.
-	var original_data: Image = preview.arrows.flow_data.get_image()
-	var repeated_data := original_data.duplicate() as Image
-	for row in repeated_data.get_height():
-		var count := int(repeated_data.get_pixel(0,row).r)
-		if count == 0 or count >= preview.arrows.MAX_PIECES: continue
-		repeated_data.set_pixel(1+count*3,row,repeated_data.get_pixel(1,row))
-		repeated_data.set_pixel(2+count*3,row,repeated_data.get_pixel(2,row))
-		repeated_data.set_pixel(3+count*3,row,repeated_data.get_pixel(3,row))
-		repeated_data.set_pixel(0,row,Color(count+1,0,0,0))
-	preview.arrows.flow_data.update(repeated_data)
-	await frames()
-	await RenderingServer.frame_post_draw
-	var repeated_image := get_viewport().get_texture().get_image()
-	repeated_image.save_png(Artifacts.path("levels/road_flow_overlap.png"))
-	var overlap_changes := 0
-	var diff_bounds := Rect2i()
-	var max_change := 0.0
-	for y in range(260, all_image.get_height()-210):
-		for x in range(300, mini(950,all_image.get_width())):
-			if repeated_image.get_pixel(x,y) != all_image.get_pixel(x,y):
-				overlap_changes += 1
-				diff_bounds = Rect2i(Vector2i(x,y),Vector2i.ONE) if overlap_changes == 1 else diff_bounds.expand(Vector2i(x,y))
-				var a := repeated_image.get_pixel(x,y)
-				var b := all_image.get_pixel(x,y)
-				max_change = maxf(max_change,maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b))))
-	print("FLOW_OVERLAP_PIXELS:", overlap_changes, " bounds ",diff_bounds," max ",max_change)
-	check(max_change <= 1.01/255.0, "Coincident line pieces darkened the junction beyond output quantization")
-	preview.arrows.flow_data.update(original_data)
+	# Web cannot round-trip the signed float geometry texture. Its overlap
+	# pixel regression uses the independent road_flow_continuity fixture.
+	if not OS.has_feature("web"):
+		# Repeated pieces must match within one 8-bit output step, never alpha-over.
+		var original_data: Image = preview.arrows.flow_data.get_image()
+		var repeated_data := original_data.duplicate() as Image
+		for row in repeated_data.get_height():
+			var count := int(repeated_data.get_pixel(0,row).r)
+			if count == 0 or count >= preview.arrows.MAX_PIECES: continue
+			repeated_data.set_pixel(1+count*3,row,repeated_data.get_pixel(1,row))
+			repeated_data.set_pixel(2+count*3,row,repeated_data.get_pixel(2,row))
+			repeated_data.set_pixel(3+count*3,row,repeated_data.get_pixel(3,row))
+			repeated_data.set_pixel(0,row,Color(count+1,0,0,0))
+		preview.arrows.flow_data.update(repeated_data)
+		await frames()
+		await RenderingServer.frame_post_draw
+		var repeated_image := get_viewport().get_texture().get_image()
+		repeated_image.save_png(Artifacts.path("levels/road_flow_overlap.png"))
+		var overlap_changes := 0
+		var diff_bounds := Rect2i()
+		var max_change := 0.0
+		for y in range(260, all_image.get_height()-210):
+			for x in range(300, mini(950,all_image.get_width())):
+				if repeated_image.get_pixel(x,y) != all_image.get_pixel(x,y):
+					overlap_changes += 1
+					diff_bounds = Rect2i(Vector2i(x,y),Vector2i.ONE) if overlap_changes == 1 else diff_bounds.expand(Vector2i(x,y))
+					var a := repeated_image.get_pixel(x,y)
+					var b := all_image.get_pixel(x,y)
+					max_change = maxf(max_change,maxf(absf(a.r-b.r),maxf(absf(a.g-b.g),absf(a.b-b.b))))
+		print("FLOW_OVERLAP_PIXELS:", overlap_changes, " bounds ",diff_bounds," max ",max_change)
+		check(max_change <= 1.01/255.0, "Coincident line pieces darkened the junction beyond output quantization")
+		preview.arrows.flow_data.update(original_data)
 	var stationary_mesh: int = preview.arrows.mesh.get_instance_id()
 	preview.arrows.material_override.set_shader_parameter("phase_offset", 1.73)
 	await frames()

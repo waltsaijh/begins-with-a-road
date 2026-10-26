@@ -1,14 +1,11 @@
 extends Node3D
 ## Independent playable review fixture. F6, then use either entrance's start button.
 const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
+const Endpoints = preload("res://tests/fixtures/level_fixture.gd")
 var session: Node3D
 func _ready() -> void: setup.call_deferred()
 func setup() -> void:
 	var level := LevelDefinition.new()
-	level.use_terrain_endpoints = false
-	level.starts = [Vector2i(0,4),Vector2i(0,7)]
-	level.goal = Vector2i(17,4)
-	level.expand_starts_after_act = false
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
@@ -16,6 +13,9 @@ func setup() -> void:
 	terrain.position = Vector3(-9,0,-5)
 	for x in 18:
 		for y in 10: terrain.set_cell_item(Vector3i(x,0,y),6)
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,4), "Start")
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,7), "Start2")
+	Endpoints.endpoint(terrain, Endpoints.Goal, Vector2i(17,4), "Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
@@ -30,6 +30,7 @@ func setup() -> void:
 		group.troop.max_health = 250
 		wave.groups.append(group)
 	var act := ActDefinition.new()
+	act.add_start_after_completion = false
 	act.waves = [wave,wave,wave]
 	level.acts = [act]
 	session = load("res://scenes/level.tscn").instantiate()

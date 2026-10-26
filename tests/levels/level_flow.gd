@@ -1,4 +1,5 @@
 extends Node
+const Fixture = preload("res://tests/fixtures/level_fixture.gd")
 var failures := 0
 
 func _ready() -> void:
@@ -31,7 +32,6 @@ func verify() -> void:
 	check(authored.configuration_error().is_empty() and authored.wave_count() == 9, "Authored level did not load its ACTs/waves")
 	var level := LevelDefinition.new()
 	# Fixed-map progression is covered here; ACT expansion has its own integration test.
-	level.expand_starts_after_act = false
 	# A fixed bridge fixture keeps level flow independent of the designer's map edits.
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
@@ -39,11 +39,14 @@ func verify() -> void:
 	terrain.cell_center_y = false
 	terrain.position = Vector3(-12, 0, -0.5)
 	for x in 24: terrain.set_cell_item(Vector3i(x, 0, 0), 3)
+	Fixture.endpoint(terrain,Fixture.Start,Vector2i.ZERO,"Start")
+	Fixture.endpoint(terrain,Fixture.Goal,Vector2i(23,0),"Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
 	var act1 := ActDefinition.new()
 	act1.title = "ACT I"
+	act1.add_start_after_completion = false
 	act1.waves = [recipe((TroopCatalog.find("soldier").duplicate() as Troop), 3, 3), recipe((TroopCatalog.find("quickfeet").duplicate() as Troop), 2, 7)]
 	var act2 := ActDefinition.new()
 	act2.title = "ACT II"
@@ -162,8 +165,11 @@ func verify() -> void:
 	scene.queue_free()
 	await get_tree().process_frame
 	# Multiple authored starts must be retained in the shared portal graph.
-	level.starts = [Vector2i.ZERO, Vector2i(5, 0)]
-	level.use_terrain_endpoints = false
+	terrain = level.terrain.instantiate()
+	Fixture.endpoint(terrain,Fixture.Start,Vector2i(5,0),"Start2")
+	level.terrain = PackedScene.new()
+	level.terrain.pack(terrain)
+	terrain.free()
 	act1.waves = [recipe((TroopCatalog.find("soldier").duplicate() as Troop), 1, 1)]
 	act1.waves[0].groups[0].start_index = 1
 	level.acts = [act1]

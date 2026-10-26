@@ -223,6 +223,13 @@ func verify() -> void:
 	click(hud.settings_button)
 	await frames()
 	check(hud.pause_requested and not camera._orbiting and is_equal_approx(camera.azimuth, menu_angle), "A pause-menu click started an orbit")
+	check(hud.settings_page.visible and camera._navigation_locked, "Settings did not acquire the camera lock")
+	var escape := InputEventKey.new()
+	escape.keycode = KEY_ESCAPE
+	escape.pressed = true
+	_viewport.push_input(escape, true)
+	await frames()
+	check(not hud.settings_page.visible and hud.pause_requested and not camera._navigation_locked, "Esc did not return from settings to normal paused navigation")
 	click(hud.resume_button)
 	await frames()
 	check(not get_tree().paused and not hud.pause_requested, "Orbit routing blocked the resume button")

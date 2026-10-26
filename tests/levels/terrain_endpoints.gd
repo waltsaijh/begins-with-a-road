@@ -41,14 +41,16 @@ func recipe(origin: int) -> WaveDefinition:
 
 func verify() -> void:
 	var authored := load("res://scenes/maps/tile_map.tscn").instantiate() as GridMap
-	var fallback: Array[Vector2i] = [Vector2i(-99, -99)]
-	var layout := Layout.read(authored, true, fallback, Vector2i(-98, -98), 0.03)
+	var layout := Layout.read(authored)
 	var authored_start := authored.local_to_map(authored.get_node("Endpoints/Start").position)
 	var authored_goal := authored.local_to_map(authored.get_node("Endpoints/Goal").position)
-	check(layout.error.is_empty() and layout.from_scene and layout.start_cells == [Vector2i(authored_start.x, authored_start.z)] and layout.goal_cell == Vector2i(authored_goal.x, authored_goal.z), "Authored tile map did not supply its endpoints")
+	check(layout.error.is_empty() and layout.start_cells == [Vector2i(authored_start.x, authored_start.z)] and layout.goal_cell == Vector2i(authored_goal.x, authored_goal.z), "Authored tile map did not supply its endpoints")
 	check(authored.get_node("Endpoints/Start/Visual") != null and authored.get_node("Endpoints/Goal/Visual") != null, "Map authoring templates lost their visible models")
 	authored.free()
-	# Use nested transforms, nonstandard grid sizes and misleading legacy coordinates.
+	var markerless := GridMap.new()
+	check(Layout.read(markerless).error.contains("至少一個 Start"), "Terrain without endpoints silently accepted a fallback")
+	markerless.free()
+	# Use nested transforms and nonstandard grid sizes.
 	var source := GridMap.new()
 	source.name = "CustomTerrain"
 	source.mesh_library = load("res://assets/models/mesh_library.tres")
@@ -69,32 +71,38 @@ func verify() -> void:
 	var goal := marker(source, group, Goal, Vector2i(6, 6), "Exit")
 	first.get_node("Visual").scale = Vector3(0.8, 0.9, 0.7)
 	source.set_editable_instance(first, true)
-	layout = Layout.read(source, true, fallback, Vector2i(-98, -98), 0.03)
+	layout = Layout.read(source)
 	check(layout.error.is_empty() and layout.start_cells == [Vector2i(2, 2), Vector2i(4, 2)] and layout.goal_cell == Vector2i(6, 6), "Nested/transformed endpoints were not resolved in map coordinates")
 	var invalid := second.transform
 	second.transform = first.transform
-	check(Layout.read(source, true, fallback, Vector2i.ZERO, 0.03).error.contains("重疊"), "Overlapping endpoints accepted")
+	check(Layout.read(source).error.contains("重疊"), "Overlapping endpoints accepted")
 	second.transform = invalid
 	goal.position += Vector3(100, 0, 0)
-	check(not Layout.read(source, true, fallback, Vector2i.ZERO, 0.03).error.is_empty(), "Endpoint over empty space accepted")
+	check(not Layout.read(source).error.is_empty(), "Endpoint over empty space accepted")
 	goal.position -= Vector3(100, 0, 0)
 	var duplicate_goal := marker(source, group, Goal, Vector2i(5, 2), "ExtraGoal")
-	check(not Layout.read(source, true, fallback, Vector2i.ZERO, 0.03).error.is_empty(), "Multiple goals accepted")
+	check(not Layout.read(source).error.is_empty(), "Multiple goals accepted")
 	duplicate_goal.free()
+	goal.role = Endpoint.Role.START
+	check(not Layout.read(source).error.is_empty(), "Terrain without a Goal was accepted")
+	goal.role = Endpoint.Role.GOAL
+	first.role = Endpoint.Role.GOAL
+	second.role = Endpoint.Role.GOAL
+	check(not Layout.read(source).error.is_empty(), "Terrain without a Start was accepted")
+	first.role = Endpoint.Role.START
+	second.role = Endpoint.Role.START
 	source.set_cell_item(Vector3i(6, 0, 4), -1)
-	check(Layout.read(source, true, fallback, Vector2i.ZERO, 0.03).error.contains("無法"), "Disconnected entry accepted")
+	check(Layout.read(source).error.contains("無法"), "Disconnected entry accepted")
 	source.set_cell_item(Vector3i(6, 0, 4), 3)
 	var packed := PackedScene.new()
 	check(packed.pack(source) == OK, "Scene fixture did not serialize")
 	check(ResourceSaver.save(packed, "res://.godot/terrain_endpoint_roundtrip.tscn") == OK, "Terrain scene could not be saved")
 	var level := LevelDefinition.new()
 	level.terrain = load("res://.godot/terrain_endpoint_roundtrip.tscn")
-	level.starts = fallback
-	level.goal = Vector2i(-98, -98)
 	var act := ActDefinition.new()
 	act.waves = [recipe(1)]
 	level.acts = [act]
-	check(level.configuration_error().is_empty(), "Wave validation still used the legacy entrance count")
+	check(level.configuration_error().is_empty(), "Wave validation did not use the scene entrance count")
 	var scene := load("res://scenes/level.tscn").instantiate() as Node3D
 	scene.level = level
 	add_child(scene)
@@ -131,15 +139,17 @@ func verify() -> void:
 	add_child(editor)
 	editor.edit_level(level)
 	check(editor.get_node("%EntrancePicker").item_count == 2 and editor.get_node("%EntrancePicker").get_item_text(1).contains("(4, 2)"), "Wave editor did not list the scene-authored entrances")
-	# Explicit legacy mode keeps older coordinate-authored levels supported.
-	level.use_terrain_endpoints = false
-	level.starts = [Vector2i(2, 2)]
-	level.goal = Vector2i(6, 6)
+	# Editing the terrain is the only way to change the level's endpoints.
+	var single := level.terrain.instantiate() as GridMap
+	single.get_node("Endpoints/InnerEntry").free()
+	level.terrain = PackedScene.new()
+	level.terrain.pack(single)
+	single.free()
 	act.waves[0].groups[0].start_index = 0
-	check(level.configuration_error().is_empty() and not level.endpoint_layout().from_scene, "Legacy coordinate mode was broken")
+	check(level.configuration_error().is_empty() and level.endpoint_layout().starts.size()==1, "Edited terrain did not replace the level endpoints")
 	editor._refresh()
-	check(editor.get_node("%EntrancePicker").item_count == 1 and editor.is_dirty(level), "Wave editor did not refresh or track endpoint source changes")
+	check(editor.get_node("%EntrancePicker").item_count == 1 and editor.is_dirty(level), "Wave editor did not refresh or track terrain changes")
 	editor.queue_free()
 	await get_tree().process_frame
-	print("TERRAIN_ENDPOINTS_CHECK:"+JSON.stringify({"failures": failures, "scene_placement": true, "nested_transforms": true, "two_starts": true, "visible_models": true, "model_overrides": true, "save_reload": true, "actual_routes": true, "snap": true, "validation": true, "legacy": true}))
+	print("TERRAIN_ENDPOINTS_CHECK:"+JSON.stringify({"failures": failures, "scene_placement": true, "nested_transforms": true, "two_starts": true, "visible_models": true, "model_overrides": true, "save_reload": true, "actual_routes": true, "snap": true, "validation": true, "endpoints_required": true}))
 	get_tree().quit(1 if failures else 0)

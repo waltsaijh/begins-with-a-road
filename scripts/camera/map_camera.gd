@@ -26,6 +26,7 @@ var _orbit_input_angle := 0.0
 var _orbit_velocity := 0.0
 var _orbit_target_velocity := 0.0
 var _last_process_usec := 0
+var _navigation_locked := false
 
 var focus := Vector3.ZERO
 var azimuth := deg_to_rad(30.0)
@@ -85,8 +86,14 @@ func _input(event: InputEvent) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if handle_navigation_input(event): get_viewport().set_input_as_handled()
 
+## A host can lock navigation for modal UI without coupling the camera to it.
+func set_navigation_locked(value: bool) -> void:
+	_navigation_locked = value
+	if value: _stop_orbit()
+
 ## HUD forwards camera navigation while gameplay input is locked.
 func handle_navigation_input(event: InputEvent) -> bool:
+	if _navigation_locked: return false
 	if _replaying_click: return false
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
@@ -136,7 +143,7 @@ func handle_navigation_input(event: InputEvent) -> bool:
 	return false
 
 func _deliver_click(press: InputEventMouseButton, release: InputEventMouseButton) -> void:
-	if not is_inside_tree(): return
+	if not is_inside_tree() or _navigation_locked: return
 	# Deferred delivery avoids re-entering the viewport's active input dispatch.
 	# Retain the original positions/modifiers and GUI -> gameplay propagation.
 	_replaying_click = true

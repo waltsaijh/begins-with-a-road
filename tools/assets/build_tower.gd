@@ -45,7 +45,7 @@ func _initialize() -> void:
 		var surface := base if part == "base" else weapon
 		surface.index()
 		surface.set_material(material)
-		var mesh := surface.commit()
+		var mesh := preload("res://tools/assets/solid_mesh_baker.gd").mesh(surface.commit())
 		mesh.resource_name = "Prototype wooden sentry " + part
 		triangles += mesh.get_faces().size()/3
 		var error := ResourceSaver.save(mesh, "res://assets/models/towers/sentry_%s_mesh.res" % part)

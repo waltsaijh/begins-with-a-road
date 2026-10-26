@@ -2,6 +2,7 @@ extends RefCounted
 ## Threshold-filtered complete routes: uniform or stable softmax weights.
 ## Build once; look up cumulative probability intervals in O(log routes).
 static func build(scores: PackedFloat64Array, temperature: float, selection: Troop.RouteSelection = Troop.RouteSelection.SOFTMAX, log_modifiers := PackedFloat64Array()) -> Dictionary:
+	if log_modifiers.is_empty(): return RoadRoutePlanner.build_distribution(scores, temperature, selection)
 	if selection not in [Troop.RouteSelection.UNIFORM, Troop.RouteSelection.SOFTMAX]:
 		return {"valid": false, "error": "未知的路線分配模式"}
 	if selection == Troop.RouteSelection.SOFTMAX and (is_nan(temperature) or temperature <= 0):

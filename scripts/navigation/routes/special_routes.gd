@@ -39,3 +39,19 @@ func route_for(profile: Troop, origin: int, effects: Array, index: int, total: i
 	var route: Dictionary = plan.routes[chosen].entry.route.duplicate(true)
 	route.selection_probability = plan.distribution.probabilities[chosen]
 	return route
+
+## The caller has already prepared this troop/entrance plan once for the wave.
+func allocate_many(profile: Troop, origin: int, effects: Array, total: int) -> Array[Dictionary]:
+	var routes: Array[Dictionary] = []
+	var key := [profile.get_instance_id(), origin, effects]
+	if not plans.has(key) or total <= 0: return routes
+	var plan: Dictionary = plans[key]
+	if not plan.summary.get("reachable", false): return routes
+	var snapshots := {}
+	for chosen: int in RoadRoutePlanner.allocate_indices(plan.distribution.cdf, total):
+		if not snapshots.has(chosen):
+			var route: Dictionary = plan.routes[chosen].entry.route.duplicate(true)
+			route.selection_probability = plan.distribution.probabilities[chosen]
+			snapshots[chosen] = route
+		routes.append(snapshots[chosen].duplicate())
+	return routes

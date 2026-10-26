@@ -2,20 +2,12 @@ extends RefCounted
 const Distribution = preload("res://scripts/navigation/routes/route_distribution.gd")
 ## All troops rank a FINITE set of complete routes using raw tile scores.
 ## Geometry/local representatives are shared across troops with the same search settings.
-var _cell_indices := {}
-var _node_cells: Array[Vector2i] = []
 var _pools := {}
 var _plans := {}
 
-func prepare(graph: Dictionary) -> void:
-	_cell_indices.clear()
-	_node_cells.clear()
+func prepare(_graph: Dictionary) -> void:
 	_pools.clear()
 	_plans.clear()
-	for i in graph.tiles.size():
-		_cell_indices[Vector2i(graph.tiles[i])] = i
-	for node: Dictionary in graph.nodes:
-		_node_cells.append(node.cell)
 
 func invalidate(profile_key := "") -> void:
 	if profile_key.is_empty():
@@ -30,45 +22,16 @@ func _pool(planner: RefCounted, profile: Troop, start: int) -> Dictionary:
 	var base: Dictionary = planner.find_paths(key, PackedFloat64Array(), start, -1, INF, profile.overlap_penalty, profile.search_budget)
 	if not base.get("valid", false):
 		return base
-	var extracted := _representatives(planner, key, base, 0)
+	var segment_ids := {}
+	var extracted := _representatives(planner, key, base, segment_ids)
 	if not extracted.valid:
 		return extracted
-	var pool := {"valid": true, "base": base, "entries": extracted.entries}
+	var pool := {"valid": true, "base": base, "entries": extracted.entries, "segments": segment_ids, "normalization": extracted.normalization}
 	_pools[key] = pool
 	return pool
 
-func _representatives(planner: RefCounted, key: String, base: Dictionary, edge_offset: int) -> Dictionary:
-	var entries := []
-	var seen := {}
-	for route_index in base.routes:
-		for variant in EnemyConstants.CANDIDATE_LOCAL_SAMPLES:
-			var route: Dictionary = planner.sample_route(key, variant, route_index)
-			if route.is_empty() or seen.has(route.cells):
-				continue
-			seen[route.cells] = true
-			if edge_offset > 0:
-				var remapped: PackedInt32Array = route.edges
-				for i in remapped.size():
-					remapped[i] += edge_offset
-				route.edges = remapped
-			var indices := PackedInt32Array()
-			for cell: Vector2 in route.cells:
-				indices.append(_cell_indices[Vector2i(cell)])
-			var ranges: Array[Vector2i] = []
-			var cursor := 0
-			for i in route.edges.size():
-				var begin := cursor
-				var target: Vector2i = _node_cells[route.nodes[i+1]]
-				while cursor+1 < route.cells.size():
-					cursor += 1
-					if Vector2i(route.cells[cursor]) == target:
-						break
-				if Vector2i(route.cells[cursor]) != target:
-					return {"valid": false, "error": "候選路線的入口分段不一致"}
-				ranges.append(Vector2i(begin, cursor))
-			route.candidate_variant = variant
-			entries.append({"route": route, "indices": indices, "ranges": ranges})
-	return {"valid": true, "entries": entries}
+func _representatives(planner: RefCounted, key: String, _base: Dictionary, segment_ids: Dictionary) -> Dictionary:
+	return planner.candidate_representatives(key, EnemyConstants.CANDIDATE_LOCAL_SAMPLES, segment_ids)
 
 func plan_for(planner: RefCounted, profile: Troop, key: String, start: int, weights: PackedFloat64Array) -> Dictionary:
 	if _plans.has(key):
@@ -86,95 +49,74 @@ func plan_for(planner: RefCounted, profile: Troop, key: String, start: int, weig
 		return pool
 	# Include positive-guided alternatives so a safe local detour can enter the
 	# pool even when it is longer than the geometric shortest route.
-	var minimum := INF
-	for value in weights:
-		minimum = minf(minimum, value)
-	# A common shift preserves tile preferences, including negative evaluations.
-	# It changes route-length tradeoffs, so only raw sums decide the final cutoff.
-	var shift := 1.0-minimum if minimum <= 0.0 else 0.0
-	var guided_weights := PackedFloat64Array()
-	guided_weights.resize(weights.size())
-	var neutral := true
-	for i in weights.size():
-		var value := weights[i]+shift
-		if not is_finite(value) or value <= 0:
-			return {"valid": false, "error": "候選探索成本必須為正有限數值"}
-		guided_weights[i] = value
-		neutral = neutral and value == 1.0
+	var search := RoadRoutePlanner.search_costs(weights)
+	if not search.valid: return search
 	var entries: Array = pool.entries.duplicate()
+	var normalization: Dictionary = pool.normalization.duplicate()
 	# The shared pool already used all-one costs; do not run the same search twice.
-	if not neutral:
+	if not search.neutral:
 		var guided_key := "guided:"+key
-		var guided: Dictionary = planner.find_paths(guided_key, guided_weights, start, -1, INF, profile.overlap_penalty, profile.search_budget)
+		var guided: Dictionary = planner.find_paths(guided_key, search.costs, start, -1, INF, profile.overlap_penalty, profile.search_budget)
 		if not guided.get("valid", false):
 			return guided
-		var extracted := _representatives(planner, guided_key, guided, pool.base.choice_edges)
+		# The geometry registry is immutable. Guided-only segments live with
+		# this plan, so profile edits cannot accumulate stale global segments.
+		var segment_ids: Dictionary = pool.segments.duplicate()
+		var extracted := _representatives(planner, guided_key, guided, segment_ids)
 		if not extracted.valid:
 			return extracted
-		var seen := {}
-		for entry: Dictionary in entries:
-			seen[entry.route.cells] = true
-		for entry: Dictionary in extracted.entries:
-			if not seen.has(entry.route.cells):
-				seen[entry.route.cells] = true
-				entries.append(entry)
-	var scored := []
-	var best := INF
-	for entry: Dictionary in entries:
-		var score := 0.0
-		# Charge entering each tile, exactly as the native planner; spawn is free.
-		for i in range(1, entry.indices.size()):
-			score += weights[entry.indices[i]]
-		if not is_finite(score):
-			return {"valid": false, "error": "候選路線總評分超出有限範圍"}
-		best = minf(best, score)
-		scored.append({"entry": entry, "score": score})
-	var accepted := []
-	var nodes := {}
-	var edges := {}
-	var directions := {}
-	for candidate: Dictionary in scored:
-		if not is_inf(profile.score_threshold) and candidate.score-best >= profile.score_threshold:
-			continue
-		accepted.append(candidate)
-		var route: Dictionary = candidate.entry.route
-		for node: int in route.nodes:
-			nodes[node] = true
-		for i in route.edges.size():
-			edges[route.edges[i]] = [route.nodes[i], route.edges[i], route.nodes[i+1]]
-		for i in range(1, route.cells.size()):
-			var a := Vector2i(route.cells[i-1])
-			var b := Vector2i(route.cells[i])
-			directions[Vector4i(a.x, a.y, b.x, b.y)] = true
+		for field: String in normalization:
+			normalization[field] += extracted.normalization[field]
+		entries.append_array(extracted.entries)
+	var ranked := RoadRoutePlanner.rank_candidates(entries, weights, profile.score_threshold, profile.route_temperature, profile.route_selection)
+	if not ranked.valid: return ranked
+	var accepted: Array = ranked.routes
 	var summary: Dictionary = pool.base.duplicate(true)
-	summary.score = best
+	# Native guide unions describe untrimmed exploration, not final candidates.
+	# Gameplay needs only the light summary; build final unions on explicit demand.
+	for field in ["active_nodes", "used_edges", "steps", "directions"]: summary.erase(field)
+	summary.score = ranked.score
 	summary.routes = accepted.size()
 	summary.reachable = not accepted.is_empty()
 	summary.score_threshold = profile.score_threshold
-	summary.candidate_routes = scored.size()
+	summary.candidate_routes = ranked.candidate_routes
 	summary.source_node_routes = pool.base.routes
 	summary.local_samples = EnemyConstants.CANDIDATE_LOCAL_SAMPLES
-	summary.active_nodes = nodes.size()
-	summary.used_edges = edges.size()
 	summary.cached = false
-	var accepted_scores := PackedFloat64Array()
-	for candidate: Dictionary in accepted:
-		accepted_scores.append(candidate.score)
-	var distribution := Distribution.build(accepted_scores, profile.route_temperature, profile.route_selection)
+	summary.merge(normalization)
+	var distribution: Dictionary = ranked.distribution
 	summary.route_selection = profile.route_selection
 	summary.route_temperature = profile.route_temperature
 	summary.route_probabilities = distribution.probabilities
-	var steps := PackedInt32Array()
-	for step: Array in edges.values():
-		steps.append_array(PackedInt32Array(step))
-	summary.steps = steps
-	var packed_directions := PackedVector2Array()
-	for segment: Vector4i in directions:
-		packed_directions.append(Vector2(segment.x, segment.y))
-		packed_directions.append(Vector2(segment.z, segment.w))
-	summary.directions = packed_directions
-	_plans[key] = {"summary": summary, "routes": accepted, "weights": weights, "cdf": distribution.cdf, "debug": {}}
+	_plans[key] = {"summary": summary, "routes": accepted, "weights": weights, "cdf": distribution.cdf, "details": {}, "debug": {}}
 	return summary.duplicate(true)
+
+func debug_summary(key: String) -> Dictionary:
+	if not _plans.has(key): return {}
+	var plan: Dictionary = _plans[key]
+	if plan.details.is_empty():
+		var nodes := {}
+		var edges := {}
+		var directions := {}
+		for candidate: Dictionary in plan.routes:
+			var route: Dictionary = candidate.entry.route
+			for node: int in route.nodes: nodes[node] = true
+			for i in route.edges.size(): edges[route.edges[i]] = [route.nodes[i], route.edges[i], route.nodes[i+1]]
+			for i in range(1, route.cells.size()):
+				var a := Vector2i(route.cells[i-1])
+				var b := Vector2i(route.cells[i])
+				directions[Vector4i(a.x, a.y, b.x, b.y)] = true
+		var steps := PackedInt32Array()
+		for step: Array in edges.values(): steps.append_array(PackedInt32Array(step))
+		var packed_directions := PackedVector2Array()
+		for segment: Vector4i in directions:
+			packed_directions.append(Vector2(segment.x, segment.y))
+			packed_directions.append(Vector2(segment.z, segment.w))
+		plan.details = {"active_nodes": nodes.size(), "used_edges": edges.size(), "steps": steps, "directions": packed_directions}
+	var summary: Dictionary = plan.summary.duplicate(true)
+	summary.merge(plan.details.duplicate(true))
+	summary.cached = true
+	return summary
 
 func allocate(key: String, index: int, total: int) -> Dictionary:
 	if not _plans.has(key):
@@ -189,6 +131,26 @@ func sample(key: String, seed: int, route_index := -1) -> Dictionary:
 	if plan.routes.is_empty() or route_index < -1 or route_index >= plan.routes.size():
 		return {}
 	var index := Distribution.sample(plan.cdf, seed) if route_index < 0 else route_index
+	return _snapshot(plan, index)
+
+## A wave owns these snapshots. Equal selections share immutable packed route
+## buffers, while each member has its own dictionary and movement/stat state.
+func allocate_many(key: String, total: int, distribution: Dictionary = {}) -> Array[Dictionary]:
+	var routes: Array[Dictionary] = []
+	if not _plans.has(key) or total <= 0: return routes
+	var plan: Dictionary = _plans[key]
+	if plan.routes.is_empty(): return routes
+	if not distribution.is_empty() and not distribution.get("valid", false): return routes
+	var cdf: PackedFloat64Array = plan.cdf if distribution.is_empty() else distribution.cdf
+	var snapshots := {}
+	for index: int in RoadRoutePlanner.allocate_indices(cdf, total):
+		if not snapshots.has(index):
+			snapshots[index] = _snapshot(plan, index)
+			if not distribution.is_empty(): snapshots[index].selection_probability = distribution.probabilities[index]
+		routes.append(snapshots[index].duplicate())
+	return routes
+
+func _snapshot(plan: Dictionary, index: int) -> Dictionary:
 	var selected: Dictionary = plan.routes[index]
 	var route: Dictionary = selected.entry.route.duplicate(true)
 	route.source_route_index = route.route_index

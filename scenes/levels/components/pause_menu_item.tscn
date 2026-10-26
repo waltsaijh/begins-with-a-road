@@ -1,19 +1,24 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bwwyxg5qf4ivj"]
 
-[ext_resource type="Script" path="res://scripts/levels/presentation/pause_menu_button.gd" id="1"]
+[ext_resource type="Script" uid="uid://b0nn4i3wp4tq1" path="res://scripts/levels/presentation/pause_menu_button.gd" id="1"]
 
-[node name="MenuItem" type="Control"]
-custom_minimum_size = Vector2(180, 40)
-layout_mode = 2
+[node name="MenuItem" type="Control" unique_id=634846673]
+custom_minimum_size = Vector2(180, 32)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 180.0
+offset_bottom = 28.0
 mouse_filter = 2
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=1503585489]
+oversampling_with_scale = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_font_sizes/font_size = 18
 text = "Menu item"
 alignment = 2
 script = ExtResource("1")

@@ -209,6 +209,24 @@ func debug_graph_for(profile: Troop, start_index := 0) -> Dictionary:
 	var entry := plan_for(profile, start_index)
 	return _candidate_routes.debug_graph(_profile_key(profile, start_index)) if entry.get("valid", false) else {}
 
+func debug_summary_for(profile: Troop, start_index := 0) -> Dictionary:
+	var entry := plan_for(profile, start_index)
+	return _candidate_routes.debug_summary(_profile_key(profile, start_index)) if entry.get("valid", false) else entry
+
+## Validate/prepare a plan once per troop + entrance, then freeze its wave quota.
+func prepare_route_batch(profile: Troop, total: int, start_index := 0, modifiers: Variant = null) -> Dictionary:
+	if total <= 0: return {}
+	var entry := plan_for(profile, start_index, modifiers)
+	if not entry.get("valid", false) or not entry.get("reachable", false): return {}
+	var effects: Array = traffic_effects if modifiers == null else modifiers
+	var routes: Array[Dictionary]
+	if profile.route_rule != Troop.RouteRule.COST:
+		routes = _special_routes.allocate_many(profile, start_index, effects, total)
+	else:
+		var distribution := {} if effects.is_empty() else _traffic_distribution(profile, start_index, effects)
+		routes = _candidate_routes.allocate_many(_profile_key(profile, start_index), total, distribution)
+	return {"routes": routes, "pool_size": entry.routes} if routes.size() == total else {}
+
 ## Deterministic wave allocation through cumulative probability intervals.
 func allocate_route_for(profile: Troop, index: int, total: int, start_index := 0, modifiers: Variant = null) -> Dictionary:
 	if profile != null and profile.route_rule != Troop.RouteRule.COST:

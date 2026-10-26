@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://c628wohk7k5ce" path="res://assets/sprites/troops/quickfeet.png" id="1_0cwrg"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/runner.tscn" id="3"]
+[ext_resource type="Resource" path="res://assets/models/enemies/runner_gpu.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -17,7 +18,8 @@ debug_color = Color(1, 0.7607843, 0.2784314, 1)
 max_health = 50.0
 speed_multiplier = 1.3
 score_threshold = 25.0
-path_base_cost = 0.0
+path_base_cost = 0.25
 threat_weight = 1.0
 model = ExtResource("3")
+gpu_model = ExtResource("4")
 animation_speed = 3.0

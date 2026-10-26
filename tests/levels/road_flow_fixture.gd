@@ -1,5 +1,6 @@
 extends RefCounted
 ## Synthetic loop/junction terrain; never changes the authored Frontier resource.
+const Endpoints = preload("res://tests/fixtures/level_fixture.gd")
 static func group(profile: Troop, count: int, origin := 0) -> WaveSpawnGroup:
 	var result := WaveSpawnGroup.new()
 	result.troop = profile
@@ -10,9 +11,6 @@ static func group(profile: Troop, count: int, origin := 0) -> WaveSpawnGroup:
 
 static func level() -> LevelDefinition:
 	var result := LevelDefinition.new()
-	result.use_terrain_endpoints = false
-	result.starts = [Vector2i(0, 0), Vector2i(0, 4)]
-	result.goal = Vector2i(10, 2)
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
@@ -23,6 +21,9 @@ static func level() -> LevelDefinition:
 	for x in [0, 4, 8]:
 		for z in 5: terrain.set_cell_item(Vector3i(x, 0, z), 6)
 	for x in range(8, 11): terrain.set_cell_item(Vector3i(x, 0, 2), 6)
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0, 0), "Start")
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0, 4), "Start2")
+	Endpoints.endpoint(terrain, Endpoints.Goal, Vector2i(10, 2), "Goal")
 	result.terrain = PackedScene.new()
 	result.terrain.pack(terrain)
 	terrain.free()

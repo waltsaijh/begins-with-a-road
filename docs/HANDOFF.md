@@ -2,6 +2,10 @@
 
 核對日期：2026-10-23（Asia/Taipei）。本文件是新工作階段的起點；玩法共識看 [AGENTS](../AGENTS.md)，細節看 [systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。測試結果只對下述版本及環境成立。
 
+2026-10-26 整合註記：本次依使用者指令，從 main `eb618c6` 合併 experiment/optimize_graph `cd6da3b`，工作目錄為 `D:\Windows\Desktop\begins-with-a-road`。以下分支、路徑、F5 入口及測試為 2026-10-23 歷史快照，不代表目前狀態。正式入口已改為 Boot → 主選單 → 選圖／本局設定 → Level；保留 Phase 2–4、C++ 候選／批次配額、GPU 模型與設定／解鎖流程。新增整合回歸核對交通倍率與硬性選路的批次／單筆一致性、群體狀態獨立及飛行高度；本次測試記錄位於 `.godot/merge-checks-2026-10-26/`，不沿用以下歷史結果。
+
+本次整合驗證（2026-10-26）：Godot 4.7.2、Compatibility、RTX 3050 Laptop；29 項 runtime 回歸＋1 項真實波次編輯器檢查通過，涵蓋路線／批次配額／去環、九兵種、交通、六塔、遺物、ACT／卸載、選單／設定及實際載入預熱。Windows 與單執行緒 Web 的 debug／release 擴充建置成功；未跑現版 Web 瀏覽器、完整長局與效能對照。scene_loading 以故意失敗的目標驗證恢復流程，預期產生 Invalid data／Unavailable 診斷，無非預期引擎或腳本錯誤。詳細結果見上述目錄的 summary.json 及各項 log。
+
 ## 1. 目標與 Design Pillars
 
 - 建造卡同時決定道路形狀與火力配置；路網必須保留所有入口到終點的通行。

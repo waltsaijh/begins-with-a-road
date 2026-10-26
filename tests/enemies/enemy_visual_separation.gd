@@ -116,14 +116,11 @@ func verify() -> void:
 		for i in count:
 			ids[i] = i
 		# Everyone in ONE tile is the case that breaks an uncapped pairwise scan.
-		var began := Time.get_ticks_usec()
-		for repeat in 3:
-			offsets = solver.solve(positions, normals, ids, offsets)
-		var elapsed := (Time.get_ticks_usec()-began)/3
+		offsets = solver.solve(positions, normals, ids, offsets)
 		check(solver.candidate_checks == count*EnemyRenderConstants.VISUAL_SAMPLES_PER_TILE*EnemyRenderConstants.VISUAL_SEPARATION_ITERATIONS, "Crowded tile work is not strictly bounded per unit")
 		for offset in offsets:
 			check(is_finite(offset) and absf(offset) <= EnemyRenderConstants.VISUAL_MAX_OFFSET+0.00001, "Dense crowd offset escaped bounds")
-		cases.append({"units": count, "candidate_checks": solver.candidate_checks, "solve_us": elapsed})
+		cases.append({"units": count, "candidate_checks": solver.candidate_checks})
 	# Exercise every adjacent bucket, not just a single crowded bucket.
 	var positions := PackedVector2Array()
 	var normals := PackedVector2Array()

@@ -1,5 +1,6 @@
 class_name WaveSpawnSchedule
 extends RefCounted
+const Waypoints = preload("res://scripts/enemies/spawning/route_waypoints.gd")
 ## Freeze routes/stats at wave start. Shuffle assignments only within each group.
 static func origins_for(group: WaveSpawnGroup, additional_starts: PackedInt32Array) -> PackedInt32Array:
 	var origins := PackedInt32Array([group.start_index])
@@ -13,6 +14,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 	# IDs never seed either entrance or route choice; only departures are shuffled.
 	var assignments := _assigned_origins(definition,additional_starts)
 	var quotas := {}
+	var sources := {}
 	var used := {}
 	var pool_size := 0
 	for group_index in definition.groups.size():
@@ -21,15 +23,21 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 			var origin: int = assignments[group_index][i]
 			var key := "%d:%d" % [group.troop.get_instance_id(), origin]
 			if not quotas.has(key):
-				var plan: Dictionary = controller.plan_for(group.troop, origin, modifiers)
-				if not plan.get("valid", false) or plan.get("routes", 0) == 0: return {}
-				pool_size += int(plan.routes)
 				quotas[key] = 0
 				used[key] = 0
+				sources[key] = {"profile": group.troop, "origin": origin}
 			quotas[key] += 1
+	var batches := {}
+	for key: String in quotas:
+		var source: Dictionary = sources[key]
+		var batch: Dictionary = controller.prepare_route_batch(source.profile, quotas[key], source.origin, modifiers)
+		if batch.is_empty(): return {}
+		batches[key] = batch.routes
+		pool_size += int(batch.pool_size)
 	var pending: Array[Dictionary] = []
 	var offset := 0
 	var map: GridMap = controller.map
+	var waypoint_cache := {}
 	for group_index in definition.groups.size():
 		var group := definition.groups[group_index]
 		var profile := group.troop
@@ -39,14 +47,11 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 			var key := "%d:%d" % [profile.get_instance_id(), origin]
 			var allocation_index := int(used[key])
 			used[key] += 1
-			var route: Dictionary = controller.allocate_route_for(profile, allocation_index, quotas[key], origin, modifiers)
-			if route.is_empty(): return {}
-			var points := PackedVector3Array()
-			for cell: Vector2 in route.cells:
-				points.append(map.to_global(map.map_to_local(Vector3i(int(cell.x), 0, int(cell.y)))+Vector3.UP*(EnemyConstants.GROUND_OFFSET+profile.flight_height*map.cell_size.y)))
+			var route: Dictionary = batches[key][allocation_index]
+			var points := Waypoints.for_route(route, map, waypoint_cache, profile.flight_height)
 			var members: Array[Dictionary] = []
 			for i in range(first, mini(first+profile.cohort_size, group.enemy_count)):
-				members.append({"id": first_id+offset+i, "wave_index": offset+i, "route": route.duplicate(true), "points": points,
+				members.append({"id": first_id+offset+i, "wave_index": offset+i, "route": route.duplicate(), "points": points,
 					"profile": profile, "health": profile.max_health, "shield": profile.max_shield, "abilities":profile.ability_snapshot(),
 					"speed": definition.move_speed*profile.speed_multiplier, "group_index": group_index, "cohort_id":offset+first,
 					"allocation_index": allocation_index, "allocation_total": int(quotas[key]), "start_index": origin})
@@ -66,7 +71,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 		offset += group.enemy_count
 	pending.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.spawn_tick < b.spawn_tick if a.spawn_tick != b.spawn_tick else a.slot < b.slot)
-	return {"pending": pending, "pool_size": pool_size}
+	return {"pending": pending, "pool_size": pool_size, "waypoint_paths": waypoint_cache.size()}
 
 ## The same deterministic entrance assignment used by combat, without route queries.
 static func _assigned_origins(definition: WaveDefinition, additional_starts: PackedInt32Array) -> Array[PackedInt32Array]:

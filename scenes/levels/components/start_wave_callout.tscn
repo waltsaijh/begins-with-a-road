@@ -65,4 +65,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="NextWaveIntel" parent="." instance=ExtResource("4_intel")]
+layout_mode = 1
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 32.0
+offset_right = -8.0
+offset_bottom = 68.0
 

@@ -2,14 +2,15 @@ extends RefCounted
 const Base = preload("res://tests/levels/road_flow_fixture.gd")
 static func definition() -> LevelDefinition:
 	var result := Base.level()
-	result.expand_starts_after_act = false
 	var wave := WaveDefinition.new()
 	for origin in 2:
 		for id in ["soldier","quickfeet","heavy"]:
 			wave.groups.append(Base.group(TroopCatalog.find(id).duplicate(),30,origin))
 	var first := ActDefinition.new()
+	first.add_start_after_completion = false
 	first.waves = [wave,wave]
 	var second := ActDefinition.new()
+	second.add_start_after_completion = false
 	second.waves = [wave,wave]
 	result.acts = [first,second]
 	return result

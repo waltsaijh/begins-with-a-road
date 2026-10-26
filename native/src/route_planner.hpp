@@ -4,6 +4,8 @@
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/packed_float64_array.hpp>
 #include <godot_cpp/variant/string.hpp>
+#include <godot_cpp/variant/array.hpp>
+#include <godot_cpp/variant/packed_int32_array.hpp>
 #include <string>
 class RoadRoutePlanner : public godot::RefCounted {
     GDCLASS(RoadRoutePlanner,godot::RefCounted)
@@ -16,12 +18,18 @@ class RoadRoutePlanner : public godot::RefCounted {
     road::PortalGraph physical;road::PortalRoutes geometry;
     std::unordered_map<std::string,CachedPlan> profiles;
     uint64_t prepare_us=0;const char *input_error="not_prepared";
+    bool sample_cells(const CachedPlan &entry,uint64_t seed,int64_t route_index,std::vector<int> &walk,double &score,int &index) const;
 protected:
     static void _bind_methods();
 public:
     godot::Dictionary prepare(const godot::Dictionary &graph);
     godot::Dictionary find_paths(const godot::String &profile="default",const godot::PackedFloat64Array &costs={},int64_t start=-1,int64_t goal=-1,double score_threshold=10,double overlap_penalty=1,int64_t search_budget=64);
     godot::Dictionary sample_route(const godot::String &profile="default",int64_t seed=0,int64_t route_index=-1) const;
+    godot::Dictionary candidate_representatives(const godot::String &profile,int64_t samples,godot::Dictionary segment_ids) const;
+    static godot::Dictionary search_costs(const godot::PackedFloat64Array &weights);
+    static godot::Dictionary rank_candidates(const godot::Array &entries,const godot::PackedFloat64Array &weights,double threshold,double temperature,int64_t selection);
+    static godot::Dictionary build_distribution(const godot::PackedFloat64Array &scores,double temperature,int64_t selection=1);
+    static godot::PackedInt32Array allocate_indices(const godot::PackedFloat64Array &cdf,int64_t total);
     godot::Dictionary get_region_paths(const godot::String &profile="default") const;
     godot::Dictionary get_debug_graph(const godot::String &profile="default");
     void invalidate(const godot::String &profile="");

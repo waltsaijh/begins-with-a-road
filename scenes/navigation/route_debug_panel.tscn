@@ -21,7 +21,7 @@ mouse_filter = 2
 layout_mode = 2
 focus_mode = 0
 toggle_mode = true
-text = "F1 本波路徑"
+text = "F1 路徑／Vertex"
 
 [node name="Threat" type="Button" parent="Panel/Column/Actions"]
 layout_mode = 2
