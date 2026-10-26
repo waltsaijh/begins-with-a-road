@@ -1,5 +1,4 @@
 #include "../../native/src/portal_routes_core.hpp"
-#include <chrono>
 #include <iostream>
 #include <set>
 #include <stdexcept>
@@ -115,13 +114,5 @@ int main() {
             CHECK(on_face);
         }
         std::cout<<"PASS: every tied shortest path vs exhaustive 2x2/3x2/3x3 enumeration; all three portal pairs; region boundaries; 184756 paths; 64-bit count saturation without path loss; 50-mouth 50x50 compression; thin maze\n";
-        for(int width:{11,50}) {
-            graph=rectangle(width,width,{0,0},{width-1,width-1});std::vector<double> times;
-            for(int i=0;i<21;++i) {auto before=std::chrono::steady_clock::now();routes=road::build_portal_routes(graph);if(i) times.push_back(std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-before).count());}
-            std::sort(times.begin(),times.end());
-            size_t bytes=0;for(const auto &r:routes.regions) bytes+=r.distances.size()*sizeof(int)+r.links.size()*sizeof(std::array<int,2>)+r.node_cells.size()*sizeof(int)+r.visible_links.size()*sizeof(int);
-            bytes+=routes.pairs.size()*sizeof(road::LocalRoute);
-            std::cout<<"filled"<<width<<" routing_ms="<<times[10]<<" encoded_bytes="<<bytes<<" count="<<routes.pairs[0].count<<" capped="<<routes.pairs[0].count_capped<<"\n";
-        }
     } catch(const std::exception &e) {std::cerr<<e.what()<<"\n";return 1;}
 }

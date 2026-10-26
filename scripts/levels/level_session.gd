@@ -16,6 +16,8 @@ var _wave_start_elapsed := 0.0
 var _balance: Label
 var _hud: CanvasLayer
 var choosing_start := false
+var _loading := false
+var _presentation_prepared := false
 var choosing_relic := false
 var _settling_wave := false
 var relic_choice: CanvasLayer
@@ -23,6 +25,7 @@ var enemy_intelligence: CanvasLayer
 @onready var expansion: Node3D = $SpawnExpansion
 
 func _enter_tree() -> void:
+	level = LevelLaunch.take(level)
 	get_node("EnemyWave").auto_start = false
 	if level == null: return
 	var error := level.configuration_error()
@@ -48,21 +51,10 @@ func _enter_tree() -> void:
 	var layout := level.endpoint_layout(source)
 	var paths: Array[NodePath] = []
 	for i in layout.starts.size():
-		var marker: Node3D
 		var marker_name := "Start" if i == 0 else "Start%d" % (i+1)
-		if layout.from_scene:
-			marker = _install_endpoint(source, layout.starts[i], marker_name, map)
-		else:
-			marker = get_node("Start") if i == 0 else get_node("Start").duplicate()
-			if i > 0:
-				marker.name = marker_name
-				add_child(marker)
-			marker.position = map.transform*layout.starts[i].transform.origin
+		var marker := _install_endpoint(source, layout.starts[i], marker_name, map)
 		paths.append(NodePath("../"+str(marker.name)))
-	if layout.from_scene:
-		_install_endpoint(source, layout.goal, "Goal", map)
-	else:
-		get_node("Goal").position = map.transform*layout.goal.transform.origin
+	_install_endpoint(source, layout.goal, "Goal", map)
 	source.free()
 	get_node("PortalMap").start_paths = paths
 	for act in level.acts:
@@ -114,6 +106,60 @@ func _ready() -> void:
 func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
 
+## Generic transition contract; reports completed work, never an estimated time.
+func prepare_for_play(report: Callable) -> int:
+	if not report.is_valid(): return ERR_INVALID_PARAMETER
+	if not _valid: return ERR_INVALID_DATA
+	if _presentation_prepared: return OK
+	if _loading or _wave.active: return ERR_BUSY
+	_loading = true
+	var previous_allowed: bool = _wave.start_allowed
+	_wave.start_allowed = false
+	_update_start_callout()
+	var profiles: Array[Troop] = []
+	for definition in _waves:
+		for group in definition.groups:
+			if not profiles.has(group.troop): profiles.append(group.troop)
+	profiles = DisplayWarmup.representatives(profiles, _wave.visuals)
+	var plans: Array[Dictionary] = []
+	for group in _waves[0].groups:
+		var exists := false
+		for plan in plans:
+			if plan.profile == group.troop and plan.origin == group.start_index: exists = true
+		if not exists: plans.append({"profile": group.troop, "origin": group.start_index})
+	var state := {"done": 0, "total": 1+plans.size()+profiles.size()}
+	report.call(0, state.total, &"ui.loading.navigation")
+	await _loading_frame()
+	var controller: Node = get_node("PortalMap")
+	while controller.computing: await get_tree().process_frame
+	var error := OK if controller.plan.get("reachable", false) else ERR_INVALID_DATA
+	if error == OK:
+		state.done += 1
+		report.call(state.done, state.total, &"ui.loading.navigation")
+		for plan in plans:
+			await _loading_frame()
+			var result: Dictionary = controller.plan_for(plan.profile, plan.origin)
+			if not result.get("reachable", false):
+				error = ERR_INVALID_DATA
+				break
+			state.done += 1
+			report.call(state.done, state.total, &"ui.loading.navigation")
+	if error == OK:
+		report.call(state.done, state.total, &"ui.loading.visuals")
+		error = await DisplayWarmup.prepare(_wave.visuals, profiles, func():
+			state.done += 1
+			report.call(state.done, state.total, &"ui.loading.visuals"))
+	_loading = false
+	_presentation_prepared = error == OK
+	_wave.start_allowed = previous_allowed if error == OK else false
+	_wave._update_button()
+	_update_start_callout()
+	return error
+
+func _loading_frame() -> void:
+	if DisplayServer.get_name() == "headless": await get_tree().process_frame
+	else: await RenderingServer.frame_post_draw
+
 func _prepare_wave() -> void:
 	get_node("PortalMap").route_history.wave = current_wave+1
 	_wave_starting = false
@@ -126,7 +172,7 @@ func _prepare_wave() -> void:
 	set_process(false)
 
 func _update_start_callout() -> void:
-	var available: bool = not finished and not choosing_start and not choosing_relic and not _settling_wave and not _wave.active and not _wave_starting
+	var available: bool = not _loading and not finished and not choosing_start and not choosing_relic and not _settling_wave and not _wave.active and not _wave_starting
 	_hud.set_start_available(available)
 	preparation_changed.emit(available)
 
@@ -135,7 +181,7 @@ func _on_start_requested() -> void:
 	_begin_wave_start()
 
 func _begin_wave_start() -> void:
-	if finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
+	if _loading or finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
 	_wave_starting = true
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
@@ -168,7 +214,7 @@ func _advance_wave_start(delta: float) -> void:
 func _on_wave_finished() -> void:
 	# Enemy tree_exiting callbacks also run while the level is being removed,
 	# after later siblings such as the HUD have already left the tree.
-	if not is_inside_tree() or is_queued_for_deletion(): return
+	if finished or not is_inside_tree() or is_queued_for_deletion(): return
 	if not is_instance_valid(_hud) or not _hud.is_inside_tree(): return
 	if _settling_wave: return
 	_settling_wave = true
@@ -206,13 +252,14 @@ func _continue_after_reward() -> void:
 		finished = true
 		_wave.start_allowed = false
 		timeline.set_state(current_wave, 0.0, false)
+		if not level.progress_id().is_empty(): LevelProgress.mark_completed(level.progress_id())
 		level_finished.emit()
 		_update_start_callout()
 	else:
 		_wave.start_allowed = true
 		get_node("CardPlacement").set_entry_selection(false)
 		_prepare_wave()
-		if level.expand_starts_after_act and _is_act_boundary(current_wave):
+		if _should_expand_after(current_wave):
 			choosing_start = true
 			_wave.start_allowed = false
 			get_node("CardPlacement").set_entry_selection(true)
@@ -230,6 +277,19 @@ func _is_act_boundary(index: int) -> bool:
 		count += act.waves.size()
 		if count == index: return true
 	return false
+
+func _should_expand_after(index: int) -> bool:
+	var count := 0
+	for act in level.acts:
+		count += act.waves.size()
+		if count == index: return act.add_start_after_completion
+	return false
+
+func restart_level() -> int:
+	LevelLaunch.select(level)
+	var error := get_tree().reload_current_scene()
+	if error != OK: LevelLaunch.clear()
+	return error
 
 func _on_start_added(index: int) -> void:
 	if index >= 0:

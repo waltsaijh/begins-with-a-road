@@ -120,7 +120,7 @@ func knock_back(distance: float) -> void:
 		_next -= 1
 	if _next < waypoints.size(): move_direction = (waypoints[_next]-global_position).normalized()
 
-func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> void:
+func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, shared_snapshot := false) -> void:
 	if is_instance_valid(engaged_by): engaged_by.release()
 	melee_damage = troop.melee_damage if troop != null else 0.0
 	melee_interval = troop.melee_interval if troop != null else 1.0
@@ -131,7 +131,9 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array) -> 
 	cast_target = null
 	enemy_id = id
 	route = selected_route
-	waypoints = points.duplicate()
+	# Spawn scheduling owns immutable packed snapshots; external callers keep
+	# the defensive copy. Movement reads waypoints and changes only _next.
+	waypoints = points if shared_snapshot else points.duplicate()
 	_next = 1
 	_finished = false
 	travelled_distance = 0.0

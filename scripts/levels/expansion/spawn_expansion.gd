@@ -22,6 +22,7 @@ var _new_start_index := -1
 var _saved_focus := Vector3.ZERO
 var _camera_framed := false
 var _mouse_inside := true
+var _entrance_height := 0.0
 
 func _ready() -> void:
 	for i in buttons.get_child_count():
@@ -56,6 +57,12 @@ func begin() -> bool:
 	# Obstacles may hide a nearby frontier; search farther before omitting it.
 	if choices.size() < 3: choices = Planner.generate(controller, search_depth+8, frontier_band)
 	if choices.is_empty(): return false
+	# Continue the terrain's authored entrance height in map-local coordinates.
+	var first := controller.get_node(controller.start_paths[0]) as Node3D
+	var local_position: Vector3 = controller.map.to_local(first.global_position)
+	var cell: Vector3i = controller.map.local_to_map(local_position)
+	cell.y = 0
+	_entrance_height = local_position.y-controller.map.map_to_local(cell).y
 	active = true
 	committing = false
 	selected_direction = -1
@@ -139,7 +146,7 @@ func show_hover(cell: Vector3i) -> void:
 	_set_cells($World/PathPreview, paths[at])
 	$World/Hover.position = controller.map.map_to_local(cell)
 	$World/Hover.show()
-	$World/EntrancePreview.position = controller.map.map_to_local(cell)+Vector3.UP*get_parent().level.marker_height
+	$World/EntrancePreview.position = controller.map.map_to_local(cell)+Vector3.UP*_entrance_height
 	$World/EntrancePreview.rotation.y = _entrance_angle(paths[at])
 	$World/EntrancePreview.show()
 
@@ -164,7 +171,7 @@ func commit(cell: Vector3i) -> bool:
 	_new_start_index = controller.start_paths.size()
 	marker.name = "ActStart%d" % (_new_start_index+1)
 	get_parent().add_child(marker)
-	marker.global_position = controller.map.to_global(controller.map.map_to_local(cell)+Vector3.UP*get_parent().level.marker_height)
+	marker.global_position = controller.map.to_global(controller.map.map_to_local(cell)+Vector3.UP*_entrance_height)
 	marker.get_node("Visual").rotation.y = _entrance_angle(paths[at])
 	controller.start_paths.append(controller.get_path_to(marker))
 	controller.rebuild()

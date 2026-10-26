@@ -1,0 +1,343 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/tiles/road_corner.tscn" id="1_frk27"]
+[ext_resource type="PackedScene" path="res://assets/models/tiles/variants/pillar_support.tscn" id="2_espdw"]
+[ext_resource type="PackedScene" path="res://assets/models/tiles/road_straight.tscn" id="3_yr1on"]
+[ext_resource type="PackedScene" path="res://assets/models/tiles/variants/wood_straight.tscn" id="4_q6gsg"]
+[ext_resource type="PackedScene" path="res://assets/models/tiles/road_end.tscn" id="5_ksrfv"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/start.tscn" id="6_64rj4"]
+[ext_resource type="PackedScene" path="res://assets/models/endpoints/goal.tscn" id="7_tv47f"]
+[ext_resource type="Shader" path="res://assets/shaders/menu_cloud_layer.gdshader" id="8_iu8cr"]
+[ext_resource type="Texture2D" path="res://assets/materials/cloud_noise.tres" id="9_v4xk8"]
+[ext_resource type="Shader" path="res://assets/shaders/cloud_mist.gdshader" id="10_rc0mf"]
+
+[sub_resource type="Environment" id="Environment_m3r44"]
+background_mode = 1
+background_color = Color(0.9, 0.925, 0.94, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.635, 0.722, 0.82, 1)
+ambient_light_energy = 0.55
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_25i8k"]
+render_priority = 0
+shader = ExtResource("8_iu8cr")
+shader_parameter/cloud_noise_texture = ExtResource("9_v4xk8")
+shader_parameter/cloud_drift = Vector2(0.012, 0.005)
+shader_parameter/cloud_scale = 0.012
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cj33c"]
+size = Vector2(600, 600)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pjc4h"]
+render_priority = -100
+shader = ExtResource("10_rc0mf")
+shader_parameter/opacity = 0.18
+shader_parameter/coverage = 0.3
+shader_parameter/noise_offset = Vector2(7, 19)
+shader_parameter/cloud_noise_texture = ExtResource("9_v4xk8")
+shader_parameter/cloud_drift = Vector2(-0.009, 0.008)
+shader_parameter/cloud_scale = 0.015
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jijfa"]
+size = Vector2(600, 600)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ae673"]
+render_priority = -99
+shader = ExtResource("10_rc0mf")
+shader_parameter/opacity = 0.08
+shader_parameter/coverage = 0.44
+shader_parameter/noise_offset = Vector2(31, 5)
+shader_parameter/cloud_noise_texture = ExtResource("9_v4xk8")
+shader_parameter/cloud_drift = Vector2(0.019, -0.005)
+shader_parameter/cloud_scale = 0.018
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_gr56j"]
+size = Vector2(600, 600)
+
+[sub_resource type="Animation" id="Animation_wrynb"]
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Bridge:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, -0.35, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_k28e8"]
+_data = {
+&"enter": SubResource("Animation_wrynb")
+}
+
+[node name="MenuStage" type="Node3D" unique_id=1529478138]
+
+[node name="Bridge" type="Node3D" parent="." unique_id=1949389124]
+
+[node name="Road00" type="Node3D" parent="Bridge" unique_id=727570135 instance=ExtResource("1_frk27")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 18, 0, 2)
+
+[node name="Pillar00" type="Node3D" parent="Bridge" unique_id=75852646 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 2)
+
+[node name="Road01" type="Node3D" parent="Bridge" unique_id=198251715 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 3)
+
+[node name="Road02" type="Node3D" parent="Bridge" unique_id=1124986046 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 4)
+
+[node name="Road03" type="Node3D" parent="Bridge" unique_id=1145128659 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 5)
+
+[node name="Road04" type="Node3D" parent="Bridge" unique_id=73543685 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 6)
+
+[node name="Pillar04" type="Node3D" parent="Bridge" unique_id=1744106084 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 6)
+
+[node name="Road05" type="Node3D" parent="Bridge" unique_id=131371315 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 7)
+
+[node name="Road06" type="Node3D" parent="Bridge" unique_id=878143171 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 8)
+
+[node name="Road07" type="Node3D" parent="Bridge" unique_id=1577663557 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 9)
+
+[node name="Road08" type="Node3D" parent="Bridge" unique_id=987695199 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 10)
+
+[node name="Pillar08" type="Node3D" parent="Bridge" unique_id=26547486 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 10)
+
+[node name="Road09" type="Node3D" parent="Bridge" unique_id=1084315505 instance=ExtResource("4_q6gsg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 11)
+
+[node name="Road10" type="Node3D" parent="Bridge" unique_id=918934425 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 12)
+
+[node name="Road11" type="Node3D" parent="Bridge" unique_id=1497935247 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 13)
+
+[node name="Road12" type="Node3D" parent="Bridge" unique_id=276976421 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 14)
+
+[node name="Pillar12" type="Node3D" parent="Bridge" unique_id=942035002 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 14)
+
+[node name="Road13" type="Node3D" parent="Bridge" unique_id=53099771 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 15)
+
+[node name="Road14" type="Node3D" parent="Bridge" unique_id=1141612236 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 16)
+
+[node name="Road15" type="Node3D" parent="Bridge" unique_id=380956350 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 17)
+
+[node name="Road16" type="Node3D" parent="Bridge" unique_id=1621144033 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 18)
+
+[node name="Pillar16" type="Node3D" parent="Bridge" unique_id=980817530 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 18)
+
+[node name="Road17" type="Node3D" parent="Bridge" unique_id=452332555 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 19)
+
+[node name="Road18" type="Node3D" parent="Bridge" unique_id=1249397952 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 20)
+
+[node name="Road19" type="Node3D" parent="Bridge" unique_id=827263287 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 21)
+
+[node name="Road20" type="Node3D" parent="Bridge" unique_id=466425697 instance=ExtResource("5_ksrfv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 22)
+
+[node name="Pillar20" type="Node3D" parent="Bridge" unique_id=1935860489 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0, 22)
+
+[node name="Road21" type="Node3D" parent="Bridge" unique_id=1021582103 instance=ExtResource("1_frk27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2)
+
+[node name="Pillar21" type="Node3D" parent="Bridge" unique_id=178135416 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2)
+
+[node name="Road22" type="Node3D" parent="Bridge" unique_id=1628903621 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 12, 0, 2)
+
+[node name="Road23" type="Node3D" parent="Bridge" unique_id=1328670067 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 13, 0, 2)
+
+[node name="Road24" type="Node3D" parent="Bridge" unique_id=681209351 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 14, 0, 2)
+
+[node name="Pillar24" type="Node3D" parent="Bridge" unique_id=1906055951 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 2)
+
+[node name="Road25" type="Node3D" parent="Bridge" unique_id=996952437 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 15, 0, 2)
+
+[node name="Road26" type="Node3D" parent="Bridge" unique_id=1811349230 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 16, 0, 2)
+
+[node name="Road27" type="Node3D" parent="Bridge" unique_id=28696655 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 17, 0, 2)
+
+[node name="Road28" type="Node3D" parent="Bridge" unique_id=1127196377 instance=ExtResource("1_frk27")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 11, 0, -10)
+
+[node name="Pillar28" type="Node3D" parent="Bridge" unique_id=1010990121 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -10)
+
+[node name="Road29" type="Node3D" parent="Bridge" unique_id=10040196 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -9)
+
+[node name="Road30" type="Node3D" parent="Bridge" unique_id=1412108243 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -8)
+
+[node name="Road31" type="Node3D" parent="Bridge" unique_id=600371705 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -7)
+
+[node name="Road32" type="Node3D" parent="Bridge" unique_id=540345188 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -6)
+
+[node name="Pillar32" type="Node3D" parent="Bridge" unique_id=2129581902 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -6)
+
+[node name="Road33" type="Node3D" parent="Bridge" unique_id=623351022 instance=ExtResource("4_q6gsg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -5)
+
+[node name="Road34" type="Node3D" parent="Bridge" unique_id=35725546 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -4)
+
+[node name="Road35" type="Node3D" parent="Bridge" unique_id=1351373346 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -3)
+
+[node name="Road36" type="Node3D" parent="Bridge" unique_id=727196528 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -2)
+
+[node name="Pillar36" type="Node3D" parent="Bridge" unique_id=1290296104 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -2)
+
+[node name="Road37" type="Node3D" parent="Bridge" unique_id=117275411 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, -1)
+
+[node name="Road38" type="Node3D" parent="Bridge" unique_id=1726462982 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 0)
+
+[node name="Road39" type="Node3D" parent="Bridge" unique_id=72881958 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 1)
+
+[node name="Road40" type="Node3D" parent="Bridge" unique_id=1164995641 instance=ExtResource("1_frk27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
+
+[node name="Pillar40" type="Node3D" parent="Bridge" unique_id=169391202 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -10)
+
+[node name="Road41" type="Node3D" parent="Bridge" unique_id=1999042390 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 6, 0, -10)
+
+[node name="Road42" type="Node3D" parent="Bridge" unique_id=44312646 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 7, 0, -10)
+
+[node name="Road43" type="Node3D" parent="Bridge" unique_id=324707607 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8, 0, -10)
+
+[node name="Road44" type="Node3D" parent="Bridge" unique_id=622746565 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 9, 0, -10)
+
+[node name="Pillar44" type="Node3D" parent="Bridge" unique_id=1516890040 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, -10)
+
+[node name="Road45" type="Node3D" parent="Bridge" unique_id=2114075883 instance=ExtResource("3_yr1on")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 10, 0, -10)
+
+[node name="Road46" type="Node3D" parent="Bridge" unique_id=1643608060 instance=ExtResource("5_ksrfv")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 5, 0, -22)
+
+[node name="Road47" type="Node3D" parent="Bridge" unique_id=2066588261 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -21)
+
+[node name="Road48" type="Node3D" parent="Bridge" unique_id=1793655376 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -20)
+
+[node name="Pillar48" type="Node3D" parent="Bridge" unique_id=715266911 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -20)
+
+[node name="Road49" type="Node3D" parent="Bridge" unique_id=136300413 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -19)
+
+[node name="Road50" type="Node3D" parent="Bridge" unique_id=989537371 instance=ExtResource("4_q6gsg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -18)
+
+[node name="Road51" type="Node3D" parent="Bridge" unique_id=1842719679 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -17)
+
+[node name="Road52" type="Node3D" parent="Bridge" unique_id=1970238938 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -16)
+
+[node name="Pillar52" type="Node3D" parent="Bridge" unique_id=849940379 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -16)
+
+[node name="Road53" type="Node3D" parent="Bridge" unique_id=1294431453 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -15)
+
+[node name="Road54" type="Node3D" parent="Bridge" unique_id=639348816 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -14)
+
+[node name="Road55" type="Node3D" parent="Bridge" unique_id=2000591271 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -13)
+
+[node name="Road56" type="Node3D" parent="Bridge" unique_id=1912558140 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -12)
+
+[node name="Pillar56" type="Node3D" parent="Bridge" unique_id=1546916884 instance=ExtResource("2_espdw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -12)
+
+[node name="Road57" type="Node3D" parent="Bridge" unique_id=1145195453 instance=ExtResource("3_yr1on")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -11)
+
+[node name="Entrance" type="Node3D" parent="Bridge" unique_id=1298827159 instance=ExtResource("6_64rj4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 0.0305, 22)
+
+[node name="Citadel" type="Node3D" parent="Bridge" unique_id=871288794 instance=ExtResource("7_tv47f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.0305, -22)
+
+[node name="Environment" type="WorldEnvironment" parent="." unique_id=244955734]
+environment = SubResource("Environment_m3r44")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1025815544]
+transform = Transform3D(0.90630776, 0.34618863, -0.24240388, 0, 0.57357645, 0.81915206, 0.42261827, -0.74240386, 0.5198368, 0, 0, 0)
+light_color = Color(1, 0.94, 0.85, 1)
+light_energy = 1.12
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=64116240]
+transform = Transform3D(0.8595359, -0.23258315, 0.4550858, 0, 0.89044756, 0.4550858, -0.5110754, -0.39116257, 0.7653716, 33, 22, 38)
+h_offset = -7.0
+current = true
+fov = 46.0
+far = 300.0
+
+[node name="CloudSea" type="MeshInstance3D" parent="." unique_id=215041756]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
+material_override = SubResource("ShaderMaterial_25i8k")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_cj33c")
+
+[node name="MidMist" type="MeshInstance3D" parent="." unique_id=1466590634]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3, 0)
+material_override = SubResource("ShaderMaterial_pjc4h")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_jijfa")
+
+[node name="HighWisps" type="MeshInstance3D" parent="." unique_id=2071620048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+material_override = SubResource("ShaderMaterial_ae673")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_gr56j")
+
+[node name="Entry" type="AnimationPlayer" parent="." unique_id=371537389]
+libraries/ = SubResource("AnimationLibrary_k28e8")

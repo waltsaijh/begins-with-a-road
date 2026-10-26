@@ -12,9 +12,42 @@ troop.soldier.name,Soldier,士兵
 troop.quickfeet.name,Quickfeet,疾行兵
 troop.heavy.name,Heavy,重裝兵
 ui.pause.resume,Resume game,繼續遊戲
+ui.menu.subtitle,A bridge above the clouds,開局一座橋
+ui.menu.tagline,Build your defense above the clouds.,於雲海之上，築起你的防線。
+ui.menu.start,Start game,開始遊戲
+ui.maps.title,Choose your battlefield,選擇戰場
+ui.maps.title.frontier,Frontier Outpost,邊境前哨
+ui.maps.description.frontier,Extend a road above the clouds and shape your defense.,延伸雲海上的道路，築起屬於你的防線。
+ui.maps.title.bridge,Bridge,橋梁
+ui.maps.description.bridge,Defend the bridge above the clouds.,守住雲海上的橋梁。
+ui.maps.summary,%d ACTs · %d waves,%d 個 ACT · %d 波進攻
+ui.maps.launch,Begin defense,開始作戰
+ui.run.next,Next,下一步
+ui.run.title,Prepare your defense,本局設定
+ui.run.step_map,01 · Choose map   /   02 · Run settings   /   03 · Begin,01 · 選擇地圖   /   02 · 本局設定   /   03 · 開始
+ui.run.step_options,01 · Map selected   /   02 · Run settings   /   03 · Begin,01 · 地圖已選   /   02 · 本局設定   /   03 · 開始
+ui.run.difficulty,Difficulty,難度
+ui.run.relaxed,Relaxed,輕鬆
+ui.run.standard,Standard,標準
+ui.run.challenge,Challenge,挑戰
+ui.run.starting_hand,Starting hand,起始手牌
+ui.run.random,Random,隨機
+ui.run.fixed,Fixed,固定
+ui.run.extra_events,Extra events,額外事件
+ui.run.prototype_hint,Preview options · No gameplay effects yet,暫定選項 · 目前尚未影響戰局
 ui.pause.restart,Restart,重新開始
 ui.pause.settings,Settings,設定
+ui.settings.back,Back,返回
+ui.settings.general,General,一般
+ui.settings.display,Display,顯示
+ui.settings.audio,Audio,音效
+ui.settings.language,Language,語言
+ui.settings.msaa,Anti-aliasing,抗鋸齒
+ui.settings.mute,Mute all audio,全部靜音
+ui.settings.enabled,Enabled,啟用
+ui.settings.off,Off,關閉
 ui.pause.exit,Exit,離開
+ui.pause.home,Back to main menu,回到主畫面
 ui.wave.start_next,Start next wave,開始下一波
 ui.expansion.choose_direction,Choose a direction for the new entrance,選擇新入口的方向
 ui.expansion.choose_position,Choose a highlighted tile,選擇一個標示的候選位置
@@ -24,6 +57,19 @@ ui.expansion.north,↑ North,↑ 北方
 ui.expansion.west,← West,← 西方
 ui.expansion.south,↓ South,↓ 南方
 ui.expansion.east,→ East,→ 東方
+ui.loading.title,Loading,載入中
+ui.loading.scene,Loading battlefield…,載入戰場…
+ui.loading.navigation,Preparing routes…,準備路線…
+ui.loading.visuals,Preparing characters and status displays…,準備角色與狀態顯示…
+ui.loading.catalog,Collecting display resources…,整理顯示資源…
+ui.loading.menu,Preparing main menu…,準備主選單…
+ui.loading.materials,Preparing shared materials…,準備共用材質…
+ui.maps.locked,Locked,未解鎖
+ui.maps.completed,Completed,已通關
+ui.maps.requires,Complete first: %s,需要先通關：%s
+ui.maps.invalid,Level unavailable,關卡資料尚未完成
+ui.maps.invalid_dependencies,Invalid level prerequisites,前置關卡設定有誤
+ui.maps.none,No levels available,目前沒有關卡
 tower.mortar.name,Mortar,迫擊砲
 tower.ballista.name,Ballista,弩砲
 tower.broadside.name,Airship Broadside,空艇舷炮

@@ -3,17 +3,25 @@ class_name LevelDefinition
 extends Resource
 const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 ## One level file references its editable GridMap scene and complete ACT schedule.
-@export var title := "Begins With a Road"
+@export_group("Map Selection")
+## Stable save/requirement key. Empty uses the relative filename under levels/.
+@export var level_id := ""
+## All these IDs must be completed. IDs avoid cyclic Resource dependencies.
+@export var required_to_complete_levels := PackedStringArray()
+@export_group("Gameplay")
 @export var terrain: PackedScene
-## Prefer draggable Start/Goal nodes in the terrain scene when present.
-@export var use_terrain_endpoints := true
-## Compatibility for markerless maps, or when Use Terrain Endpoints is disabled.
-@export var starts: Array[Vector2i] = [Vector2i.ZERO]
-@export var goal := Vector2i(23, 0)
-@export var marker_height := 0.0305
 @export var acts: Array[ActDefinition] = []
-## Between ACTs, choose a direction and extend the road to one new entrance.
-@export var expand_starts_after_act := true
+
+func progress_id() -> String:
+	if not level_id.strip_edges().is_empty(): return level_id.strip_edges()
+	var directory := "res://assets/data/levels/"
+	return resource_path.trim_prefix(directory).get_basename() if resource_path.begins_with(directory) else ""
+
+func title_key() -> String:
+	return "ui.maps.title."+progress_id()
+
+func description_key() -> String:
+	return "ui.maps.description."+progress_id()
 
 func wave_count() -> int:
 	var count := 0
@@ -39,9 +47,6 @@ func configuration_error() -> String:
 	return ""
 
 func endpoint_layout(source: GridMap = null) -> Dictionary:
-	# Existing resources can retain Nil for newly added exports after a script
-	# reload. Read through Variant so the boundary always receives a real bool.
-	var prefer_markers := terrain_endpoints_enabled()
 	var owned := source == null
 	var node: Node = source
 	if owned:
@@ -51,16 +56,11 @@ func endpoint_layout(source: GridMap = null) -> Dictionary:
 		if node == null: return TerrainLayout.empty("無法載入地形場景")
 	var result := TerrainLayout.empty("Level terrain must have a GridMap root")
 	if node is GridMap:
-		result = TerrainLayout.read(node, prefer_markers, starts, goal, marker_height)
+		result = TerrainLayout.read(node)
 	if owned: node.free()
 	if not result.has("error"): return TerrainLayout.empty("無法讀取地形端點；請重新載入地形場景")
 	return result
 
-func terrain_endpoints_enabled() -> bool:
-	var value: Variant = get("use_terrain_endpoints")
-	return value if value is bool else true
-
 func repair_missing_defaults() -> void:
-	# Repair before validation/save, rather than serializing stale Nil fields.
-	for property in ["use_terrain_endpoints", "expand_starts_after_act"]:
-		if get(property) == null: set(property, true)
+	for act in acts:
+		if act != null: act.repair_missing_defaults()

@@ -14,13 +14,7 @@
 [ext_resource type="Script" uid="uid://bx26rxhfw34rv" path="res://scripts/map/tile/appearance/tile_visuals.gd" id="26_visuals"]
 [ext_resource type="PackedScene" path="res://scenes/cards/card_placement.tscn" id="27_cards"]
 
-[sub_resource type="Environment" id="Environment"]
-background_mode = 1
-background_color = Color(0.9, 0.925, 0.94, 1)
-ambient_light_source = 3
-ambient_light_color = Color(0.6352941, 0.7215686, 0.8196078, 1)
-ambient_light_energy = 0.23
-reflected_light_source = 2
+[ext_resource type="Environment" path="res://assets/data/rendering/level_environment.tres" id="28_environment"]
 
 [node name="Main" type="Node3D" unique_id=262629719]
 
@@ -51,7 +45,7 @@ light_color = Color(1, 0.9411765, 0.8470588, 1)
 light_energy = 1.12
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=637674091]
-environment = SubResource("Environment")
+environment = ExtResource("28_environment")
 
 [node name="PortalMap" type="Node" parent="." unique_id=1234077156]
 script = ExtResource("20_portal_map")

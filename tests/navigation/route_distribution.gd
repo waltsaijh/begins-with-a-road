@@ -12,23 +12,6 @@ func check(ok: bool, message: String) -> void:
 		failures += 1
 		push_error(message)
 
-func old_indices(count: int, total := 64) -> PackedInt32Array:
-	var result := PackedInt32Array()
-	var order := PackedInt32Array()
-	for seed in total:
-		if seed%count == 0:
-			order.resize(count)
-			for i in count: order[i] = i
-			var rng := RandomNumberGenerator.new()
-			rng.seed = seed
-			for i in range(count-1, 0, -1):
-				var j := rng.randi_range(0, i)
-				var swap := order[i]
-				order[i] = order[j]
-				order[j] = swap
-		result.append(order[seed%count])
-	return result
-
 func weighted_indices(cdf: PackedFloat64Array, total := 64) -> PackedInt32Array:
 	var result := PackedInt32Array()
 	for seed in total:
@@ -54,10 +37,6 @@ func stats(indices: PackedInt32Array, scores: PackedFloat64Array, branches: Arra
 		result.branched_side = branched
 		result.straight = indices.size()-branched
 	return result
-
-func median(values: Array[int]) -> int:
-	values.sort()
-	return values[values.size()>>1]
 
 func ready_map(scene: Node) -> void:
 	for i in 120:
@@ -186,23 +165,10 @@ func verify() -> void:
 				check(entry.route.route_index == first_assignment[entry.wave_index], "Global enemy IDs or shuffle changed route quotas")
 				next_order.append(entry.wave_index)
 			check(next_order != departure_order, "Departure order was not shuffled between waves")
-			# Remove pending wave state before measuring another origin.
+			# Remove pending wave state before checking another origin.
 			wave._pending.clear()
 			wave.active = false
-			var build_us: Array[int] = []
-			var weighted_us: Array[int] = []
-			var old_us: Array[int] = []
-			for trial in 21:
-				var began := Time.get_ticks_usec()
-				Distribution.build(scores, profile.route_temperature)
-				build_us.append(Time.get_ticks_usec()-began)
-				began = Time.get_ticks_usec()
-				weighted_indices(table.cdf)
-				weighted_us.append(Time.get_ticks_usec()-began)
-				began = Time.get_ticks_usec()
-				old_indices(scores.size())
-				old_us.append(Time.get_ticks_usec()-began)
-			cases.append({"scene": kind, "origin": origin, "routes": scores.size(), "old_shuffle64": stats(old_indices(scores.size()), scores, branches), "temperatures": variants, "distribution_build_us": median(build_us), "weighted64_us": median(weighted_us), "old_shuffle64_us": median(old_us)})
+			cases.append({"scene": kind, "origin": origin, "routes": scores.size(), "temperatures": variants})
 		# Threshold is still a hard filter, and temperature edits invalidate caches.
 		if kind == "two_corridors":
 			var saved_temperature: float = profile.route_temperature
@@ -217,11 +183,11 @@ func verify() -> void:
 		profile.route_selection = Troop.RouteSelection.SOFTMAX
 		var before: Array[Dictionary] = []
 		for origin in controller.start_nodes.size():
-			before.append(controller.plan_for(profile, origin))
+			before.append(controller.debug_summary_for(profile, origin))
 		wave.select_route_selection(Troop.RouteSelection.UNIFORM)
 		check(profile.route_selection == Troop.RouteSelection.UNIFORM, "Wave API did not select Uniform")
 		for origin in controller.start_nodes.size():
-			var plan: Dictionary = controller.plan_for(profile, origin)
+			var plan: Dictionary = controller.debug_summary_for(profile, origin)
 			check(plan.routes == before[origin].routes and plan.steps == before[origin].steps, "Distribution mode changed accepted candidates")
 			for probability: float in plan.route_probabilities:
 				check(is_equal_approx(probability, 1.0/plan.routes), "Uniform gameplay candidates are not equally likely")

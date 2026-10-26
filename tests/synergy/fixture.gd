@@ -1,13 +1,10 @@
 extends RefCounted
+const Endpoints = preload("res://tests/fixtures/level_fixture.gd")
 const KEYS = ["ballista","crossfire","mortar","broadside","barracks","sentry"]
 const ANCHORS = [Vector3i(7,0,2),Vector3i(10,0,1),Vector3i(12,0,4),Vector3i(9,0,7),Vector3i(5,0,7),Vector3i(14,0,8)]
 const TITLES = ["A 盾衛兵＋鼠群", "B 盾衛兵＋血法師＋重裝兵", "C 鼠群＋爆破手", "D 飛翼獸＋偵查兵"]
 static func definition(scenario: int) -> LevelDefinition:
 	var level := LevelDefinition.new()
-	level.use_terrain_endpoints = false
-	level.starts = [Vector2i(0,0),Vector2i(0,6)]
-	level.goal = Vector2i(18,3)
-	level.expand_starts_after_act = false
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
@@ -20,6 +17,9 @@ static func definition(scenario: int) -> LevelDefinition:
 	for x in range(16,19): terrain.set_cell_item(Vector3i(x,0,3),6)
 	# A single attached base supplies the barracks' legal road garrison.
 	terrain.set_cell_item(Vector3i(5,0,7),6)
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,0), "Start")
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,6), "Start2")
+	Endpoints.endpoint(terrain, Endpoints.Goal, Vector2i(18,3), "Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
@@ -29,6 +29,7 @@ static func definition(scenario: int) -> LevelDefinition:
 		[["saboteur",6,0],["rat_swarm",30,1]],
 		[["winged_beast",12,0],["scout",12,0]]][scenario]
 	var act := ActDefinition.new()
+	act.add_start_after_completion = false
 	act.title = TITLES[scenario]
 	for repeat in 3:
 		var wave := WaveDefinition.new()

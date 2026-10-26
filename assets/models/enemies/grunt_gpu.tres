@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="EnemyGpuModel" format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/enemy_gpu_model.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/grunt.tscn" id="2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/grunt_mesh.res" id="3"]
+
+[resource]
+script = ExtResource("1")
+source = ExtResource("2")
+mesh = ExtResource("3")

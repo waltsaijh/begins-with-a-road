@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>BEGINS WITH A ROAD</title>
+		<style>
+html, body, #canvas { margin: 0; padding: 0; border: 0; }
+body { background: white; overflow: hidden; touch-action: none; }
+#canvas { display: block; }
+#canvas:focus { outline: none; }
+#status { position: fixed; inset: 0; z-index: 1; background: white; display: flex; align-items: center; justify-content: center; }
+#status-column { width: min(360px, calc(100vw - 48px)); text-align: center; font: 300 16px/1.5 "Noto Sans TC", "Microsoft JhengHei", sans-serif; color: #406166; }
+#status-title { font-size: 24px; color: #244a52; margin-bottom: 12px; }
+#status-stage { min-height: 24px; }
+#status-progress { display: none; width: 100%; height: 2px; border: 0; border-radius: 0; appearance: none; background: #dfe7e8; margin: 12px 0 0; }
+#status-progress::-webkit-progress-bar { background: #dfe7e8; }
+#status-progress::-webkit-progress-value { background: #52767b; }
+#status-progress::-moz-progress-bar { background: #52767b; }
+#status-notice { display: none; margin-top: 12px; overflow-wrap: anywhere; color: #70454a; white-space: normal; }
+</style>
+		$GODOT_HEAD_INCLUDE
+
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+            <div id="status-column" role="status" aria-live="polite">
+                <div id="status-title">載入中</div>
+                <div id="status-stage">載入遊戲資源…</div>
+                <progress id="status-progress"></progress>
+                <div id="status-notice"></div>
+            </div>
+        </div>
+
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+    const statusStage = document.getElementById('status-stage');
+    const english = navigator.language.toLowerCase().startsWith('en');
+    const messages = english ? { title: 'Loading', download: 'Loading game resources…', starting: 'Starting game…', failure: 'Unable to start game' }
+        : { title: '載入中', download: '載入遊戲資源…', starting: '啟動遊戲…', failure: '無法啟動遊戲' };
+    document.documentElement.lang = english ? 'en' : 'zh-Hant';
+    document.getElementById('status-title').textContent = messages.title;
+    statusStage.textContent = messages.download;
+    let engineStarted = false;
+    let canvasPresented = false;
+    // Never reveal an empty canvas between the engine promise and its first draw.
+    function dismissWhenPresented() {
+        if (engineStarted && canvasPresented && initializing) {
+            requestAnimationFrame(() => setStatusMode('hidden'));
+        }
+    }
+    window.roadStartupPresented = () => {
+        canvasPresented = true;
+        dismissWhenPresented();
+    };
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+        statusStage.textContent = messages.failure;
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+                const downloaded = current > 0 && total > 0 && current >= total;
+                statusStage.textContent = downloaded ? messages.starting : messages.download;
+                statusProgress.style.display = !downloaded && current > 0 && total > 0 ? 'block' : 'none';
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+            engineStarted = true;
+            statusStage.textContent = messages.starting;
+            statusProgress.style.display = 'none';
+            dismissWhenPresented();
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
+</html>

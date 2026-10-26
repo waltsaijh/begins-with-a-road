@@ -29,13 +29,18 @@ func verify() -> void:
 	var soldier: Troop = (TroopCatalog.find("soldier").duplicate() as Troop)
 	var quick: Troop = (TroopCatalog.find("quickfeet").duplicate() as Troop)
 	var heavy: Troop = (TroopCatalog.find("heavy").duplicate() as Troop)
+	# Routing examples below deliberately score threat alone; keep the fixture
+	# independent of the designer's editable per-step base cost.
+	quick.path_base_cost = 0.0
 	# Isolate the frozen-stat checks from editable game balance.
 	quick.max_health = 50
 	quick.speed_multiplier = 1.5
 	heavy.max_health = 500
 	heavy.speed_multiplier = 0.5
 	check(soldier.max_health == 100 and soldier.speed_multiplier == 1 and is_inf(soldier.score_threshold), "Soldier defaults incorrect")
-	check(quick.max_health == 50 and quick.speed_multiplier == 1.5 and quick.score_threshold == 25, "Quickfeet defaults incorrect")
+	# Movement speed is editable balance, independent of the routing contract.
+	check(quick.configuration_error().is_empty(), "Quickfeet resource is invalid")
+	check(quick.max_health == 50 and quick.speed_multiplier == 1.5 and quick.score_threshold == 25, "Quickfeet fixture stats incorrect")
 	check(heavy.max_health == 500 and heavy.speed_multiplier == 0.5 and heavy.score_threshold == 25, "Heavy fixture stats incorrect")
 	for profile in [soldier, quick, heavy]:
 		for property: Dictionary in profile.get_property_list():
@@ -76,7 +81,8 @@ func verify() -> void:
 			check(route.score-plan.score < 25, "Candidate threshold not applied to raw score")
 			check((Vector2(2, 0) in route.cells) == (profile == heavy), "Wrong dangerous/safe branch retained")
 		var debug: Dictionary = controller.debug_graph_for(profile)
-		check(debug.nodes.size() == plan.active_nodes and debug.edges.size() == plan.used_edges, "Signed debug graph contains rejected candidates")
+		var details: Dictionary = controller.debug_summary_for(profile)
+		check(debug.nodes.size() == details.active_nodes and debug.edges.size() == details.used_edges, "Signed debug graph contains rejected candidates")
 	# Strict cutoff: an exactly 25-point worse candidate is excluded.
 	danger.threat = 25
 	await get_tree().process_frame
@@ -136,6 +142,7 @@ func verify() -> void:
 	controller.tile_parameters.get_tile(Vector2i(1, 1)).threat = 100
 	await get_tree().process_frame
 	quick = (TroopCatalog.find("quickfeet").duplicate() as Troop)
+	quick.path_base_cost = 0.0
 	quick.score_threshold = 1
 	heavy = (TroopCatalog.find("heavy").duplicate() as Troop)
 	heavy.score_threshold = 1
@@ -158,9 +165,7 @@ func verify() -> void:
 		await get_tree().process_frame
 		for origin in controller.start_nodes.size():
 			for profile in TroopCatalog.all():
-				var began := Time.get_ticks_usec()
 				var plan: Dictionary = controller.plan_for(profile, origin)
-				var elapsed := Time.get_ticks_usec()-began
 				check(plan.get("reachable", false), "Troop lost a test-map origin")
 				for i in mini(plan.get("routes", 0), 8):
 					var route: Dictionary = controller.sample_for(profile, i, origin, i)
@@ -168,7 +173,7 @@ func verify() -> void:
 						check(not route.is_empty() and route.score == actual_score(controller, profile, route), "Test-map score not exact")
 					else:
 						check(not route.is_empty() and route.identity == str(route.cells), "Hard-rule route lost physical identity")
-				cases.append({"scene": name, "origin": origin, "troop": profile.troop_name, "routes": plan.get("routes", 0), "score": plan.get("score", 0), "candidates": plan.get("candidate_routes", plan.get("routes", 0)), "solve_us": elapsed})
+				cases.append({"scene": name, "origin": origin, "troop": profile.troop_name, "routes": plan.get("routes", 0), "score": plan.get("score", 0), "candidates": plan.get("candidate_routes", plan.get("routes", 0))})
 		scene.queue_free()
 		await get_tree().process_frame
 	var report := {"platform": OS.get_name(), "failures": failures, "raw_signed_scoring": true, "stats_frozen": true, "safe_local_detour": true, "cases": cases}

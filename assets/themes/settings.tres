@@ -1,0 +1,57 @@
+[gd_resource type="Theme" format=3 uid="uid://bvphrxycivmoh"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
+[sub_resource type="StyleBoxEmpty" id="Plain"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+[sub_resource type="StyleBoxEmpty" id="Compact"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+[sub_resource type="StyleBoxLine" id="Track"]
+color = Color(0.2, 0.36, 0.38, 0.12)
+thickness = 1
+vertical = true
+[sub_resource type="StyleBoxFlat" id="Grabber"]
+bg_color = Color(0.2, 0.36, 0.38, 0.4)
+content_margin_left = 2.0
+content_margin_right = 2.0
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_left = 2
+corner_radius_bottom_right = 2
+[sub_resource type="StyleBoxFlat" id="GrabberHover"]
+bg_color = Color(0.14, 0.29, 0.32, 0.75)
+content_margin_left = 2.0
+content_margin_right = 2.0
+[resource]
+default_font = ExtResource("1")
+default_font_size = 18
+Label/colors/font_color = Color(0.25, 0.38, 0.4, 1)
+Button/colors/font_color = Color(0.32, 0.44, 0.45, 1)
+Button/colors/font_disabled_color = Color(0.32, 0.44, 0.45, 0.3)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(0.1, 0.25, 0.28, 1)
+Button/colors/font_focus_color = Color(0.1, 0.25, 0.28, 1)
+Button/colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+Button/styles/normal = SubResource("Plain")
+Button/styles/hover = SubResource("Plain")
+Button/styles/pressed = SubResource("Plain")
+Button/styles/hover_pressed = SubResource("Plain")
+Button/styles/focus = SubResource("Empty")
+Button/styles/disabled = SubResource("Plain")
+CompactOption/base_type = &"Button"
+CompactOption/font_sizes/font_size = 18
+CompactOption/styles/normal = SubResource("Compact")
+CompactOption/styles/hover = SubResource("Compact")
+CompactOption/styles/pressed = SubResource("Compact")
+CompactOption/styles/hover_pressed = SubResource("Compact")
+CompactOption/styles/disabled = SubResource("Compact")
+VScrollBar/styles/scroll = SubResource("Track")
+VScrollBar/styles/scroll_focus = SubResource("Track")
+VScrollBar/styles/grabber = SubResource("Grabber")
+VScrollBar/styles/grabber_highlight = SubResource("GrabberHover")
+VScrollBar/styles/grabber_pressed = SubResource("GrabberHover")

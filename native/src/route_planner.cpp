@@ -13,6 +13,11 @@ void RoadRoutePlanner::_bind_methods() {
     ClassDB::bind_method(D_METHOD("prepare","graph"),&RoadRoutePlanner::prepare);
     ClassDB::bind_method(D_METHOD("find_paths","profile","tile_costs","start","goal","score_threshold","overlap_penalty","search_budget"),&RoadRoutePlanner::find_paths,DEFVAL(String("default")),DEFVAL(PackedFloat64Array()),DEFVAL(-1),DEFVAL(-1),DEFVAL(10.0),DEFVAL(1.0),DEFVAL(64));
     ClassDB::bind_method(D_METHOD("sample_route","profile","seed","route_index"),&RoadRoutePlanner::sample_route,DEFVAL(String("default")),DEFVAL(0),DEFVAL(-1));
+    ClassDB::bind_method(D_METHOD("candidate_representatives","profile","samples","segment_ids"),&RoadRoutePlanner::candidate_representatives);
+    ClassDB::bind_static_method("RoadRoutePlanner",D_METHOD("search_costs","weights"),&RoadRoutePlanner::search_costs);
+    ClassDB::bind_static_method("RoadRoutePlanner",D_METHOD("rank_candidates","entries","weights","threshold","temperature","selection"),&RoadRoutePlanner::rank_candidates);
+    ClassDB::bind_static_method("RoadRoutePlanner",D_METHOD("build_distribution","scores","temperature","selection"),&RoadRoutePlanner::build_distribution,DEFVAL(1));
+    ClassDB::bind_static_method("RoadRoutePlanner",D_METHOD("allocate_indices","cdf","total"),&RoadRoutePlanner::allocate_indices);
     ClassDB::bind_method(D_METHOD("get_region_paths","profile"),&RoadRoutePlanner::get_region_paths,DEFVAL(String("default")));
     ClassDB::bind_method(D_METHOD("get_debug_graph","profile"),&RoadRoutePlanner::get_debug_graph,DEFVAL(String("default")));
     ClassDB::bind_method(D_METHOD("invalidate","profile"),&RoadRoutePlanner::invalidate,DEFVAL(String("")));
@@ -130,17 +135,16 @@ Dictionary RoadRoutePlanner::get_debug_graph(const String &profile) {
     entry.debug_graph["nodes"]=pack_route_values<PackedInt32Array>(ids);entry.debug_graph["edges"]=edges;
     return entry.debug_graph.duplicate(true);
 }
-Dictionary RoadRoutePlanner::sample_route(const String &profile,int64_t seed,int64_t route_index) const {
-    Dictionary result;auto found=profiles.find(profile.utf8().get_data());if(found==profiles.end()) return result;
-    const auto &entry=found->second;const auto &plan=entry.plan;if(!plan.valid || plan.routes.empty()) return result;
-    if(route_index < -1 || route_index >= int64_t(plan.routes.size())) return result;
-    uint64_t state=uint64_t(seed);auto random=[&](){return road::route_random(state);};
+bool RoadRoutePlanner::sample_cells(const CachedPlan &entry,uint64_t seed,int64_t route_index,std::vector<int> &walk,double &score,int &selected) const {
+    const auto &plan=entry.plan;if(!plan.valid || plan.routes.empty()) return false;
+    if(route_index < -1 || route_index >= int64_t(plan.routes.size())) return false;
+    uint64_t state=seed;auto random=[&](){return road::route_random(state);};
     // Consume the same RNG value in both modes so the seeded local walk stays
     // identical when its randomly selected pool entry is requested explicitly.
     size_t random_index=random()%plan.routes.size();
-    size_t index=route_index<0 ? random_index : size_t(route_index);const auto &route=plan.routes[index];
-    PackedVector2Array walk;double score=0;
-    auto append=[&](int cell,bool charge=true){const auto &p=physical.cells[cell];walk.push_back(Vector2(p.x,p.y));if(charge) score+=entry.weights[cell];};
+    size_t index=route_index<0 ? random_index : size_t(route_index);selected=int(index);const auto &route=plan.routes[index];
+    walk.clear();score=0;
+    auto append=[&](int cell,bool charge=true){walk.push_back(cell);if(charge) score+=entry.weights[cell];};
     append(physical.nodes[plan.start].cell,false);
     for(int id:route.edges) {
         const auto &edge=entry.choices.edges[id];
@@ -150,12 +154,20 @@ Dictionary RoadRoutePlanner::sample_route(const String &profile,int64_t seed,int
             while(cell!=target) {
                 auto first=std::lower_bound(edge.dag.begin(),edge.dag.end(),std::array<int,2>{cell,INT32_MIN});
                 auto last=std::upper_bound(edge.dag.begin(),edge.dag.end(),std::array<int,2>{cell,INT32_MAX});
-                if(first==last || ++length>physical.cells.size()) return Dictionary{};
+                if(first==last || ++length>physical.cells.size()) return false;
                 cell=(first+random()%size_t(last-first))->at(1);append(cell);
             }
         }
     }
-    if(!road::cost_equal(score,route.score) || route.score-plan.score>=entry.threshold) return Dictionary{};
+    return road::cost_equal(score,route.score) && route.score-plan.score<entry.threshold;
+}
+Dictionary RoadRoutePlanner::sample_route(const String &profile,int64_t seed,int64_t route_index) const {
+    Dictionary result;auto found=profiles.find(profile.utf8().get_data());if(found==profiles.end()) return result;
+    std::vector<int> cells;double score=0;int index=-1;
+    if(!sample_cells(found->second,uint64_t(seed),route_index,cells,score,index)) return result;
+    const auto &plan=found->second.plan;const auto &route=plan.routes[index];
+    PackedVector2Array walk;walk.resize(cells.size());auto *write=walk.ptrw();
+    for(size_t i=0;i<cells.size();++i) {const auto &p=physical.cells[cells[i]];write[i]=Vector2(p.x,p.y);}
     result["nodes"]=pack_route_values<PackedInt32Array>(route.nodes);result["edges"]=pack_route_values<PackedInt32Array>(route.edges);
     result["cells"]=walk;result["length"]=walk.size()-1;result["score"]=score;result["best_score"]=plan.score;result["route_index"]=int64_t(index);return result;
 }

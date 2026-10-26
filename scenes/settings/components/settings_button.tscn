@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/settings/settings_button.gd" id="1"]
+[node name="SettingsButton" type="Button"]
+custom_minimum_size = Vector2(0, 44)
+oversampling_with_scale = 2
+script = ExtResource("1")

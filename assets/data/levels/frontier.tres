@@ -170,6 +170,7 @@ waves = Array[ExtResource("3")]([SubResource("Wave7"), SubResource("Wave8"), Sub
 
 [resource]
 script = ExtResource("1")
-title = "Frontier"
+level_id = "frontier"
+required_to_complete_levels = PackedStringArray()
 terrain = ExtResource("7")
 acts = Array[ExtResource("2")]([SubResource("Act1"), SubResource("Act2"), SubResource("Act3")])

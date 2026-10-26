@@ -147,7 +147,6 @@ theme_override_constants/margin_bottom = 4
 [node name="Actions" type="VBoxContainer" parent="PauseBlocker/Menu/Margin" unique_id=246740673]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 2
 
 [node name="Resume" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1171473691 instance=ExtResource("10_menu_item")]
 
@@ -155,4 +154,4 @@ theme_override_constants/separation = 2
 
 [node name="Settings" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1202626757 instance=ExtResource("10_menu_item")]
 
-[node name="Exit" parent="PauseBlocker/Menu/Margin/Actions" unique_id=778682886 instance=ExtResource("10_menu_item")]
+[node name="ReturnHome" parent="PauseBlocker/Menu/Margin/Actions" unique_id=778682886 instance=ExtResource("10_menu_item")]

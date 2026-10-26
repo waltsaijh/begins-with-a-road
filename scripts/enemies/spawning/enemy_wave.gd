@@ -7,6 +7,7 @@ signal routes_changed
 const EnemyScene = preload("res://scenes/enemies/enemy.tscn")
 const VisualBatch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
 const Controls = preload("res://scenes/enemies/components/enemy_wave_controls.tscn")
+const Waypoints = preload("res://scripts/enemies/spawning/route_waypoints.gd")
 @export var auto_start := true
 @export_range(1, 200, 1, "or_greater") var enemy_count := EnemyConstants.WAVE_SIZE
 ## Enemies emitted together per interval; the last batch is capped by the total.
@@ -92,11 +93,13 @@ func start_wave() -> bool:
 		if not _prepare_legacy_wave(): return false
 	total = _pending.size()
 	_next_enemy_id += total
-	visuals.reserve(total)
+	var population := {}
 	_committed_routes.clear()
 	for data: Dictionary in _pending:
 		var profile: Troop = data.get("profile", _wave_troop)
+		population[profile] = int(population.get(profile,0))+1
 		_committed_routes.append({"troop": profile.troop_name, "color": profile.debug_color, "cells": data.route.cells})
+	visuals.reserve_population(population)
 	spawned = 0
 	alive = 0
 	completed = 0
@@ -122,9 +125,9 @@ func _prepare_legacy_wave() -> bool:
 		pool_size = schedule.pool_size
 		_scheduled = true
 		return true
-	var plan: Dictionary = controller.plan_for(profile, origin)
-	pool_size = plan.get("routes", 0)
-	if not plan.get("valid", false) or pool_size == 0:
+	var batch: Dictionary = controller.prepare_route_batch(profile, enemy_count, origin)
+	pool_size = batch.get("pool_size", 0)
+	if batch.is_empty():
 		_update_button()
 		return false
 	_wave_troop = profile
@@ -132,18 +135,14 @@ func _prepare_legacy_wave() -> bool:
 	_wave_shield = profile.max_shield
 	_wave_speed = move_speed*profile.speed_multiplier
 	var map: GridMap = controller.map
+	var waypoint_cache := {}
 	_pending.clear()
 	# Capture every path now. Later map/profile edits cannot redirect an enemy,
 	# including those still waiting for their staggered spawn time.
 	for i in enemy_count:
 		var id := _next_enemy_id+i
-		var route: Dictionary = controller.allocate_route_for(profile, i, enemy_count, origin)
-		if route.is_empty():
-			_pending.clear()
-			return false
-		var points := PackedVector3Array()
-		for cell: Vector2 in route.cells:
-			points.append(map.to_global(map.map_to_local(Vector3i(int(cell.x), 0, int(cell.y)))+Vector3.UP*(EnemyConstants.GROUND_OFFSET+profile.flight_height*map.cell_size.y)))
+		var route: Dictionary = batch.routes[i]
+		var points := Waypoints.for_route(route, map, waypoint_cache, profile.flight_height)
 		_pending.append({"id": id, "wave_index": i, "route": route, "points": points, "abilities":profile.ability_snapshot()})
 	# Randomness changes departure timing only; route quotas are already fixed.
 	_pending.shuffle()
@@ -180,9 +179,10 @@ func routes_for_display() -> Array[Dictionary]:
 			for data: Dictionary in schedule.get("pending",[]):
 				result.append({"troop":profile.troop_name,"color":profile.debug_color,"cells":data.route.cells})
 			return result
+		var batch: Dictionary = controller.prepare_route_batch(profile, enemy_count, origin)
+		if batch.is_empty(): return []
 		for i in enemy_count:
-			var route: Dictionary = controller.allocate_route_for(profile, i, enemy_count, origin)
-			if route.is_empty(): return []
+			var route: Dictionary = batch.routes[i]
 			result.append({"troop": profile.troop_name, "color": profile.debug_color, "cells": route.cells})
 	return result
 
@@ -232,7 +232,7 @@ func _spawn_entry(data: Dictionary) -> void:
 	enemy.tree_exiting.connect(_on_enemy_exiting.bind(enemy), CONNECT_ONE_SHOT)
 	add_child(enemy)
 	_living[enemy] = true
-	enemy.follow(data.id, data.route, data.points)
+	enemy.follow(data.id, data.route, data.points, true)
 	visuals.add_enemy(enemy)
 	spawned += 1
 	alive += 1
