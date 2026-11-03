@@ -16,11 +16,6 @@ var _body_cells: Array[Vector2i] = []
 func garrison_cell() -> Vector2i:
 	return custom_garrison if custom_garrison.x != 2147483647 else grid_cell+BuildCard.rotate_cell(Vector2i.UP,rotation_steps)
 
-func _show_footprint() -> void:
-	if placement_preset == null or placement_preset.tower_footprint.is_empty(): return
-	var material := StandardMaterial3D.new()
-	material.albedo_color = definition.accent_color.darkened(0.3)
-	add_child(preload("res://scripts/towers/footprint_visual.gd").create(occupied_cells,grid_cell,rotation_steps,material))
 var rotation_steps := 0:
 	set(value):
 		value = posmod(value, 4)
@@ -164,7 +159,7 @@ func _ready() -> void:
 			_aim_pivot = _visual.get_node(definition.aim_pivot_path) as Node3D
 		if not definition.muzzle_path.is_empty():
 			_muzzle = _visual.get_node(definition.muzzle_path) as Marker3D
-	if definition.deployment != null: _show_footprint()
+	# The complete footprint already has a flush foundation in TileVisuals.
 
 func upgrade_error() -> String:
 	if definition == null or health <= 0 or is_queued_for_deletion(): return "防禦塔已不存在"

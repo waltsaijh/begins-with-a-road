@@ -1,5 +1,33 @@
 # Routing Sandbox — Phase 5 交接
 
+## 本次 Git 更新授權：2026-11-03
+
+使用者於道路、橋頭、寬路流線及雙向路肩接觸暗部完成後再次要求「git更新並push到遠端」，授權提交目前全部相依修改並正常推送 origin/experiment/routing-sandbox。已 fetch 核對遠端；保留本輪實作與驗證，提交前核對 diff --check。下方各階段「未提交／不 push」是此次授權前的歷史狀態，不再限制本次提交與推送。未操作 main worktree，未執行 merge／rebase／reset／clean 或強制推送。
+
+最新路肩補強：路面內側加入0.06格寬、0.46強度的漸淡接觸暗部，受光側也能讀出凹槽。雙向固定光源渲染163項通過，兩側根部亮度約為鄰近路面的0.76；補強後 depth_flow 真渲染5128項亦重跑通過。原始結果在 `.godot/test-results/bank_contact/`／`road_depth_flow/`，忽略的測試產物不納入提交。
+
+## 最新工作：道路凹槽、橋頭與寬路流線，2026-11-03
+
+起始仍為 `experiment/routing-sandbox`／HEAD `4b0d2fe`，沿用上一輪全部未提交成果；本輪不 commit／merge／rebase／reset／clean／push，不操作 main worktree。僅新增道路高度／接合及流量視覺修改；塔模型、戰鬥、商店、敵軍與原生選路未再更動。
+
+RoadSurface 同一網格以路面0／路肩0.065／斜面寬0.045形成凹槽，塔／石地基礎仍為0。木橋不再當作完整實心相鄰地面；開放橋保留橋台與同網格接合面，側邊已有地面則用連續石路；索引及向上面向亦經覆蓋驗證。新增 WideRoadFlow 以全雙向道路臂／共用交會區投影完整配額行程，窄轉寬共用真實入口，反向時鐘各自保存，內部換道保留原時間為停留；建造預覽多傳候選快照，未改排程或RNG。
+
+Current PASS：新 depth_flow rendered5128／headless5111（4650覆蓋、17像素、120名真正三兵種配額，五組0備援）；原流量連續性含78像素／56線寬、流量預覽含Hover／配額／RNG；放置744、Construction placement34／regression54／rendered input32、裁切input13、編輯器rendered input48、地塊動畫／變種；PortalGraph／native_candidates286／route_batch／多入口／dead_end_edits／traffic104／synergy routing357；Frontier180幀渲染啟動。C++本輪未改，未再build。下方1722／458等是前輪結果，沒有在本輪重跑。
+
+人工 F6 `tests/road_refinement/depth_flow.tscn`，1–9／0選案例、R改格子旋轉、Space短筆觸動畫；26張截圖與JSON在 `.godot/test-results/road_depth_flow/`，logs `.godot/road-depth-*.log`。細節、根因、檔案及當次證據見 [道路修正](road_visual_and_placement_refinement.md)。所驗配置未見缺面／格線／額外支線，極端不規則交會仍有安全保留原位置的備援；Web／release遊玩／效能／15波／真人未測，等待人工驗收。
+
+## 前輪工作：道路視覺與建造裁切，2026-11-03
+
+起始核對 `experiment/routing-sandbox`／HEAD `4b0d2fed64731ad5bb5c9452d66a0f4b10022441`，工作區乾淨。本輪依新任務不 commit／merge／rebase／reset／clean／push、不改 main worktree；下方 Git 授權是上一輪已完成的操作。
+
+已完成道路遇既有塔全 footprint 裁切、預覽／提交同源、雙向接口寬路聯集、塔旁終止邊界、移除塔下重複基板，以及原生 block-cut 完整合法路線灰化。沒有改20＋1資源、戰鬥數值、經濟／商店／遺物或波次。主要檔案、設計與限制見 [road_visual_and_placement_refinement](road_visual_and_placement_refinement.md)。
+
+Current PASS：新增規則744、rendered裁切input13；20＋1 rules1722／combat104／rendered input118；編輯器rules458／rendered input48／組合29；Construction placement34／regression54／geometry51／rendered input32；cards／tile_presets／rendered拖牌；combat／tower_restoration／stacking；traffic104、synergy routing357、RoadPortalGraph／native_candidates286／route_batch／多入口／dead_end_edits／road_flow_preview；tile_animation／tile_variants。Windows native debug／release重建，C++ edit_guard3584編輯oracle通過。Frontier正式level180幀渲染啟動通過。原始資料在 `.godot/road-refinement-*.log` 及 `.godot/test-results/`，初輪失敗／短timeout保留，最終結果見詳細文件。
+
+人工入口：F6 `tests/road_refinement/gallery.tscn`，A全覽、1–9／0聚焦；實際放牌用原 `tests/tower_tile_editor/playground.tscn`，文件附原基礎版迫擊砲L型＋哨塔直線的重現座標。新增14張真實道路／點牌／拖牌／提交截圖在 `.godot/test-results/road_refinement/`；六塔12張等級圖亦已重產。已由agent檢視，未宣稱人類美術驗收。
+
+NOT RUN：Web native／匯出／瀏覽器、Windows release遊玩、效能、Frontier全15波及真人。舊wasm無route_cells時保留中性色並警告，Web上線前需重建；沒有修改Windows防護。選圖頁無腳本預覽與手工主選單橋景仍使用原素材。完成後等待人工驗收。
+
 ## Git 更新授權：2026-11-03
 
 使用者在塔體／射程／預覽工作完成後要求「git更新並push到遠端」，授權將目前相依的施工原型、Tower Tile Editor、使用者保存的地塊／Frontier 配置及20＋1更新一併提交，推送至 origin/experiment/routing-sandbox。已 fetch 核對遠端，更新前本地領先14個提交、落後0個；不改 main worktree，不做 merge／rebase／reset／clean 或強制推送。下方「未提交／不 push」敘述是本次授權前的歷史快照。程式未再修改，沿用本輪已完成的驗證，提交前另核對 git diff --check；測試原始輸出仍留在忽略的 .godot/。

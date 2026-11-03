@@ -111,11 +111,8 @@ static func _build(definition: TowerDefinition, body: Array[Vector2i]) -> Node3D
 			cylinder(base,Vector3(cell.x,0.1,cell.y),0.38,0.2,IRON)
 			cylinder(base,Vector3(cell.x,0.29,cell.y),0.12,0.25,DECK)
 		moving = group(root,"Airship"); root.moving_body_path = NodePath("Airship")
-	else:
-		# Thin deck follows every real cell; machinery uses the entire platform.
-		for cell in body:
-			box(root,Vector3(cell.x,0.09,cell.y),Vector3(0.96,0.18,0.96),WOOD)
-			box(root,Vector3(cell.x,0.2,cell.y),Vector3(0.94,0.05,0.94),DECK)
+	# Ground belongs to TileVisuals. Do not stack one generic box per body cell
+	# underneath the authored carriage / octagonal weapon base.
 	var recoil := group(moving,"RecoilAssembly")
 	var lv2 := group(moving,"Level2")
 	var lv3 := group(moving,"Level3")
@@ -134,8 +131,8 @@ static func _build(definition: TowerDefinition, body: Array[Vector2i]) -> Node3D
 			cylinder(root,center+Vector3(0,0.6,0.55),0.13,0.5,IRON,Vector3(0,0,PI/2))
 			for cell in body:
 				if cell.x == TowerBodyGeometry.weapon_lane(body): continue
-				box(root,Vector3(cell.x,0.39,cell.y),Vector3(0.6,0.32,0.65),WOOD)
-				for x in [-0.2,0,0.2]: box(root,Vector3(cell.x+x,0.6,cell.y),Vector3(0.045,0.045,0.7),LIGHT)
+				box(root,Vector3(cell.x,0.19,cell.y),Vector3(0.6,0.32,0.65),WOOD)
+				for x in [-0.2,0,0.2]: box(root,Vector3(cell.x+x,0.4,cell.y),Vector3(0.045,0.045,0.7),LIGHT)
 			box(lv2,center+Vector3(0,0.46,0.4),Vector3(0.65,0.12,0.25),accent)
 			for sign_x in [-1,1]: box(lv2,center+Vector3(sign_x*0.31,0.63,0.4),Vector3(0.09,0.48,0.43),accent,Vector3(0,0,-sign_x*0.18))
 			for sign_x in [-1,1]: box(lv3,Vector3(c.x+sign_x*0.24,0.79,front+0.15),Vector3(0.48,0.09,0.13),accent,Vector3(0,sign_x*0.4,0))
@@ -182,5 +179,11 @@ static func _build(definition: TowerDefinition, body: Array[Vector2i]) -> Node3D
 				marker(root,arm,Vector3(0,0.55,0.94))
 				box(lv2,center+direction*0.65+Vector3.UP*0.69,Vector3(0.25,0.13,0.25),accent)
 				cylinder(lv3,center+direction*0.65+Vector3.UP*0.83,0.11,0.22,LIGHT)
+	# Reseat the existing machinery after removing the redundant 0.20 deck.
+	# Only the art children move; anchor, attack origin and occupied cells do not.
+	# These two assemblies' lowest structural surface was at 0.21.
+	if key in ["mortar","crossfire"]:
+		for child in root.get_children():
+			if child is Node3D: child.position.y -= 0.20
 	set_level(root,1)
 	return root

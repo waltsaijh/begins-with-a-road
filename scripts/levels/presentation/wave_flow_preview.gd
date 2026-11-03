@@ -6,6 +6,7 @@ var baseline := RoadFlowForecast.new()
 var candidate := {}
 ## Null uses committed roads; an Array is an explicitly labeled draft forecast.
 var construction_pending: Variant = null
+var construction_snapshot := {}
 var candidate_rebuild_count := 0
 var _candidate_dirty := false
 var _candidate_unavailable := false
@@ -57,9 +58,10 @@ func set_candidate(effect: Dictionary) -> void:
 		delta_overlay.hint = ""
 		_render_filter()
 
-func set_construction_pending(pending: Variant) -> void:
-	if construction_pending == pending: return
+func set_construction_pending(pending: Variant, snapshot: Dictionary = {}) -> void:
+	if construction_pending == pending and construction_snapshot == snapshot: return
 	construction_pending = pending
+	construction_snapshot = snapshot
 	invalidate()
 
 func _panels() -> Array[Control]:
@@ -200,7 +202,7 @@ func _render_filter() -> void:
 	if selected_origin >= 0 and selected_origin < panels.size():
 		profile = panels[selected_origin].selected
 		segments = forecast.by_origin.get(selected_origin,{}) if profile == null else forecast.by_troop_origin.get(profile,{}).get(selected_origin,{})
-	arrows.display(segments,forecast.all,controller.map,forecast.animation(profile,selected_origin))
+	arrows.display(segments,forecast.all,controller.map,forecast.animation(profile,selected_origin),construction_snapshot)
 	var before: Dictionary = baseline.all
 	if selected_origin >= 0 and selected_origin < panels.size():
 		before = baseline.by_origin.get(selected_origin,{}) if profile == null else baseline.by_troop_origin.get(profile,{}).get(selected_origin,{})

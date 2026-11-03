@@ -31,7 +31,7 @@ func update(card: BuildCard, cell: Vector3i, turns: int, error: String) -> void:
 	var schedule := Schedule.build(towers,proposal,wave)
 	rebuild_count += 1
 	pending = schedule.pending
-	flow.set_construction_pending(pending)
+	flow.set_construction_pending(pending,proposal.snapshot if proposal.ok else {})
 	cards.preview.prospective_ports = proposal.layout.masks if proposal.ok else {}
 	cards.preview.show_at(towers.map,card,cell,turns,schedule.ok)
 	status.text = "放置後路線預測（未提交）· %d 名敵人；完整塔體均不可通行。" % pending.size() if schedule.ok else schedule.error

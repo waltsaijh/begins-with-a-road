@@ -37,6 +37,11 @@ func verify() -> void:
 	check(Layout.select(roads.slice(0,24),straight,{bridge_ends[0]:true,bridge_ends[1]:true},bridge_ends).wood.size()==1,"24-tile bridge should have one wood tile")
 	for scene_path in ["res://scenes/main.tscn", "res://scenes/9x9.tscn", "res://scenes/11x11big.tscn"]:
 		var scene: Node = load(scene_path).instantiate()
+		if scene_path.ends_with("main.tscn"):
+			scene.free()
+			var cells: Array[Vector2i] = []
+			for x in 24: cells.append(Vector2i(x,0))
+			scene = preload("res://tests/fixtures/portal_fixture.gd").scene_for(cells,Vector2i.ZERO,Vector2i(23,0))
 		scene.get_node("EnemyWave").auto_start = false
 		root.add_child(scene)
 		for i in 5:

@@ -20,6 +20,7 @@ static func build(map: GridMap, ground: Dictionary, requested: Dictionary, store
 		allowed[cell] = int(allowed.get(cell,masks.get(cell,0))) | int(requested[cell])
 	for cell: Vector2i in affected:
 		if not masks.has(cell): continue
+		if blocked.has(cell) and not ground.has(cell): continue
 		var mask := 0
 		for d in 4:
 			var direction: Vector3i = TileConstants.DIRECTIONS[d]
@@ -27,6 +28,14 @@ static func build(map: GridMap, ground: Dictionary, requested: Dictionary, store
 			if masks.has(neighbor) and int(allowed.get(cell,15)) & (1<<d) and int(allowed.get(neighbor,15)) & (1<<((d+2)%4)):
 				mask |= 1<<d
 		masks[cell] = mask
+	# Foundations retain their authored road record for tower removal, but no
+	# traversable neighbor is allowed to advertise an exit into an obstacle.
+	for cell: Vector2i in masks:
+		if blocked.has(cell): continue
+		for d in 4:
+			var direction: Vector3i = TileConstants.DIRECTIONS[d]
+			if blocked.has(cell+Vector2i(direction.x,direction.z)):
+				masks[cell] = int(masks[cell]) & ~(1<<d)
 	var cells := PackedInt32Array()
 	var ports := PackedByteArray()
 	for cell: Vector2i in masks:

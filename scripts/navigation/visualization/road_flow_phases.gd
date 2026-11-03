@@ -5,6 +5,8 @@ var edges := {}
 var turns := {}
 var starts := {}
 var ends := {}
+## Unique immutable complete walks for display-only wide-road projection.
+var trips := {}
 var steps := 0
 var period := 4
 var _profiles := {}
@@ -12,6 +14,7 @@ var _sets: Array[PackedInt32Array] = []
 var _texture: ImageTexture
 
 func add_trip(cells: PackedVector2Array) -> void:
+	trips[cells] = true
 	steps = maxi(steps, cells.size()-1)
 	for i in range(cells.size()-1):
 		var a := Vector2i(cells[i])

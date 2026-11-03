@@ -111,14 +111,7 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 	if card.traffic != null: return traffic.validate(card.traffic, at, turns)
 	if occupied.has(at): return upgrade_error(card, occupied[at])
 	if not card.allows_rotation(turns): return "地塊不支援這個旋轉方向"
-	if not card.tile_preset.tower_footprint.is_empty() or card.tile_preset.has_explicit_ports() or not placement.port_overrides.is_empty() or card.tile_preset.tower_offset != Vector2i.ZERO:
-		return construction_plan([{"card":card,"anchor":cell,"turns":turns}]).error
-	var deployment_error := _validate_deployment(card.tower,at,turns)
-	if not deployment_error.is_empty(): return deployment_error
-	var additions := {}
-	for ground in card.ground_cells(at, turns):
-		additions[ground] = true
-	return _validate(card.tower_cells(at, turns), additions)
+	return construction_plan([{"card":card,"anchor":cell,"turns":turns}]).error
 
 func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 	var error := validate_card(card, cell, turns)
@@ -135,17 +128,18 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 		tower_upgraded.emit(existing)
 		if BalanceTrace.enabled: BalanceTrace.event("upgrade",BalanceTrace.tower_id(existing),{"level":existing.level,"gold":0})
 		return existing
-	if not card.tile_preset.tower_footprint.is_empty() or card.tile_preset.has_explicit_ports() or not placement.port_overrides.is_empty() or card.tile_preset.tower_offset != Vector2i.ZERO:
-		var built := commit_construction([{"card":card,"anchor":cell,"turns":turns}])
-		return built[0] if not built.is_empty() else null
-	var tower := DefenseTower.new()
-	tower.definition = card.tower
-	tower.rotation_steps = posmod(turns, 4)
-	var at := Vector2i(cell.x, cell.z)
-	var additions := {}
-	for ground in card.ground_cells(at, turns):
-		additions[ground] = true
-	return _commit(tower, at, additions)
+	var built := commit_construction([{"card":card,"anchor":cell,"turns":turns}])
+	return built[0] if not built.is_empty() else null
+
+## Used by validation, preview and commit, including legacy single-cell recipes.
+func card_ground(card: BuildCard, anchor: Vector2i, turns: int) -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	var footprint := card.tower_cells(anchor, turns)
+	var roads := card.road_cells(anchor, turns)
+	for pos in card.ground_cells(anchor, turns):
+		if occupied.has(pos) and pos in roads and not pos in footprint: continue
+		result.append(pos)
+	return result
 
 func upgrade_target(cell: Vector3i) -> DefenseTower:
 	return occupied.get(Vector2i(cell.x, cell.z)) if cell.y == 0 else null
@@ -258,6 +252,10 @@ func remove_tower(cell: Vector3i) -> bool:
 	tower.influence_changed.disconnect(_on_influence_changed.bind(at))
 	for position in tower.occupied_cells:
 		occupied.erase(position)
+	for position in tower.occupied_cells:
+		var ground_cell := Vector3i(position.x,0,position.y)
+		placement.refresh_cell(ground_cell)
+		for direction: Vector3i in TileConstants.DIRECTIONS: placement.refresh_cell(ground_cell+direction)
 	controller.set_blocked_cells(occupied)
 	_apply_change(at, _settings[at], [])
 	towers.erase(at)
@@ -352,7 +350,8 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		var footprint := card.tower_cells(anchor,turns)
 		var explicit := card.tile_preset.has_explicit_ports()
 		var entry_roads := card.road_cells(anchor,turns)
-		for pos in card.ground_cells(anchor,turns):
+		var clipped_ground := card_ground(card,anchor,turns)
+		for pos in clipped_ground:
 			if absi(pos.x) >= 32767 or absi(pos.y) >= 32767: failure.error = "超出可建造範圍"
 			elif pos in terminals: failure.error = "地塊不能覆蓋起點或終點"
 			elif occupied.has(pos) or map.get_cell_item(Vector3i(pos.x,0,pos.y)) == 0: failure.error = "地塊與已建防禦塔或石地重疊"
@@ -362,10 +361,12 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 			# Foundation cells never become accidental road junctions.
 			if explicit and not pos in entry_roads and not ports.has(pos): ports[pos] = 0
 		for pos in entry_roads:
+			if not pos in clipped_ground: continue
 			# Legacy recipes may list their own tower's support tile as road.
 			# It is still an obstacle, not a conflicting road from another entry.
 			if not pos in footprint: roads[pos] = true
 		for pos: Vector2i in card.road_ports(anchor,turns):
+			if not pos in clipped_ground: continue
 			ports[pos] = int(ports.get(pos,0)) | int(card.road_ports(anchor,turns)[pos])
 		for pos in footprint:
 			if proposed.has(pos): failure.error = "預擺防禦塔互相重疊"

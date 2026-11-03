@@ -268,7 +268,7 @@ func _rebuild() -> void:
 	var plan := validate()
 	pending_forecast = plan.get("pending",[])
 	var flow := session.get_node_or_null("WaveFlowPreview")
-	if flow != null: flow.set_construction_pending(null if entries.is_empty() else pending_forecast)
+	if flow != null: flow.set_construction_pending(null if entries.is_empty() else pending_forecast,plan.get("snapshot",{}) if not entries.is_empty() else {})
 	status = ("預擺 %d 塊 · 可確認／開波\n流量為預擺預測" % entries.size()) if plan.ok and not entries.is_empty() else ("選牌放置；可直接開波" if entries.is_empty() else str(plan.error))
 	changed.emit()
 

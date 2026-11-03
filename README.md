@@ -27,6 +27,10 @@
 
 ## 複合地塊建造實驗
 
+新塔牌附帶的道路遇到已建塔時會自動裁切，保留原塔；剩餘道路仍須讓所有入口通往基地。並排且相通的道路現在呈現連續寬路，塔旁路面自然終止，死路與孤立道路以灰色區分。可用 [道路對照場景](tests/road_refinement/gallery.tscn) 按 F6 查看十個案例，或在原 Tower Tile Editor 試玩；詳見 [規則與人工驗收](docs/road_visual_and_placement_refinement.md)。
+
+道路外側新增有斜面與暗部的路肩，保留連續的凹陷路面；橋頭會正確銜接，流量筆觸也會沿寬路中央轉彎／分岔。最新 [凹槽與流線驗收場景](tests/road_refinement/depth_flow.tscn) 可用1–9／0、R與Space查看十種配置及動畫。
+
 另有獨立 [Construction Playground](tests/construction/playground.tscn)：在 Godot 開啟該場景按 **F6**，可比較舊版即時放置、五種複合形狀及批次預擺。批次可以暫時斷路，先移動、旋轉、排序或撤銷，再確認整組配置；開始戰鬥前必須全路連通。弩砲長直線射程與交叉火力路口傷害提供兩種小幅幾何獎勵。
 
 實驗明示提供六張卡、60 Gold、補牌／換形工具與無敗北，仍可使用原商店、開波及戰鬥。F5 的 Frontier 不受模式切換影響。操作、限制及對照結果見 [原型說明](docs/construction_prototype.md)；目前已完成自動驗證，待真人操作與美感驗收。

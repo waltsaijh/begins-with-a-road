@@ -15,6 +15,7 @@ func run() -> void:
 	var catalog := Catalog.new()
 	var total := 0
 	for key in Catalog.KEYS:
+		print("TOWER_VISUAL_RULES: checking ",key)
 		var definition := Catalog.tower(key)
 		var options := definition.preset_candidates()
 		check(options.size() == (1 if key == "barracks" else 4),key+" has accepted production count")

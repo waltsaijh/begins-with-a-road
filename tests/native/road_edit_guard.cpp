@@ -30,6 +30,8 @@ int main() {
             assert(guard.add_cell(x,y)==on_path(added,{x,y}));++checked;
         }
         RoadEditGuardCore guard;assert(guard.prepare(tiles(cells),{{2,1},{0,1}}));
+        auto input=tiles(cells);std::set<int> membership(guard.route_cell_indices.begin(),guard.route_cell_indices.end());
+        for(int i=0;i<int(input.size());++i) assert(bool(membership.count(i))==on_path(cells,{input[i].x,input[i].y}));
         // Several skipped additions must accumulate and eventually reconnect.
         for(int y=0;y<3;++y) for(int x=0;x<3;++x) if(!cells.count({x,y})) {
             cells.insert({x,y});bool changed=guard.add_cell(x,y);
@@ -43,6 +45,7 @@ int main() {
     spur.insert({4,1});spur.insert({4,2});spur.insert({5,2});spur.insert({5,3});spur.insert({4,3});
     RoadEditGuardCore guard;assert(guard.prepare(tiles(spur),{{0,0},{8,0}}));
     assert(!guard.add_cell(4,1));
+    assert(guard.route_cell_indices.size()==9); // dangling cycle is excluded
     assert(!guard.add_cell(6,3));assert(!guard.add_cell(6,2)); // Close a loop inside the spur.
     assert(guard.add_cell(6,1)); // Connect the spur back to a different route cell.
     std::set<std::pair<int,int>> dense;

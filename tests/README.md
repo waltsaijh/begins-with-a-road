@@ -1,5 +1,11 @@
 # 測試
 
+## 道路視覺與建造裁切
+
+最新凹槽／橋頭／寬路流線入口為 `tests/road_refinement/depth_flow.tscn`：1–9／0切十例、R旋轉實際地塊／接口、Space動畫。加 `-- --verify` 同時驗證覆蓋、GPU像素、真正WaveSpawnSchedule配額並產生26張截圖，輸出 `.godot/test-results/road_depth_flow/`。Headless可驗證幾何／資料，畫面與像素另跑真渲染；本輪結果見 [道路修正](../docs/road_visual_and_placement_refinement.md)。
+
+`tests/road_refinement/rules.tscn` 以完整路線 oracle 驗證原生結構判定與放置裁切；`input.tscn` 用實際基礎版迫擊砲L型＋哨塔直線，經真實點牌／拖牌／R／提交／開波驗證。`gallery.tscn` 為唯讀十案例對照，F6後 A全覽、1–9／0聚焦，`-- --capture` 產生11張真實渲染圖。輸出在 `.godot/test-results/road_refinement/`。Windows native debug／release須重新建置以提供route_cells；Web亦需重建，不沿用舊wasm。當次PASS／初輪FAIL／NOT RUN及人工步驟見 [完整紀錄](../docs/road_visual_and_placement_refinement.md)。
+
 波次編輯器回歸亦會移除 ACT／波次控制項，模擬切分支後新腳本仍搭配舊 dock，驗證子介面重建、未儲存／待切換資料、選取及原生 Undo／Redo 保留。`enemies/solid_material.gd` 同時驗證舊 enemy_walk shader 路徑可載入、相容入口與共用材質的實際像素一致；正式模型仍使用同一份共用材質。
 
 保留可驗證目前行為的功能回歸；一次性效能量測與重複截圖場景已清除，功能測試內的重複計時迴圈也已移除，仍保留機率分布及避讓工作量上限等斷言。同一項的 `.gd`、`.gd.uid` 與 `.tscn` 保持在同一目錄。測試資料與預設值盡量獨立於使用者正在編輯的關卡與塔數值。

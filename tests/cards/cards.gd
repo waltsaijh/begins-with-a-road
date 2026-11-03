@@ -138,10 +138,7 @@ func verify() -> void:
 	check(towers.place_card(bridge, TileConstants.INVALID_CELL) == null, "Invalid anchor accepted")
 	check(towers.place_card(bridge, Vector3i(32766, 0, 0)) == null, "Out-of-bounds offset accepted")
 	check(towers.validate_card(bridge, Vector3i.ZERO).is_empty(), "New roads should allow a bypass before the tower is committed")
-	var additions := {}
-	for cell in bridge.ground_cells(Vector2i.ZERO):
-		additions[cell] = true
-	var predicted := ports_at(Snapshot.capture(map, {Vector2i.ZERO: true}, additions))
+	var predicted := ports_at(towers.construction_plan([{"card":bridge,"anchor":Vector3i.ZERO,"turns":0}]).snapshot)
 	check(map.get_used_cells().size() == before and controller.revision == revision, "Preview mutated the map")
 	placement.cell_placed.connect(func(_cell: Vector3i):
 		events += 1

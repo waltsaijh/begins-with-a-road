@@ -17,6 +17,8 @@ godot-cpp 固定 commit e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77，4.5 API；Pyt
 
 ## 資料與 API
 
+RoadEditGuard.prepare 另回傳 `route_cells: PackedInt32Array`（交錯 x／y），為基地（terminals[0]）到啟用入口的完整 simple paths 格子聯集。沿用迭代 Tarjan／block-cut，不讀候選池或配額；只取基地所在分量，沒有可達入口時為空。供道路灰化使用，不更動 add_cell 的增量 guard 行為。需要重新建置 Windows DLL／Web wasm；本輪 Windows debug／release、C++ oracle及Godot回歸結果見 [道路修正](../docs/road_visual_and_placement_refinement.md)。
+
 ### Windows 編輯器載入封鎖（2026-10-25）
 
 若錯誤對話框指向 `bin/~road_graph...dll`，狀態 `0xc0e90002`，先查 Godot log 是否為 Win32 4551。Windows SDK 將兩者定義為 Application Control policy block，不能直接判定 DLL 損毀。本機已核對 Smart App Control 狀態為啟用、phase4 debug DLL 未簽章、原檔與留存暫存副本 SHA-256 相同；沒有修改系統信任或安全設定。

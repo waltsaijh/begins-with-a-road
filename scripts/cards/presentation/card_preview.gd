@@ -21,6 +21,7 @@ var geometry_cells: Variant = null
 var detailed_geometry := false
 var prospective_ports := {}
 var footprint_body: Node3D
+var displayed_ground: Array[Vector2i] = []
 
 func _ready() -> void:
 	_material = ground.material_override.duplicate()
@@ -67,7 +68,9 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 	var mesh := ImmediateMesh.new()
 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	var footprint := card.tower_cells(Vector2i(cell.x,cell.z),turns)
-	for pos in card.ground_cells(Vector2i(cell.x,cell.z),turns):
+	var towers := map.get_node_or_null("../TowerMap")
+	displayed_ground = towers.card_ground(card,Vector2i(cell.x,cell.z),turns) if towers != null and card.traffic == null else card.ground_cells(Vector2i(cell.x,cell.z),turns)
+	for pos in displayed_ground:
 		var center := map.map_to_local(Vector3i(pos.x,0,pos.y))+Vector3.UP*0.05
 		var existing := map.get_cell_item(Vector3i(pos.x,0,pos.y)) > 0
 		var paint := Color(0.86,0.78,0.57,0.5)
