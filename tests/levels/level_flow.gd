@@ -29,7 +29,7 @@ func wait_map(scene: Node) -> void:
 
 func verify() -> void:
 	var authored: LevelDefinition = load("res://assets/data/levels/frontier.tres")
-	check(authored.configuration_error().is_empty() and authored.wave_count() == 9, "Authored level did not load its ACTs/waves")
+	check(authored.configuration_error().is_empty() and authored.wave_count() == 15, "Authored level did not load its ACTs/waves")
 	var level := LevelDefinition.new()
 	# Fixed-map progression is covered here; ACT expansion has its own integration test.
 	# A fixed bridge fixture keeps level flow independent of the designer's map edits.
@@ -144,7 +144,7 @@ func verify() -> void:
 			var choice: RelicDefinition = scene.relic_choice.offers.filter(func(r): return r.id != &"gold")[0]
 			scene.relic_choice.choose(choice)
 			await get_tree().create_timer(0.3).timeout
-		check(not wave.active and not cards.hand.stowed and not cards.input_suspended, "Wave end did not restore the hand/build phase")
+		check(not wave.active and (cards.input_suspended if index == 2 else not cards.hand.stowed and not cards.input_suspended), "Wave end did not apply the preparation/terminal lock")
 		check(shop.coins == expected_rewards[index], "Wave completion reward used the wrong value or was duplicated")
 		check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after a wave reward")
 		check(scene.current_wave == index+1 and scene.timeline.wave_index == index+1, "Timeline did not advance across the ACT boundary")
@@ -157,10 +157,10 @@ func verify() -> void:
 		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
 	shop.open_shop()
 	shop.view.finish_animation()
-	check(shop.buy(0), "Wallet purchase check failed")
+	check(not shop.buy(0), "Terminal run permitted a purchase")
 	check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after purchase")
 	shop.view.finish_animation()
-	check(shop.reroll(), "Wallet reroll check failed")
+	check(not shop.reroll(), "Terminal run permitted a reroll")
 	check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after reroll")
 	scene.queue_free()
 	await get_tree().process_frame

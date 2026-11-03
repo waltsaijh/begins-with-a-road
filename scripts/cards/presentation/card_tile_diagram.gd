@@ -51,6 +51,24 @@ func _refresh() -> void:
 		view.size = Vector2.ONE*width
 		view.get_node("Tower").visible = cells[i] in blocked
 		view.get_node("Tower/Accent").self_modulate = accent
+		var ports := view.get_node_or_null("Ports") as Line2D
+		if ports == null:
+			ports = Line2D.new()
+			ports.name = "Ports"
+			ports.default_color = Color("e7eee8")
+			ports.width = 1.4
+			view.add_child(ports)
+		ports.clear_points()
+		ports.visible = card.tile_preset != null and card.tile_preset.has_explicit_ports() and not cells[i] in blocked
+		if ports.visible:
+			var mask: int = card.road_ports(Vector2i.ZERO, turns).get(cells[i], 0)
+			var midpoint := Vector2.ONE * width / 2.0
+			for direction in 4:
+				if not mask & (1 << direction): continue
+				var offset: Vector3i = TileConstants.DIRECTIONS[direction]
+				ports.add_point(midpoint)
+				ports.add_point(midpoint + Vector2(offset.x, offset.z) * width / 2.0)
+				ports.add_point(midpoint)
 
 func _draw() -> void:
 	if card == null or card.traffic == null: return

@@ -1,0 +1,34 @@
+config,policy,map,mode,n,wins,leaks_mean,leaks_median,leaks_min,leaks_max,leaks_sd,gold_mean,seeds
+candidate1,generalist,frontier,headless,2,2,0.5,0.5,0,1,0.71,6.5,11 23
+speed1.5,generalist,frontier,headless,1,1,0,0,0,0,,7,11
+reward0.55,generalist,frontier,headless,1,1,0,0,0,0,,0,11
+candidate2,generalist,frontier,headless,2,2,0.5,0.5,0,1,0.71,5,11 23
+candidate2-reward75,generalist,frontier,headless,2,1,2,2.0,0,4,2.83,0.5,11 23
+candidate2-speed125,generalist,frontier,headless,1,1,3,3,3,3,,6,23
+candidate1,generalist,frontier,rendered,1,1,0,0,0,0,,7,11
+final,generalist,frontier,rendered,1,1,0,0,0,0,,1,11
+candidate3,barracks,frontier,headless,2,2,0.5,0.5,0,1,0.71,6.5,11 23
+candidate3,core,frontier,headless,2,2,5,5.0,4,6,1.41,1,11 23
+candidate3,damage,frontier,headless,2,2,0.5,0.5,0,1,0.71,4,11 23
+candidate3,generalist,frontier,headless,2,2,2,2.0,0,4,2.83,0.5,11 23
+candidate3,heavy,frontier,headless,2,2,6,6.0,1,11,7.07,3.5,11 23
+candidate3,swarm,frontier,headless,2,2,1.5,1.5,0,3,2.12,3.5,11 23
+holdout,core,frontier,headless,1,1,15,15,15,15,,0,307
+holdout,generalist,frontier,headless,1,1,0,0,0,0,,4,101
+sensitivity-flat9,generalist,frontier,headless,1,0,1,1,1,1,,6,23
+sensitivity-oldprices,generalist,frontier,headless,1,1,4,4,4,4,,2,23
+sensitivity-price120,generalist,frontier,headless,1,1,5,5,5,5,,0,23
+sensitivity-price80,generalist,frontier,headless,1,1,2,2,2,2,,4,23
+final,generalist,frontier,headless,1,1,4,4,4,4,,0,23
+candidate3,route,frontier,headless,2,2,0.5,0.5,0,1,0.71,1.5,11 23
+holdout,barracks,holdout,headless,1,1,4,4,4,4,,7,307
+holdout,swarm,holdout,headless,1,1,0,0,0,0,,7,101
+sensitivity-disable150,generalist,frontier,headless,1,1,4,4,4,4,,0,23
+sensitivity-growth70,generalist,frontier,headless,1,1,9,9,9,9,,0,23
+sensitivity-healing150,generalist,frontier,headless,1,1,11,11,11,11,,0,23
+sensitivity-hp120,generalist,frontier,headless,1,0,20,20,20,20,,5,23
+sensitivity-interval75,generalist,frontier,headless,1,1,6,6,6,6,,0,23
+sensitivity-reward120,generalist,frontier,headless,1,1,3,3,3,3,,2,23
+sensitivity-reward80,generalist,frontier,headless,1,1,11,11,11,11,,7,23
+sensitivity-speed120,generalist,frontier,headless,1,0,11,11,11,11,,0,23
+reroll-first,generalist,frontier,headless,1,1,3,3,3,3,,4,23

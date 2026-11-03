@@ -13,9 +13,19 @@ godot-cpp 固定 commit e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77，4.5 API；Pyt
 ./tools/build/build_native.ps1 -Platform web -Target template_release
 ```
 
-可提供 -Python、-MsvcTools、-WindowsSdk、-Emsdk。輸出 `bin/road_graph.editguard.phase4.*`，road_graph.gdextension 指向各平台版本；reloadable=false，需重啟 Godot 載入。舊已載入 DLL 保留，避免破壞正在開啟的編輯器。
+可提供 -Python、-MsvcTools、-WindowsSdk、-Emsdk。輸出 `bin/road_graph.candidates.*`，road_graph.gdextension 指向各平台版本；reloadable=false，需重啟 Godot 載入。舊已載入 DLL 保留，避免破壞正在開啟的編輯器。
 
 ## 資料與 API
+
+RoadEditGuard.prepare 另回傳 `route_cells: PackedInt32Array`（交錯 x／y），為基地（terminals[0]）到啟用入口的完整 simple paths 格子聯集。沿用迭代 Tarjan／block-cut，不讀候選池或配額；只取基地所在分量，沒有可達入口時為空。供道路灰化使用，不更動 add_cell 的增量 guard 行為。需要重新建置 Windows DLL／Web wasm；本輪 Windows debug／release、C++ oracle及Godot回歸結果見 [道路修正](../docs/road_visual_and_placement_refinement.md)。
+
+### Windows 編輯器載入封鎖（2026-10-25）
+
+若錯誤對話框指向 `bin/~road_graph...dll`，狀態 `0xc0e90002`，先查 Godot log 是否為 Win32 4551。Windows SDK 將兩者定義為 Application Control policy block，不能直接判定 DLL 損毀。本機已核對 Smart App Control 狀態為啟用、phase4 debug DLL 未簽章、原檔與留存暫存副本 SHA-256 相同；沒有修改系統信任或安全設定。
+
+[Godot 4.7.2 loader](https://github.com/godotengine/godot/blob/4.7.2-stable/core/extension/gdextension_library_loader.cpp) 在 editor 模式啟用暫存 DLL，即使 `reloadable=false` 仍會產生副本。因此切換 reloadable 或刪除副本並非已驗證修復。編輯器載入仍待處理系統信任／簽章要求；不要把遊戲 runtime 通過等同 Editor 通過。
+
+同日直接 runtime 的 construction regression 54 檢查通過（`.godot/test-results/construction/dll_runtime_check.log`）。本機可先不開 editor 執行遊戲：`& 'C:\tools\Godot.exe' --path 'D:\games\begins-with-a-road-routing' res://tests/construction/playground.tscn`。此方式仍受 Windows 原有載入政策檢查；若也遭封鎖，保留錯誤交由系統信任／簽章流程處理，不關閉防護或修改 DLL 規避。
 
 RoadPortalGraph.build(cells, ports, start, goal, include_routes=true, extra_terminals=PackedVector2Array()) 的入口／寬區／細走廊縮減保持原本設計。PortalMap 傳 false，避免建圖階段先算一遍全 1 路線；extra_terminals 保留每個額外起點，包括走廊中段、寬區與共享窗口內的 terminal。prepare(graph) 只重建共用實體幾何並清空計畫；不建立定向、rank 或 incidence forest。
 
@@ -90,3 +100,5 @@ Phase 4 使用新的輸出檔名，保留舊已載入 DLL；重新建置後需�
 本機 `native/godot-cpp` 的 commit 已核對為上述固定版本，extension_api.json 為 4.5 API；遊戲使用 Godot 4.7.2。SDK 及 `bin/` 均在 .gitignore，新 clone 必須另外取得 SDK 與建置產物。當前本機 SDK 的 origin 是正式專案內 SDK 的本機來源路徑，Sandbox 自己持有完整 SDK；建置不需修改該來源或讀取其他遊戲內容。
 
 Windows phase4 debug／release 的歷史成功 log 位於 `.godot/phase4-native-{debug,release}.log`。2026-10-23 Offboarding 核對兩個 DLL 存在並以 debug 載入通過代表性回歸，沒有重建或進行 release runtime 驗證；現版 Web wasm／瀏覽器仍為 NOT RUN。準確版本、限制及當次測試見 [HANDOFF](../docs/HANDOFF.md)。
+
+2026-11-03 整合原生候選 API 後，輸出改用 road_graph.candidates，避免覆寫編輯器仍持有的舊 phase4 DLL；切換後須重新啟動編輯器。

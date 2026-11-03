@@ -64,11 +64,14 @@ func _process(delta: float) -> void:
 		return
 	for tower: DefenseTower in tower_map.towers.values():
 		if tower.is_queued_for_deletion() or tower.health <= 0 or tower.attack == null or tower.is_disabled():
+			if BalanceTrace.enabled and tower.is_disabled(): BalanceTrace.sample(tower,"disabled",step)
 			continue
 		if wave.active: RelicCombat.advance(self,tower,step)
 		var target: Node3D = tower.attack.select_target(self,tower)
 		if target == null:
+			if BalanceTrace.enabled: BalanceTrace.sample(tower,"no_target",step)
 			continue
+		if BalanceTrace.enabled: BalanceTrace.sample(tower,"has_target",step)
 		var aligned := tower.aim_at(aim_position(target, tower.attack), step)
 		if elapsed < tower.next_attack_time or not aligned:
 			continue
@@ -81,6 +84,7 @@ func _process(delta: float) -> void:
 		tower.present_shot(target,visuals)
 		tower.next_attack_time = elapsed+tower.attack_interval
 		shots_fired += 1
+		if BalanceTrace.enabled: BalanceTrace.event("attack",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"damage":tower.damage})
 
 func default_target(tower: DefenseTower) -> Node3D:
 	var preferred: Node3D = enemy_abilities.preferred(tower,targets_for(tower))
@@ -95,7 +99,8 @@ func targets_for(tower: DefenseTower, strategy: TowerAttack = null) -> Array[Nod
 	if strategy is VolleyAttack and strategy.circular_range:
 		candidates = _index.targets_near(tower.combat_origin(),tower.attack_radius*tower.range_multiplier)
 	else:
-		var center := _index.cell_for(tower.combat_origin()) if tower.has_relic(&"departure") else tower.grid_cell
+		# Offsets already contain the body's center. Translate by patrol only.
+		var center := _index.cell_for(tower.patrol_visual().global_position) if tower.has_relic(&"departure") else tower.grid_cell
 		candidates = _index.targets_in_offsets(center,tower.attack_offsets())
 	return candidates.filter(func(enemy): return tower.can_attack_target(enemy))
 
@@ -112,10 +117,16 @@ func fire_mortar(tower: DefenseTower, target: Node3D, attack: VolleyAttack) -> v
 	projectiles.append({"mortar":true,"start":start,"end":end,"age":0.0,"duration":duration,"radius":radius,"arc":attack.shell_arc_height,"visual_size":0.20 if special else 0.13,"color":Color("f18655") if special else attack.color,"payload":AttackPayload.new(tower,target,attack),"flying":tower.has_relic(&"air_strike"),"friendly":tower.relic_value(&"explosive_shell", &"friendly_multiplier") if special else 0.0})
 
 func _impact_mortar(shot: Dictionary) -> void:
+	var hits := 0
 	for target in _index.targets_near(shot.end,shot.radius):
 		if RelicCombat.tagged(target,&"flying") and not shot.flying: continue
 		var offset := (map.to_local(target.global_position)-map.to_local(shot.end))/map.cell_size
-		if offset.length_squared() <= shot.radius*shot.radius: shot.payload.apply(target)
+		if offset.length_squared() <= shot.radius*shot.radius:
+			shot.payload.apply(target)
+			hits += 1
+	if BalanceTrace.enabled:
+		BalanceTrace.event("mortar_landing",shot.payload.source_id,{"hits":hits,"flight_seconds":shot.duration})
+		if hits == 0: BalanceTrace.event("miss",shot.payload.source_id,{"reason":"empty_landing"})
 	if shot.friendly > 0:
 		# Snapshot values: destroying a tower mutates the live dictionary.
 		for tower: DefenseTower in tower_map.towers.values():

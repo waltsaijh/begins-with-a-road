@@ -27,12 +27,14 @@ preset_path = "res://assets/data/tile_presets/blasting.tres"
 [resource]
 script = ExtResource("1")
 name_key = "tower.sentry.name"
+preset_group = "base"
 model = ExtResource("2")
+card_price = 9
 icon = ExtResource("1_yfivi")
 accent_color = Color(0.52, 0.8, 0.83, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
 attack_area = ExtResource("5_area")
-default_damage = 25.0
+default_damage = 12.0
 attack_interval = 0.5
 attack = ExtResource("3_attack")
 aim_pivot_path = NodePath("AimPivot")

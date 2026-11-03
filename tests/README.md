@@ -1,5 +1,11 @@
 # 測試
 
+## 道路視覺與建造裁切
+
+最新凹槽／橋頭／寬路流線入口為 `tests/road_refinement/depth_flow.tscn`：1–9／0切十例、R旋轉實際地塊／接口、Space動畫。加 `-- --verify` 同時驗證覆蓋、GPU像素、真正WaveSpawnSchedule配額並產生26張截圖，輸出 `.godot/test-results/road_depth_flow/`。Headless可驗證幾何／資料，畫面與像素另跑真渲染；本輪結果見 [道路修正](../docs/road_visual_and_placement_refinement.md)。
+
+`tests/road_refinement/rules.tscn` 以完整路線 oracle 驗證原生結構判定與放置裁切；`input.tscn` 用實際基礎版迫擊砲L型＋哨塔直線，經真實點牌／拖牌／R／提交／開波驗證。`gallery.tscn` 為唯讀十案例對照，F6後 A全覽、1–9／0聚焦，`-- --capture` 產生11張真實渲染圖。輸出在 `.godot/test-results/road_refinement/`。Windows native debug／release須重新建置以提供route_cells；Web亦需重建，不沿用舊wasm。當次PASS／初輪FAIL／NOT RUN及人工步驟見 [完整紀錄](../docs/road_visual_and_placement_refinement.md)。
+
 波次編輯器回歸亦會移除 ACT／波次控制項，模擬切分支後新腳本仍搭配舊 dock，驗證子介面重建、未儲存／待切換資料、選取及原生 Undo／Redo 保留。`enemies/solid_material.gd` 同時驗證舊 enemy_walk shader 路徑可載入、相容入口與共用材質的實際像素一致；正式模型仍使用同一份共用材質。
 
 保留可驗證目前行為的功能回歸；一次性效能量測與重複截圖場景已清除，功能測試內的重複計時迴圈也已移除，仍保留機率分布及避讓工作量上限等斷言。同一項的 `.gd`、`.gd.uid` 與 `.tscn` 保持在同一目錄。測試資料與預設值盡量獨立於使用者正在編輯的關卡與塔數值。
@@ -24,9 +30,12 @@ Web 啟動頁交接回歸：`node tests/menus/web_loading_shell.cjs`，依環境
 | 目錄 | 範圍 |
 | --- | --- |
 | `cards/` | 卡牌命名、配置、放置、輸入、商店與旋轉提示 |
+| `construction/` | 獨立複合地塊、批次預擺、幾何加成、真輸入及 A／B／C 對照；見 [原型說明](../docs/construction_prototype.md) |
+| `tower_tile_editor/` | 自由多格塔編輯器及即時試玩；rules 為資料／占位／路線回歸，input 必須真渲染；見 [工具說明](../docs/tower_tile_editor.md) |
 | `relics/` | Phase 3 疊加升級、21 件遺物、抽取、協同、真實迫擊砲與實際拖放／三選一 |
 | `traffic/` | Phase 2 三種臨時設施、選路倍率、壽命、預覽差異及商店 |
 | `synergy/` | Phase 4 六新兵、群體分配、硬性選路、敵軍能力及 A–D 可玩場景 |
+| `balance/` | Phase 5 十五波、Boss、勝敗／重開、七策略、獨立帳本、參考場與預留驗證；見 [量測入口](balance/README.md) |
 | `combat/` | 塔、障礙物、索敵、攻擊、實際繪製與特效 |
 | `enemies/` | 兵種資源、移動、MultiMesh、狀態與視覺避讓 |
 | `menus/` | 開始選單的明確橋景／介面、雙語設定、尺寸與真正進入關卡 |
@@ -148,3 +157,12 @@ godot --path . res://scenes/level.tscn --quit-after 180
 每次用不同的 `--log-file` 保存原始輸出；測試的固定 JSON／截圖位置可能覆寫前次產物，必要時先複製保存。Windows GUI 執行檔可用 `Start-Process -PassThru -Wait -WindowStyle Hidden` 等待。判定須同時檢查退出碼、完成標記、斷言與 GDScript error；正式關卡最後一項只有有限啟動 Smoke，不代表完成九波或驗證完整 Run。
 
 本次原始結果在 `.godot/offboarding-2026-10-23/`，前次 synergy／traffic／relics 產物先複製至其中 `prior-results/`。本次沒有重建 native、執行 release 專用測試或重跑全部 input／editor；Web wasm／瀏覽器、長局平衡及效能仍未驗證。不要把歷史 471 項 Phase 4 結果寫成本次總數。
+
+## 20＋1 塔體與預覽
+
+- [tower_visuals/rules.tscn](tower_visuals/rules.tscn)：原基礎版資源、四向提交、升級與實際商店21份抽取。
+- [tower_visuals/combat.tscn](tower_visuals/combat.tscn)：真正的目標邊界、砲口、傷害、迫擊砲快照與巡航。
+- [tower_visuals/input.tscn](tower_visuals/input.tscn)：必須渲染；全部21份的真實選單／補牌／旋轉／放置／升級與開波。兵營fixture預建道路廣場，仍走正常權威檢查。
+- [tower_visuals/gallery.tscn](tower_visuals/gallery.tscn)：人工1–6／R／A；加 -- --capture 會存六塔等級與射程對照圖。
+
+規格與限制見 [塔體與預覽](../docs/tower_visuals_and_preview.md)。

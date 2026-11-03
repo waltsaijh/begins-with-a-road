@@ -73,3 +73,7 @@ Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large�
 - **Ability Text／Ability Text En**：情報介面的繁中／英文能力說明；改數值時一併更新描述。
 
 以上參數於開波快照，暫停停止能力時鐘，原三兵種的預設值維持既有行為。
+
+## Phase 5 最終巨獸
+
+`siege_behemoth.tres` 是最終波的一隻 boss，與九種普通兵種共用 Troop／Enemy 生命週期。`Sabotage Targets` 控制同次最多標記的塔數（普通爆破手1、巨獸2），`Base Damage` 控制漏敵扣血（普通1、巨獸20）；正式關卡額外將 boss 漏敵視為敗北。巨獸沿 Cost／Uniform 固定路線，boss Tag 排除狩獵處決，其餘狀態及兵營攔截依原規則。載入數值、模型來源與測試見 [Phase 5](../../../docs/phase5.md)。

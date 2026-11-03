@@ -12,6 +12,7 @@
 [sub_resource type="Resource" id="Resource_u5wrp"]
 script = ExtResource("2_3x4mj")
 unit_model = ExtResource("3_c38ft")
+damage = 6.0
 
 [sub_resource type="Resource" id="Resource_5v8q0"]
 script = ExtResource("7_unot2")
@@ -22,7 +23,7 @@ script = ExtResource("6_hvhi4")
 name_key = "tower.barracks.name"
 model = ExtResource("5_wws40")
 deployment = SubResource("Resource_u5wrp")
-card_price = 15
+card_price = 8
 icon = ExtResource("4_gx47c")
 accent_color = Color(0.4627451, 0.8117647, 0.8784314, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])

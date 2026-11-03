@@ -17,10 +17,13 @@ void fragment() {
 	float best_alpha = 0.0;
 	// Derivatives must be outside the variable-count primitive loop.
 	float aa = max(length(fwidth(point))*0.55, 0.0001);
-	for (int i = 0; i < 48; i++) {
-		if (i >= count) { break; }
+	// Narrow patches retain the 48-piece bound. Wide projected junctions keep
+	// every allocated phase instead of truncating a data-dependent piece list.
+	for (int i = 0; i < count; i++) {
 		vec4 endpoints = texelFetch(flow_data, ivec2(1+i*3, row), 0);
 		vec4 info = texelFetch(flow_data, ivec2(2+i*3, row), 0);
+		bool dwell = info.x < 0.0;
+		float start_strength = dwell ? -info.x-1.0 : info.x;
 		vec2 delta = endpoints.zw - endpoints.xy;
 		float segment_length = max(length(delta),0.0001);
 		vec2 axis = delta/segment_length;
@@ -28,12 +31,13 @@ void fragment() {
 		float progress = dot(relative,axis);
 		bool arc = info.w < 0.0;
 		float end_strength = abs(info.w);
-		float maximum_width = line_width*0.5*mix(0.4,1.0,max(info.x,end_strength));
+		float maximum_width = line_width*0.5*mix(0.4,1.0,max(start_strength,end_strength));
 		vec2 center = endpoints.xy+endpoints.zw;
 		vec2 radial = point-center;
 		vec2 radius_a = endpoints.xy-center;
 		float distance = arc ? abs(length(radial)-length(radius_a))
 			: abs(relative.x*axis.y-relative.y*axis.x);
+		if (dwell) { distance = length(relative); }
 		if (distance > maximum_width+aa) { continue; }
 		vec4 clips = texelFetch(flow_data, ivec2(3+i*3,row), 0);
 		// Partition the shared join without fading its seam. The outer strip
@@ -57,16 +61,21 @@ void fragment() {
 			t = clamp(angle/1.57079632679,0.0,1.0);
 		}
 		// Ease only the style: the complete-trip animation clock stays linear.
-		float strength = mix(info.x,end_strength,smoothstep(0.0,1.0,t));
+		float strength = mix(start_strength,end_strength,smoothstep(0.0,1.0,t));
 		float width = line_width*0.5*mix(0.4,1.0,strength);
 		float coverage = 1.0-smoothstep(width-aa,width+aa,distance);
 		if (coverage <= 0.0) { continue; }
 		float local_progress = mix(fract(info.y),fract(info.z),t)*4.0-0.5;
+		if (dwell) { local_progress = fract(info.y)*4.0-0.5; }
 		float along = mod(TIME*flow_speed+phase_offset-floor(info.y)-local_progress,stroke_period);
 		// Nearest complete-trip arrival, in constant work even after many merges.
 		vec4 packed_gap = round(texelFetch(phase_data, ivec2(int(floor(along)),int(floor(info.z))), 0)*255.0);
 		vec2 gap = vec2(dot(packed_gap.rg,vec2(1.0,256.0)),dot(packed_gap.ba,vec2(1.0,256.0)));
 		float distance_to_light = min(gap.x+fract(along),gap.y-fract(along));
+		if (dwell) {
+			float duration = (fract(info.z)-fract(info.y))*4.0;
+			distance_to_light = min(max(0.0,gap.x+fract(along)-duration),gap.y-fract(along));
+		}
 		// The entire stroke fades at both ends. Outside it, there is no base line.
 		float envelope = 1.0-smoothstep(0.0,highlight_length*0.5,distance_to_light);
 		float opacity = coverage*highlight_color.a*mix(0.45,1.0,strength)*envelope;

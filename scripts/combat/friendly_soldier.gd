@@ -32,7 +32,7 @@ func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> vo
 	health = settings.health
 	_max_health = settings.health
 	tower.stats_changed.connect(_refresh_stats)
-	home = tower.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),tower.rotation_steps)
+	home = tower.garrison_cell()
 	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),tower.rotation_steps))*(6.0/48.0 if slot == 1 else (-6.0/48.0 if slot == 0 else 0.0))
 	home_position = manager.world(home)+manager.map.global_basis*Vector3(side.x*manager.map.cell_size.x,0,side.y*manager.map.cell_size.z)
 	if slot >= 2:
@@ -134,14 +134,16 @@ func advance(delta: float) -> void:
 	else:
 		if not is_instance_valid(target.engaged_by):
 			target.engaged_by = self
+			if BalanceTrace.enabled: BalanceTrace.event("intercept",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"slot":slot_index})
 			attack_timer = settings.interval
 			enemy_timer = target.melee_interval
 		attack_timer -= delta
 		enemy_timer -= delta
+		if BalanceTrace.enabled: BalanceTrace.sample(tower,"interception_unit_seconds",delta)
 		if attack_timer <= 0:
 			attack_timer += settings.interval
 			pulse = 1
-			target.take_damage(settings.damage)
+			target.take_damage(settings.damage,BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "barracks")
 		if is_instance_valid(target) and target.can_be_targeted() and enemy_timer <= 0:
 			enemy_timer += target.melee_interval
 			take_damage(target.melee_damage)
@@ -155,7 +157,7 @@ func advance(delta: float) -> void:
 		if not ranged.is_empty():
 			var victim: Node3D = ranged[0]
 			manager.combat.visuals.add_beam(global_position+Vector3.UP*0.5,victim.global_position+Vector3.UP*0.25,Color("ead5a2"),0.035,0.18)
-			victim.take_damage(settings.damage)
+			victim.take_damage(settings.damage,BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "sharpshooter")
 			ranged_timer = tower.relic_value(&"sharpshooter", &"interval")*settings.interval/tower.definition.deployment.interval
 			pulse = 1.0
 	var motion := global_position-previous

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "candidate3-swarm-11",
+    "args": [
+      "--policy=swarm",
+      "--seed=11",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-core-11",
+    "args": [
+      "--policy=core",
+      "--seed=11",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-damage-23",
+    "args": [
+      "--policy=damage",
+      "--seed=23",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-barracks-23",
+    "args": [
+      "--policy=barracks",
+      "--seed=23",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  }
+]

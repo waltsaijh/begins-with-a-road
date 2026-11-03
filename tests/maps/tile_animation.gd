@@ -89,7 +89,7 @@ func verify() -> void:
 	visual._process(visual.duration * 0.43)
 	check(visual.jobs[added].model.position.y <= 0.0 and visual.jobs[added].model.position.y > before_rise, "Tile must rise toward its target")
 	visual.finish()
-	check(visual.jobs.is_empty() and not visual.is_processing() and visual.static_tiles.get_cell_item(added) == 4, "Settling did not return tiles to the batched grid")
+	check(visual.jobs.is_empty() and not visual.is_processing() and visual.static_tiles.get_cell_item(added) == visual._display_items[added], "Settling did not return tiles to the batched grid")
 	# Find a normal straight tile for independently checking the transformation.
 	var cell := Vector3i.ZERO
 	for candidate in map.get_used_cells():
@@ -110,7 +110,7 @@ func verify() -> void:
 			check(visual.jobs[cell].fixed_top == fixed_top and is_equal_approx(visual.jobs[cell].model.position.y, 0.0 if fixed_top else -visual.rise_depth), "Pillar conversion must hold the stone top; replacement wood must rise")
 			check(visual.jobs[cell].support_material.get_shader_parameter("support_growth") == (0.0 if TileConstants.appearance_of(item) == TileConstants.Appearance.PILLAR else 1.0), "Pillar transition has incorrect initial support")
 		else:
-			check(visual.jobs[cell].body.get_child_count() == 1 and visual.jobs[cell].model.mesh == map.mesh_library.get_item_mesh(item), "Ordinary replacement must show only the new model")
+			check(visual.jobs[cell].body.get_child_count() == 1 and visual.jobs[cell].model.mesh.get_surface_count() == 1, "Ordinary replacement must show only the new road surface")
 			check(is_equal_approx(visual.jobs[cell].model.position.y, -visual.rise_depth), "Replacement must rise from the configured depth")
 		visual._process(visual.duration * 0.5)
 		if pillar_transition:
@@ -118,9 +118,9 @@ func verify() -> void:
 		else:
 			check(is_equal_approx(visual.jobs[cell].model.position.y, -visual.rise_depth / 8.0), "Rise progress is incorrect")
 		visual._process(visual.duration * 0.51)
-		check(not visual.jobs.has(cell) and visual.static_tiles.get_cell_item(cell) == item, "Replacement failed to settle within its configured duration")
+		check(not visual.jobs.has(cell) and visual.static_tiles.get_cell_item(cell) == visual._display_items[cell], "Replacement failed to settle within its configured duration")
 	check(Snapshot.capture(map) == snapshot, "Visual transitions changed navigation ports")
-	check(visual.static_tiles.get_cell_item(cell) == 1 and visual.get_child_count() == 1, "Temporary model leak after settling")
+	check(visual.static_tiles.get_cell_item(cell) == visual._display_items[cell] and visual.get_child_count() == 1, "Temporary model leak after settling")
 	scene.queue_free()
 	await get_tree().process_frame
 	await verify_tower_rise()
@@ -129,7 +129,9 @@ func verify() -> void:
 		get_tree().quit(0 if failures == 0 else 1)
 
 func verify_tower_rise() -> void:
-	var scene: Node3D = load("res://scenes/main.tscn").instantiate()
+	var cells: Array[Vector2i] = []
+	for x in 24: cells.append(Vector2i(x,0))
+	var scene: Node3D = preload("res://tests/fixtures/portal_fixture.gd").scene_for(cells,Vector2i.ZERO,Vector2i(23,0))
 	scene.get_node("EnemyWave").auto_start = false
 	get_tree().root.add_child(scene)
 	for i in 5: await get_tree().process_frame

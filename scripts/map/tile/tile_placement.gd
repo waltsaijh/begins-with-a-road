@@ -5,6 +5,9 @@ signal cell_placed(cell: Vector3i)
 
 @onready var map: GridMap = $"../TileMap"
 @onready var camera: Camera3D = $"../Camera3D"
+## Compound recipes retain allowed exits even before a neighboring tile exists.
+## Empty in legacy levels; appearance variants never change these contracts.
+var port_overrides := {}
 
 func _ready() -> void:
 	for cell in map.get_used_cells():
@@ -57,8 +60,11 @@ func notify_cells(cells: Array[Vector3i]) -> void:
 
 func neighbor_mask(cell: Vector3i) -> int:
 	var mask := 0
+	var towers := get_node_or_null("../TowerMap")
 	for i in TileConstants.DIRECTIONS.size():
-		if map.get_cell_item(cell + TileConstants.DIRECTIONS[i]) > 0:
+		var neighbor: Vector3i = cell + TileConstants.DIRECTIONS[i]
+		if towers != null and towers.occupied.has(Vector2i(neighbor.x,neighbor.z)): continue
+		if map.get_cell_item(neighbor) > 0 and int(port_overrides.get(Vector2i(cell.x,cell.z),15)) & (1<<i) and int(port_overrides.get(Vector2i(neighbor.x,neighbor.z),15)) & (1<<((i+2)%4)):
 			mask |= 1 << i
 	return mask
 
@@ -83,6 +89,8 @@ func tile_for_mask(mask: int) -> Vector2i:
 func refresh_cell(cell: Vector3i) -> void:
 	if map.get_cell_item(cell) <= 0:
 		return
+	var towers := get_node_or_null("../TowerMap")
+	if towers != null and towers.occupied.has(Vector2i(cell.x,cell.z)): return
 	var tile := tile_for_mask(neighbor_mask(cell))
 	var appearance := TileConstants.appearance_of(map.get_cell_item(cell))
 	map.set_cell_item(cell, TileConstants.item_for(tile.x, appearance), tile.y)

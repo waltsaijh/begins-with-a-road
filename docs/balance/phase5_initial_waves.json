@@ -1,0 +1,500 @@
+[
+  {
+    "wave": 1,
+    "purpose": "single target / speed",
+    "move_speed": 1.25,
+    "reward": 12,
+    "groups": [
+      {
+        "troop": "soldier",
+        "count": 5,
+        "start_tick": 0,
+        "interval_ticks": 8,
+        "batch": 1
+      },
+      {
+        "troop": "quickfeet",
+        "count": 3,
+        "start_tick": 24,
+        "interval_ticks": 10,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 2,
+    "purpose": "cohorts / first taunt",
+    "move_speed": 1.25,
+    "reward": 12,
+    "groups": [
+      {
+        "troop": "soldier",
+        "count": 6,
+        "start_tick": 0,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "rat_swarm",
+        "count": 10,
+        "start_tick": 12,
+        "interval_ticks": 10,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 1,
+        "start_tick": 0,
+        "interval_ticks": 1,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 3,
+    "purpose": "armor and crowds",
+    "move_speed": 1.25,
+    "reward": 12,
+    "groups": [
+      {
+        "troop": "rat_swarm",
+        "count": 15,
+        "start_tick": 12,
+        "interval_ticks": 10,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 2,
+        "start_tick": 0,
+        "interval_ticks": 24,
+        "batch": 1
+      },
+      {
+        "troop": "heavy",
+        "count": 2,
+        "start_tick": 8,
+        "interval_ticks": 24,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 4,
+    "purpose": "healing introduction",
+    "move_speed": 1.35,
+    "reward": 14,
+    "groups": [
+      {
+        "troop": "soldier",
+        "count": 10,
+        "start_tick": 0,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "heavy",
+        "count": 3,
+        "start_tick": 8,
+        "interval_ticks": 16,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 2,
+        "start_tick": 12,
+        "interval_ticks": 24,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 5,
+    "purpose": "healer and swarm cooperation",
+    "move_speed": 1.35,
+    "reward": 14,
+    "groups": [
+      {
+        "troop": "rat_swarm",
+        "count": 25,
+        "start_tick": 8,
+        "interval_ticks": 8,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 3,
+        "start_tick": 0,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 2,
+        "start_tick": 8,
+        "interval_ticks": 24,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 6,
+    "purpose": "limited disable",
+    "move_speed": 1.35,
+    "reward": 14,
+    "groups": [
+      {
+        "troop": "heavy",
+        "count": 5,
+        "start_tick": 0,
+        "interval_ticks": 14,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 3,
+        "start_tick": 4,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 2,
+        "start_tick": 12,
+        "interval_ticks": 24,
+        "batch": 1
+      },
+      {
+        "troop": "saboteur",
+        "count": 1,
+        "start_tick": 24,
+        "interval_ticks": 1,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 7,
+    "purpose": "newest routes",
+    "move_speed": 1.45,
+    "reward": 16,
+    "groups": [
+      {
+        "troop": "scout",
+        "count": 8,
+        "start_tick": 0,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "soldier",
+        "count": 12,
+        "start_tick": 4,
+        "interval_ticks": 5,
+        "batch": 1
+      },
+      {
+        "troop": "quickfeet",
+        "count": 6,
+        "start_tick": 20,
+        "interval_ticks": 7,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 8,
+    "purpose": "shortest routes / anti-air",
+    "move_speed": 1.45,
+    "reward": 16,
+    "groups": [
+      {
+        "troop": "winged_beast",
+        "count": 10,
+        "start_tick": 12,
+        "interval_ticks": 7,
+        "batch": 1
+      },
+      {
+        "troop": "heavy",
+        "count": 6,
+        "start_tick": 0,
+        "interval_ticks": 12,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 9,
+    "purpose": "hard-route combination",
+    "move_speed": 1.45,
+    "reward": 16,
+    "groups": [
+      {
+        "troop": "scout",
+        "count": 10,
+        "start_tick": 16,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "winged_beast",
+        "count": 8,
+        "start_tick": 24,
+        "interval_ticks": 7,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 4,
+        "start_tick": 0,
+        "interval_ticks": 16,
+        "batch": 1
+      },
+      {
+        "troop": "rat_swarm",
+        "count": 25,
+        "start_tick": 8,
+        "interval_ticks": 8,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 10,
+    "purpose": "crowds and sabotage",
+    "move_speed": 1.5,
+    "reward": 18,
+    "groups": [
+      {
+        "troop": "rat_swarm",
+        "count": 35,
+        "start_tick": 4,
+        "interval_ticks": 7,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 5,
+        "start_tick": 0,
+        "interval_ticks": 14,
+        "batch": 1
+      },
+      {
+        "troop": "saboteur",
+        "count": 3,
+        "start_tick": 12,
+        "interval_ticks": 20,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 11,
+    "purpose": "healing / air coverage",
+    "move_speed": 1.5,
+    "reward": 18,
+    "groups": [
+      {
+        "troop": "heavy",
+        "count": 8,
+        "start_tick": 0,
+        "interval_ticks": 12,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 4,
+        "start_tick": 8,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "winged_beast",
+        "count": 12,
+        "start_tick": 24,
+        "interval_ticks": 6,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 12,
+    "purpose": "cooperation stress",
+    "move_speed": 1.5,
+    "reward": 18,
+    "groups": [
+      {
+        "troop": "shield_guardian",
+        "count": 5,
+        "start_tick": 0,
+        "interval_ticks": 14,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 3,
+        "start_tick": 8,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "saboteur",
+        "count": 3,
+        "start_tick": 16,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "scout",
+        "count": 12,
+        "start_tick": 24,
+        "interval_ticks": 5,
+        "batch": 1
+      },
+      {
+        "troop": "rat_swarm",
+        "count": 30,
+        "start_tick": 8,
+        "interval_ticks": 7,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 13,
+    "purpose": "mature ground build",
+    "move_speed": 1.55,
+    "reward": 20,
+    "groups": [
+      {
+        "troop": "rat_swarm",
+        "count": 40,
+        "start_tick": 4,
+        "interval_ticks": 7,
+        "batch": 1
+      },
+      {
+        "troop": "shield_guardian",
+        "count": 6,
+        "start_tick": 0,
+        "interval_ticks": 14,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 4,
+        "start_tick": 12,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "heavy",
+        "count": 8,
+        "start_tick": 8,
+        "interval_ticks": 12,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 14,
+    "purpose": "mobility and disabled coverage",
+    "move_speed": 1.55,
+    "reward": 20,
+    "groups": [
+      {
+        "troop": "winged_beast",
+        "count": 16,
+        "start_tick": 24,
+        "interval_ticks": 5,
+        "batch": 1
+      },
+      {
+        "troop": "scout",
+        "count": 14,
+        "start_tick": 0,
+        "interval_ticks": 5,
+        "batch": 1
+      },
+      {
+        "troop": "saboteur",
+        "count": 4,
+        "start_tick": 16,
+        "interval_ticks": 16,
+        "batch": 1
+      },
+      {
+        "troop": "quickfeet",
+        "count": 12,
+        "start_tick": 12,
+        "interval_ticks": 5,
+        "batch": 1
+      }
+    ]
+  },
+  {
+    "wave": 15,
+    "purpose": "staged assault / telegraphed siege",
+    "move_speed": 1.55,
+    "reward": 0,
+    "groups": [
+      {
+        "troop": "shield_guardian",
+        "count": 4,
+        "start_tick": 0,
+        "interval_ticks": 16,
+        "batch": 1
+      },
+      {
+        "troop": "rat_swarm",
+        "count": 25,
+        "start_tick": 8,
+        "interval_ticks": 8,
+        "batch": 1
+      },
+      {
+        "troop": "blood_mage",
+        "count": 3,
+        "start_tick": 20,
+        "interval_ticks": 20,
+        "batch": 1
+      },
+      {
+        "troop": "siege_behemoth",
+        "count": 1,
+        "start_tick": 56,
+        "interval_ticks": 1,
+        "batch": 1
+      },
+      {
+        "troop": "heavy",
+        "count": 6,
+        "start_tick": 64,
+        "interval_ticks": 12,
+        "batch": 1
+      },
+      {
+        "troop": "scout",
+        "count": 8,
+        "start_tick": 76,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "winged_beast",
+        "count": 8,
+        "start_tick": 88,
+        "interval_ticks": 6,
+        "batch": 1
+      },
+      {
+        "troop": "saboteur",
+        "count": 2,
+        "start_tick": 76,
+        "interval_ticks": 20,
+        "batch": 1
+      }
+    ]
+  }
+]

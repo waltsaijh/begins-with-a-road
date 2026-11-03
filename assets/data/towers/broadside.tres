@@ -29,12 +29,13 @@ preset_path = "res://assets/data/tile_presets/broadside_04.tres"
 [resource]
 script = ExtResource("5_l6yb8")
 name_key = "tower.broadside.name"
+preset_group = "base"
 model = ExtResource("4_ggahg")
-card_price = 12
+card_price = 8
 icon = SubResource("CompressedTexture2D_x372t")
 accent_color = Color(0.7882353, 0.63529414, 0.92941177, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
 attack_area = ExtResource("2_av4gk")
-default_damage = 8.0
+default_damage = 16.0
 attack = ExtResource("1_xpn7g")
 tile_preset_candidates = Array[ExtResource("6_odhbd")]([SubResource("Resource_1ljdw"), SubResource("Resource_nf4w8"), SubResource("Resource_ilwns"), SubResource("Resource_3g8r7")])

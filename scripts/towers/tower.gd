@@ -7,6 +7,15 @@ signal stats_changed
 @export var definition: TowerDefinition
 var grid_cell := Vector2i.ZERO
 var occupied_cells: Array[Vector2i] = []
+var placement_preset: TilePreset
+var placement_origin := Vector2i.ZERO
+var geometry_turns := 0
+var custom_garrison := Vector2i(2147483647,2147483647)
+var _body_cells: Array[Vector2i] = []
+
+func garrison_cell() -> Vector2i:
+	return custom_garrison if custom_garrison.x != 2147483647 else grid_cell+BuildCard.rotate_cell(Vector2i.UP,rotation_steps)
+
 var rotation_steps := 0:
 	set(value):
 		value = posmod(value, 4)
@@ -31,6 +40,8 @@ var unlimited_levels := false
 var deployment: BarracksDeployment
 var relic_effects := {}
 var support_bonus := 0.0
+var geometry_damage_bonus := 0.0
+var geometry_range_extension := 0
 var isolated := true
 var range_multiplier := 1.0
 var relic_clocks := {}
@@ -45,6 +56,7 @@ func apply_disable(source: Node3D, seconds: float) -> void:
 	if not is_instance_valid(source) or not source.can_be_targeted() or not is_finite(seconds) or seconds <= 0: return
 	var key := source.get_instance_id()
 	_disables[key] = {"source":weakref(source),"remaining":maxf(seconds,float(_disables.get(key,{}).get("remaining",0.0)))}
+	if BalanceTrace.enabled: BalanceTrace.event("disable",BalanceTrace.tower_id(self),{"source":source.enemy_id,"duration":seconds})
 	_refresh_disable_visual()
 
 func is_disabled() -> bool:
@@ -78,7 +90,13 @@ func has_relic(id: StringName) -> bool: return relic_effects.has(id)
 func relic_value(id: StringName, key: StringName, fallback := 0.0) -> float: return float(effect(id).get(key,fallback))
 
 func combat_origin() -> Vector3:
-	return patrol_visual().global_position if has_relic(&"departure") and _visual != null else global_position
+	var center := TowerBodyGeometry.origin(definition,body_cells()) if definition != null else Vector2.ZERO
+	var offset := Vector3(center.x,0,center.y)
+	if has_relic(&"departure") and _visual != null: return patrol_visual().to_global(offset)
+	return to_global(offset)
+
+func body_cells() -> Array[Vector2i]:
+	return _body_cells
 
 func patrol_visual() -> Node3D:
 	return _visual.motion_root() if _visual != null and _visual.has_method("motion_root") else _visual
@@ -92,7 +110,7 @@ func can_attack_target(target: Node3D) -> bool:
 	if attack is VolleyAttack and attack.mortar_visual and target.troop != null and target.troop.has_tag(&"flying") and not has_relic(&"air_strike"): return false
 	if has_relic(&"crew_concentration"):
 		var origin := patrol_visual() if _visual != null else self
-		if origin.to_local(target.global_position).x <= 0: return false
+		if origin.to_local(target.global_position).x <= TowerBodyGeometry.origin(definition,body_cells()).x: return false
 	return true
 var next_attack_time := 0.0
 var _visual: Node3D
@@ -113,11 +131,16 @@ var threat := TowerConstants.THREAT:
 			influence_changed.emit()
 
 func footprint_at(cell: Vector2i) -> Array[Vector2i]:
+	if placement_preset != null:
+		var result: Array[Vector2i] = []
+		for pos in occupied_cells: result.append(pos-grid_cell+cell)
+		return result
 	return definition.cells_at(cell, rotation_steps) if definition != null else []
 
 func _ready() -> void:
 	if definition == null:
 		return
+	_body_cells = TowerBodyGeometry.local_cells(placement_preset)
 	definition.changed.connect(_invalidate_attack_area)
 	attack_radius = definition.attack_radius
 	threat = definition.threat
@@ -128,13 +151,15 @@ func _ready() -> void:
 	attack = definition.attack.duplicate(true) if definition.attack != null else null
 	deployment = definition.deployment.duplicate(true) if definition.deployment != null else null
 	if definition.model != null:
-		_visual = definition.model.instantiate()
+		_visual = preload("res://scripts/towers/body_visual.gd").create(definition,body_cells()) if not body_cells().is_empty() and definition.deployment == null else definition.model.instantiate()
 		_visual.name = "Visual"
 		add_child(_visual)
+		if placement_preset != null: _visual.position += placement_preset.model_offset
 		if not definition.aim_pivot_path.is_empty():
 			_aim_pivot = _visual.get_node(definition.aim_pivot_path) as Node3D
 		if not definition.muzzle_path.is_empty():
 			_muzzle = _visual.get_node(definition.muzzle_path) as Marker3D
+	# The complete footprint already has a flush foundation in TileVisuals.
 
 func upgrade_error() -> String:
 	if definition == null or health <= 0 or is_queued_for_deletion(): return "防禦塔已不存在"
@@ -154,6 +179,7 @@ func growth_values(at_level: int) -> Array[float]:
 func upgrade() -> bool:
 	if not upgrade_error().is_empty(): return false
 	level += 1
+	if _visual != null: preload("res://scripts/towers/body_visual.gd").set_level(_visual,level)
 	refresh_stats()
 	return true
 
@@ -173,7 +199,7 @@ func refresh_stats() -> void:
 
 func effective_values(at_level: int) -> Dictionary:
 	var base := growth_values(at_level)
-	var bonus := 1.0+relic_value(&"global_damage", &"bonus")*relic_value(&"global_damage", &"stacks")+support_bonus
+	var bonus := 1.0+relic_value(&"global_damage", &"bonus")*relic_value(&"global_damage", &"stacks")+support_bonus+geometry_damage_bonus
 	var haste := 1.0+relic_value(&"global_haste", &"bonus")*relic_value(&"global_haste", &"stacks")
 	var result := {"damage":definition.default_damage*definition.growth.multiplier(definition.growth.damage,at_level)*bonus,"interval":base[1]/haste,"health":base[2]}
 	if has_relic(&"assembled_cannon"):
@@ -191,9 +217,18 @@ func _invalidate_attack_area() -> void:
 	_attack_area_dirty = true
 	influence_changed.emit()
 
+func set_geometry_bonus(extension: int, bonus: float) -> void:
+	if extension == geometry_range_extension and is_equal_approx(bonus,geometry_damage_bonus): return
+	geometry_range_extension = extension
+	geometry_damage_bonus = bonus
+	refresh_stats()
+	_invalidate_attack_area()
+
 func attack_offsets() -> Array[Vector2i]:
 	if _attack_area_dirty:
-		_attack_offsets = definition.effective_attack_cells(Vector2i.ZERO, rotation_steps, range_multiplier, has_relic(&"crew_concentration"), attack_radius) if definition != null else TowerAttackArea.circle_cells(Vector2i.ZERO, attack_radius)
+		_attack_offsets = definition.effective_attack_cells(Vector2i.ZERO, rotation_steps, range_multiplier, has_relic(&"crew_concentration"), attack_radius,body_cells()) if definition != null else TowerAttackArea.circle_cells(Vector2i.ZERO, attack_radius)
+		if geometry_range_extension > 0:
+			_attack_offsets = preload("res://scripts/construction/geometry_bonus_calculator.gd").extend(_attack_offsets,Vector2i.ZERO,rotation_steps,geometry_range_extension)
 		_attack_lookup.clear()
 		for offset in _attack_offsets: _attack_lookup[offset] = true
 		_attack_area_dirty = false
@@ -205,7 +240,7 @@ func covers_cell(cell: Vector2i) -> bool:
 
 func influence_offsets() -> Array[Vector2i]:
 	if has_relic(&"departure"):
-		return definition.patrol_attack_cells(Vector2i.ZERO,rotation_steps,range_multiplier,has_relic(&"crew_concentration"))
+		return definition.patrol_attack_cells(Vector2i.ZERO,rotation_steps,range_multiplier,has_relic(&"crew_concentration"),body_cells())
 	return attack_offsets()
 
 ## Override for troop-specific damage rules without changing delivery strategies.

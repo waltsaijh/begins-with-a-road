@@ -4,7 +4,13 @@
 
 目前共用保留雙向道路與環的路網。一般 COST 兵種先用正成本探索有限候選，再依原始 evaluation 與 strict threshold 篩選；Phase 4 的 SHORTEST／NEWEST 依同一已提交路網生成硬性候選，不使用普通 Cost 池或 cutoff。合格候選共用 Uniform／Softmax、交通權重與確定性配額；Soldier 及新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax。WaveSpawnSchedule 在開波前固定完整行程與數值，鼠群以整群分配後展開個體，只打亂出發順序。正式關卡依 Resource 的人數與刻度手動開波；64 隻自動出兵只屬獨立舊場景。普通導航不使用全域 DAG、ZDD 或 Yen，最短路硬規則的 DAG 僅用於合法最短代表。
 
+Construction Prototype 是獨立可選擴充：`construction/` 保存草稿、隔離預測與兩種幾何效果，仍由 TowerMap 提交及原生 RoadPortalGraph／RoadSpecialRoutes 規劃，未另建敵人尋路系統。TilePreset 的明確接口與塔偏移經 `map/tile/construction_layout` 產生預覽／驗證／提交共用聯集；TilePlacement 保存本局允許接口，空字典相容舊地形。批次放置保留手牌直到成功，只有最終合法拓樸進入歷史；開始波次先驗證完整排程，直接 EnemyWave 入口也不能略過草稿。未安裝管理器的 Frontier 維持即時規則。操作、數值、限制、測試及九組幾何對照集中於 [Construction Prototype](construction_prototype.md)。
+
+Tower Tile Editor 讓非空 tower_footprint 覆蓋每張卡的塔體占位，空值保持舊 TowerDefinition 語意。塔體與道路以放置原點旋轉；tower_offset 是邏輯錨點，塔朝向另疊加 facing_steps。TowerMap 一次排除完整塔體並驗證接口／端點／固定行程／自訂兵營駐點，再建立一座塔與全占格映射。卡牌與塔保存幾何快照，升級不重鋪道路，模型偏移不移動邏輯中心。獨立工具維護使用者資源及 catalog，透過原 shop override 套用候選權重；候選預測重用隔離 ConstructionSchedule，不改歷史、不取 RNG。欄位、存取／封存、入口與驗證見 [Tower Tile Editor](tower_tile_editor.md)。
+
 腳本責任如下；場景仍使用原本的 TilePlacement／PortalMap／PortalOverlay 節點名稱。
+
+Tower Tile Editor 的具名測試組合由 catalog 保存塔種＋配置 ID 成員與內建排除狀態，經同一篩選產生商店候選與補牌清單，並以獨立關卡的 TowerMap card_filter 驗證最終放置。切換時重開以清除舊組合實例；正式關卡不設定此篩選。塔體由 TowerBodyVisual 組裝兵器／基座與 Lv1–3 零件；地面交給 TileVisuals，不再逐格疊額外方塊／木板，兵營也不加舊補體。詳見 [道路修正](road_visual_and_placement_refinement.md)。
 
 | 腳本 | 責任 |
 |---|---|
@@ -66,6 +72,9 @@ MeshLibrary ID：石地 0、直路 1、轉角 2、獨立道路地塊 3、道路�
 
 ### 外觀變種與雲海
 
+遊戲的 road_surface 依雙向接口生成連續路面，四格角只有四邊皆連通才填滿；外側倒角保留，內部沒有格線或路緣，塔旁沒有出口。塔／石地基礎與道路Y=0，路肩Y=0.065，以0.045格斜面銜接，形成凹槽。顯示 MeshLibrary ID 與原始地塊 ID 分離。原生 RoadEditGuard 的 block-cut 完整行程聯集 route_cells 決定米色／灰色，不能用候選池或配額替代；死路新增即使不重建導航也刷新。詳見 [道路與放置修正](road_visual_and_placement_refinement.md)。下述模型庫仍是邏輯資料／手工素材，不直接當作遊戲石路外觀。
+
+
 連接類型與外觀分開：`TileConstants.base_item()` 取得原有 0～6 的連接類型，`item_for()` 套用 STONE／PILLAR／WOOD 外觀。MeshLibrary 保留原本 ID，新增 7～12 為六種道路的柱子版、13 為直線木橋；所有變種沿用原接口與旋轉。外觀不修改 TileParameters、兵種成本或原生導航。
 
 `scripts/map/tile/appearance/` 中，`tile_appearance_constants.gd` 是全域常數類、layout 是不依賴場景的純選點演算法、tile_appearance 讀取入口圖並只更新有差異的 GridMap 格、tile_visuals 管理顯示與浮起動畫。三張遊戲場景均包含 TileAppearance／TileVisuals。直接調整 `TileAppearanceConstants.SEED_VALUE`、`PILLAR_RADIUS`、`TILES_PER_WOOD_BRIDGE`、`WOOD_SPACING` 後重新執行即可使用；不再透過設定 Resource 載入。
@@ -105,7 +114,7 @@ tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高�
 
 三張地圖均包含 `scenes/cards/card_placement.tscn`。初始三張卡先抽塔種，再依該塔的候選權重抽地塊配置；Sentry 目前包含 Corner、Bridge、Flank、Blasting。放置成功消耗、失敗保留；波次結束可由商店補充。卡面使用 `scenes/cards/components/card_view.tscn`，可在 Godot 2D 編輯器調整。底紙與灰階卡框使用 NinePatchRect，獨立塔圖示使用 TextureRect，文字使用 Label；地塊配置示意使用共用場景範本。塔的 `icon`／`accent_color` 統一提供圖示與染色，同種塔的卡片因此共用同一色彩。
 
-防禦塔 `BuildCard` 引用獨立的 `TowerDefinition` 與 `TilePreset`；後者的 `road_offsets` 為相對塔中心的 Vector2i 陣列，塔完整 footprint 的底座也會自動補齊。卡片與塔都以同一個 `TowerDefinition.cells_at()` 計算旋轉後佔格。道路可合併既有道路，保留既有地塊參數／合法外觀；不能覆蓋塔、石地或任何起終點。預覽以綠／紅顯示整組範圍與塔模型，滑鼠在 UI 上時隱藏。
+防禦塔 `BuildCard` 引用獨立的 `TowerDefinition` 與 `TilePreset`；後者的 `road_offsets` 為相對塔中心的 Vector2i 陣列，塔完整 footprint 的底座也會自動補齊。非空 preset.tower_footprint 覆蓋塔的預設占格，經 BuildCard 同步旋轉。道路可合併既有道路，保留既有地塊參數／合法外觀；遇已建塔完整占格時，由 TowerMap.card_ground 裁切道路並同步預覽／驗證／提交；新塔體重疊、石地、端點與設施保護仍保留。預覽以綠／紅顯示整組範圍與塔模型，滑鼠在 UI 上時隱藏。
 
 Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側兩格、上方橫排三格、左側三格＋下方一格，沒有地形評分。新增／編輯／刪除方法見 `assets/data/tile_presets/README.md`；`tests/cards/tile_presets.tscn` 驗證塔專屬候選與相對權重、存檔與刪除、preset 變更通知、初始手牌及空清單的重抽處理。
 
@@ -181,7 +190,7 @@ F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線�
 
 `RoadFlowForecast` 對每份完整行程的相鄰格以 Vector4i(from.x, from.y, to.x, to.y) 計數，保留 all、by_troop、by_origin、by_troop_origin 四種彙總；相反方向不合併，重訪區段計入實際通過次數，非四鄰步驟略過。無有效排程時只顯示兵種清單、中心線清空。Hover 只讀已快取的「兵種＋入口」彙總並重建顯示 mesh，不重新取得行程或消耗 RNG；移至同一按鈕的標題、空白或捲軸時顯示該入口全部兵種，離開整個按鈕才恢復所有入口。每幀依實際 GUI 命中子控制項確認入口與兵種，避免列間切換暫時恢復全波。動畫相位只由篩選後的完整行程建立，全體資料只提供共同強度尺度，正反方向的幾何皆保持在道路中央。`RoadFlowForecast.animation` 依入口／兵種延後快取 `RoadFlowPhases`，相同行程只建立一份時鐘但保留全部流量計數。每條有向邊保留全部到達步數，每個實際連續轉彎另保留通過中央格的步數；不再對聯集網路做 BFS 取單一相位，避免長支路在匯流時中斷，或環路重訪消失。
 
-`scenes/navigation/road_flow_renderer.tscn` 保留有向區段，正反方向疊在道路中央，每個道路格只建立一個不重疊的 quad，整批一份 mesh／ShaderMaterial。格內線形以 RGBAF ImageTexture 保存端點、流量強度、局部進度、兩端流量強度與相位列／基準步數，每個 primitive 使用三個 texel：端點、兩端強度／相位，以及兩端裁切法線；相位基準步數／查表列放於整數部分，局部進度 [-0.5,1] 放於小數部分。最多 48 個 primitives；直段在格內完全筆直，每個實際 90 度轉向（包括匯流／分岔）皆以半徑 0.22 的局部四分之一圓角銜接，圓角離開後仍為直線，不再對整段道路作 Bezier 彎曲。雙向道路正反方向使用完全相同的中央幾何，hover 保持中央位置，兩方向仍各自使用流量、寬度與行進相位。每個實際相鄰轉向按該轉向的抵達相位建立線形；所有路口的 90 度轉向均由「直段＋解析四分之一圓弧＋直段」組成，不再因路口有第三條邊而退回直角。圓弧以負的終端強度標記，shader 依精確半徑與有向夾角計算距離及進度，取代八段折線；中央幾何令圓心可直接由兩個弧端點相加得到。共用切線裁切面連接直段與弧線，避免接縫與內部端帽突出。不同流量的進出邊不再以固定較小流量畫整段弧線：每段保存兩端強度，shader 以 smoothstep 插值強度，並用 `Line Width×0.5×lerp(0.4,1,strength)` 推導半寬；線寬及透明度在每個接點連續，邊界仍匹配原有向邊流量。只平滑樣式，不改變幾何或行程動畫相位；資料紋理／draw call／primitive 數不增加。只有完整行程的起點／終點使用圓頭，並保留獨立相位集合；格子邊界及內部接點不畫端帽。內部裁切不做透明度漸淡，避免聯集 max 在接縫變暗，外側輪廓及真正端點仍抗鋸齒。shader 對同一格內線形計算聯集，以最大覆蓋透明度而非 alpha-over 合成，岔路重合不會額外加深；跨格 quad 不重疊，端點相位銜接。只保留一小段米白筆觸，高流量較粗、較清楚，前後漸淡至透明；道路其他位置完全沒有固定底線，沒有箭頭、虛線、粒子、Bloom 或 emission。surface_height 預設 0.075，保留深度測試、不寫深度、不投影。
+`scenes/navigation/road_flow_renderer.tscn` 保留有向區段，正反方向疊在道路中央，每個道路格只建立一個不重疊的 quad，整批一份 mesh／ShaderMaterial。格內線形以 RGBAF ImageTexture 保存端點、流量強度、局部進度、兩端流量強度與相位列／基準步數，每個 primitive 使用三個 texel：端點、兩端強度／相位，以及兩端裁切法線；相位基準步數／查表列放於整數部分，局部進度 [-0.5,1] 放於小數部分。窄路最多48個 primitives，寬路依實際投影片段動態配置；直段在格內完全筆直，每個實際 90 度轉向（包括匯流／分岔）皆以半徑 0.22 的局部四分之一圓角銜接，圓角離開後仍為直線，不再對整段道路作 Bezier 彎曲。雙向道路正反方向使用完全相同的中央幾何，hover 保持中央位置，兩方向仍各自使用流量、寬度與行進相位。每個實際相鄰轉向按該轉向的抵達相位建立線形；所有路口的 90 度轉向均由「直段＋解析四分之一圓弧＋直段」組成，不再因路口有第三條邊而退回直角。圓弧以負的終端強度標記，shader 依精確半徑與有向夾角計算距離及進度，取代八段折線；中央幾何令圓心可直接由兩個弧端點相加得到。共用切線裁切面連接直段與弧線，避免接縫與內部端帽突出。不同流量的進出邊不再以固定較小流量畫整段弧線：每段保存兩端強度，shader 以 smoothstep 插值強度，並用 `Line Width×0.5×lerp(0.4,1,strength)` 推導半寬；線寬及透明度在每個接點連續，邊界仍匹配原有向邊流量。只平滑樣式，不改變幾何或行程動畫相位；資料紋理／draw call／primitive 數不增加。只有完整行程的起點／終點使用圓頭，並保留獨立相位集合；格子邊界及內部接點不畫端帽。內部裁切不做透明度漸淡，避免聯集 max 在接縫變暗，外側輪廓及真正端點仍抗鋸齒。shader 對同一格內線形計算聯集，以最大覆蓋透明度而非 alpha-over 合成，岔路重合不會額外加深；跨格 quad 不重疊，端點相位銜接。只保留一小段米白筆觸，高流量較粗、較清楚，前後漸淡至透明；道路其他位置完全沒有固定底線，沒有箭頭、虛線、粒子、Bloom 或 emission。surface_height 預設 0.075，保留深度測試、不寫深度、不投影。
 
 相位查表把到達步數減去最小值後去重，相同抵達間距共用一列；單一到達時間的區段共用同一列。週期為 `max(4, 最長完整行程步數+1, ceil(2×Highlight Length))`。RGBA8 紋理每列每個整數時刻以兩組 16-bit 整數保存前後最近到達相位的距離（低／高 byte 分占兩個通道，避免 Web 浮點紋理讀回的截斷），shader 依小數部分精確還原最近距離，再沿用原 smoothstep 筆觸。每個有覆蓋的 primitive 固定查一次相位表，不隨路線數增加片元迴圈；透明區直接略過。相位紋理按篩選快取，hover 只首次建立該篩選的資料，不重設 shader 的 TIME。
 
@@ -258,7 +267,7 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 - `tile.num_towers_around`：周圍上下左右與對角共八格的塔數，不含本格的塔。
 - `tile.threat`：所有攻擊區域包含本格的塔之 threat 加總（不額外擴張投射物的範圍傷害外溢）。自訂 TowerAttackArea 對 offsets 去重後依 rotation_steps 轉向；attack_area 空引用則使用圓形距離 `dx²+dy² <= radius²`，含本格與半徑邊界，半徑 3 仍覆蓋 29 格。
 
-TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色填色與細框顯示完整攻擊格（包含空地）；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都呼叫 TowerDefinition.attack_cells_at，不在每幀重建 mesh。
+TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色連續色面與聯集外輪廓顯示完整攻擊範圍（包含空地），圓形為圓盤，內部不畫格線；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都經 TowerDefinition.effective_attack_cells 並傳入 TowerBodyGeometry 的局部塔體快照，不在每幀重建 mesh。二十份基礎版與兵營的來源、外觀、砲口及三層預覽見 [塔體與預覽](tower_visuals_and_preview.md)。
 
 重疊塔會相加；移除、修改範圍／威脅值會更新影響。僅修改暫緩地塊時發出參數顯示通知，不使現有路線成本快取失效。每次只處理前後範圍格子聯集與八鄰格，整批更新僅發出一次成本失效通知，不重建道路幾何。空格也保留稀疏覆蓋資料，因此之後新增道路時立即繼承數值。已經為本波固定的敵人行程保持不變。
 
@@ -268,7 +277,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 攻擊與效果
 
-在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。攻擊區域以塔 anchor 與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
+在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。格形攻擊區域以塔 anchor 加上 footprint 幾何偏移與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
 
 - `ArrowAttack`：快速單體箭矢，只追蹤原先鎖定者，抵達後扣血；目標已死亡或抵達終點時飛至最後位置後消失，不轉移目標或造成範圍傷害。sentry_arrow.tres 可調 speed（世界單位／秒，預設 24）、arrow_length／arrow_width、trail_length／trail_width／color。
 - `BeamAttack`：立即對目標扣血，再顯示短暫灰色軌跡。sentry_beam.tres 可調 trail_duration／trail_width／color。
@@ -376,15 +385,15 @@ F1 的路徑來自本波每隻敵人的完整行程，不受評分正負值影�
 
 ## 關卡、ACT 與波次
 
-F5 先完成啟動顯示預熱並進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。範例包含三個 ACT、每個三波。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的菱形驚嘆號確認（hover 顯示「開始下一波」及兵種情報），沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
+F5 先完成啟動顯示預熱並進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。Frontier 包含五個 ACT、每個三波，各 ACT 關閉入口擴張。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的菱形驚嘆號確認（hover 顯示「開始下一波」及兵種情報），沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
 
 介面場景是 `scenes/levels/level_hud.tscn`，包含頂部金幣、時間線、倍速與暫停，以及 `WorldActions/EarlyStart` 起點對話框；已實例化於 `level.tscn` 的 `LevelHUD`。時間線本身是 `scenes/levels/wave_timeline.tscn`，可直接在 2D 編輯器預覽。選取 WaveTimeline 後，可在 Inspector 的 Preview 調整波次索引、準備進度與戰鬥狀態，Appearance 可調字型、字級與顏色；執行時由關卡進度接管。時間線的節點數與 ACT 名稱來自 Level 資源。
 
-- `LevelDefinition`：穩定 ID、前置關卡 ID、必含端點的地形 GridMap 場景與 ACT 列表。標題／描述 key 由 ID 推導為 `ui.maps.title.<id>`／`ui.maps.description.<id>`，不保存額外名稱、翻譯 key、起終點座標、來源開關或 Marker Height。高度由 TerrainEndpoint.height_offset 控制，ACT 新入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。準備時間、自動開始、開波額外獎勵與全局 ACT 擴張欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
+- `LevelDefinition`：穩定 ID、前置關卡 ID、必含端點的地形 GridMap 場景、ACT 列表與 Phase 5 的 base_health／starting_gold／opening_shop／reward_final_act。標題／描述 key 由 ID 推導為 `ui.maps.title.<id>`／`ui.maps.description.<id>`，不保存額外名稱、翻譯 key、起終點座標、來源開關或 Marker Height。高度由 TerrainEndpoint.height_offset 控制，ACT 新入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。準備時間、自動開始、開波額外獎勵與全局 ACT 擴張欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
 - `ActDefinition`：ACT 名稱、有順序的波次列表與 `add_start_after_completion`（預設 true）。完成這個 ACT 後若還有下一個 ACT，勾選才進入新增出生點流程；取消則直接進入不限時、手動開始的下一波準備。最後 ACT 直接完成關卡，即使選項勾選也不額外擴張。不同 ACT 各自保存設定。
 - `WaveDefinition`：出生群組列表、共用移動速度與完成獎勵。
 - `WaveSpawnGroup`：兵種、開始刻度、總數、每批隻數、批次間隔刻度與入口索引。
-- `level_session.gd`：在遊戲節點 ready 前載入預設地形與端點，依序準備波次；完成最後一波後停用開波按鈕。
+- `level_session.gd`：在遊戲節點 ready 前載入預設地形與端點，依序準備波次；管理防線生命、四次遺物、勝敗及清理。最後一波清完與在途攻擊結束後勝利；普通漏敵扣 1，boss 漏敵立即敗北，禁止因卸載或敗北取得波次獎勵。
 
 可在 Inspector 開啟 frontier.tres 編輯，或另存一份關卡 Resource，指定到 level.tscn 根節點的 Level。地形使用可獨立編輯的 GridMap `.tscn`，不把地形資料混進敵人生成程式；範例引用 `scenes/maps/tile_map.tscn`。既有 main／9x9／11x11big 場景仍可獨立用於地圖與功能測試。
 
@@ -394,7 +403,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 拖曳色塊可移動開始時間；預覽滑桿顯示指定時刻各兵種的累計出生數。按「儲存關卡」寫回原檔，或使用 Godot 儲存操作一起儲存；ACT／波次／checkbox、群組編輯與拖曳皆支援原生復原／重做及未儲存狀態追蹤。切換關卡可先儲存再切換。外掛已在專案設定啟用；若編輯器尚未重新載入設定，可在「專案 → 專案設定 → 外掛」啟用「波次編輯器」。介面場景位於 `addons/wave_editor/wave_editor.tscn`。
 
-出生排程以開波為 0，所有時間保存為整數：`start_tick` 與 `interval_ticks`，每格固定 0.25 秒。例如開始 6 格 = 1.5 秒、間隔 2 格 = 0.5 秒。結束刻度由「開始 + (批次數 − 1) × 間隔」自動計算，間隔 0 表示同時出生。準備期與開波動畫獨立於出生排程。既有九波已轉成群組資料，原先 0.2 秒的出生間隔對齊為 1 格（0.25 秒）。
+出生排程以開波為 0，所有時間保存為整數：`start_tick` 與 `interval_ticks`，每格固定 0.25 秒。例如開始 6 格 = 1.5 秒、間隔 2 格 = 0.5 秒。結束刻度由「開始 + (批次數 − 1) × 間隔」自動計算，間隔 0 表示同時出生。準備期與開波動畫獨立於出生排程。目前十五波均使用群組資料，間隔與群內刻度以 Resource 為準。
 
 同波群組可重疊或留下空檔；即使當下無存活敵人，也要等未來群組全部出生並清場後才結束。同一兵種與入口跨群組共用整波的 `index / total` 路線配額，再只打亂各組內路線的出發順序。開波時固定路線、血量與速度，後續資料修改不會改寫待出生敵人。排程以絕對整數刻度判斷，慢幀會補上已到期的批次，不會把整段出生時間往後移。
 
@@ -530,7 +539,7 @@ LevelProgress 只在最後一波完成時保存穩定 Level Id 到 user://level_
 
 可選準備契約讓轉場層暫存並停用新場景的 processing，呼叫指定方法並接受 `report(completed, total, translation_key)`；轉場層不讀取 Level、EnemyWave 或 PortalMap。使用方法名稱而非來源節點回呼，避免選單釋放後失效。完成後還原 processing，再淡出白畫面與載入介面；準備失敗或目標離場時回到來源場景。輸入鎖定持續到淡出結束。
 
-LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池、尚未準備的顯示代表；這階段的總工作數已知，完成一項才推進一格。目前 Frontier 第一波只有 Soldier／入口 0 一個組合，正常啟動後為 2 項；直接開選單、跳過啟動預熱則為 4 項（另準備 Soldier 共用 GPU 及盾衛兩個顯示代表）。耗時不相等，因此條形不是時間估算。候選池只查詢 plan，不分配配額或打亂出發順序。準備期間拒絕開波，完成後仍為手動第一波準備。
+LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池、尚未準備的顯示代表；這階段的總工作數已知，完成一項才推進一格。Frontier 第一波依目前 Resource 準備各兵種／入口組合（恢復的本地編成目前只有 Quickfeet／入口 0）；工作數依候選池與尚未預熱的代表動態計算，顯示代表包含 Phase 5 Boss。耗時不相等，因此條形不是時間估算。候選池只查詢 plan，不分配配額或打亂出發順序。準備期間拒絕開波，完成後仍為手動第一波準備。
 
 `enemies/rendering/display_warmup.gd` 是保留 Resource 與完成紀錄的 Autoload。`enemy_render_signatures.gd` 依有效材質的儲存設定、shader code、紋理身分、每個 surface 的頂點格式及 primitive、一般／MultiMesh、蒙皮／blend shape、陰影與 overlay 計算組合；排除網格形狀、模型名稱、變換動畫及 Resource 名稱。含腳本或非變換動畫軌的場景保守區分。原三種 GPU 模型共用 shader 與頂點格式，僅 Soldier 作為繪製代表；各自步態參數不產生新的 shader source。新六種兵帶有獨立模型腳本，保守地各自預熱。啟動場景另以塔底座的純顯示網格實際繪製普通 MeshInstance 路徑，與敵人 MultiMesh 共用材質；因引擎可能依繪製方式分出 program，仍保留兩種繪製代表，不初始化塔或戰鬥。外部場景材質仍保守區分，不宣稱已枚舉引擎所有 shader 版本。
 
@@ -548,6 +557,10 @@ Boot 的初始階段文字直接保存在場景，依序呈現整理資源及準
 
 `tests/menus/main_menu.gd` 驗證完整往返、每次 covered 的白色像素、過渡期間 Esc／重複操作隔離、4x 戰鬥暫停返回、舊關卡釋放與再次開始的全新進度。白畫面截圖與結果寫入 `.godot/test-results/menus/`。
 
+
+### 寬路流線的顯示投影
+
+WideRoadFlow從雙向接口找最大矩形道路臂與共享交會區，將原RoadFlowPhases保存的完整已分配行程投影到各臂中心，窄入口共用真實接口過渡；L／T共用交會點，不逐候選換道畫出額外短支線。原行程時間逐步保留，投影成同點的換道作停留，反向端點／時鐘及原始流量來源均獨立。每格仍只畫一次，shader取透明度max聯集；寬路的片段數可變，不截斷原資料。建築預覽只多交接既有proposal.snapshot，不改WaveSpawnSchedule。凹槽／橋頭／十案例及像素驗證見 [道路修正](road_visual_and_placement_refinement.md)。
 
 ### 手動調整流量中心線外觀
 
@@ -582,7 +595,7 @@ P99 判因採固定 simulation delta／相同暖機與取樣步數，核對完�
 
 ## 塔牌疊加與遺物（Phase 3）
 
-完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物，再選遺物，最後才擴張或完成關卡；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
+完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物；第 3／6／9／12 波後選遺物，最後 ACT 直接結算；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
 
 ## 敵軍協同與專用路線（Phase 4）
 

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TilePreset" format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/tile_preset.gd" id="1_m2vm7"]
+
+[resource]
+script = ExtResource("1_m2vm7")
+tower_footprint = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1)])
+display_name = "直路"
+preset_id = "user_17c8dc78705573a24b5c07ef37567b68"
+road_offsets = Array[Vector2i]([Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1)])

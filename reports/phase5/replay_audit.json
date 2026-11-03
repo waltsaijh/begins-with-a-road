@@ -1,0 +1,76 @@
+{
+  "status": "Current PASS",
+  "scope": "Five encounter aggregates, not byte-identical traces",
+  "stream_migration_diagnostic": {
+    "original": ".godot/phase5/baseline-v2",
+    "replay": ".godot/phase5/baseline-reproduced",
+    "samples": 72,
+    "compared_metrics": [
+      "damage",
+      "killed",
+      "leaked",
+      "overkill",
+      "healing"
+    ],
+    "differences": [
+      {
+        "id": "mortar_approach_heavy_11.jsonl",
+        "metrics": {
+          "damage": [
+            72.0,
+            96.0
+          ]
+        }
+      },
+      {
+        "id": "mortar_away_heavy_11.jsonl",
+        "metrics": {
+          "damage": [
+            64.0,
+            88.0
+          ]
+        }
+      },
+      {
+        "id": "mortar_parallel_heavy_11.jsonl",
+        "metrics": {
+          "damage": [
+            80.0,
+            88.0
+          ]
+        }
+      },
+      {
+        "id": "mortar_parallel_rat_swarm_11.jsonl",
+        "metrics": {
+          "damage": [
+            80.0,
+            88.0
+          ]
+        }
+      },
+      {
+        "id": "mortar_parallel_soldier_11.jsonl",
+        "metrics": {
+          "damage": [
+            32.0,
+            24.0
+          ]
+        }
+      }
+    ]
+  },
+  "restored_stream_replay": {
+    "original": ".godot/phase5/baseline-v2",
+    "replay": ".godot/phase5/baseline-legacy-rng",
+    "samples": 72,
+    "compared_metrics": [
+      "damage",
+      "killed",
+      "leaked",
+      "overkill",
+      "healing"
+    ],
+    "differences": []
+  }
+}

@@ -27,8 +27,10 @@
 | 共用介面 `interface` | 跨場景白色過渡及期間的輸入攔截，持續存在於主畫面與關卡之間；呼叫者決定切換目標與遊戲狀態 |
 | 關卡 `levels` | 載入地形與端點、ACT／波次排程、入口擴張、時間線與暫停 |
 | 卡牌 `cards` | 建造卡組合、手牌、旋轉預覽、放置意圖與商店交易；顯示與交易分開管理 |
-| 地圖 `map` | 格子資料、道路接口與批次變更；外觀變種和浮起動畫獨立管理 |
-| 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額與除錯顯示 |
+| 建造原型 `construction` | 可選的準備期草稿、隔離排程預測及道路幾何獎勵；沿用 cards／map／towers 權威，只由獨立實驗場景啟用 |
+| 地塊編輯 `tower_tile_editor` | 繪圖與屬性 UI、原生配置索引及存取、獨立即時測試的唯讀候選預測；幾何仍交由 cards／map／towers 驗證提交 |
+| 地圖 `map` | 格子資料、道路接口與批次變更；外觀層依雙向接口合併連續路面、完整路線聯集灰化，顯示 MeshLibrary 與邏輯 ID 分離，外觀變種和浮起動畫獨立管理 |
+| 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額；視覺子層依原完整行程投影寬路中心與動畫，不回寫導航／排程 |
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
 | 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
 | 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與收藏 UI |
@@ -41,6 +43,7 @@
 
 ```text
 scripts/
+├── tower_tile_editor/       自由塔體編輯、使用者配置索引與即時路線預測
 ├── camera/                  地圖鏡頭
 ├── cards/                   選牌、旋轉與放置意圖
 │   ├── definitions/         建造卡、地塊配置與候選權重
@@ -50,6 +53,7 @@ scripts/
 │   ├── attacks/             攻擊策略與發射時的傷害快照
 │   ├── effects/             命中後的規則效果
 │   └── rendering/           攻擊軌跡與回收式爆散特效
+├── construction/            批次預擺、最終排程預檢及幾何獎勵
 ├── enemies/                 單隻敵人的移動、生命與狀態
 │   ├── presentation/        頭頂狀態與獨立開波按鈕
 │   ├── rendering/           模型、步態、MultiMesh 與視覺避讓
@@ -156,3 +160,7 @@ scripts/
 Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。
 
 Phase 4 沿用 `enemies/troops` 資料型別；`spawning` 將整群配額展開為個體。`navigation/routes` 保存每局物理路網歷史與硬性候選快取，原生核心提供最短格距及新通路查證；不把候選索引當作持久身份。`combat` 的敵軍能力協調器在塔／友軍前處理治療與癱瘓，共用敵人空間索引。`enemies/presentation` 管理首次提示與可重開情報，`enemies/rendering` 管理共用步態與能力環，詳細規則見 [Phase 4](phase4.md)。
+
+Phase 5 的 `levels` 負責防線生命、終局與四次獎勵時序，`levels/presentation` 提供共用結果／Boss 資訊。Boss 沿用 `enemies/troops` 與 `combat` 的能力／傷害生命週期，沒有第二套管理器。`tests/balance` 驅動正式系統做可重現實驗；`tools/balance` 負責參數匯出、獨立帳本、批次執行及分析，與正式 runtime 分離。選用的 `combat` trace hook 預設關閉，詳細規格見 [Phase 5](phase5.md)。
+
+2026-11-03：cards/definitions 的正式候選解析讀取 Tower Tile Editor 已標記的基礎組合，不複製幾何；towers/ 的塔體幾何提供實例、威脅與預覽一致的局部中心／方向，顯示組件依 footprint 快取並由塔實例控制三段外觀。cards/presentation 維持塔體、道路、射程三層顯示；多格細節與驗證見 [塔體與預覽](tower_visuals_and_preview.md)。
