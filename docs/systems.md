@@ -4,7 +4,13 @@
 
 目前共用保留雙向道路與環的路網。一般 COST 兵種先用正成本探索有限候選，再依原始 evaluation 與 strict threshold 篩選；Phase 4 的 SHORTEST／NEWEST 依同一已提交路網生成硬性候選，不使用普通 Cost 池或 cutoff。合格候選共用 Uniform／Softmax、交通權重與確定性配額；Soldier 及新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax。WaveSpawnSchedule 在開波前固定完整行程與數值，鼠群以整群分配後展開個體，只打亂出發順序。正式關卡依 Resource 的人數與刻度手動開波；64 隻自動出兵只屬獨立舊場景。普通導航不使用全域 DAG、ZDD 或 Yen，最短路硬規則的 DAG 僅用於合法最短代表。
 
+Construction Prototype 是獨立可選擴充：`construction/` 保存草稿、隔離預測與兩種幾何效果，仍由 TowerMap 提交及原生 RoadPortalGraph／RoadSpecialRoutes 規劃，未另建敵人尋路系統。TilePreset 的明確接口與塔偏移經 `map/tile/construction_layout` 產生預覽／驗證／提交共用聯集；TilePlacement 保存本局允許接口，空字典相容舊地形。批次放置保留手牌直到成功，只有最終合法拓樸進入歷史；開始波次先驗證完整排程，直接 EnemyWave 入口也不能略過草稿。未安裝管理器的 Frontier 維持即時規則。操作、數值、限制、測試及九組幾何對照集中於 [Construction Prototype](construction_prototype.md)。
+
+Tower Tile Editor 讓非空 tower_footprint 覆蓋每張卡的塔體占位，空值保持舊 TowerDefinition 語意。塔體與道路以放置原點旋轉；tower_offset 是邏輯錨點，塔朝向另疊加 facing_steps。TowerMap 一次排除完整塔體並驗證接口／端點／固定行程／自訂兵營駐點，再建立一座塔與全占格映射。卡牌與塔保存幾何快照，升級不重鋪道路，模型偏移不移動邏輯中心。獨立工具維護使用者資源及 catalog，透過原 shop override 套用候選權重；候選預測重用隔離 ConstructionSchedule，不改歷史、不取 RNG。欄位、存取／封存、入口與驗證見 [Tower Tile Editor](tower_tile_editor.md)。
+
 腳本責任如下；場景仍使用原本的 TilePlacement／PortalMap／PortalOverlay 節點名稱。
+
+Tower Tile Editor 的具名測試組合由 catalog 保存塔種＋配置 ID 成員與內建排除狀態，經同一篩選產生商店候選與補牌清單，並以獨立關卡的 TowerMap card_filter 驗證最終放置。切換時重開以清除舊組合實例；正式關卡不設定此篩選。額外塔體顯示由共用 footprint_visual 產生，模型錨點保留薄底座，其餘格高 1.0，預覽／實例一致，不更改導航占位或射線規則。
 
 | 腳本 | 責任 |
 |---|---|
@@ -258,7 +264,7 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 - `tile.num_towers_around`：周圍上下左右與對角共八格的塔數，不含本格的塔。
 - `tile.threat`：所有攻擊區域包含本格的塔之 threat 加總（不額外擴張投射物的範圍傷害外溢）。自訂 TowerAttackArea 對 offsets 去重後依 rotation_steps 轉向；attack_area 空引用則使用圓形距離 `dx²+dy² <= radius²`，含本格與半徑邊界，半徑 3 仍覆蓋 29 格。
 
-TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色填色與細框顯示完整攻擊格（包含空地）；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都呼叫 TowerDefinition.attack_cells_at，不在每幀重建 mesh。
+TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色連續色面與聯集外輪廓顯示完整攻擊範圍（包含空地），圓形為圓盤，內部不畫格線；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都經 TowerDefinition.effective_attack_cells 並傳入 TowerBodyGeometry 的局部塔體快照，不在每幀重建 mesh。二十份基礎版與兵營的來源、外觀、砲口及三層預覽見 [塔體與預覽](tower_visuals_and_preview.md)。
 
 重疊塔會相加；移除、修改範圍／威脅值會更新影響。僅修改暫緩地塊時發出參數顯示通知，不使現有路線成本快取失效。每次只處理前後範圍格子聯集與八鄰格，整批更新僅發出一次成本失效通知，不重建道路幾何。空格也保留稀疏覆蓋資料，因此之後新增道路時立即繼承數值。已經為本波固定的敵人行程保持不變。
 
@@ -268,7 +274,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 攻擊與效果
 
-在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。攻擊區域以塔 anchor 與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
+在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。格形攻擊區域以塔 anchor 加上 footprint 幾何偏移與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
 
 - `ArrowAttack`：快速單體箭矢，只追蹤原先鎖定者，抵達後扣血；目標已死亡或抵達終點時飛至最後位置後消失，不轉移目標或造成範圍傷害。sentry_arrow.tres 可調 speed（世界單位／秒，預設 24）、arrow_length／arrow_width、trail_length／trail_width／color。
 - `BeamAttack`：立即對目標扣血，再顯示短暫灰色軌跡。sentry_beam.tres 可調 trail_duration／trail_width／color。
@@ -530,7 +536,7 @@ LevelProgress 只在最後一波完成時保存穩定 Level Id 到 user://level_
 
 可選準備契約讓轉場層暫存並停用新場景的 processing，呼叫指定方法並接受 `report(completed, total, translation_key)`；轉場層不讀取 Level、EnemyWave 或 PortalMap。使用方法名稱而非來源節點回呼，避免選單釋放後失效。完成後還原 processing，再淡出白畫面與載入介面；準備失敗或目標離場時回到來源場景。輸入鎖定持續到淡出結束。
 
-LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池、尚未準備的顯示代表；這階段的總工作數已知，完成一項才推進一格。Frontier 第一波有 Soldier 與 Quickfeet／入口 0 兩個組合；工作數依候選池與尚未預熱的代表動態計算，顯示代表包含 Phase 5 Boss。耗時不相等，因此條形不是時間估算。候選池只查詢 plan，不分配配額或打亂出發順序。準備期間拒絕開波，完成後仍為手動第一波準備。
+LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池、尚未準備的顯示代表；這階段的總工作數已知，完成一項才推進一格。Frontier 第一波依目前 Resource 準備各兵種／入口組合（恢復的本地編成目前只有 Quickfeet／入口 0）；工作數依候選池與尚未預熱的代表動態計算，顯示代表包含 Phase 5 Boss。耗時不相等，因此條形不是時間估算。候選池只查詢 plan，不分配配額或打亂出發順序。準備期間拒絕開波，完成後仍為手動第一波準備。
 
 `enemies/rendering/display_warmup.gd` 是保留 Resource 與完成紀錄的 Autoload。`enemy_render_signatures.gd` 依有效材質的儲存設定、shader code、紋理身分、每個 surface 的頂點格式及 primitive、一般／MultiMesh、蒙皮／blend shape、陰影與 overlay 計算組合；排除網格形狀、模型名稱、變換動畫及 Resource 名稱。含腳本或非變換動畫軌的場景保守區分。原三種 GPU 模型共用 shader 與頂點格式，僅 Soldier 作為繪製代表；各自步態參數不產生新的 shader source。新六種兵帶有獨立模型腳本，保守地各自預熱。啟動場景另以塔底座的純顯示網格實際繪製普通 MeshInstance 路徑，與敵人 MultiMesh 共用材質；因引擎可能依繪製方式分出 program，仍保留兩種繪製代表，不初始化塔或戰鬥。外部場景材質仍保守區分，不宣稱已枚舉引擎所有 shader 版本。
 

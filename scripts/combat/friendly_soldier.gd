@@ -32,7 +32,7 @@ func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> vo
 	health = settings.health
 	_max_health = settings.health
 	tower.stats_changed.connect(_refresh_stats)
-	home = tower.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),tower.rotation_steps)
+	home = tower.garrison_cell()
 	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),tower.rotation_steps))*(6.0/48.0 if slot == 1 else (-6.0/48.0 if slot == 0 else 0.0))
 	home_position = manager.world(home)+manager.map.global_basis*Vector3(side.x*manager.map.cell_size.x,0,side.y*manager.map.cell_size.z)
 	if slot >= 2:

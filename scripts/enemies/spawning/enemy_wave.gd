@@ -87,6 +87,8 @@ func _on_plan_ready() -> void:
 func start_wave() -> bool:
 	if not start_allowed or active or controller == null or controller.computing:
 		return false
+	var cards := get_node_or_null("../CardPlacement")
+	if cards != null and is_instance_valid(cards.construction) and not cards.construction.entries.is_empty(): return false
 	_scheduled = definition != null
 	if _scheduled:
 		var schedule := WaveSpawnSchedule.build(definition, controller, _next_enemy_id, true, additional_start_indices,null,spawn_rng)

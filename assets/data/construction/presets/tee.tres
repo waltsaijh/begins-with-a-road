@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TilePreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/tile_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+preset_id = "construction.tee.v1"
+prefix_key = "construction.preset.tee"
+road_offsets = Array[Vector2i]([Vector2i(-3, -1), Vector2i(-2, -1), Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(2, -1), Vector2i(3, -1), Vector2i(0, -2), Vector2i(0, -3)])
+occupied_offsets = Array[Vector2i]([Vector2i(0, 0), Vector2i(-3, -1), Vector2i(-2, -1), Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(2, -1), Vector2i(3, -1), Vector2i(0, -2), Vector2i(0, -3)])
+explicit_road_ports = Dictionary[Vector2i, int]({
+Vector2i(-3, -1): 10,
+Vector2i(-2, -1): 10,
+Vector2i(-1, -1): 10,
+Vector2i(0, -1): 11,
+Vector2i(1, -1): 10,
+Vector2i(2, -1): 10,
+Vector2i(3, -1): 10,
+Vector2i(0, -2): 5,
+Vector2i(0, -3): 5
+})

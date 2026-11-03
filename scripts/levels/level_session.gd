@@ -14,6 +14,7 @@ var _valid := false
 var _wave: Node
 var _wave_starting := false
 var _wave_start_elapsed := 0.0
+var _opening_shop_available := false
 var _balance: Label
 var _hud: CanvasLayer
 var choosing_start := false
@@ -212,10 +213,13 @@ func _on_start_requested() -> void:
 
 func _begin_wave_start() -> void:
 	if _loading or finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
+	var construction: Node = get_node("CardPlacement").construction
+	if is_instance_valid(construction) and not construction.commit().ok: return
 	if _owns_balance_trace: BalanceTrace.wave = current_wave+1
 	_wave_starting = true
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
+	_opening_shop_available = get_node("CardPlacement/Shop").available
 	get_node("CardPlacement").prepare_wave_start()
 	_update_start_callout()
 	set_process(true)
@@ -240,7 +244,15 @@ func _advance_wave_start(delta: float) -> void:
 	var progress: float = Tween.interpolate_value(0.0, 1.0, minf(_wave_start_elapsed, TIMELINE_ADVANCE_SECONDS), TIMELINE_ADVANCE_SECONDS, Tween.TRANS_QUAD, Tween.EASE_IN_OUT)
 	timeline.set_state(current_wave, progress, false)
 	if _wave_start_elapsed >= WAVE_START_SECONDS:
-		_wave.start_wave()
+		if not _wave.start_wave():
+			_wave_starting = false
+			if _wave.controls != null: _wave.controls.start_pending = false
+			get_node("CardPlacement")._wave_start_pending = false
+			get_node("CardPlacement")._refresh_input_state()
+			get_node("CardPlacement/Shop").restore_after_failed_start(_opening_shop_available)
+			timeline.set_state(current_wave,0.0,false)
+			_update_start_callout()
+			set_process(false)
 
 func _on_wave_finished() -> void:
 	# Enemy tree_exiting callbacks also run while the level is being removed,

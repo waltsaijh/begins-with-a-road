@@ -26,6 +26,7 @@ preset_path = "res://assets/data/tile_presets/mortar_04.tres"
 [resource]
 script = ExtResource("4_iyo7d")
 name_key = "tower.mortar.name"
+preset_group = "base"
 model = ExtResource("3_0bsys")
 card_price = 9
 icon = ExtResource("2_4m8w2")

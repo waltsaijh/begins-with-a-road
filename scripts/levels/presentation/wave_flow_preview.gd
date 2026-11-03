@@ -4,6 +4,8 @@ const Renderer = preload("res://scenes/navigation/road_flow_renderer.tscn")
 var forecast := RoadFlowForecast.new()
 var baseline := RoadFlowForecast.new()
 var candidate := {}
+## Null uses committed roads; an Array is an explicitly labeled draft forecast.
+var construction_pending: Variant = null
 var candidate_rebuild_count := 0
 var _candidate_dirty := false
 var _candidate_unavailable := false
@@ -54,6 +56,11 @@ func set_candidate(effect: Dictionary) -> void:
 		delta_overlay.markers = {}
 		delta_overlay.hint = ""
 		_render_filter()
+
+func set_construction_pending(pending: Variant) -> void:
+	if construction_pending == pending: return
+	construction_pending = pending
+	invalidate()
 
 func _panels() -> Array[Control]:
 	var result: Array[Control] = []
@@ -112,6 +119,8 @@ func _process(_delta: float) -> void:
 		_sync_callouts()
 		var definition: WaveDefinition = wave.definition
 		var schedule := WaveSpawnSchedule.build(definition, controller, wave._next_enemy_id, false, wave.additional_start_indices) if definition != null else {}
+		if construction_pending != null:
+			schedule = {"pending":construction_pending} if not construction_pending.is_empty() else {}
 		_schedule_error = ""
 		if schedule.is_empty() and definition != null:
 			for group in definition.groups:
@@ -132,7 +141,7 @@ func _process(_delta: float) -> void:
 		_candidate_dirty = false
 		forecast = baseline
 		_candidate_unavailable = false
-		if not candidate.is_empty():
+		if not candidate.is_empty() and construction_pending == null:
 			var effects: Array = controller.traffic_effects.duplicate(true)
 			effects.append(candidate)
 			var predicted := WaveSpawnSchedule.build(wave.definition,controller,wave._next_enemy_id,false,wave.additional_start_indices,effects)

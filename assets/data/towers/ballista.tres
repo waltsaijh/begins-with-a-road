@@ -29,6 +29,7 @@ preset_path = "res://assets/data/tile_presets/ballista_04.tres"
 [resource]
 script = ExtResource("5_1kgwr")
 name_key = "tower.ballista.name"
+preset_group = "base"
 model = ExtResource("4_57dd7")
 card_price = 8
 icon = SubResource("CompressedTexture2D_onxsf")

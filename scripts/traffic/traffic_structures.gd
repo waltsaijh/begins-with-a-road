@@ -42,7 +42,7 @@ func validate(definition: TrafficStructureDefinition, at: Vector2i, turns: int) 
 	if (wave != null and wave.active) or (cards != null and cards.input_suspended): return "目前不能建造"
 	if tower_map.occupied.has(at) or at in tower_map.controller.terminal_cells(): return "不能覆蓋防禦塔或端點"
 	for existing: DefenseTower in tower_map.towers.values():
-		if existing.definition.deployment != null and at == existing.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),existing.rotation_steps): return "不能覆蓋兵營駐點"
+		if existing.definition.deployment != null and at == existing.garrison_cell(): return "不能覆蓋兵營駐點"
 	for existing: TrafficStructure in occupied.get(at, []):
 		if not definition.can_share(existing.definition): return "此處已有互斥設施"
 	var map: GridMap = tower_map.map

@@ -2,6 +2,7 @@ extends Node
 const Shop = preload("res://scripts/cards/shop/card_shop.gd")
 const Sentry = preload("res://assets/data/towers/sentry.tres")
 const TestCards = preload("res://tests/fixtures/card_fixture.gd")
+const TestArtifacts = preload("res://tests/fixtures/test_artifacts.gd")
 var failures := 0
 
 func _ready() -> void:
@@ -31,7 +32,7 @@ func verify() -> void:
 	custom.prefix_key = "tile_preset.test_renamed.prefix"
 	custom.road_offsets = [Vector2i.LEFT, Vector2i.UP]
 	check(changed[0] == 2 and card.localized_prefix() == tr(custom.prefix_key) and card.ground_cells(Vector2i.ZERO).size() == 3, "Preset edits did not reach existing cards")
-	var directory := "user://weighted_presets_check_%d" % Time.get_ticks_usec()
+	var directory := TestArtifacts.path("cards/weighted_presets_check_%d/alpha.tres" % Time.get_ticks_usec()).get_base_dir()
 	DirAccess.make_dir_recursive_absolute(directory)
 	var alpha := directory.path_join("alpha.tres")
 	var beta := directory.path_join("beta.tres")
@@ -40,8 +41,10 @@ func verify() -> void:
 	check(ResourceSaver.save(TestCards.card("bridge").tile_preset, beta) == OK, "Could not save beta preset")
 	check(ResourceSaver.save(TestCards.card("flank").tile_preset, gamma) == OK, "Could not save gamma preset")
 	var first: TowerDefinition = Sentry.duplicate()
+	first.preset_group = "" # This fixture explicitly tests a private weighted pool.
 	first.tile_preset_candidates = [candidate(alpha, 1.0), candidate(beta, 3.0), candidate(gamma, 0.0), candidate(alpha, -1.0), candidate(alpha, NAN), candidate(alpha, INF), candidate(directory.path_join("missing.tres"), 1000.0), null]
 	var second: TowerDefinition = Sentry.duplicate()
+	second.preset_group = ""
 	second.name_key = "tower.crossfire.name"
 	second.card_price = 7
 	second.tile_preset_candidates = [candidate(gamma, 1.0)]
@@ -54,6 +57,12 @@ func verify() -> void:
 	var cards: Array[BuildCard] = shop.roll_cards(1024)
 	var repeated: Array[BuildCard] = repeat.roll_cards(1024)
 	check(cards.size() == 1024 and repeated.size() == 1024, "Roll did not produce complete cards")
+	if cards.is_empty() or repeated.size() != cards.size():
+		shop.free()
+		repeat.free()
+		print("TILE_PRESETS_CHECK:" + JSON.stringify({"failures": failures, "incomplete_roll": true}))
+		get_tree().quit(1)
+		return
 	var first_total := 0
 	var beta_total := 0
 	for i in cards.size():
@@ -100,10 +109,12 @@ func verify() -> void:
 	check(placement.cards.size() == 3 and placement.hand.views.size() == 3, "Starting hand was not rolled from tower candidates")
 	for rolled: BuildCard in placement.cards:
 		var allowed := false
-		for option: TilePresetCandidate in rolled.tower.tile_preset_candidates:
-			if option != null and option.resolve_preset() == rolled.tile_preset: allowed = true
+		for option: TilePresetCandidate in rolled.tower.preset_candidates():
+			if option != null and option.resolve_preset() != null and option.resolve_preset().stable_id() == rolled.tile_preset.stable_id(): allowed = true
 		check(allowed, "Starting card did not use its tower's candidate pool")
 	live_shop.catalog.assign([first])
+	# Both independent shop pools must be unavailable for an impossible reroll.
+	live_shop.traffic_catalog.clear()
 	live_shop.coins = 20
 	live_shop.available = true
 	live_shop.view.set_available(true)

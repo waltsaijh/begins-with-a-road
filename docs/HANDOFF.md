@@ -1,10 +1,64 @@
 # Routing Sandbox — Phase 5 交接
 
-## 本次整合：2026-11-03
+## Git 更新授權：2026-11-03
+
+使用者在塔體／射程／預覽工作完成後要求「git更新並push到遠端」，授權將目前相依的施工原型、Tower Tile Editor、使用者保存的地塊／Frontier 配置及20＋1更新一併提交，推送至 origin/experiment/routing-sandbox。已 fetch 核對遠端，更新前本地領先14個提交、落後0個；不改 main worktree，不做 merge／rebase／reset／clean 或強制推送。下方「未提交／不 push」敘述是本次授權前的歷史快照。程式未再修改，沿用本輪已完成的驗證，提交前另核對 git diff --check；測試原始輸出仍留在忽略的 .godot/。
+
+## 最新工作：20＋1 塔體／射程／預覽，2026-11-03
+
+核對 `experiment/routing-sandbox`／HEAD `e87f8288cb97b85d71c4b38dcb7dc7a67754bb63`，在既有未提交成果上繼續；沒有 commit／merge／rebase／reset／clean／push，未操作 main worktree。下方整合與 stash 紀錄是先前工作，本節才是本輪測試。
+
+已把保存的「基礎版」二十份配置與既有兵營接入正式抽牌，組合標記 variant_group=base；資源／名稱／權重仍同源。新增 footprint 幾何與低面數完整組件模型，Lv1–3 外觀及哨塔 Lv3 視覺封頂；迫擊砲／交叉火力的整體中心、弩砲主軸、側舷雙側各2×3與巡航／右舷同步。放置預覽區分塔體、道路與連續範圍，不畫道路接口與射程內部格線。傷害／攻速／價格／成長保持原數值。主要入口與完整映射見 [tower_visuals_and_preview](tower_visuals_and_preview.md)。
+
+本輪 Current PASS：新 tower_visuals/rules 1722、combat 104、真渲染 input 118（全部21份 selector／補牌／旋轉／放置、六塔疊級、開波）；原 tower_tile_editor rules 458、rendered input 48（兩波）、combinations_input 29、card_drag_placement；headless cards／tile_presets、combat／tower_restoration、relics stacking／mechanisms 113／rewards、construction geometry 51／regression 54、traffic integration 104、balance rules 67。Frontier 正式 level 180幀渲染啟動通過；Gallery 六塔12張等級／範圍圖與六塔實際預覽已產生並檢視。數字為各 suite 自己的斷言數，不混稱遊玩場次。
+
+輸出在 `.godot/test-results/tower_visuals/` 及 `.godot/tower-visual-*.log`。初輪的舊單格／方塊／候選身份斷言與新兵營輸入 fixture 的單通道不足均已修正重跑；失敗 log 保留，不算最終 PASS。最後 editor import 無腳本／資源解析錯誤，但有 Godot 使用者設定路徑無寫入權限；rendered 另有 user:// shader cache 目錄警告。未解除或修改 Windows 防護，未宣稱完整 Editor 互動驗收。
+
+人工入口：`tests/tower_tile_editor/playground.tscn` 選「基礎版」；`tests/tower_visuals/gallery.tscn` 用1–6／R／A看塔種、四向與射程。兵營需先有可繞行道路。造型採共用程式組件／快取，極端自訂 footprint 仍需美術驗收；兵營原模型保留。未跑 Web、release、效能、真人或Frontier全十五波，未改／重建 C++。本輪完成後停止，等待人工驗收。
+
+## 先前整合：2026-11-03
 
 本次由 experiment/routing-sandbox `4440da4` 合併 origin/main `d36a866`，保留五 ACT／十五波、生命、勝敗、經濟與 Boss，整合 Boot／選單、選圖／解鎖、通關 ID、逐 ACT 擴張、預熱與原生候選優化。勝利才記通關，重新開始保留所選 Level。下列量測均為歷史證據；本次驗證與 stash 恢復結果另見 `.godot/merge-2026-11-03/`。使用者授權本次 Merge Commit；stash 恢復的本地修改保持未提交、原 stash 保留，不 push。
 
 本次合併樹驗證：Godot 4.7.2 headless editor import 無腳本／資源錯誤；Windows debug／release 原生擴充建置通過。headless 通過 balance/rules（含勝利保存與敗北不保存）、level_catalog、level_flow、act_spawn_expansion、terrain_endpoints、relics/rewards、traffic/integration、synergy/routing、native_candidates、route_batch。rendered 通過 level_selection（含結果畫面重開）、startup_loading、scene_loading 及 main_menu；main_menu 需以 --resolution 1600x900 啟動以涵蓋最大測試 viewport，預設較小視窗的初輪滑鼠輸入失敗仍保留。scene_loading 的 Invalid data／Unavailable 為預期失敗恢復案例。未執行 Web 建置／瀏覽器、完整長局或效能重測；stash 恢復後的驗證另記，不混同本次 Merge Commit 的成果。
+
+## stash 恢復與本次驗證：2026-11-03
+
+Merge Commit 為 `e87f8288cb97b85d71c4b38dcb7dc7a67754bb63`（父提交 `4440da4`、`d36a866`）。其後使用 `git stash apply` 恢復 `60a92248d2e091dfede9ffefdaf3ee6e6ba28826`，保留原 stash；恢復的 tracked／untracked 修改均不另行提交。Frontier 保留 stash 的編成與資源改動（目前首波僅 Quickfeet），並遷移至 ID／逐 ACT 擴張設定。施工開波先原子確認草稿，保留載入鎖定與失敗恢復商店。獨立施工／塔牌編輯器的舊座標欄位已遷移為同位置的地形端點，不更改路網或波次。
+
+恢復後 Current PASS：headless editor import；cards、tile_presets；construction shapes／placement／regression／geometry；tower_tile_editor rules（458）；balance/rules；level_flow；traffic/integration；rendered construction input（32）、tower_tile_editor input（48）與 combinations_input（29）。翻譯 142 列的兩種語言逐項與 CSV 相符；Frontier 15 波、穩定 ID、關閉入口擴張及自建 catalog 的資源引用驗證通過。日誌／JSON 位於 `.godot/merge-2026-11-03/`。套用前額外產生的 tower_tiles 備份位於該目錄的 `pre-stash-tower-tiles/`；其兩份新增配置亦保留於原目錄，沒有刪除使用者資源。Web、真人、效能與完整十五波實戰未重測。
+
+## 已恢復的本地工作（以下為歷史驗證）
+
+## 最新修改：測試組合與高塔身，2026-10-26
+
+在現有未提交成果與使用者已編輯的 Frontier／塔資源／自建配置上增加：內建排除／清單隱藏、可命名的跨塔種配置組合、套用／切換後重開獨立測試，以及一格高的額外塔身與一致預覽。組合約束實際商店、補牌與 TowerMap 放置／升級，空池不回退；資料保存在既有 catalog 原生資源，舊索引可直接讀取。未改寫使用者資料、未 commit／merge／push，未改 C++ 或 Windows 安全設定。
+
+本次新 `combinations_input.tscn` 真渲染 29 項 PASS，原編輯器 input 48／rules 458、Construction regression 54、cards／tile_presets 重跑 PASS。GPU 畫面已檢視，修正初輪對話框自動換行導致過高的版面；最終操作按鈕都在畫面內。保留已知 shader cache 權限訊息，無最終腳本錯誤。詳細使用與測試檔見 [tower_tile_editor.md](tower_tile_editor.md)。真人、Web、release 與完整長局未重測。下節為初版歷史驗證，不當作本次全數重跑。
+
+## 初版工作：Tower Tile Editor，2026-10-25
+
+核對分支 `experiment/routing-sandbox`、HEAD `4440da42402df2343d586265c55a3050e08c7c2d`。在上次 Construction Prototype 的全部未提交成果上繼續，未 commit／merge／push／reset／clean，未改正式／舊 worktree、六塔數值或 C++ DLL。
+
+已交付獨立 `tests/tower_tile_editor/editor.tscn`／`playground.tscn`：可自由畫每份配置自己的連通多格塔體、道路、手動接口、原點／錨點與方向；具存取、複製、改名、權重、預設、安全封存及立即補牌。共用 TowerMap 真正阻擋全體格子，仍只建立一座塔，任何占格可升級；自訂兵營駐點經完整路網檢查。既有牌與塔保存幾何快照。獨立測試維持單卡立即提交、60 Gold／免費補牌／無敗北，沿用正式商店及混兵戰鬥；不安裝批次或幾何加成。
+
+新責任位於 `scripts/tower_tile_editor/`，原生使用者資源首次儲存才建立於 `assets/data/tower_tiles/user/`。詳細欄位、存取／封存、A–E 人工情境及操作見 [tower_tile_editor.md](tower_tile_editor.md)。Preview 的隔離排程只在候選改變時計算，不寫歷史或消耗 RNG。編輯模式凍結世界並停用關卡輸入，修正鏡頭攔截畫筆拖曳。
+
+本次規則 **458 項 PASS**，實際 Compatibility／RTX 4060 Laptop 渲染與滑鼠鍵盤 **48 項 PASS**，包含連續兩波、重開、原點／錨點、手動接口、取消捨棄、真實拖放及十字五格單塔。相關舊牌／建造／疊塔／交通／硬性選路／Phase 5 規則、波次／卸載、combat、真渲染拖牌／暫停回歸亦通過；Frontier 完成 120 幀渲染啟動 smoke，不代表全長局。原始輸出在 `.godot/test-results/tower_tile_editor/`，詳見工具文件。初輪實際輸入暴露的畫筆／鏡頭衝突已修正並重跑；初輪測試腳本的下拉索引、排程等待及 CombatSystem 取址錯誤已修正，不將帶 SCRIPT ERROR 的執行列為 PASS。
+
+Godot Editor 的 SAC `~road_graph…dll` 封鎖未修改也未宣稱解除；這次使用直接 runtime 入口，可依工具文件的 PowerShell 命令啟動。渲染另記錄 `user://` shader cache 目錄權限訊息，但畫面、截圖與測試完成。未進行真人、Web、release、效能或正式十五波驗收；目前等待人工接受。下節是上一個 Construction Prototype 的歷史交接。
+
+## 前次工作：Construction Prototype，2026-10-25
+
+本次實際分支 `experiment/routing-sandbox`、HEAD `4440da42402df2343d586265c55a3050e08c7c2d`（Phase 5 已提交）。Oct 24 開始乾淨，Oct 25 從用量中斷留下的修改續作；新增建造原型全部保留未提交，沒有 commit／merge／push／reset／clean。正式／舊 worktree 未修改。以下 Oct 24 merge 補註是歷史，不能用其 HEAD 或未提交數量判定目前狀態。
+
+已完成五複合形狀、明確接口及塔偏移、批次預擺／移動／旋轉／排序／撤銷／原子確認、唯讀下一波預測、兩種可撤回幾何獎勵及 A／B／C 可玩 Playground。開 [tests/construction/playground.tscn](../tests/construction/playground.tscn) 按 F6；F5 仍為 Frontier。正式塔／兵種／Frontier 資源未修改，C++ 未改也未重建。
+
+當次證據和限制以 [construction_prototype.md](construction_prototype.md) 為準，原始 JSON／log／GPU 截圖在 `.godot/test-results/construction/`。五形狀、放置、批次／排程、幾何、真輸入與九組對照通過；相關舊牌、疊塔、交通、硬性選路、Phase 5 規則、波次、拖牌、暫停、流量預覽與 Frontier 啟動回歸亦通過。先前 Phase 5 全長局／Web／效能的歷史數字不算本次執行。Editor import 有環境權限／系統封鎖訊息，翻譯已匯入並由遊戲畫面驗證，未宣稱 Editor 互動驗收。
+
+目前停在人工接受前；真人、Web、release、效能與正式十五波未重測。四 U 明顯擴張路網但仍讓同塔覆蓋多分支；兩 L 反向逐次放置亦能成功，不能把批次描述成唯一可達終局。下一步由使用者玩兩波比較操作負擔與輪廓，再決定是否進入正式規則；不要自行整合 main。
+
+使用者後續回報 Editor 的 `~road_graph...dll`／`0xc0e90002` 對話框。已確認為 Application Control policy block（4551），本機 SAC 啟用、DLL 未簽章；直接 runtime 重跑 54 項 construction regression 通過，但 Editor 問題尚未解除。診斷及直接執行入口見 [native/README](../native/README.md#windows-編輯器載入封鎖2026-10-25)。未關閉防護、未重建／替換 DLL，不能宣稱 F6 已驗收。
 
 ## 歷史同步補註：2026-10-24
 

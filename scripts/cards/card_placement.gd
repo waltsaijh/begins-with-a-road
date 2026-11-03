@@ -1,7 +1,10 @@
 extends Node3D
 signal cards_changed
 signal traffic_preview_changed(effect: Dictionary)
+signal build_preview_changed(card: BuildCard, cell: Vector3i, rotation_steps: int, error: String)
 var traffic_candidate := {}
+## Only the independent construction playground installs this controller.
+var construction: Node
 ## Input orchestration. BuildCard is data, TowerMap is the commit authority.
 @export var cards: Array[BuildCard] = []
 ## Used when no fixed starting cards are authored above.
@@ -80,6 +83,9 @@ func preview_traffic_at(card: BuildCard, cell: Vector3i, rotation_steps: int, va
 func select_card(index: int, toggle := true) -> void:
 	if input_suspended and index >= 0:
 		return
+	if is_instance_valid(construction) and index >= 0:
+		if construction.is_reserved(index): return
+		construction.cancel_move()
 	set_traffic_candidate({})
 	if toggle: hand.cancel_drag()
 	selected = index if index >= 0 and index < cards.size() and cards[index] != null and (not toggle or index != selected) else -1
@@ -90,7 +96,13 @@ func select_card(index: int, toggle := true) -> void:
 		_preview_definition = next_definition
 		if _preview_definition != null: _preview_definition.changed.connect(_invalidate)
 	turns = 0
-	towers.input_enabled = selected < 0 and not input_suspended
+	if selected >= 0 and cards[selected].tile_preset != null: turns = cards[selected].tile_preset.default_rotation
+	if selected >= 0 and not cards[selected].allows_rotation(turns):
+		for next in 4:
+			if cards[selected].allows_rotation(next):
+				turns = next
+				break
+	towers.input_enabled = selected < 0 and not input_suspended and not is_instance_valid(construction)
 	preview.visible = false
 	_reset_rotation_hint()
 	_dirty = true
@@ -128,7 +140,7 @@ func set_pause_locked(value: bool, seconds := 0.35) -> void:
 	pause_locked = value
 	input_suspended = pause_locked or entry_selection_active or _wave_active or _wave_start_pending or _shop_open
 	hand.set_interaction_enabled(not input_suspended)
-	towers.input_enabled = selected < 0 and not input_suspended
+	towers.input_enabled = selected < 0 and not input_suspended and not is_instance_valid(construction)
 	if value:
 		preview.hide()
 		_reset_rotation_hint()
@@ -167,6 +179,7 @@ func _refresh_input_state() -> void:
 	hand.set_stowed(entry_selection_active or _wave_active or _wave_start_pending)
 
 func add_card(card: BuildCard) -> bool:
+	if towers.card_filter.is_valid() and not String(towers.card_filter.call(card)).is_empty(): return false
 	if card == null or not card.configuration_error().is_empty():
 		return false
 	select_card(-1)
@@ -178,6 +191,13 @@ func add_card(card: BuildCard) -> bool:
 func place_selected(cell: Vector3i) -> Node3D:
 	if input_suspended or selected < 0 or selected >= cards.size():
 		return null
+	if is_instance_valid(construction):
+		var error: String = construction.validate_candidate(cards[selected],cell,turns)
+		if not error.is_empty():
+			construction._result(error)
+			return null
+		if construction.mode == 2 and cards[selected].traffic == null:
+			return construction.stage_selected(cell)
 	var tower: Node3D = towers.place_card(cards[selected], cell, turns)
 	if tower == null:
 		_dirty = true
@@ -192,7 +212,11 @@ func place_selected(cell: Vector3i) -> Node3D:
 func rotate_card(amount: int) -> void:
 	if input_suspended or selected < 0:
 		return
-	turns = posmod(turns+amount, 4)
+	for step in range(1,5):
+		var next := posmod(turns+amount*step,4)
+		if cards[selected].allows_rotation(next):
+			turns = next
+			break
 	_dirty = true
 	hand.show_selection(selected, turns)
 
@@ -243,7 +267,16 @@ func _process(delta: float) -> void:
 		_dirty = false
 		_last_cell = cell
 		_retry = 0.0
-		_preview_error = towers.validate_card(cards[selected], cell, turns)
+		_preview_error = construction.validate_candidate(cards[selected],cell,turns) if is_instance_valid(construction) else towers.validate_card(cards[selected], cell, turns)
+		preview.geometry_cells = null
+		var geometry := get_node_or_null("../GeometryBonuses")
+		var message := _preview_error
+		if geometry != null and _preview_error.is_empty():
+			var drafts: Array = construction.entries if is_instance_valid(construction) else []
+			var bonus: Dictionary = geometry.preview(cards[selected],cell,turns,drafts)
+			preview.geometry_cells = bonus.get("cells")
+			message = "\n".join(bonus.get("messages",[]))
+		if is_instance_valid(construction): construction.feedback.emit(message)
 		preview_traffic_at(cards[selected], cell, turns, _preview_error.is_empty())
 		if cards[selected].configuration_error().is_empty():
 			var target: DefenseTower = towers.upgrade_target(cell) if cards[selected].tower != null else null
@@ -251,6 +284,7 @@ func _process(delta: float) -> void:
 			else: preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
 		else:
 			preview.visible = false
+		build_preview_changed.emit(cards[selected],cell,turns,_preview_error)
 	if preview.visible:
 		if preview.upgrade_mode:
 			_reset_rotation_hint()

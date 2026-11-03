@@ -165,7 +165,10 @@ func verify() -> void:
 		samples += 1
 	before = map.get_used_cells().size()
 	revision = controller.revision
-	check(towers.place_card(bridge, Vector3i.ZERO) == null and map.get_used_cells().size() == before and controller.revision == revision, "Overlapping card was partially committed")
+	# Phase 3 treats the same definition as an upgrade, regardless of its preset.
+	var ground_before_upgrade := ports_at(Snapshot.capture(map, towers.occupied))
+	check(towers.place_card(bridge, Vector3i.ZERO) == tower and tower.level == 2, "Same tower card did not upgrade the existing instance")
+	check(map.get_used_cells().size() == before and controller.revision == revision and ports_at(Snapshot.capture(map, towers.occupied)) == ground_before_upgrade, "Tower upgrade changed road geometry or navigation revision")
 	scene.queue_free()
 	await get_tree().process_frame
 	# Every orientation, including negative coordinates and a multi-cell tower.

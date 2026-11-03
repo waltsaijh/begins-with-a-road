@@ -99,7 +99,8 @@ func targets_for(tower: DefenseTower, strategy: TowerAttack = null) -> Array[Nod
 	if strategy is VolleyAttack and strategy.circular_range:
 		candidates = _index.targets_near(tower.combat_origin(),tower.attack_radius*tower.range_multiplier)
 	else:
-		var center := _index.cell_for(tower.combat_origin()) if tower.has_relic(&"departure") else tower.grid_cell
+		# Offsets already contain the body's center. Translate by patrol only.
+		var center := _index.cell_for(tower.patrol_visual().global_position) if tower.has_relic(&"departure") else tower.grid_cell
 		candidates = _index.targets_in_offsets(center,tower.attack_offsets())
 	return candidates.filter(func(enemy): return tower.can_attack_target(enemy))
 

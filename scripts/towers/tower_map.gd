@@ -5,6 +5,7 @@ signal towers_changed
 signal tower_upgraded(tower: DefenseTower)
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
 const CombatSystem = preload("res://scripts/combat/combat_system.gd")
+const ConstructionLayout = preload("res://scripts/map/tile/construction_layout.gd")
 @export var tower_scene: PackedScene = preload("res://scenes/towers/sentry.tscn")
 var controller: Node
 var map: GridMap
@@ -15,6 +16,8 @@ var occupied := {}
 var _settings := {}
 var last_error := ""
 var input_enabled := true
+## Optional session-specific allowlist. Formal levels leave this empty.
+var card_filter: Callable
 var combat: Node
 var traffic: TrafficStructures
 var relics: RunRelics
@@ -94,6 +97,9 @@ func place_tower(cell: Vector3i, scene: PackedScene = null) -> DefenseTower:
 
 ## Preview is read-only. Commit always validates again against current world state.
 func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
+	if card_filter.is_valid():
+		var denied: String = card_filter.call(card)
+		if not denied.is_empty(): return denied
 	if map == null or card == null:
 		return "請選擇建造卡"
 	var error := card.configuration_error()
@@ -104,6 +110,9 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 	var at := Vector2i(cell.x, cell.z)
 	if card.traffic != null: return traffic.validate(card.traffic, at, turns)
 	if occupied.has(at): return upgrade_error(card, occupied[at])
+	if not card.allows_rotation(turns): return "地塊不支援這個旋轉方向"
+	if not card.tile_preset.tower_footprint.is_empty() or card.tile_preset.has_explicit_ports() or not placement.port_overrides.is_empty() or card.tile_preset.tower_offset != Vector2i.ZERO:
+		return construction_plan([{"card":card,"anchor":cell,"turns":turns}]).error
 	var deployment_error := _validate_deployment(card.tower,at,turns)
 	if not deployment_error.is_empty(): return deployment_error
 	var additions := {}
@@ -126,6 +135,9 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 		tower_upgraded.emit(existing)
 		if BalanceTrace.enabled: BalanceTrace.event("upgrade",BalanceTrace.tower_id(existing),{"level":existing.level,"gold":0})
 		return existing
+	if not card.tile_preset.tower_footprint.is_empty() or card.tile_preset.has_explicit_ports() or not placement.port_overrides.is_empty() or card.tile_preset.tower_offset != Vector2i.ZERO:
+		var built := commit_construction([{"card":card,"anchor":cell,"turns":turns}])
+		return built[0] if not built.is_empty() else null
 	var tower := DefenseTower.new()
 	tower.definition = card.tower
 	tower.rotation_steps = posmod(turns, 4)
@@ -162,7 +174,7 @@ func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 	for pos in footprint:
 		if traffic != null and traffic.occupied.has(pos): return "不能覆蓋輔助設施"
 		for existing: DefenseTower in towers.values():
-			if existing.definition.deployment != null and pos == existing.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),existing.rotation_steps):
+			if existing.definition.deployment != null and pos == existing.garrison_cell():
 				return "不能覆蓋兵營的士兵駐點"
 		if absi(pos.x) >= 32767 or absi(pos.y) >= 32767:
 			return "超出可建造範圍"
@@ -189,6 +201,19 @@ func _validate_deployment(definition: TowerDefinition,at: Vector2i,turns: int) -
 		if traffic != null and traffic.occupied.has(position): return "兵營或駐點不能覆蓋輔助設施"
 		if map.get_cell_item(Vector3i(position.x,0,position.y)) <= 0 or occupied.has(position) or position in terminals:
 			return "兵營必須覆蓋既有道路，前方必須保留合法士兵駐點"
+	return ""
+
+func _validate_card_home(card: BuildCard, anchor: Vector2i, turns: int) -> String:
+	if card.tower.deployment == null: return ""
+	var at := card.tower_anchor(anchor,turns)
+	var home := card.home_cell(anchor,turns)
+	for pos in [at,home]:
+		if traffic != null and traffic.occupied.has(pos): return "兵營或駐點不能覆蓋輔助設施"
+		if occupied.has(pos) or pos in controller.terminal_cells(): return "兵營或駐點與占用格衝突"
+	if home in card.tower_cells(anchor,turns): return "兵營駐點不能位於塔體內"
+	if not card.tile_preset.custom_home: return _validate_deployment(card.tower,at,card.tower_facing(turns))
+	if map.get_cell_item(Vector3i(at.x,0,at.y)) <= 0: return "兵營錨點必須覆蓋既有道路"
+	if map.get_cell_item(Vector3i(home.x,0,home.y)) <= 0 and not home in card.road_cells(anchor,turns): return "兵營駐點必須是道路"
 	return ""
 
 func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> DefenseTower:
@@ -270,3 +295,161 @@ func _apply_change(at: Vector2i, before: Array, after: Array) -> void:
 		if nearby != 0 or old_amount != new_amount:
 			records.change_tower_influence(at+offset, nearby, new_amount-old_amount)
 	records.end_update()
+
+## Read-only union validation. A draft may skip terminal connectivity, never
+## physical occupancy. Entries are recipes, not temporary world mutations.
+func construction_plan(entries: Array, require_connected := true) -> Dictionary:
+	var failure := {"ok":false,"error":""}
+	if map == null or controller.terminal_cells().is_empty():
+		failure.error = "起點與終點尚未準備好"
+		return failure
+	var terminals: Array[Vector2i] = controller.terminal_cells()
+	var ground := {}
+	var roads := {}
+	var ports := {}
+	var proposed := occupied.duplicate()
+	var additions := {}
+	var upgrades := {}
+	var builds: Array[Dictionary] = []
+	var homes := {}
+	for existing: DefenseTower in towers.values():
+		if existing.definition.deployment != null:
+			homes[existing.garrison_cell()] = true
+	for entry: Dictionary in entries:
+		var card: BuildCard = entry.get("card")
+		if card_filter.is_valid():
+			failure.error = card_filter.call(card)
+			if not failure.error.is_empty(): return failure
+		var cell: Vector3i = entry.get("anchor",TileConstants.INVALID_CELL)
+		var turns: int = entry.get("turns",0)
+		if card == null: failure.error = "缺少預擺卡牌"
+		elif not card.configuration_error().is_empty(): failure.error = card.configuration_error()
+		elif card.traffic != null: failure.error = "輔助設施請在確認預擺後單獨放置"
+		elif cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767: failure.error = "超出可建造範圍"
+		if not failure.error.is_empty(): return failure
+		var existing := upgrade_target(cell)
+		if existing != null:
+			failure.error = upgrade_error(card,existing)
+			if not failure.error.is_empty(): return failure
+			upgrades[existing] = int(upgrades.get(existing,0))+1
+			var next_level: int = existing.level+int(upgrades[existing])
+			if not existing.unlimited_levels and next_level > card.tower.growth.max_level:
+				failure.error = "預擺升級超過最高等級"
+				return failure
+			for value: float in existing.growth_values(next_level):
+				if not is_finite(value) or value <= 0: failure.error = "升級數值超出可表示範圍"
+			for value: float in existing.effective_values(next_level).values():
+				if not is_finite(value) or value < 0: failure.error = "升級數值超出可表示範圍"
+			if not failure.error.is_empty(): return failure
+			continue
+		if not card.allows_rotation(turns):
+			failure.error = "地塊不支援這個旋轉方向"
+			return failure
+		var anchor := Vector2i(cell.x,cell.z)
+		var tower_at := card.tower_anchor(anchor,turns)
+		failure.error = _validate_card_home(card,anchor,turns)
+		if not failure.error.is_empty(): return failure
+		var footprint := card.tower_cells(anchor,turns)
+		var explicit := card.tile_preset.has_explicit_ports()
+		var entry_roads := card.road_cells(anchor,turns)
+		for pos in card.ground_cells(anchor,turns):
+			if absi(pos.x) >= 32767 or absi(pos.y) >= 32767: failure.error = "超出可建造範圍"
+			elif pos in terminals: failure.error = "地塊不能覆蓋起點或終點"
+			elif occupied.has(pos) or map.get_cell_item(Vector3i(pos.x,0,pos.y)) == 0: failure.error = "地塊與已建防禦塔或石地重疊"
+			elif traffic != null and traffic.occupied.has(pos): failure.error = "地塊不能覆蓋輔助設施"
+			if not failure.error.is_empty(): return failure
+			ground[pos] = true
+			# Foundation cells never become accidental road junctions.
+			if explicit and not pos in entry_roads and not ports.has(pos): ports[pos] = 0
+		for pos in entry_roads:
+			# Legacy recipes may list their own tower's support tile as road.
+			# It is still an obstacle, not a conflicting road from another entry.
+			if not pos in footprint: roads[pos] = true
+		for pos: Vector2i in card.road_ports(anchor,turns):
+			ports[pos] = int(ports.get(pos,0)) | int(card.road_ports(anchor,turns)[pos])
+		for pos in footprint:
+			if proposed.has(pos): failure.error = "預擺防禦塔互相重疊"
+			elif homes.has(pos): failure.error = "不能覆蓋兵營士兵駐點"
+			if not failure.error.is_empty(): return failure
+			proposed[pos] = true
+			additions[pos] = true
+		if card.tower.deployment != null:
+			homes[card.home_cell(anchor,turns)] = true
+		builds.append({"card":card,"at":tower_at,"turns":card.tower_facing(turns),"geometry_turns":turns,"origin":anchor,"footprint":footprint})
+	for pos: Vector2i in roads:
+		if additions.has(pos):
+			failure.error = "道路與另一塊預擺防禦塔重疊"
+			return failure
+	for pos: Vector2i in homes:
+		if additions.has(pos):
+			failure.error = "不能覆蓋兵營士兵駐點"
+			return failure
+	var wave := get_node_or_null("../EnemyWave")
+	if wave != null and wave.reserves_cells(additions):
+		failure.error = "此處在敵軍已固定的路線上"
+		return failure
+	var layout := ConstructionLayout.build(map,ground,ports,placement.port_overrides,proposed)
+	var reachable: Array[Vector2i] = terminals.duplicate()
+	for home: Vector2i in homes:
+		if proposed.has(home) or not layout.masks.has(home):
+			failure.error = "兵營駐點必須保留可通行道路"
+			return failure
+		if not home in reachable: reachable.append(home)
+	if require_connected and not Snapshot.connects_terminals(layout.snapshot,reachable):
+		failure.error = "道路尚未連通：所有入口都必須能抵達終點"
+		return failure
+	return {"ok":true,"error":"","snapshot":layout.snapshot,"layout":layout,"ground":ground,"ports":ports,"blocked":proposed,"builds":builds,"upgrades":upgrades}
+
+## All possible rejection points precede mutation. Nodes are prepared before the
+## one geometry write, then occupancy/influence is published once for the union.
+func commit_construction(entries: Array) -> Array[Node3D]:
+	var plan := construction_plan(entries)
+	var result: Array[Node3D] = []
+	if not plan.ok:
+		_feedback(plan.error)
+		return result
+	var prepared: Array[DefenseTower] = []
+	for build: Dictionary in plan.builds:
+		var tower := DefenseTower.new()
+		tower.definition = build.card.tower
+		tower.rotation_steps = build.turns
+		tower.grid_cell = build.at
+		tower.occupied_cells.assign(build.footprint)
+		tower.placement_preset = build.card.tile_preset.duplicate(true)
+		tower.geometry_turns = build.geometry_turns
+		tower.placement_origin = build.origin
+		tower.custom_garrison = build.card.home_cell(build.origin,build.geometry_turns) if build.card.tile_preset.custom_home else Vector2i(2147483647,2147483647)
+		prepared.append(tower)
+	var new_cells: Array[Vector3i] = ConstructionLayout.apply(placement,plan.layout)
+	var records: RefCounted = controller.tile_parameters
+	records.begin_update()
+	for tower in prepared:
+		var at := tower.grid_cell
+		add_child(tower)
+		tower.global_transform = map.global_transform*Transform3D(Basis(Vector3.UP,-tower.rotation_steps*PI/2),map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*TowerConstants.GROUND_OFFSET)
+		towers[at] = tower
+		for pos in tower.occupied_cells: occupied[pos] = tower
+		var values := [tower.influence_offsets().duplicate(),tower.threat]
+		_settings[at] = values
+		tower.influence_changed.connect(_on_influence_changed.bind(at))
+		tower.died.connect(_on_tower_died)
+		_apply_change(at,[],values)
+		result.append(tower)
+	# No await or event loop between validation and these upgrades.
+	for tower: DefenseTower in plan.upgrades:
+		for i in int(plan.upgrades[tower]):
+			tower.upgrade()
+			result.append(tower)
+	if not prepared.is_empty(): controller.set_blocked_cells(occupied)
+	records.end_update()
+	placement.notify_cells(new_cells)
+	for tower: DefenseTower in plan.upgrades: tower_upgraded.emit(tower)
+	if not prepared.is_empty(): towers_changed.emit()
+	var visuals := get_node_or_null("../TileVisuals")
+	for tower in prepared:
+		if visuals != null: visuals.follow_new_cell(Vector3i(tower.grid_cell.x,0,tower.grid_cell.y),tower.get_node_or_null("Visual"))
+		if BalanceTrace.enabled: BalanceTrace.event("build",BalanceTrace.tower_id(tower),{"level":tower.level,"turns":tower.rotation_steps})
+	for tower: DefenseTower in plan.upgrades:
+		if BalanceTrace.enabled: BalanceTrace.event("upgrade",BalanceTrace.tower_id(tower),{"level":tower.level,"gold":0})
+	_feedback("")
+	return result

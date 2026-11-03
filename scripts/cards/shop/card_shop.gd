@@ -19,6 +19,17 @@ var _wave: Node
 var _rng := RandomNumberGenerator.new()
 var _round := 0
 var _rewarded_round := 0
+## Optional per-session geometry pools. Keys are the original TowerDefinition
+## objects; these never replace the combat definitions or alter shared assets.
+var tile_preset_overrides: Dictionary = {}
+
+func _preset_picker(definition: TowerDefinition) -> TowerDefinition:
+	if not tile_preset_overrides.has(definition): return definition
+	# Reuse the established file/weight validation and stable weighted draw.
+	# This temporary picker is never assigned to a card or a combat instance.
+	var picker := TowerDefinition.new()
+	picker.tile_preset_candidates.assign(tile_preset_overrides[definition])
+	return picker
 
 func setup(placement: Node3D, wave: Node) -> void:
 	_placement = placement
@@ -53,6 +64,13 @@ func hide_for_wave_start() -> void:
 	view.set_available(false)
 	if is_instance_valid(_wave.controls): _wave.controls.set_shop_present(false)
 
+func restore_after_failed_start(was_available: bool) -> void:
+	# Restore the same offers and prices, without rewards, a new deal or RNG use.
+	available = was_available
+	_refresh()
+	view.set_available(available)
+	if is_instance_valid(_wave.controls): _wave.controls.set_shop_present(available)
+
 func _on_wave_finished() -> void:
 	if not is_inside_tree() or not view.is_inside_tree() or _round <= _rewarded_round or _wave.active:
 		return
@@ -66,10 +84,14 @@ func _on_wave_finished() -> void:
 func roll_cards(count: int) -> Array[BuildCard]:
 	var result: Array[BuildCard] = []
 	var valid: Array[TowerDefinition] = []
+	var pickers := {}
 	for tower in catalog:
 		if tower == null: continue
-		var preset := tower.first_tile_preset()
-		if preset != null and BuildCard.from_parts(tower, preset).configuration_error().is_empty(): valid.append(tower)
+		var picker := _preset_picker(tower)
+		var preset := picker.first_tile_preset()
+		if preset != null and BuildCard.from_parts(tower, preset).configuration_error().is_empty():
+			valid.append(tower)
+			pickers[tower] = picker
 	if valid.is_empty(): return result
 	var bag: Array[TowerDefinition] = []
 	for i in maxi(0, count):
@@ -81,7 +103,7 @@ func roll_cards(count: int) -> Array[BuildCard]:
 				bag[j] = bag[index]
 				bag[index] = swap
 		var tower: TowerDefinition = bag.pop_back()
-		var preset := tower.roll_tile_preset(_rng)
+		var preset: TilePreset = pickers[tower].roll_tile_preset(_rng)
 		result.append(BuildCard.from_parts(tower, preset))
 	return result
 

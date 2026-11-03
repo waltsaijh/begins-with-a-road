@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TilePreset" format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/tile_preset.gd" id="1_ylvms"]
+
+[resource]
+script = ExtResource("1_ylvms")
+tower_footprint = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, -1), Vector2i(1, -1), Vector2i(1, 0)])
+display_name = "轉角"
+preset_id = "user_4643b5ca3ad53500c2bf1cf88473b12a"
+road_offsets = Array[Vector2i]([Vector2i(0, -2), Vector2i(1, -2), Vector2i(2, -1), Vector2i(2, 0)])

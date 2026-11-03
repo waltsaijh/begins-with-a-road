@@ -29,6 +29,7 @@ preset_path = "res://assets/data/tile_presets/broadside_04.tres"
 [resource]
 script = ExtResource("5_l6yb8")
 name_key = "tower.broadside.name"
+preset_group = "base"
 model = ExtResource("4_ggahg")
 card_price = 8
 icon = SubResource("CompressedTexture2D_x372t")

@@ -25,10 +25,15 @@ func check(ok: bool, message: String) -> void:
 func world(at: Vector2i, height := 0.0) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*height)
 func build(key: String, at: Vector2i, turns := 0) -> DefenseTower:
 	var definition: TowerDefinition = load("res://assets/data/towers/"+key+".tres")
-	# Freeze numerical fixtures in this process; mechanism assertions predate tuning.
+	# Freeze legacy one-cell fixtures; body geometry has its own combat suite.
+	# Numerical mechanism assertions predate tuning.
 	definition.default_damage = {"sentry":25.0,"mortar":8.0,"ballista":15.0,"broadside":8.0,"crossfire":4.0,"barracks":4.0}[key]
 	if definition.deployment != null: definition.deployment.damage = 4.0
-	var tower: DefenseTower = towers.place_card(BuildCard.from_parts(definition,definition.first_tile_preset()),Vector3i(at.x,0,at.y),turns)
+	var preset: TilePreset
+	for candidate in definition.tile_preset_candidates:
+		preset = candidate.resolve_preset()
+		if preset != null: break
+	var tower: DefenseTower = towers.place_card(BuildCard.from_parts(definition,preset),Vector3i(at.x,0,at.y),turns)
 	check(tower != null, "Place "+key)
 	return tower
 func acquire(id: StringName) -> void: check(relics.acquire(relics.catalog.find(id)), "Acquire "+str(id))

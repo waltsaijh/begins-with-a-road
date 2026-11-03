@@ -42,7 +42,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 			candidates.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
 			for side in [-1,1]:
 				if side < 0 and tower.has_relic(&"crew_concentration"): continue
-				var side_targets: Array[Node3D] = candidates.filter(func(enemy): return signf(tower.patrol_visual().to_local(enemy.global_position).x) == side)
+				var side_targets: Array[Node3D] = candidates.filter(func(enemy): return signf(tower.patrol_visual().to_local(enemy.global_position).x-TowerBodyGeometry.origin(tower.definition,tower.body_cells()).x) == side)
 				var preferred: Node3D = combat.enemy_abilities.preferred(tower,side_targets)
 				if preferred != null:
 					side_targets.erase(preferred)

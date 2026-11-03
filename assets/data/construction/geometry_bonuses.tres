@@ -1,0 +1,14 @@
+[gd_resource type="Resource" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/construction/geometry_bonus_rules.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/data/towers/ballista.tres" id="2"]
+[ext_resource type="Resource" path="res://assets/data/towers/crossfire.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+straight_tower = ExtResource("2")
+straight_length = 5
+range_extension = 1
+junction_tower = ExtResource("3")
+junction_radius = 2.0
+damage_bonus = 0.1
