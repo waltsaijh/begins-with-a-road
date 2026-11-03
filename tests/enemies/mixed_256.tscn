@@ -1,0 +1,86 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://tests/enemies/mixed_256.gd" id="1"]
+[ext_resource type="Theme" path="res://assets/themes/pause_controls.tres" id="2"]
+
+[node name="Mixed256" type="Node3D"]
+script = ExtResource("1")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Root" type="Control" parent="HUD"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2")
+
+[node name="Info" type="VBoxContainer" parent="HUD/Root"]
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 800.0
+offset_bottom = 90.0
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="HUD/Root/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.14, 0.29, 0.32, 1)
+theme_override_font_sizes/font_size = 26
+text = "256 混兵試驗場"
+
+[node name="Load" type="Label" parent="HUD/Root/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.36, 0.38, 1)
+text = "32 × 32 · 16 座塔 · Soldier 86 / Quickfeet 85 / Heavy 85"
+
+[node name="Bottom" type="VBoxContainer" parent="HUD/Root"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -154.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Status" type="Label" parent="HUD/Root/Bottom"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.14, 0.29, 0.32, 1)
+theme_override_font_sizes/font_size = 18
+text = "正在建立地圖與路線…"
+
+[node name="Buttons" type="HBoxContainer" parent="HUD/Root/Bottom"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="Start" type="Button" parent="HUD/Root/Bottom/Buttons"]
+custom_minimum_size = Vector2(160, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+disabled = true
+text = "開始一局"
+
+[node name="Reload" type="Button" parent="HUD/Root/Bottom/Buttons"]
+custom_minimum_size = Vector2(170, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "重新載入場景"
+
+[node name="Hint" type="Label" parent="HUD/Root/Bottom"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.36, 0.38, 1)
+text = "再次開波：清除敵人，保留地圖與已載入資源。Web 冷啟動請重新整理頁面。\n中鍵平移 · 滾輪縮放 · 左鍵拖曳旋轉 · F1 路線／節點 · F2 威脅"

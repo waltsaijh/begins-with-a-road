@@ -11,9 +11,9 @@ static func apply(level: LevelDefinition) -> void:
 	for x in [3,19]:
 		for z in 5: terrain.set_cell_item(Vector3i(x,0,z),6)
 	for x in range(19,23): terrain.set_cell_item(Vector3i(x,0,2),6)
+	var endpoints = preload("res://tests/fixtures/level_fixture.gd")
+	endpoints.endpoint(terrain,endpoints.Start,Vector2i(0,0),"Start")
+	endpoints.endpoint(terrain,endpoints.Goal,Vector2i(22,2),"Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
-	level.use_terrain_endpoints = false
-	level.starts = [Vector2i(0,0)]
-	level.goal = Vector2i(22,2)

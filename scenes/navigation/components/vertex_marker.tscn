@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="MarkerMaterial"]
+shading_mode = 0
+albedo_color = Color(0.08, 0.2, 0.23, 1)
+
+[sub_resource type="SphereMesh" id="MarkerMesh"]
+material = SubResource("MarkerMaterial")
+radius = 0.1
+height = 0.2
+radial_segments = 12
+rings = 6
+
+[node name="Vertex" type="Node3D"]
+
+[node name="Point" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = SubResource("MarkerMesh")
+
+[node name="ID" type="Label3D" parent="."]
+position = Vector3(0, 0.32, 0)
+billboard = 1
+pixel_size = 0.01
+modulate = Color(0.08, 0.2, 0.23, 1)
+outline_modulate = Color(1, 1, 1, 0.95)
+text = "V0"
+font_size = 40
+outline_size = 8
+no_depth_test = true

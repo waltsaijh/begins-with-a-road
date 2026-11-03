@@ -55,6 +55,7 @@ func _initialize() -> void:
 	# GPU limb motion can extend beyond the rest pose. Keep culling conservative.
 	mesh.custom_aabb = mesh.get_aabb().grow(0.2)
 	mesh.resource_name = "Prototype red grunt"
+	mesh = preload("res://tools/assets/solid_mesh_baker.gd").gait(mesh,preload("res://assets/models/enemies/grunt_gpu.tres"))
 	DirAccess.make_dir_recursive_absolute("res://assets/models/enemies")
 	var error := ResourceSaver.save(mesh, "res://assets/models/enemies/grunt_mesh.res")
 	body.free()
@@ -120,7 +121,7 @@ func _build_profile_scene(generator: GDScript, profile: String) -> Error:
 		surface.set_material(material)
 		var instance := MeshInstance3D.new()
 		instance.name = "Mesh"
-		instance.mesh = surface.commit()
+		instance.mesh = preload("res://tools/assets/solid_mesh_baker.gd").mesh(surface.commit())
 		group.add_child(instance)
 		instance.owner = root
 	var player := AnimationPlayer.new()

@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://q3arwya5j7jb"]
+
+[ext_resource type="Script" uid="uid://d1cpreu1xcoil" path="res://scripts/menus/boot.gd" id="1"]
+[ext_resource type="Script" uid="uid://c55nknnd0ya0m" path="res://scripts/enemies/rendering/enemy_multimesh.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/interface/components/loading_display.tscn" id="3"]
+[ext_resource type="Environment" path="res://assets/data/rendering/level_environment.tres" id="4"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/sentry_base_mesh.res" id="5"]
+
+[node name="Boot" type="Node3D" unique_id=460860012]
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1663612828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 10)
+projection = 1
+current = true
+size = 8.0
+near = 0.1
+far = 100.0
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1212406909]
+transform = Transform3D(0.90630776, 0.34618863, -0.24240388, 0, 0.57357645, 0.81915206, 0.42261827, -0.74240386, 0.5198368, 0, 0, 0)
+light_color = Color(1, 0.9411765, 0.8470588, 1)
+light_energy = 1.12
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1656603808]
+environment = ExtResource("4")
+
+[node name="EnemyDisplay" type="MultiMeshInstance3D" parent="." unique_id=733024468]
+script = ExtResource("2")
+
+[node name="CommonGeometry" type="MeshInstance3D" parent="." unique_id=1360400532]
+visible = false
+mesh = ExtResource("5")
+
+[node name="Interface" type="CanvasLayer" parent="." unique_id=690078395]
+layer = 100
+
+[node name="Cover" type="ColorRect" parent="Interface" unique_id=1728711869]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Loading" parent="Interface" unique_id=210641484 instance=ExtResource("3")]
+layout_mode = 3
+
+[node name="Column" parent="Interface/Loading" index="0"]
+anchors_preset = 8
+
+[node name="Stage" parent="Interface/Loading/Column" index="1"]
+text = "ui.loading.catalog"
+
+[editable path="Interface/Loading"]

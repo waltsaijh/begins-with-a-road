@@ -1,5 +1,4 @@
 #include "../../native/src/portal_graph_core.hpp"
-#include <chrono>
 #include <iostream>
 #include <random>
 #include <set>
@@ -70,7 +69,7 @@ static int routes(const road::PortalGraph &g) {
     };
     dfs(dfs,g.start_node);return count;
 }
-int main(int argc,char**) {
+int main() {
     try {
         auto room=grid(11,11);for(int x=-3;x<0;++x) room.insert({x,5});for(int x=11;x<14;++x) room.insert({x,5});
         auto g=build(room,{-3,5},{13,5});CHECK(g.regions.size()==1 && g.nodes.size()==4 && g.corridors.size()==2 && g.cycles==0);CHECK(routes(g)==1);
@@ -115,13 +114,5 @@ int main(int argc,char**) {
         CHECK(!road::build_portal_graph({{0,0,15},{0,0,15}},{0,0},{1,1}).valid);
         CHECK(build({{-30000,0},{30000,0}},{-30000,0},{30000,0}).components==2);
         std::cout<<"PASS: portal positions, annotated branch/obstacle scene, broad-area merging, internal obstacles, thin maze, rings, window endpoints, ports, islands, 50x50 and 3000 random maps vs independent obstacle flood-fill\n";
-        if(argc>1) for(auto entry:std::vector<std::pair<const char*,std::set<Point>>>{{"filled11",room},{"maze9_junctions",grid(17,17,true)},{"filled50",grid(50,50)}}) {
-            std::string name=entry.first;
-            Point s=name=="filled11" ? Point{-3,5} : name=="filled50" ? Point{0,25} : Point{0,0};
-            Point t=name=="filled11" ? Point{13,5} : name=="filled50" ? Point{49,25} : Point{16,16};
-            std::vector<double> times;
-            for(int i=0;i<21;++i) {auto before=std::chrono::steady_clock::now();g=road::build_portal_graph(tiles(entry.second),s,t);if(i) times.push_back(std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-before).count());}
-            std::sort(times.begin(),times.end());std::cout<<entry.first<<" median_ms="<<times[times.size()/2]<<" nodes="<<g.nodes.size()<<" regions="<<g.regions.size()<<" corridors="<<g.corridors.size()<<" cycles="<<g.cycles<<"\n";
-        }
     } catch(const std::exception &error) {std::cerr<<error.what()<<"\n";return 1;}
 }

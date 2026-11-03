@@ -1,8 +1,21 @@
 # Routing Sandbox — Phase 5 交接
 
-## 最新同步補註：2026-10-24
+## 本次整合：2026-11-03
+
+本次由 experiment/routing-sandbox `4440da4` 合併 origin/main `d36a866`，保留五 ACT／十五波、生命、勝敗、經濟與 Boss，整合 Boot／選單、選圖／解鎖、通關 ID、逐 ACT 擴張、預熱與原生候選優化。勝利才記通關，重新開始保留所選 Level。下列量測均為歷史證據；本次驗證與 stash 恢復結果另見 `.godot/merge-2026-11-03/`。使用者授權本次 Merge Commit；stash 恢復的本地修改保持未提交、原 stash 保留，不 push。
+
+本次合併樹驗證：Godot 4.7.2 headless editor import 無腳本／資源錯誤；Windows debug／release 原生擴充建置通過。headless 通過 balance/rules（含勝利保存與敗北不保存）、level_catalog、level_flow、act_spawn_expansion、terrain_endpoints、relics/rewards、traffic/integration、synergy/routing、native_candidates、route_batch。rendered 通過 level_selection（含結果畫面重開）、startup_loading、scene_loading 及 main_menu；main_menu 需以 --resolution 1600x900 啟動以涵蓋最大測試 viewport，預設較小視窗的初輪滑鼠輸入失敗仍保留。scene_loading 的 Invalid data／Unavailable 為預期失敗恢復案例。未執行 Web 建置／瀏覽器、完整長局或效能重測；stash 恢復後的驗證另記，不混同本次 Merge Commit 的成果。
+
+## 歷史同步補註：2026-10-24
 
 已完成 `origin/main`（`a5422c8`）→ `experiment/routing-sandbox` 的本地正常 merge，新 HEAD 為 `3fbad09d78085c9d646174cc9f4177fa46eba333`；原 Sandbox HEAD 為 `c33d425`，共同祖先為 `2fe5adc`。未 push，未移動本地 main 或修改正式 worktree。完整差異、衝突、修復與本次證據見 [Git 整合報告](../reports/git_integration_2026-10-24.md)。
+
+### main 的歷史同步紀錄（2026-10-26）
+
+2026-10-26 整合註記：本次依使用者指令，從 main `eb618c6` 合併 experiment/optimize_graph `cd6da3b`，工作目錄為 `D:\Windows\Desktop\begins-with-a-road`。以下分支、路徑、F5 入口及測試為 2026-10-23 歷史快照，不代表目前狀態。正式入口已改為 Boot → 主選單 → 選圖／本局設定 → Level；保留 Phase 2–4、C++ 候選／批次配額、GPU 模型與設定／解鎖流程。新增整合回歸核對交通倍率與硬性選路的批次／單筆一致性、群體狀態獨立及飛行高度；本次測試記錄位於 `.godot/merge-checks-2026-10-26/`，不沿用以下歷史結果。
+
+本次整合驗證（2026-10-26）：Godot 4.7.2、Compatibility、RTX 3050 Laptop；29 項 runtime 回歸＋1 項真實波次編輯器檢查通過，涵蓋路線／批次配額／去環、九兵種、交通、六塔、遺物、ACT／卸載、選單／設定及實際載入預熱。Windows 與單執行緒 Web 的 debug／release 擴充建置成功；未跑現版 Web 瀏覽器、完整長局與效能對照。scene_loading 以故意失敗的目標驗證恢復流程，預期產生 Invalid data／Unavailable 診斷，無非預期引擎或腳本錯誤。詳細結果見上述目錄的 summary.json 及各項 log。
+
 
 Phase 5 原有 42 個 tracked 修改與 77 個 untracked 檔案已還原並保留未提交；安全 stash `d884400fc38ba15e429a5f1f9f2b260eb04948aa` 與 `.godot/merge-main-2026-10-24/original-files/` 仍保留。WIP 已在工作區，不要再次直接套用 stash。合併後 32 個代表性功能場景最終通過，另有正式入口 smoke、完整十五波渲染局／四次遺物／Boss／重開、獨立帳本及待提交樹的獨立驗證。Native runtime 已執行，Native build／Web／release／效能／真人未執行；初輪失敗與限制見整合報告。
 

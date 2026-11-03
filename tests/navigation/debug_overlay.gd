@@ -1,5 +1,7 @@
 extends Node3D
 const Overlay = preload("res://scripts/navigation/visualization/portal_overlay.gd")
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
+const Fixture = preload("res://tests/fixtures/portal_fixture.gd")
 var failures := 0
 
 func _ready() -> void:
@@ -50,6 +52,15 @@ func committed_entries(wave: Node) -> Array[Dictionary]:
 		result.append({"troop": profile.troop_name, "cells": entry.route.cells})
 	return result
 
+func check_vertices(view: Node3D, controller: Node) -> void:
+	check(view.vertex_markers.get_child_count() == controller.graph.nodes.size(), "F1 omitted graph vertices or retained stale markers")
+	for node: Dictionary in controller.graph.nodes:
+		var marker := view.vertex_markers.get_node_or_null("V%d" % node.id) as Node3D
+		check(marker != null, "F1 vertex ID is missing")
+		if marker == null: continue
+		var expected: Vector3 = view.map.to_global(view.map.map_to_local(Vector3i(node.cell.x, 0, node.cell.y))+Vector3.UP*0.18)
+		check(marker.global_position.is_equal_approx(expected) and marker.get_node("ID").text == "V%d" % node.id, "F1 vertex ID or map position is incorrect")
+
 func verify() -> void:
 	var scene: Node3D = load("res://scenes/9x9.tscn").instantiate()
 	var wave: Node = scene.get_node("EnemyWave")
@@ -62,6 +73,7 @@ func verify() -> void:
 	definition.groups = [group((TroopCatalog.find("soldier").duplicate() as Troop), 7), group((TroopCatalog.find("quickfeet").duplicate() as Troop), 5), group((TroopCatalog.find("heavy").duplicate() as Troop), 3)]
 	check(wave.apply_definition(definition), "Mixed definition was rejected")
 	check(not view.show_routes and not view.show_parameters and view.routes_mesh.mesh == null and view.parameters_mesh.mesh == null, "Debug layers were visible by default")
+	check(not view.vertex_markers.visible and view.vertex_markers.get_child_count() == 0, "Vertex markers must remain hidden and unbuilt until F1 opens")
 	check(view._buttons.size() == 2 and view.find_children("PlannedTraffic", "MeshInstance3D", true, false).is_empty(), "Removed F3 layer remains")
 	press(view, KEY_F3)
 	check(not view.show_routes and not view.show_parameters, "F3 still toggles a layer")
@@ -75,6 +87,14 @@ func verify() -> void:
 	await frames()
 	check(view.show_routes and view.routes_mesh.mesh != null and view._route_segments == segments(preview), "F1 omitted a preview route")
 	check(view._troop_names.size() == 3, "F1 displayed only the selected troop")
+	check_vertices(view, controller)
+	check(view.vertex_markers.visible, "F1 vertex markers are hidden")
+	var vertex_instance: int = view.vertex_markers.get_child(0).get_instance_id()
+	await frames()
+	check(view.vertex_markers.get_child(0).get_instance_id() == vertex_instance, "Vertex markers were rebuilt without a graph change")
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png(Artifacts.path("navigation/f1_vertices.png"))
 	var colors: PackedColorArray = view.routes_mesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
 	for troop_name: String in ["soldier", "quickfeet", "heavy"]:
 		var expected := Overlay.troop_color(troop_name)
@@ -104,6 +124,8 @@ func verify() -> void:
 	await wait_map(controller)
 	await frames()
 	check(view.routes_mesh.mesh.get_instance_id() == mesh_id and view._route_segments == segments(actual), "Map edit redrew committed routes using a new plan")
+	check_vertices(view, controller)
+	check(view.vertex_markers.get_child(0).get_instance_id() != vertex_instance, "Map edits failed to refresh vertex markers during a committed wave")
 	wave._process(0.0)
 	wave.set_process(false)
 	for enemy: Node3D in wave.living_enemies(): enemy.set_process(false)
@@ -112,15 +134,13 @@ func verify() -> void:
 	press(view, KEY_F1)
 	press(view, KEY_F2)
 	check(not view.routes_mesh.visible and not view.parameters_mesh.visible and not view._panel.visible and not view.is_processing(), "Debug layers cannot be hidden independently")
+	check(not view.vertex_markers.visible, "Closing F1 left vertex markers visible")
 	scene.queue_free()
 	await frames()
 	# Every troop may share the same bridge: all colors must remain visible.
-	scene = load("res://scenes/main.tscn").instantiate()
-	# The designer's shared terrain now contains branches; keep this 23-edge
-	# color regression independent of authored map edits.
-	var bridge: GridMap = scene.get_node("TileMap")
-	bridge.clear()
-	for x in 24: bridge.set_cell_item(Vector3i(x, 0, 0), 3)
+	var bridge: Array[Vector2i] = []
+	for x in 24: bridge.append(Vector2i(x, 0))
+	scene = Fixture.scene_for(bridge, Vector2i.ZERO, Vector2i(23, 0))
 	wave = scene.get_node("EnemyWave")
 	wave.auto_start = false
 	add_child(scene)
@@ -177,5 +197,5 @@ func verify() -> void:
 	check(not view._origin.visible, "Origin selector implies an incorrect per-entrance filter for authored waves")
 	scene.queue_free()
 	await frames()
-	print("DEBUG_CHECK:"+JSON.stringify({"failures": failures, "f1_all_troops": true, "f3_removed": true, "pending_routes": true, "preview_matches_combat": true, "separate_colors": true, "shared_segments": true, "multiple_entrances": true, "next_wave_reset": true, "no_per_frame_rebuild": true}))
+	print("DEBUG_CHECK:"+JSON.stringify({"failures": failures, "f1_all_troops": true, "f1_vertices": true, "f3_removed": true, "pending_routes": true, "preview_matches_combat": true, "separate_colors": true, "shared_segments": true, "multiple_entrances": true, "next_wave_reset": true, "no_per_frame_rebuild": true}))
 	if not OS.has_feature("web"): get_tree().quit(1 if failures else 0)

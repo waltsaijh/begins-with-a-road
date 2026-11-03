@@ -1,11 +1,12 @@
 extends MultiMeshInstance3D
 ## Dense active slots. Removing one enemy moves only the last slot into its hole.
 const Model = preload("res://assets/models/enemies/grunt_mesh.res")
-const WalkShader = preload("res://assets/shaders/enemy_walk.gdshader")
+const WalkShader = preload("res://assets/shaders/solid_color.gdshader")
 const Separation = preload("res://scripts/enemies/rendering/enemy_visual_separation.gd")
 const Pose = preload("res://scripts/enemies/rendering/enemy_pose.gd")
 const StatusOverlay = preload("res://scenes/enemies/components/enemy_status_overlay.tscn")
 const Appearance = preload("res://scripts/enemies/rendering/enemy_model.gd")
+const MeshBatch = preload("res://scripts/enemies/rendering/enemy_mesh_batch.gd")
 @export var death_effects_scene: PackedScene = preload("res://scenes/effects/death_effects.tscn")
 var turn_sharpness := EnemyRenderConstants.TURN_SHARPNESS
 var units: Array[Node3D] = []
@@ -21,24 +22,13 @@ var _countdown := 0.0
 var head_positions := PackedVector3Array()
 var status_overlay: Control
 var death_effects: Node3D
+var _batches := {}
 
 func _ready() -> void:
 	# Sample a coherent snapshot after all logical movement, then submit once/frame.
 	process_priority = 100
 	set_process(false)
-	multimesh = MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.use_colors = true
-	multimesh.use_custom_data = true
-	multimesh.mesh = Model
-	var material := ShaderMaterial.new()
-	material.shader = WalkShader
-	material.set_shader_parameter("leg_swing", EnemyRenderConstants.LEG_SWING)
-	material.set_shader_parameter("arm_swing", EnemyRenderConstants.ARM_SWING)
-	material.set_shader_parameter("body_bob", EnemyRenderConstants.BODY_BOB)
-	material.set_shader_parameter("body_sway", EnemyRenderConstants.BODY_SWAY)
-	material_override = material
-	reserve(EnemyRenderConstants.INITIAL_CAPACITY)
+	_batches[Appearance.DefaultGpu] = MeshBatch.new(self,Appearance.DefaultGpu)
 	var status_layer := StatusOverlay.instantiate() as CanvasLayer
 	status_overlay = status_layer.get_node("EnemyStatusOverlay")
 	status_overlay.renderer = self
@@ -47,23 +37,34 @@ func _ready() -> void:
 	add_child(death_effects)
 
 func reserve(count: int) -> void:
-	if count <= multimesh.instance_count:
-		return
-	multimesh.instance_count = maxi(count, multimesh.instance_count * 2)
-	multimesh.visible_instance_count = units.size()
-	# Resizing clears the buffer. Refill only when capacity actually grows.
-	for enemy in units:
-		multimesh.set_instance_color(_slots[enemy], Color.WHITE)
-		update_enemy(enemy)
+	_batches[Appearance.DefaultGpu].reserve(count)
+
+func reserve_population(counts: Dictionary) -> void:
+	var models := {}
+	for profile: Troop in counts:
+		var model := Appearance.gpu_for(profile)
+		if model != null: models[model] = int(models.get(model,0))+int(counts[profile])
+	for model: EnemyGpuModel in models: _batch_for(model).reserve(models[model])
+
+func _batch_for(model: EnemyGpuModel) -> RefCounted:
+	if not _batches.has(model):
+		var view := MultiMeshInstance3D.new()
+		view.name = "GpuMesh%d" % _batches.size()
+		add_child(view)
+		_batches[model] = MeshBatch.new(view,model)
+	return _batches[model]
 
 func add_enemy(enemy: Node3D) -> void:
 	if _slots.has(enemy):
 		return
-	reserve(units.size() + 1)
 	_slots[enemy] = units.size()
 	units.append(enemy)
 	_poses.append(Pose.new(enemy))
-	_appearances.append(Appearance.new(enemy.troop, self))
+	var appearance := Appearance.new(enemy.troop,self)
+	if appearance.gpu_model != null:
+		appearance.batch = _batch_for(appearance.gpu_model)
+		appearance.batch.add(enemy)
+	_appearances.append(appearance)
 	_offsets.append(Vector2.ZERO)
 	_offset_velocities.append(Vector2.ZERO)
 	_targets.append(0.0)
@@ -73,10 +74,7 @@ func add_enemy(enemy: Node3D) -> void:
 	enemy.tree_exiting.connect(remove_enemy.bind(enemy), CONNECT_ONE_SHOT)
 	enemy.arrived.connect(remove_enemy, CONNECT_ONE_SHOT)
 	enemy.died.connect(_on_enemy_died, CONNECT_ONE_SHOT)
-	# Explicit white keeps the baked vertex palette intact in Compatibility.
-	multimesh.set_instance_color(_slots[enemy], Color.WHITE)
 	update_enemy(enemy)
-	multimesh.visible_instance_count = units.size()
 
 func update_enemy(enemy: Node3D) -> void:
 	var slot: int = _slots.get(enemy, -1)
@@ -93,12 +91,8 @@ func update_enemy(enemy: Node3D) -> void:
 	var appearance: RefCounted = _appearances[slot]
 	var model_transform: Transform3D = appearance.transform_for(display)
 	head_positions[slot] = model_transform*appearance.head
-	if appearance.batched:
-		multimesh.set_instance_transform(slot, global_transform.affine_inverse()*model_transform)
-	else:
-		# Imported scenes keep their own materials/skeletons/animations.
-		multimesh.set_instance_transform(slot, Transform3D(Basis().scaled(Vector3.ZERO), Vector3.ZERO))
-	multimesh.set_instance_custom_data(slot, Color(pose.walk_phase, pose.walk_blend, 0.0, 0.0))
+	if appearance.batch != null:
+		appearance.batch.update(enemy,global_transform.affine_inverse()*model_transform,appearance.custom_data(pose))
 
 func _on_enemy_died(enemy: Node3D) -> void:
 	var slot: int = _slots.get(enemy, -1)
@@ -118,6 +112,7 @@ func remove_enemy(enemy: Node3D) -> void:
 	if slot < 0:
 		return
 	_slots.erase(enemy)
+	if _appearances[slot].batch != null: _appearances[slot].batch.remove(enemy)
 	_appearances[slot].dispose()
 	var last: Node3D = units.pop_back()
 	if slot < units.size():
@@ -135,7 +130,6 @@ func remove_enemy(enemy: Node3D) -> void:
 	_poses.resize(units.size())
 	_appearances.resize(units.size())
 	head_positions.resize(units.size())
-	multimesh.visible_instance_count = units.size()
 	# Instance buffers persist without _draw; explicitly remove departed slots.
 	if units.is_empty(): status_overlay.clear()
 	else: status_overlay.request_update()

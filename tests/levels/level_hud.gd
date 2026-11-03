@@ -115,18 +115,18 @@ func verify() -> void:
 	var before_progress: float = scene.timeline.progress
 	await frames(8)
 	check(scene.timeline.progress == remaining and scene.timeline.progress == before_progress, "Preparation/timeline kept advancing while paused")
-	check(hud.resume_button.can_process() and hud.exit_button.can_process(), "Pause menu cannot receive input while paused")
+	check(hud.resume_button.can_process() and hud.home_button.can_process(), "Pause menu cannot receive input while paused")
 	var menu: Control = hud.pause_menu.get_node("Menu")
 	var viewport := get_viewport().get_visible_rect().size
 	check(menu.get_global_rect().position.x > viewport.x*0.5 and menu.get_global_rect().position.y > viewport.y*0.5 and menu.get_global_rect().end.x <= viewport.x and menu.get_global_rect().end.y <= viewport.y, "Pause menu is not inside the bottom-right corner")
 	var locale := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_TW")
 	await frames(1)
-	check(hud.resume_button.text == "繼續遊戲" and hud.exit_button.text == "離開", "Pause menu Chinese labels are missing")
+	check(hud.resume_button.text == "繼續遊戲" and hud.home_button.text == "回到主畫面", "Pause menu Chinese labels are missing")
 	check(hud.early_start.get_node("Title").text == "開始下一波", "Chinese callout label is wrong")
 	TranslationServer.set_locale("en")
 	await frames(1)
-	check(hud.resume_button.text == "Resume game" and hud.exit_button.text == "Exit", "Pause menu English labels are missing")
+	check(hud.resume_button.text == "Resume game" and hud.home_button.text == "Back to main menu", "Pause menu English labels are missing")
 	check(hud.early_start.get_node("Title").text == "Start next wave", "English callout label is wrong")
 	TranslationServer.set_locale(locale)
 	if DisplayServer.get_name() != "headless":
@@ -197,13 +197,10 @@ func verify() -> void:
 	if hud._callout_motion != null and hud._callout_motion.is_running(): await hud._callout_motion.finished
 	check(is_equal_approx(hud._callout_reveal, 1.0) and hud.early_start.visible, "Callout did not return above the tower")
 	await screenshot(Artifacts.path("levels/wave_start_callout_return.png"))
-	# The Exit action closes the test only after reporting its verification.
+	# Actual paused battle -> home -> fresh run is covered by menus/main_menu.gd.
 	await click(hud.pause_button)
 	await finish_pause(hud)
 	hud.cycle_speed()
-	var exited := [false]
-	hud.exit_requested.connect(func(): exited[0] = true)
-	hud.exit_button.pressed.emit()
-	check(exited[0] and not get_tree().paused and Engine.time_scale == 1, "Exit did not request closing and reset pause/speed")
-	print("LEVEL_HUD_CHECK:"+JSON.stringify({"failures": failures, "speed_cycle": true, "button_row": true, "pause_menu": true, "pause_freezes_simulation": true, "input_blocked": true, "resume_preserves_speed": true, "early_start_pause": true, "exit": true}))
+	check(hud.home_button.text == tr("ui.pause.home"), "Pause menu does not offer returning to the main menu")
+	print("LEVEL_HUD_CHECK:"+JSON.stringify({"failures": failures, "speed_cycle": true, "button_row": true, "pause_menu": true, "pause_freezes_simulation": true, "input_blocked": true, "resume_preserves_speed": true, "early_start_pause": true, "return_home_label": true}))
 	get_tree().quit(1 if failures else 0)

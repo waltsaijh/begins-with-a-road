@@ -21,7 +21,7 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 	var id := "%s_%d_%d_%d" % [mechanic,int(enabled),int(traffic),seed_value]
 	BalanceTrace.begin(output+"/"+id+".jsonl",{"run_id":id,"config":"counterfactual","seed":seed_value,"kind":"counterfactual","mechanic":mechanic,"enabled":enabled,"traffic":traffic,"budget":50,"forced_loadout":true})
 	var level := Fixture.definition(0)
-	level.starts = [Vector2i(0,0)]
+	preload("res://tests/fixtures/level_fixture.gd").single_start(level)
 	var recipe := WaveDefinition.new()
 	recipe.move_speed = 1.4
 	recipe.reward = 0

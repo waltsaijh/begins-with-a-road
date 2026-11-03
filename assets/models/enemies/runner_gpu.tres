@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyGpuModel" format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/runner_mesh.res" id="1_4sdv5"]
+[ext_resource type="Script" path="res://scripts/enemies/rendering/enemy_gpu_model.gd" id="2_hada5"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/runner.tscn" id="3_v8x2r"]
+
+[resource]
+script = ExtResource("2_hada5")
+source = ExtResource("3_v8x2r")
+mesh = ExtResource("1_4sdv5")
+rest_height = 0.42330694
+clip_length = 0.8
+keyframe_intervals = 16
+body_bob = 0.0325
+body_sway = 0.025

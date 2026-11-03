@@ -23,6 +23,8 @@ func check_sample(graph: Dictionary, route: Dictionary) -> void:
 	for node: Dictionary in graph.nodes:
 		node_at[Vector2(node.cell)] = node.id
 	for i in route.cells.size():
+		assert(not seen.has(route.cells[i]))
+		seen[route.cells[i]] = true
 		if i:
 			var delta: Vector2 = route.cells[i]-route.cells[i-1]
 			assert(absi(int(delta.x))+absi(int(delta.y)) == 1)
@@ -32,7 +34,9 @@ func check_sample(graph: Dictionary, route: Dictionary) -> void:
 
 func verify() -> void:
 	assert(ClassDB.class_exists("RoadRoutePlanner") and not ClassDB.class_exists("RoadRouteZdd"))
-	var scene: Node3D = load("res://scenes/main.tscn").instantiate()
+	var bridge: Array[Vector2i] = []
+	for x in 24: bridge.append(Vector2i(x, 0))
+	var scene := Fixture.scene_for(bridge, Vector2i.ZERO, Vector2i(23, 0))
 	root.add_child(scene)
 	var controller: Node = await ready_plan(scene)
 	assert(controller.plan.routes == 1 and controller.plan.score == 23)
@@ -110,7 +114,8 @@ func verify() -> void:
 			var route: Dictionary = controller.sample_route(seed)
 			check_sample(controller.graph, route)
 			assert(route.length == route.score and route.score-controller.plan.score < controller.troop.score_threshold)
-		print("SCENE_POOL:", name, " vertices=", controller.plan.active_nodes, " edges=", controller.plan.used_edges, " paths=", controller.plan.routes, " best=", controller.plan.score, " max_score=", maximum_score)
+		var details: Dictionary = controller.debug_summary_for(controller.troop)
+		print("SCENE_POOL:", name, " vertices=", details.active_nodes, " edges=", details.used_edges, " paths=", controller.plan.routes, " best=", controller.plan.score, " max_score=", maximum_score)
 		scene.queue_free()
 		await process_frame
 	print("PASS: shared cyclic graph and route pool, profile cache/invalidation, all local ties, actual nonrepeated portal visits, physical weighted samples, controls and both real scenes")

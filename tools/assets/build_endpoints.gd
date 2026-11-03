@@ -58,7 +58,7 @@ func part(parent: Node3D, kind: String, dimensions: Vector3, at: Vector3, color:
 	mesh.material = material(color)
 	var node := MeshInstance3D.new()
 	node.name = kind.capitalize() + color.capitalize()
-	node.mesh = mesh
+	node.mesh = preload("res://tools/assets/solid_mesh_baker.gd").mesh(mesh) if preload("res://tools/assets/solid_mesh_baker.gd").supports(mesh.material) else mesh
 	node.scale = dimensions
 	node.position = at
 	parent.add_child(node, true)

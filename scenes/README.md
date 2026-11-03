@@ -4,7 +4,9 @@
 
 | 分類 | 主要場景 | 共用範本 |
 | --- | --- | --- |
-| 根目錄 | `level.tscn` 正式關卡、`main.tscn` 共用遊戲場景、`9x9.tscn`／`11x11big.tscn` 測試地圖 | 各功能分類管理自己的範本 |
+| 根目錄 | `level.tscn` 正式關卡（由開始選單進入，亦可直接執行）、`main.tscn` 共用遊戲場景、`9x9.tscn`／`11x11big.tscn` 測試地圖 | 各功能分類管理自己的範本 |
+| `menus/` | `main_menu.tscn`，F5 開始入口；`map_selection.tscn` 同場景選圖與本局設定介面 | `components/`：可編輯固定橋景、唯讀正式地形預覽、徽記；按鈕與設定頁沿用 settings 範本 |
+| `interface/` | `screen_transition.tscn`，跨場景保留的白色過渡 Autoload | 過渡遮罩與時長由場景編輯 |
 | `cards/` | 放置系統、手牌、商店與商店整體畫面 | `components/`：卡面、牌背、標題、價格、地塊格、商品槽與旋轉提示 |
 | `levels/` | HUD、時間線整體與 ACT 新入口選擇 | `components/`：時間線軌道／節點／ACT 標題、開波對話框、獎勵文字、新入口模型 |
 | `maps/` | `tile_map.tscn`，道路與初始起終點 | `components/`：`start_point.tscn`、`goal_point.tscn` |

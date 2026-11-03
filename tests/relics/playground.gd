@@ -1,6 +1,7 @@
 extends Node3D
 ## Independent manual review: shortcuts affect this synthetic scene only.
 const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
+const Endpoints = preload("res://tests/fixtures/level_fixture.gd")
 const KEYS = ["mortar","ballista","crossfire","broadside","barracks","sentry"]
 const ANCHORS = [Vector3i(3,0,5),Vector3i(6,0,5),Vector3i(9,0,5),Vector3i(12,0,4),Vector3i(14,0,5),Vector3i(16,0,6)]
 var session: Node3D
@@ -19,10 +20,6 @@ func _ready() -> void: setup.call_deferred()
 func setup() -> void:
 	TranslationServer.set_locale("zh_TW")
 	var level := LevelDefinition.new()
-	level.use_terrain_endpoints = false
-	level.starts = [Vector2i(0,4),Vector2i(0,7)]
-	level.goal = Vector2i(17,4)
-	level.expand_starts_after_act = false
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
@@ -30,11 +27,15 @@ func setup() -> void:
 	terrain.position = Vector3(-9,0,-5)
 	for x in 18:
 		for y in 10: terrain.set_cell_item(Vector3i(x,0,y),6)
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,4), "Start")
+	Endpoints.endpoint(terrain, Endpoints.Start, Vector2i(0,7), "Start2")
+	Endpoints.endpoint(terrain, Endpoints.Goal, Vector2i(17,4), "Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
 	for act_index in 3:
 		var act := ActDefinition.new()
+		act.add_start_after_completion = false
 		act.title = "ACT %d" % (act_index+1)
 		var wave := WaveDefinition.new()
 		wave.move_speed = 1.6

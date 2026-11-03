@@ -529,34 +529,37 @@ groups = Array[ExtResource("group")]([SubResource("W15G0"), SubResource("W15G1")
 
 [sub_resource type="Resource" id="A1"]
 script = ExtResource("act")
+add_start_after_completion = false
 title = "ACT I"
 waves = Array[ExtResource("wave")]([SubResource("W1"), SubResource("W2"), SubResource("W3")])
 
 [sub_resource type="Resource" id="A2"]
 script = ExtResource("act")
+add_start_after_completion = false
 title = "ACT II"
 waves = Array[ExtResource("wave")]([SubResource("W4"), SubResource("W5"), SubResource("W6")])
 
 [sub_resource type="Resource" id="A3"]
 script = ExtResource("act")
+add_start_after_completion = false
 title = "ACT III"
 waves = Array[ExtResource("wave")]([SubResource("W7"), SubResource("W8"), SubResource("W9")])
 
 [sub_resource type="Resource" id="A4"]
 script = ExtResource("act")
+add_start_after_completion = false
 title = "ACT IV"
 waves = Array[ExtResource("wave")]([SubResource("W10"), SubResource("W11"), SubResource("W12")])
 
 [sub_resource type="Resource" id="A5"]
 script = ExtResource("act")
+add_start_after_completion = false
 title = "ACT V"
 waves = Array[ExtResource("wave")]([SubResource("W13"), SubResource("W14"), SubResource("W15")])
 
 [resource]
 script = ExtResource("level")
-title = "Frontier"
 terrain = ExtResource("terrain")
-expand_starts_after_act = false
 base_health = 20
 starting_gold = 9
 opening_shop = true

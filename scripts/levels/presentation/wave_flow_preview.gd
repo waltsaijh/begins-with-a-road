@@ -159,6 +159,8 @@ func _sync_pointer_filter() -> void:
 		var owned := hovered != null and (hovered == action or action.is_ancestor_of(hovered))
 		if not owned and not (hovered == null and bool(action.get("_hovered"))): continue
 		origin = i
+		# An expanded bridge without a GUI owner selects only the entrance.
+		if hovered == null: break
 		for item in panels[i].get_node("Scroll/Items").get_children():
 			var body := item.get_node_or_null("Body")
 			if body != null and (hovered == item or item.is_ancestor_of(hovered)):

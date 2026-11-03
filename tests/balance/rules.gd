@@ -3,6 +3,7 @@ const Fixture = preload("res://tests/synergy/fixture.gd")
 const Driver = preload("res://tests/balance/laboratory.gd")
 var failures: Array[String] = []
 var checks := 0
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 func _ready() -> void: verify.call_deferred()
 func check(ok: bool, message: String) -> void:
 	checks += 1
@@ -11,13 +12,15 @@ func check(ok: bool, message: String) -> void:
 		push_error(message)
 func session(count: int, boss := false) -> Node:
 	var level := Fixture.definition(0)
-	level.starts = [Vector2i(0,0)]
+	level.level_id = "merge_defeat_boss" if boss else ("merge_victory" if count == 15 else "merge_defeat")
+	preload("res://tests/fixtures/level_fixture.gd").single_start(level)
 	level.base_health = 20 if boss else 1
 	level.starting_gold = 9
 	level.opening_shop = true
 	level.acts.clear()
 	for a in ceili(count/3.0):
 		var act := ActDefinition.new()
+		act.add_start_after_completion = false
 		for w in mini(3,count-a*3):
 			var recipe := WaveDefinition.new()
 			recipe.reward = 0 if a*3+w == count-1 else 2
@@ -38,9 +41,13 @@ func start(scene: Node) -> void:
 	scene._advance_wave_start(1.5)
 	scene.get_node("EnemyWave")._process(0.0)
 func verify() -> void:
+	var old_path: String = LevelProgress.save_path
+	var old_completed: Dictionary = LevelProgress.snapshot()
+	LevelProgress.save_path = Artifacts.path("balance/merge_completion.cfg")
+	LevelProgress._completed = {}
 	var level: LevelDefinition = load("res://assets/data/levels/frontier.tres")
 	check(level.acts.size() == 5 and level.wave_count() == 15,"Frontier is five ACTs / fifteen waves")
-	check(not level.expand_starts_after_act and not level.reward_final_act,"No automatic entrances or fifth relic")
+	check(level.acts.all(func(act): return not act.add_start_after_completion) and not level.reward_final_act,"No automatic entrances or fifth relic")
 	var names := {}
 	for act in level.acts:
 		for wave in act.waves:
@@ -68,6 +75,7 @@ func verify() -> void:
 			await get_tree().create_timer(0.3).timeout
 	check(scene.finished and scene.victory and choices == 4,"Fifteenth completion wins with exactly four rewards")
 	check(not scene.get_node("EnemyWave").start_allowed and not shop.available,"Terminal state locks start and shop")
+	check(LevelProgress.snapshot().has("merge_victory"),"Victory records the completed Level ID")
 	var balance: int = shop.coins
 	scene._on_wave_finished()
 	shop._on_wave_finished()
@@ -93,10 +101,13 @@ func verify() -> void:
 			check(enemy._speed_factor(0) < 0.5,"Boss frost is effective")
 		enemy._process(10000)
 		check(scene.finished and not scene.victory and scene.current_wave == 0,"Leak produces immediate defeat without advancement")
+		check(not LevelProgress.snapshot().has(scene.level.progress_id()),"Defeat never records completion")
 		check(shop.coins == 9 and not wave.active and wave._pending.is_empty(),"Defeat cancels pending spawns and awards no completion Gold")
 		await get_tree().process_frame
 		check(wave.living_enemies().is_empty() and wave.alive == 0,"Defeat cleans enemy membership")
 		scene.queue_free()
 		await get_tree().process_frame
+	LevelProgress.save_path = old_path
+	LevelProgress._completed = old_completed
 	print("PHASE5_RULES ",JSON.stringify({"checks":checks,"failures":failures}))
 	get_tree().quit(0 if failures.is_empty() else 1)

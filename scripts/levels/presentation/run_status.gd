@@ -33,4 +33,4 @@ func finish(won: bool) -> void:
 func restart() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	get_tree().reload_current_scene()
+	session.restart_level()

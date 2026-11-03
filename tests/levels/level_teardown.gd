@@ -1,4 +1,5 @@
 extends Node
+const Fixture = preload("res://tests/fixtures/level_fixture.gd")
 ## Exercise the same tree-exiting callbacks as closing a running game window.
 var failures := 0
 var cases := 0
@@ -13,14 +14,14 @@ func check(ok: bool, message: String) -> void:
 
 func definition() -> LevelDefinition:
 	var level := LevelDefinition.new()
-	level.expand_starts_after_act = false
-	level.use_terrain_endpoints = false
 	var terrain := GridMap.new()
 	terrain.mesh_library = load("res://assets/models/mesh_library.tres")
 	terrain.cell_size = Vector3.ONE
 	terrain.cell_center_y = false
 	terrain.position = Vector3(-12, 0, -0.5)
 	for x in 24: terrain.set_cell_item(Vector3i(x, 0, 0), 3)
+	Fixture.endpoint(terrain,Fixture.Start,Vector2i.ZERO,"Start")
+	Fixture.endpoint(terrain,Fixture.Goal,Vector2i(23,0),"Goal")
 	level.terrain = PackedScene.new()
 	level.terrain.pack(terrain)
 	terrain.free()
@@ -96,7 +97,12 @@ func verify() -> void:
 	# An independently detached HUD must tolerate late calls and tween setters.
 	var scene := await setup_case(2.0, true, "live")
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
+	var camera: Camera3D = scene.get_node("Camera3D")
+	hud.set_paused(true)
+	hud.open_settings()
+	check(camera._navigation_locked, "Settings did not lock navigation before HUD removal")
 	scene.remove_child(hud)
+	check(not camera._navigation_locked and not get_tree().paused, "Detached HUD retained the settings navigation lock or pause state")
 	hud.set_start_available(true)
 	hud._position_callout()
 	for enemy: Node3D in scene.get_node("EnemyWave").living_enemies(): enemy.free()

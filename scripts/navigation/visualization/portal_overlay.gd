@@ -1,6 +1,7 @@
 extends Node3D
 @export var debug_panel_scene: PackedScene = preload("res://scenes/navigation/route_debug_panel.tscn")
-## F1 wave routes by troop, F2 threat. Rebuild only when their source changes.
+@export var vertex_marker_scene: PackedScene = preload("res://scenes/navigation/components/vertex_marker.tscn")
+## F1 wave routes and current graph vertices, F2 threat. Refresh on source changes.
 @onready var controller: Node = $"../PortalMap"
 @onready var map: GridMap = $"../TileMap"
 @onready var placement: Node3D = $"../TilePlacement"
@@ -8,6 +9,7 @@ var show_routes := false
 var show_parameters := false
 var routes_mesh: MeshInstance3D
 var parameters_mesh: MeshInstance3D
+var vertex_markers: Node3D
 var _wave: Node
 var _buttons: Array[Button] = []
 var _origin: Button
@@ -15,7 +17,7 @@ var _legend: RichTextLabel
 var _tooltip: Label
 var _error: Label
 var _panel: PanelContainer
-var _dirty := [true, true]
+var _dirty := [true, true, true]
 var _queued := false
 var _route_segments := {}
 var _troop_names: Array[String] = []
@@ -25,8 +27,11 @@ var _placement_error := ""
 func _ready() -> void:
 	routes_mesh = _mesh_node("WaveRoutes", false)
 	parameters_mesh = _mesh_node("Threat", true)
+	vertex_markers = Node3D.new()
+	vertex_markers.name = "GraphVertices"
+	add_child(vertex_markers)
 	_create_ui()
-	controller.graph_changed.connect(_invalidate)
+	controller.graph_changed.connect(_invalidate_vertices)
 	controller.plan_changed.connect(_invalidate)
 	controller.tile_parameters.costs_changed.connect(func(_id: int): _invalidate())
 	controller.tile_parameters.parameters_changed.connect(_invalidate_parameters)
@@ -96,11 +101,16 @@ func _toggle(index: int) -> void:
 
 func _update_visibility() -> void:
 	routes_mesh.visible = show_routes
+	vertex_markers.visible = show_routes
 	parameters_mesh.visible = show_parameters
 	set_process(show_parameters)
 	if not show_parameters:
 		_tooltip.visible = false
 	_update_ui()
+
+func _invalidate_vertices() -> void:
+	_dirty[2] = true
+	_invalidate()
 
 func _invalidate() -> void:
 	if _wave == null or not _wave.has_committed_routes(): _dirty[0] = true
@@ -125,6 +135,9 @@ func _refresh() -> void:
 	if show_routes and _dirty[0]:
 		_draw_routes()
 		_dirty[0] = false
+	if show_routes and _dirty[2]:
+		_draw_vertices()
+		_dirty[2] = false
 	if show_parameters and _dirty[1]:
 		_draw_parameters()
 		_dirty[1] = false
@@ -162,6 +175,16 @@ static func troop_color(troop_name: String) -> Color:
 static func threat_color(threat: float) -> Color:
 	var strength := threat/(1.0+threat) if is_finite(threat) else 1.0
 	return Color(1.0, lerpf(0.65, 0.02, strength), lerpf(0.45, 0.01, strength), lerpf(0.2, 0.85, strength))
+
+func _draw_vertices() -> void:
+	for marker in vertex_markers.get_children(): marker.free()
+	if not controller.graph.get("valid", false): return
+	for node: Dictionary in controller.graph.nodes:
+		var marker := vertex_marker_scene.instantiate() as Node3D
+		marker.name = "V%d" % node.id
+		marker.get_node("ID").text = marker.name
+		vertex_markers.add_child(marker)
+		marker.position = _center(node.cell, 0.18)
 
 func _draw_routes() -> void:
 	routes_mesh.mesh = null
@@ -226,6 +249,7 @@ func _update_ui() -> void:
 	_origin.text = "起點 %d/%d (R)" % [controller.active_start+1, controller.start_nodes.size()]
 	var hints := PackedStringArray()
 	if show_routes:
+		hints.append("深色圓點／V 編號＝目前路網 vertex")
 		for troop_name in _troop_names:
 			hints.append("[color=#%s]■ %s[/color]" % [_troop_colors[troop_name].to_html(false), troop_name.replace("[", "[lb]")])
 		if not _troop_names.is_empty(): hints.append("共用路段以並排色線顯示")

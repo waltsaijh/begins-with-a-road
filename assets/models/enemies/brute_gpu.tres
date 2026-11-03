@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyGpuModel" format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/brute_mesh.res" id="1_kloty"]
+[ext_resource type="Script" path="res://scripts/enemies/rendering/enemy_gpu_model.gd" id="2_m8vck"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/brute.tscn" id="3_akur4"]
+
+[resource]
+script = ExtResource("2_m8vck")
+source = ExtResource("3_akur4")
+mesh = ExtResource("1_kloty")
+rest_height = 0.61500007
+clip_length = 1.1764705882352942
+keyframe_intervals = 16
+body_bob = 0.0221
+body_sway = 0.025
