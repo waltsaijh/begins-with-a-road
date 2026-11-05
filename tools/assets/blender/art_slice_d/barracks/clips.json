@@ -1,0 +1,9 @@
+{
+  "open_close": {
+    "frames": 73,
+    "actions": {
+      "BWAR_D_barracks__DoorLeft": "BWAR_D_barracks__open_close__DoorLeft",
+      "BWAR_D_barracks__DoorRight": "BWAR_D_barracks__open_close__DoorRight"
+    }
+  }
+}

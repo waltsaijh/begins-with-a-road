@@ -1,5 +1,53 @@
 # Routing Sandbox — Phase 5 交接
 
+## 最新 Git 更新授權：2026-11-05
+
+使用者在 Art Slice F 完成後要求「git更新 並 push到遠端」，本次提交累積的 Modeling Skill、Blender 建模來源／腳本／預覽、Godot 資產、Art Slice E 正式接入及 F 配色與測試文件，正常推送 origin/experiment/routing-sandbox。開始核對 HEAD 為9b9a7f9，fetch 後與遠端同分支無差異。可重建 ZIP 及 Blender 自動備份加入忽略，保留本機檔案；未操作 main worktree、merge／rebase／reset／clean 或強制推送。以下各階段「未commit／push」為當時快照。本次 Git 更新沿用剛完成的 F 測試，未重跑遊戲測試；提交前執行 staged diff --check。
+
+## 最新配色：Art Slice F，2026-11-05
+
+六塔保留暖灰白主體，在功能區加入低彩度塔種識別色。正式／預覽預設B；assets/data/rendering/tower_color_identity.tres的Variant可切A回到原色，F6 tests/combat/tower_color_identity.tscn以A/B及1/2/3切換六塔、192塔與最遠距離。管線只替換31個共享Mesh的COLOR，不改幾何／動畫／材質／玩法；GLB與A基準保留。完整交付與重建方式見 [Art Slice F](art_slice_f.md)。
+
+本輪PASS：Godot4.7.2匯入、A與B各84配置／旋轉及實際事件動畫、既有tower_restoration／card_drag_placement、三組Compatibility GPU A/B截圖（塔外背景與UI差異0）、非COLOR資料／法線完全一致、深色機械不變、重建31個B hash不變／50個A與GLB基準檔不變。初輪headless Dummy音效退出殘留已定位，測試關閉該音效並清理場景；正式音效未改。未做本輪Web、完整十五波、真人辨識或新效能測試。保留前輪未提交工作，沒有commit／push。
+
+## 最新接入：Art Slice E，2026-11-05
+
+六塔已接入正式TowerDefinition.visual_model與TowerBodyVisual；來源GLB不重製，舊model保留fallback／音效。新wrapper／GLB純色衍生批次在assets/models/towers/integrated/，共31個網格實例，動畫與砲口獨立；新增imported_tower_visual負責事件、方向、間隔調速與閒置停止。正式／預覽共用外觀factory，預覽保留配色與格面紅綠提示。完整說明見 [Art Slice E](art_slice_e.md)。
+
+本次PASS：84組配置／旋轉實際放置與預覽比對；CombatSystem射擊事件、兵營首次部署／重生、四向／雙舷獨立與同時播放、快速重觸發／缺失動畫；tower_restoration、towers、tower_obstacles(464路線)、cards、card_drag_placement、mechanisms(113項)、stacking、traffic/integration(104項)、construction/placement(34項)。正式Frontier六塔GPU截圖與192活動視覺短測完成（RTX4060 Laptop，平均5.46ms／幀，非通用效能保證）。
+
+Web實際匯出失敗：缺少既有bin/road_graph.candidates.web.template_release.wasm32.nothreads.wasm，未執行瀏覽器測試；project.godot／export_presets已還原。未做真人操作、完整十五波或長時間測試。Lv2/3保留數值與標籤，使用本輪Lv1造型，沒有新增升級零件。沒有commit／push。
+
+## 最新視覺資產：Art Slice D，2026-11-05
+
+完成 [六塔統一配色與功能動畫](../tools/assets/blender/art_slice_d/model-spec.md)：沿用既有模型，兵營只新增雙門；六塔共10個獨立一次性動畫，來源、Python、GLB、APNG與關鍵影格保存在工具側。新遊戲資產準備在 `assets/models/towers/art_slice_d/`，包含GLB／.import、僅限本批的EditorScenePostImport、共用solid_color烘焙網格及獨立`*_visual.tscn`，尚未被TowerDefinition使用，沒有改寫戰鬥或放置。
+
+11-04 Godot4.7.2原始GLB與烘焙後場景均通過10片段播放、末幀復位、尺寸／朝向／砲口／獨立方向與Airship移動層級檢查；Compatibility GPU產生實際近景／18.5尺度圖。11-05續做兩次建置數量與規格一致、原六塔來源SHA不變，雙門73幀與入口／彼此無表面交叉。APNG為12fps真實渲染取樣。未做正式TowerBodyVisual掛載、事件時序、Lv2/3、hologram、Web或效能驗收；巨弓約3秒片段不能直接改寫既有1.4秒攻擊間隔。完整NodePath與待接入清單見成果文件。
+
+## 最新美術建模：五塔家族，2026-11-04
+
+完成 [tower_family](../tools/assets/blender/tower_family/model-spec.md)：哨塔、兵營、迫擊砲、十字火力、飛行艇，各自獨立 .blend／Python入口／GLB／兩視角與遊戲尺度圖；另有既有巨弓C＋五塔四向比較與最遠縮放。風格沿用暖灰白＋功能深色，量體依1×1／2×2／1×2區分。無攻擊動畫，無Godot接入或遊戲系統修改。
+
+本次驗證：五塔footprint越界0、非流形邊0、退化／同mesh重複三角形0；GLB無動畫／貼圖／外部依賴，重新匯入AABB最大誤差小於1.2e-7。重跑後幾何與 owned 數量相同，巨弓來源hash不變。Blender 5.2.3寫含集合實例的scene library曾崩潰（MCP WinError10054），改隔離背景程序保存正常工作檔並完成渲染。迫擊砲不同preset角落錨點須後續依規格平移外觀，未做自動掛載；未跑Godot／Web／效能驗證。可編輯網格尚未做正式靜態合批。
+
+## 最新美術驗證：Great Ballista C 上色與攻擊，2026-11-04
+
+使用者指定以C / Detailed繼續第二輪，仍僅Blender視覺驗證。成果位於 [great_ballista_round2](../tools/assets/blender/great_ballista_round2/model-spec.md)：保留46 mesh／1352三角形與L形占格，暖灰白＋少量功能深色，增加純pivot／物件關鍵影格的3秒攻擊循環。交付兩個靜態視角、白模配色對照、近景與1280×800／18.5實際尺度APNG、六格姿態及可重跑腳本／.blend。
+
+Current PASS：MCP建置／姿態檢視、重跑數量一致且原物件變換與第一輪來源保留、72幀非飛行構件footprint越界0／非流形0／非正行列式0／首尾矩陣差0、PNG真渲染、兩份APNG各36幀的CRC／時序／patch邊界及六取樣幀無損重建。箭補回為預覽用的可見性切換，無上膛人物／音效／新特效。未修改戰鬥、正式資料或地形；未建立本輪GLB、未跑Godot／Web／效能／正式整合。詳細限制與重跑命令見成果文件。
+
+## 最新美術探索：Great Ballista A/B/C，2026-11-04
+
+使用者授權第一輪 Blender Art Slice，明確不接入 Godot／不改遊戲邏輯／不做攻擊動畫。來源、三版獨立 .blend／GLB、統一正交預覽及完整比較說明位於 [great_ballista_slice](../tools/assets/blender/great_ballista_slice/model-spec.md)。沿用右後裝填格的 L 形 `(0,0),(0,1),(1,1)`，錨點0、Godot −Z正面；兩格主武器＋一格箭架，暖灰白主色。A/B/C為276／548／1352三角形，共同比例、材質及鏡頭。
+
+Current PASS：MCP程序建模與camera檢視、三版獨立圖／並排圖／四方位比較／初始與最遠遊戲距離PNG、重跑數量一致、逐mesh非流形／footprint越界／負行列式均0、GLB僅目標節點與兩材質且無貼圖／相機／動畫、四份 .blend 重新開啟及主檔渲染。保留原 Blender Cube／Camera／Light；輸出檔不帶入。父目錄 tools/assets/blender/.gdignore 隔離原始檔與Art Slice GLB。未修改任何正式遊戲邏輯、資料或資產；未跑Godot／Web／效能／正式接入驗收。視覺建議以B作後續基準，C近景改善在遊戲遠景收益有限，待使用者比較。
+
+## 最新文件工作：3D Modeling Skill，2026-11-03
+
+起始核對分支 `experiment/routing-sandbox`、HEAD `9b9a7f9`、工作樹乾淨。新增 [.agents/skills/bwar-modeling](../.agents/skills/bwar-modeling/SKILL.md)，包含美術原則／檢查清單、專案場景契約及 Blender MCP→GLB→Godot 流程；同步 AGENTS 與架構索引。來源文件規定 `.blend`／Python 留在工具側，GLB 入 assets；標明多格 TowerBodyVisual 不會因只換 TowerDefinition.model 而全面套用，以及共用 shader 所需自訂通道。
+
+本次僅文件與 Skill；未修改 Blender 場景、未製作模型、未修改遊戲邏輯／資料或既有資產，未執行遊戲／Web 測試與 GLB 接入驗收。Current PASS：基本 frontmatter／命名／必要欄位／未完成標記檢查、三份 Skill 文件相對連結與三處入口連結、git diff --check。內建 quick_validate.py 因本機 Python 缺少 PyYAML 無法完成；以不安裝套件的基本結構檢查補充，未宣稱完整 YAML 驗證。下方遊戲 PASS 均為先前工作結果。
+
 ## 本次 Git 更新授權：2026-11-03
 
 使用者於道路、橋頭、寬路流線及雙向路肩接觸暗部完成後再次要求「git更新並push到遠端」，授權提交目前全部相依修改並正常推送 origin/experiment/routing-sandbox。已 fetch 核對遠端；保留本輪實作與驗證，提交前核對 diff --check。下方各階段「未提交／不 push」是此次授權前的歷史狀態，不再限制本次提交與推送。未操作 main worktree，未執行 merge／rebase／reset／clean 或強制推送。

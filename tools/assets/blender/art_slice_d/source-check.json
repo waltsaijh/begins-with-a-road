@@ -1,0 +1,22 @@
+{
+  "repeat_counts_first": {
+    "scenes": 9,
+    "collections": 15,
+    "objects": 254,
+    "meshes": 132,
+    "materials": 6,
+    "actions": 34
+  },
+  "repeat_counts_second": {
+    "scenes": 9,
+    "collections": 15,
+    "objects": 254,
+    "meshes": 132,
+    "materials": 6,
+    "actions": 34
+  },
+  "manifest_equal": true,
+  "source_hashes_unchanged": true,
+  "door_wall_surface_intersections": [],
+  "door_frames_checked": 73
+}

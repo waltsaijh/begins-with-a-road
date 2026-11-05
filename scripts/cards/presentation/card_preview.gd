@@ -94,7 +94,7 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 		_definition = card.visual_definition(); _ghost_stamp = stamp
 		ghost = null
 		if _definition != null and _definition.model != null:
-			if _definition is TowerDefinition and not body.is_empty() and _definition.deployment == null:
+			if _definition is TowerDefinition:
 				ghost = preload("res://scripts/towers/body_visual.gd").create(_definition,body)
 			else: ghost = _definition.model.instantiate()
 			add_child(ghost)
@@ -166,6 +166,10 @@ func _top_height(node: Node, height: float) -> float:
 	return height
 
 func _tint(node: Node) -> void:
+	# Authored palette stays intact; the existing ground/occupancy colors carry validity.
+	if node.has_method("set_preview"):
+		node.set_preview()
+		return
 	if node is MeshInstance3D:
 		node.material_override = _ghost_material
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF

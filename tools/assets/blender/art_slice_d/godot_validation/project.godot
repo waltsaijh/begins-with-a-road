@@ -1,0 +1,8 @@
+config_version=5
+[application]
+config/name="BWAR Art Slice D Validation"
+[rendering]
+renderer/rendering_method="gl_compatibility"
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=800

@@ -1,0 +1,125 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_000.res" id="1_helpo"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_001.res" id="2_m8sqd"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_002.res" id="3_74qwe"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_003.res" id="4_vs4ep"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_004.res" id="5_tm3n5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_005.res" id="6_jwbvo"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_006.res" id="7_mxt25"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_007.res" id="8_u0q4h"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_008.res" id="9_e0hfn"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_009.res" id="10_g110o"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_010.res" id="11_8p8rx"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_011.res" id="12_j5uug"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_012.res" id="13_82aio"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_013.res" id="14_scu23"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_014.res" id="15_g1jc5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_015.res" id="16_vm5gd"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/watchtower_meshes/part_016.res" id="17_6dgxh"]
+
+[sub_resource type="Animation" id="Animation_8dw6l"]
+resource_name = "fire"
+step = 0.041666668
+tracks/0/type = "position_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.25, 1, 0, 0, 0.065, 0.29166666, 1, 0, 0, 0.061875, 0.375, 1, 0, 0, 0.048125, 0.41666666, 1, 0, 0, 0.045, 0.45833334, 1, 0, 0, 0.044344023, 0.5, 1, 0, 0, 0.042507287, 0.5416667, 1, 0, 0, 0.03968659, 0.5833333, 1, 0, 0, 0.036078718, 0.625, 1, 0, 0, 0.031880468, 0.6666667, 1, 0, 0, 0.02728863, 0.75, 1, 0, 0, 0.017711371, 0.7916667, 1, 0, 0, 0.013119534, 0.8333333, 1, 0, 0, 0.008921282, 0.875, 1, 0, 0, 0.005313411, 0.9166667, 1, 0, 0, 0.0024927114, 0.9583333, 1, 0, 0, 0.00065597665, 1, 1, 0, 0, 0)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0r3nq"]
+_data = {
+&"fire": SubResource("Animation_8dw6l")
+}
+
+[node name="BWAR_D_watchtower" type="Node3D" unique_id=420167864]
+
+[node name="BWAR_D_watchtower__Model" type="Node3D" parent="." unique_id=415018864]
+metadata/extras = {
+"anchor": "(0,0,0)",
+"animation": "none",
+"art_slice_only": true,
+"footprint_godot": "[[0, 0]]",
+"forward_godot": "-Z"
+}
+
+[node name="BWAR_D_watchtower__AimPivot" type="Node3D" parent="BWAR_D_watchtower__Model" unique_id=1368676143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="BWAR_D_watchtower__RecoilAssembly" type="Node3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot" unique_id=703024293]
+
+[node name="BWAR_D_watchtower__Bolt" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=1359319530]
+transform = Transform3D(-1, -3.1786524e-08, -3.1786524e-08, 3.1786524e-08, 0, -1, 3.1786524e-08, -1, 0, 0, 0.23000002, -0.1)
+mesh = ExtResource("1_helpo")
+
+[node name="BWAR_D_watchtower__Bow" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=94636992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.25, 0)
+mesh = ExtResource("2_m8sqd")
+
+[node name="BWAR_D_watchtower__String" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=658236761]
+transform = Transform3D(0.8389612, 0.54419124, -1.1920929e-07, 2.9802322e-08, -2.3841858e-07, -1, -0.54419124, 0.83896124, -2.3841858e-07, -0.12, 0.19000006, -0.004999995)
+mesh = ExtResource("3_74qwe")
+
+[node name="BWAR_D_watchtower__StringRight" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=1677607181]
+transform = Transform3D(0.8389612, -0.54419124, 1.1920929e-07, -2.9802322e-08, -2.3841858e-07, -1, 0.54419124, 0.83896124, -2.3841858e-07, 0.12, 0.19000006, -0.004999995)
+mesh = ExtResource("4_vs4ep")
+
+[node name="BWAR_D_watchtower__WeaponStock" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=1012372750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.25, 0)
+mesh = ExtResource("5_tm3n5")
+
+[node name="BWAR_D_watchtower__ArrowRelease" type="Marker3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot/BWAR_D_watchtower__RecoilAssembly" unique_id=578176407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23000002, -0.4)
+
+[node name="BWAR_D_watchtower__UpgradeSocket" type="Node3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__AimPivot" unique_id=1147533521]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.049999952, 0)
+
+[node name="BWAR_D_watchtower__FixedBase" type="Node3D" parent="BWAR_D_watchtower__Model" unique_id=1030862820]
+
+[node name="BWAR_D_watchtower__CrossBrace0_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1548104089]
+transform = Transform3D(0, 0.48053473, 0.8769757, 2.9802322e-08, 0.8769757, -0.48053473, -1, 2.9802322e-08, 0, -0.019999996, 0.655, -0.18)
+mesh = ExtResource("6_jwbvo")
+
+[node name="BWAR_D_watchtower__CrossBrace-0_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=546945808]
+transform = Transform3D(0, 0.48053473, 0.8769757, 2.9802322e-08, 0.8769757, -0.48053473, -1, 2.9802322e-08, 0, -0.019999996, 0.655, 0.18)
+mesh = ExtResource("7_mxt25")
+
+[node name="BWAR_D_watchtower__Foot" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=565466688]
+mesh = ExtResource("8_u0q4h")
+
+[node name="BWAR_D_watchtower__Landing" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1001329638]
+mesh = ExtResource("9_e0hfn")
+
+[node name="BWAR_D_watchtower__Leg0_18-0_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1832057984]
+transform = Transform3D(-0.7071067, -0.062750705, -0.704317, 5.1409006e-07, 0.99605453, -0.0887434, 0.7071068, -0.06275143, -0.70431685, 0.2115, 0.62, 0.2115)
+mesh = ExtResource("10_g110o")
+
+[node name="BWAR_D_watchtower__Leg0_180_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1511496818]
+transform = Transform3D(0.70710677, -0.06275216, -0.70431685, 5.1036477e-07, 0.9960544, -0.08874443, 0.7071068, 0.06275143, 0.70431685, 0.2115, 0.62, -0.2115)
+mesh = ExtResource("11_8p8rx")
+
+[node name="BWAR_D_watchtower__Leg-0_18-0_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=910087813]
+transform = Transform3D(-0.7071067, 0.062750705, 0.704317, -5.1409006e-07, 0.99605453, -0.0887434, -0.7071068, -0.06275143, -0.70431685, -0.2115, 0.62, 0.2115)
+mesh = ExtResource("12_j5uug")
+
+[node name="BWAR_D_watchtower__Leg-0_180_18" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=331982792]
+transform = Transform3D(0.70710677, 0.06275216, 0.70431685, -5.1036477e-07, 0.9960544, -0.08874443, -0.7071068, 0.06275143, 0.70431685, -0.2115, 0.62, -0.2115)
+mesh = ExtResource("13_82aio")
+
+[node name="BWAR_D_watchtower__Parapet0_3" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=487000335]
+mesh = ExtResource("14_scu23")
+
+[node name="BWAR_D_watchtower__Parapet-0_3" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1098361150]
+mesh = ExtResource("15_g1jc5")
+
+[node name="BWAR_D_watchtower__RearGuard" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=1892761874]
+mesh = ExtResource("16_vm5gd")
+
+[node name="BWAR_D_watchtower__Turntable" type="MeshInstance3D" parent="BWAR_D_watchtower__Model/BWAR_D_watchtower__FixedBase" unique_id=450899885]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+mesh = ExtResource("17_6dgxh")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1164323176]
+libraries/ = SubResource("AnimationLibrary_0r3nq")

@@ -1,0 +1,9 @@
+[gd_resource type="Environment" format=3]
+
+[resource]
+background_mode = 1
+background_color = Color(0.9, 0.925, 0.94, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.6352941, 0.7215686, 0.8196078, 1)
+ambient_light_energy = 0.23
+reflected_light_source = 2

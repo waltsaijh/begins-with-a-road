@@ -10,6 +10,8 @@ extends Resource
 			name_key = value
 			emit_changed()
 @export var model: PackedScene
+## Optional authored visual wrapper. model remains the legacy geometry/audio fallback.
+@export var visual_model: PackedScene
 ## Optional friendly deployment; soldiers are not navigation obstacles.
 @export var deployment: BarracksDeployment
 @export var growth: TowerGrowth = preload("res://assets/data/towers/growth/standard.tres")

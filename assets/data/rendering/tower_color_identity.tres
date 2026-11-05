@@ -1,0 +1,162 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/tower_color_identity.gd" id="1"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_00.res" id="1_tdl0o"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_01.res" id="2_2awms"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_02.res" id="3_xt0v3"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_03.res" id="4_8qdhs"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_04.res" id="5_y0pb7"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_05.res" id="6_u6w7j"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_06.res" id="7_vggkc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_07.res" id="8_ut24i"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_08.res" id="9_abhdw"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/ballista_part_09.res" id="10_up4yh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/sentry_part_00.res" id="11_i1f5k"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/sentry_part_01.res" id="12_k1vis"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_00.res" id="13_x4siy"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_01.res" id="14_uce40"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_02.res" id="15_r5ok3"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/mortar_part_00.res" id="16_l601o"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/mortar_part_01.res" id="17_niwds"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/mortar_part_02.res" id="18_18xm0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/crossfire_part_00.res" id="19_etnps"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/crossfire_part_01.res" id="20_vimei"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/crossfire_part_02.res" id="21_vhlhc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/crossfire_part_03.res" id="22_b5cub"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/crossfire_part_04.res" id="23_1p60e"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_00.res" id="24_sivol"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_01.res" id="25_laxtq"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_02.res" id="26_47ks6"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_03.res" id="27_k2wqy"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_04.res" id="28_eot5a"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_05.res" id="29_qvrlf"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_06.res" id="30_st2o0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/broadside_part_07.res" id="31_2n235"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_00.res" id="32_2uby1"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_01.res" id="33_1ehce"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_02.res" id="34_18x05"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_03.res" id="35_eu6ev"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_04.res" id="36_ipduc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_05.res" id="37_3akpy"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_06.res" id="38_n7p6v"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_07.res" id="39_vbfad"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_08.res" id="40_x85a0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/ballista_part_09.res" id="41_qm45n"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/sentry_part_00.res" id="42_k7ugd"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/sentry_part_01.res" id="43_vb16y"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/barracks_part_00.res" id="44_slkap"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/barracks_part_01.res" id="45_l6vii"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/barracks_part_02.res" id="46_0kvad"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/mortar_part_00.res" id="47_oupbe"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/mortar_part_01.res" id="48_k74f4"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/mortar_part_02.res" id="49_48fyx"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/crossfire_part_00.res" id="50_kggo3"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/crossfire_part_01.res" id="51_f3ov5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/crossfire_part_02.res" id="52_sgwet"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/crossfire_part_03.res" id="53_cyj30"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/crossfire_part_04.res" id="54_mrcgc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_00.res" id="55_8b2yy"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_01.res" id="56_wmw2r"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_02.res" id="57_j1gdx"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_03.res" id="58_nnx4d"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_04.res" id="59_8wikg"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_05.res" id="60_3oeta"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_06.res" id="61_kcadc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/color_identity/b/broadside_part_07.res" id="62_f4g6d"]
+
+[resource]
+script = ExtResource("1")
+identity_colors = Dictionary[String, Color]({
+"ballista": Color(0.3254902, 0.48235294, 0.6039216, 1),
+"barracks": Color(0.7176471, 0.54901963, 0.34509805, 1),
+"broadside": Color(0.39215687, 0.5568628, 0.627451, 1),
+"crossfire": Color(0.5333333, 0.48235294, 0.6509804, 1),
+"mortar": Color(0.6627451, 0.43529412, 0.38039216, 1),
+"sentry": Color(0.39215687, 0.5411765, 0.5098039, 1)
+})
+identity_parts = {
+"ballista": {
+"full": ["BowLimb-1", "BowLimb1", "OpenTrack-1", "OpenTrack1"]
+},
+"barracks": {
+"full": ["DoorLeaf*", "CornerGuard*", "SideParapet*", "BackParapet"]
+},
+"broadside": {
+"full": ["FacetedHull", "Deck", "Bridge"]
+},
+"crossfire": {
+"full": ["RadialLauncher0", "RadialLauncher1", "RadialLauncher2", "RadialLauncher3"]
+},
+"mortar": {
+"full": ["ShortBore"]
+},
+"sentry": {
+"full": ["Parapet*", "RearGuard", "WeaponStock"]
+}
+}
+baseline_meshes = Dictionary[String, Mesh]({
+"ballista_part_00.res": ExtResource("1_tdl0o"),
+"ballista_part_01.res": ExtResource("2_2awms"),
+"ballista_part_02.res": ExtResource("3_xt0v3"),
+"ballista_part_03.res": ExtResource("4_8qdhs"),
+"ballista_part_04.res": ExtResource("5_y0pb7"),
+"ballista_part_05.res": ExtResource("6_u6w7j"),
+"ballista_part_06.res": ExtResource("7_vggkc"),
+"ballista_part_07.res": ExtResource("8_ut24i"),
+"ballista_part_08.res": ExtResource("9_abhdw"),
+"ballista_part_09.res": ExtResource("10_up4yh"),
+"barracks_part_00.res": ExtResource("13_x4siy"),
+"barracks_part_01.res": ExtResource("14_uce40"),
+"barracks_part_02.res": ExtResource("15_r5ok3"),
+"broadside_part_00.res": ExtResource("24_sivol"),
+"broadside_part_01.res": ExtResource("25_laxtq"),
+"broadside_part_02.res": ExtResource("26_47ks6"),
+"broadside_part_03.res": ExtResource("27_k2wqy"),
+"broadside_part_04.res": ExtResource("28_eot5a"),
+"broadside_part_05.res": ExtResource("29_qvrlf"),
+"broadside_part_06.res": ExtResource("30_st2o0"),
+"broadside_part_07.res": ExtResource("31_2n235"),
+"crossfire_part_00.res": ExtResource("19_etnps"),
+"crossfire_part_01.res": ExtResource("20_vimei"),
+"crossfire_part_02.res": ExtResource("21_vhlhc"),
+"crossfire_part_03.res": ExtResource("22_b5cub"),
+"crossfire_part_04.res": ExtResource("23_1p60e"),
+"mortar_part_00.res": ExtResource("16_l601o"),
+"mortar_part_01.res": ExtResource("17_niwds"),
+"mortar_part_02.res": ExtResource("18_18xm0"),
+"sentry_part_00.res": ExtResource("11_i1f5k"),
+"sentry_part_01.res": ExtResource("12_k1vis")
+})
+colored_meshes = Dictionary[String, Mesh]({
+"ballista_part_00.res": ExtResource("32_2uby1"),
+"ballista_part_01.res": ExtResource("33_1ehce"),
+"ballista_part_02.res": ExtResource("34_18x05"),
+"ballista_part_03.res": ExtResource("35_eu6ev"),
+"ballista_part_04.res": ExtResource("36_ipduc"),
+"ballista_part_05.res": ExtResource("37_3akpy"),
+"ballista_part_06.res": ExtResource("38_n7p6v"),
+"ballista_part_07.res": ExtResource("39_vbfad"),
+"ballista_part_08.res": ExtResource("40_x85a0"),
+"ballista_part_09.res": ExtResource("41_qm45n"),
+"barracks_part_00.res": ExtResource("44_slkap"),
+"barracks_part_01.res": ExtResource("45_l6vii"),
+"barracks_part_02.res": ExtResource("46_0kvad"),
+"broadside_part_00.res": ExtResource("55_8b2yy"),
+"broadside_part_01.res": ExtResource("56_wmw2r"),
+"broadside_part_02.res": ExtResource("57_j1gdx"),
+"broadside_part_03.res": ExtResource("58_nnx4d"),
+"broadside_part_04.res": ExtResource("59_8wikg"),
+"broadside_part_05.res": ExtResource("60_3oeta"),
+"broadside_part_06.res": ExtResource("61_kcadc"),
+"broadside_part_07.res": ExtResource("62_f4g6d"),
+"crossfire_part_00.res": ExtResource("50_kggo3"),
+"crossfire_part_01.res": ExtResource("51_f3ov5"),
+"crossfire_part_02.res": ExtResource("52_sgwet"),
+"crossfire_part_03.res": ExtResource("53_cyj30"),
+"crossfire_part_04.res": ExtResource("54_mrcgc"),
+"mortar_part_00.res": ExtResource("47_oupbe"),
+"mortar_part_01.res": ExtResource("48_k74f4"),
+"mortar_part_02.res": ExtResource("49_48fyx"),
+"sentry_part_00.res": ExtResource("42_k7ugd"),
+"sentry_part_01.res": ExtResource("43_vb16y")
+})

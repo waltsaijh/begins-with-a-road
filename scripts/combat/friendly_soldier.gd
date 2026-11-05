@@ -105,6 +105,7 @@ func advance(delta: float) -> void:
 			scale = Vector3.ONE
 			respawn_pulse = 1
 			manager.effect(global_position,"respawn")
+			tower.present_deployment()
 		return
 	flash = maxf(0,flash-delta)
 	if skin != null: skin.material_override = _hit if flash > 0 else _normal

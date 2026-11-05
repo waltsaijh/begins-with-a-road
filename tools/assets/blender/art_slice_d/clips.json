@@ -1,0 +1,87 @@
+{
+  "great_ballista": {
+    "attack": {
+      "frames": 72,
+      "actions": {
+        "BWAR_D_great_ballista__WeaponMount": "BWAR_D_great_ballista__attack__WeaponMount",
+        "BWAR_D_great_ballista__BowString-1": "BWAR_D_great_ballista__attack__BowString-1",
+        "BWAR_D_great_ballista__BowString1": "BWAR_D_great_ballista__attack__BowString1",
+        "BWAR_D_great_ballista__TensionLink": "BWAR_D_great_ballista__attack__TensionLink",
+        "BWAR_D_great_ballista__Slider": "BWAR_D_great_ballista__attack__Slider",
+        "BWAR_D_great_ballista__BoltCarrier": "BWAR_D_great_ballista__attack__BoltCarrier",
+        "BWAR_D_great_ballista__LimbPivot-1": "BWAR_D_great_ballista__attack__LimbPivot-1",
+        "BWAR_D_great_ballista__LimbPivot1": "BWAR_D_great_ballista__attack__LimbPivot1"
+      }
+    }
+  },
+  "watchtower": {
+    "fire": {
+      "frames": 25,
+      "actions": {
+        "BWAR_D_watchtower__RecoilAssembly": "BWAR_D_watchtower__fire__RecoilAssembly"
+      }
+    }
+  },
+  "barracks": {
+    "open_close": {
+      "frames": 73,
+      "actions": {
+        "BWAR_D_barracks__DoorLeft": "BWAR_D_barracks__open_close__DoorLeft",
+        "BWAR_D_barracks__DoorRight": "BWAR_D_barracks__open_close__DoorRight"
+      }
+    }
+  },
+  "mortar": {
+    "fire": {
+      "frames": 37,
+      "actions": {
+        "BWAR_D_mortar__RecoilAssembly": "BWAR_D_mortar__fire__RecoilAssembly",
+        "BWAR_D_mortar__Suspension": "BWAR_D_mortar__fire__Suspension"
+      }
+    }
+  },
+  "crossfire": {
+    "fire_north": {
+      "frames": 25,
+      "actions": {
+        "BWAR_D_crossfire__RecoilAssembly0": "BWAR_D_crossfire__fire_north__RecoilAssembly0"
+      }
+    },
+    "fire_east": {
+      "frames": 25,
+      "actions": {
+        "BWAR_D_crossfire__RecoilAssembly1": "BWAR_D_crossfire__fire_east__RecoilAssembly1"
+      }
+    },
+    "fire_south": {
+      "frames": 25,
+      "actions": {
+        "BWAR_D_crossfire__RecoilAssembly2": "BWAR_D_crossfire__fire_south__RecoilAssembly2"
+      }
+    },
+    "fire_west": {
+      "frames": 25,
+      "actions": {
+        "BWAR_D_crossfire__RecoilAssembly3": "BWAR_D_crossfire__fire_west__RecoilAssembly3"
+      }
+    }
+  },
+  "broadside_airship": {
+    "fire_port": {
+      "frames": 33,
+      "actions": {
+        "BWAR_D_broadside_airship__PortGun1": "BWAR_D_broadside_airship__fire_port__PortGun1",
+        "BWAR_D_broadside_airship__PortGun2": "BWAR_D_broadside_airship__fire_port__PortGun2",
+        "BWAR_D_broadside_airship__PortGun3": "BWAR_D_broadside_airship__fire_port__PortGun3"
+      }
+    },
+    "fire_starboard": {
+      "frames": 33,
+      "actions": {
+        "BWAR_D_broadside_airship__StarboardGun1": "BWAR_D_broadside_airship__fire_starboard__StarboardGun1",
+        "BWAR_D_broadside_airship__StarboardGun2": "BWAR_D_broadside_airship__fire_starboard__StarboardGun2",
+        "BWAR_D_broadside_airship__StarboardGun3": "BWAR_D_broadside_airship__fire_starboard__StarboardGun3"
+      }
+    }
+  }
+}

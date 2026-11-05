@@ -1,0 +1,226 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_000.res" id="1_ppsl2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_001.res" id="2_a0kkf"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_002.res" id="3_sp103"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_003.res" id="4_7hadi"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_004.res" id="5_xbl8i"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_005.res" id="6_j46pc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_006.res" id="7_era6t"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_007.res" id="8_flnj2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_008.res" id="9_1dig7"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_009.res" id="10_1o65q"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_010.res" id="11_0bni6"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_011.res" id="12_rq8ff"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_012.res" id="13_np4ta"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_013.res" id="14_mdeb8"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_014.res" id="15_mr6d8"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_015.res" id="16_wtanq"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_016.res" id="17_odd4o"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_017.res" id="18_kgi6i"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_018.res" id="19_1hy6j"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_019.res" id="20_vdrfg"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_d/broadside_airship_meshes/part_020.res" id="21_fb6i3"]
+
+[sub_resource type="Animation" id="Animation_v827x"]
+resource_name = "fire_port"
+length = 1.3333334
+step = 0.041666668
+tracks/0/type = "position_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun1")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.25, 1, 0.055, 0, 0, 0.29166666, 1, 0.05292, 0, 0, 0.33333334, 1, 0.04796, 0, 0, 0.375, 1, 0.04204, 0, 0, 0.41666666, 1, 0.03708, 0, 0, 0.45833334, 1, 0.035, 0, 0, 0.5, 1, 0.034554075, 0, 0, 0.5416667, 1, 0.03329926, 0, 0, 0.5833333, 1, 0.03136, 0, 0, 0.625, 1, 0.02886074, 0, 0, 0.6666667, 1, 0.025925925, 0, 0, 0.7083333, 1, 0.02268, 0, 0, 0.75, 1, 0.019247407, 0, 0, 0.7916667, 1, 0.015752593, 0, 0, 0.8333333, 1, 0.01232, 0, 0, 0.875, 1, 0.009074074, 0, 0, 0.9166667, 1, 0.0061392593, 0, 0, 0.9583333, 1, 0.00364, 0, 0, 1, 1, 0.0017007408, 0, 0, 1.0416666, 1, 0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+tracks/1/type = "position_3d"
+tracks/1/imported = true
+tracks/1/enabled = true
+tracks/1/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun2")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.33333334, 1, 0.055, 0, 0, 0.375, 1, 0.05292, 0, 0, 0.41666666, 1, 0.04796, 0, 0, 0.45833334, 1, 0.04204, 0, 0, 0.5, 1, 0.03708, 0, 0, 0.5416667, 1, 0.035, 0, 0, 0.5833333, 1, 0.034554075, 0, 0, 0.625, 1, 0.03329926, 0, 0, 0.6666667, 1, 0.03136, 0, 0, 0.7083333, 1, 0.02886074, 0, 0, 0.75, 1, 0.025925925, 0, 0, 0.7916667, 1, 0.02268, 0, 0, 0.8333333, 1, 0.019247407, 0, 0, 0.875, 1, 0.015752593, 0, 0, 0.9166667, 1, 0.01232, 0, 0, 0.9583333, 1, 0.009074074, 0, 0, 1, 1, 0.0061392593, 0, 0, 1.0416666, 1, 0.00364, 0, 0, 1.0833334, 1, 0.0017007408, 0, 0, 1.125, 1, 0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+tracks/2/type = "position_3d"
+tracks/2/imported = true
+tracks/2/enabled = true
+tracks/2/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun3")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.33333334, 1, 0, 0, 0, 0.41666666, 1, 0.055, 0, 0, 0.45833334, 1, 0.05292, 0, 0, 0.5, 1, 0.04796, 0, 0, 0.5416667, 1, 0.04204, 0, 0, 0.5833333, 1, 0.03708, 0, 0, 0.625, 1, 0.035, 0, 0, 0.6666667, 1, 0.034554075, 0, 0, 0.7083333, 1, 0.03329926, 0, 0, 0.75, 1, 0.03136, 0, 0, 0.7916667, 1, 0.02886074, 0, 0, 0.8333333, 1, 0.025925925, 0, 0, 0.875, 1, 0.02268, 0, 0, 0.9166667, 1, 0.019247407, 0, 0, 0.9583333, 1, 0.015752593, 0, 0, 1, 1, 0.01232, 0, 0, 1.0416666, 1, 0.009074074, 0, 0, 1.0833334, 1, 0.0061392593, 0, 0, 1.125, 1, 0.00364, 0, 0, 1.1666666, 1, 0.0017007408, 0, 0, 1.2083334, 1, 0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+
+[sub_resource type="Animation" id="Animation_gs41m"]
+resource_name = "fire_starboard"
+length = 1.3333334
+step = 0.041666668
+tracks/0/type = "position_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun1")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.25, 1, -0.055, 0, 0, 0.29166666, 1, -0.05292, 0, 0, 0.33333334, 1, -0.04796, 0, 0, 0.375, 1, -0.04204, 0, 0, 0.41666666, 1, -0.03708, 0, 0, 0.45833334, 1, -0.035, 0, 0, 0.5, 1, -0.034554075, 0, 0, 0.5416667, 1, -0.03329926, 0, 0, 0.5833333, 1, -0.03136, 0, 0, 0.625, 1, -0.02886074, 0, 0, 0.6666667, 1, -0.025925925, 0, 0, 0.7083333, 1, -0.02268, 0, 0, 0.75, 1, -0.019247407, 0, 0, 0.7916667, 1, -0.015752593, 0, 0, 0.8333333, 1, -0.01232, 0, 0, 0.875, 1, -0.009074074, 0, 0, 0.9166667, 1, -0.0061392593, 0, 0, 0.9583333, 1, -0.00364, 0, 0, 1, 1, -0.0017007408, 0, 0, 1.0416666, 1, -0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+tracks/1/type = "position_3d"
+tracks/1/imported = true
+tracks/1/enabled = true
+tracks/1/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun2")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.33333334, 1, -0.055, 0, 0, 0.375, 1, -0.05292, 0, 0, 0.41666666, 1, -0.04796, 0, 0, 0.45833334, 1, -0.04204, 0, 0, 0.5, 1, -0.03708, 0, 0, 0.5416667, 1, -0.035, 0, 0, 0.5833333, 1, -0.034554075, 0, 0, 0.625, 1, -0.03329926, 0, 0, 0.6666667, 1, -0.03136, 0, 0, 0.7083333, 1, -0.02886074, 0, 0, 0.75, 1, -0.025925925, 0, 0, 0.7916667, 1, -0.02268, 0, 0, 0.8333333, 1, -0.019247407, 0, 0, 0.875, 1, -0.015752593, 0, 0, 0.9166667, 1, -0.01232, 0, 0, 0.9583333, 1, -0.009074074, 0, 0, 1, 1, -0.0061392593, 0, 0, 1.0416666, 1, -0.00364, 0, 0, 1.0833334, 1, -0.0017007408, 0, 0, 1.125, 1, -0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+tracks/2/type = "position_3d"
+tracks/2/imported = true
+tracks/2/enabled = true
+tracks/2/path = NodePath("BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun3")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.33333334, 1, 0, 0, 0, 0.41666666, 1, -0.055, 0, 0, 0.45833334, 1, -0.05292, 0, 0, 0.5, 1, -0.04796, 0, 0, 0.5416667, 1, -0.04204, 0, 0, 0.5833333, 1, -0.03708, 0, 0, 0.625, 1, -0.035, 0, 0, 0.6666667, 1, -0.034554075, 0, 0, 0.7083333, 1, -0.03329926, 0, 0, 0.75, 1, -0.03136, 0, 0, 0.7916667, 1, -0.02886074, 0, 0, 0.8333333, 1, -0.025925925, 0, 0, 0.875, 1, -0.02268, 0, 0, 0.9166667, 1, -0.019247407, 0, 0, 0.9583333, 1, -0.015752593, 0, 0, 1, 1, -0.01232, 0, 0, 1.0416666, 1, -0.009074074, 0, 0, 1.0833334, 1, -0.0061392593, 0, 0, 1.125, 1, -0.00364, 0, 0, 1.1666666, 1, -0.0017007408, 0, 0, 1.2083334, 1, -0.00044592592, 0, 0, 1.3333334, 1, 0, 0, 0)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_d52px"]
+_data = {
+&"fire_port": SubResource("Animation_v827x"),
+&"fire_starboard": SubResource("Animation_gs41m")
+}
+
+[node name="BWAR_D_broadside_airship" type="Node3D" unique_id=1296423261]
+
+[node name="BWAR_D_broadside_airship__Model" type="Node3D" parent="." unique_id=538255632]
+metadata/extras = {
+"anchor": "(0,0,0)",
+"animation": "none",
+"art_slice_only": true,
+"footprint_godot": "[[0, 0], [0, 1]]",
+"forward_godot": "-Z"
+}
+
+[node name="BWAR_D_broadside_airship__Airship" type="Node3D" parent="BWAR_D_broadside_airship__Model" unique_id=178049409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74, 0.5)
+
+[node name="BWAR_D_broadside_airship__Bridge" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=886153220]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("1_ppsl2")
+
+[node name="BWAR_D_broadside_airship__BridgeWindow" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1108050327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("2_a0kkf")
+
+[node name="BWAR_D_broadside_airship__Deck" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1887627406]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("3_sp103")
+
+[node name="BWAR_D_broadside_airship__FacetedHull" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1735149226]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("4_7hadi")
+
+[node name="BWAR_D_broadside_airship__LiftingHull" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=710489176]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("5_xbl8i")
+
+[node name="BWAR_D_broadside_airship__RecoilAssembly" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1366837969]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+
+[node name="BWAR_D_broadside_airship__Port" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly" unique_id=1073722602]
+metadata/extras = {
+"side": -1.0
+}
+
+[node name="BWAR_D_broadside_airship__PortGun1" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port" unique_id=1652173431]
+
+[node name="BWAR_D_broadside_airship__Cannon(-1, 0)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun1" unique_id=1266648169]
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, -0.22, 0.75, 1)
+mesh = ExtResource("6_j46pc")
+
+[node name="BWAR_D_broadside_airship__Muzzle(-1, 0)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun1" unique_id=179637922]
+transform = Transform3D(-1.1920929e-07, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -1.1920929e-07, -0.48, 0.75, 1)
+
+[node name="BWAR_D_broadside_airship__PortGun2" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port" unique_id=375618214]
+
+[node name="BWAR_D_broadside_airship__Cannon(-1, 1)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun2" unique_id=489955836]
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, -0.22, 0.75, 0.5)
+mesh = ExtResource("7_era6t")
+
+[node name="BWAR_D_broadside_airship__Muzzle(-1, 1)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun2" unique_id=24332496]
+transform = Transform3D(-1.1920929e-07, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -1.1920929e-07, -0.48, 0.75, 0.5)
+
+[node name="BWAR_D_broadside_airship__PortGun3" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port" unique_id=1953385196]
+
+[node name="BWAR_D_broadside_airship__Cannon(-1, 2)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun3" unique_id=788599758]
+transform = Transform3D(0, -1, 0, 0, 0, -1, 1, 0, 0, -0.22, 0.75, 0.02000001)
+mesh = ExtResource("8_flnj2")
+
+[node name="BWAR_D_broadside_airship__Muzzle(-1, 2)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Port/BWAR_D_broadside_airship__PortGun3" unique_id=967370695]
+transform = Transform3D(-1.1920929e-07, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -1.1920929e-07, -0.48, 0.75, 0.02)
+
+[node name="BWAR_D_broadside_airship__Starboard" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly" unique_id=1190945111]
+metadata/extras = {
+"side": 1.0
+}
+
+[node name="BWAR_D_broadside_airship__StarboardGun1" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard" unique_id=1262526858]
+
+[node name="BWAR_D_broadside_airship__Cannon(1, 0)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun1" unique_id=1107029802]
+transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 0.22, 0.75, 1)
+mesh = ExtResource("9_1dig7")
+
+[node name="BWAR_D_broadside_airship__Muzzle(1, 0)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun1" unique_id=920689575]
+transform = Transform3D(-1.1920929e-07, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -1.1920929e-07, 0.48, 0.75, 1)
+
+[node name="BWAR_D_broadside_airship__StarboardGun2" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard" unique_id=1614433071]
+
+[node name="BWAR_D_broadside_airship__Cannon(1, 1)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun2" unique_id=1981060548]
+transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 0.22, 0.75, 0.5)
+mesh = ExtResource("10_1o65q")
+
+[node name="BWAR_D_broadside_airship__Muzzle(1, 1)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun2" unique_id=1605061482]
+transform = Transform3D(-1.1920929e-07, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -1.1920929e-07, 0.48, 0.75, 0.5)
+
+[node name="BWAR_D_broadside_airship__StarboardGun3" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard" unique_id=764734098]
+
+[node name="BWAR_D_broadside_airship__Cannon(1, 2)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun3" unique_id=1085901859]
+transform = Transform3D(0, 1, 0, 0, 0, -1, -1, 0, 0, 0.22, 0.75, 0.02000001)
+mesh = ExtResource("11_0bni6")
+
+[node name="BWAR_D_broadside_airship__Muzzle(1, 2)" type="Marker3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship/BWAR_D_broadside_airship__RecoilAssembly/BWAR_D_broadside_airship__Starboard/BWAR_D_broadside_airship__StarboardGun3" unique_id=1127123574]
+transform = Transform3D(-1.1920929e-07, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -1.1920929e-07, 0.48, 0.75, 0.02)
+
+[node name="BWAR_D_broadside_airship__Suspension(0_21, 0_4)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=619938952]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0.21, 0.23499995, -0.4)
+mesh = ExtResource("12_rq8ff")
+
+[node name="BWAR_D_broadside_airship__Suspension(0_21, -0_46)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=294113550]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, 0.21, 0.23499995, 0.46000004)
+mesh = ExtResource("13_np4ta")
+
+[node name="BWAR_D_broadside_airship__Suspension(-0_21, 0_4)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=945395039]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, -0.21, 0.23499995, -0.4)
+mesh = ExtResource("14_mdeb8")
+
+[node name="BWAR_D_broadside_airship__Suspension(-0_21, -0_46)" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1870177458]
+transform = Transform3D(-1, 0, -1.509958e-07, 0, 1, 0, 1.509958e-07, 0, -1, -0.21, 0.23499995, 0.46000004)
+mesh = ExtResource("15_mr6d8")
+
+[node name="BWAR_D_broadside_airship__TailFin" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1210180465]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("16_wtanq")
+
+[node name="BWAR_D_broadside_airship__TailPlane" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1803381032]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
+mesh = ExtResource("17_odd4o")
+
+[node name="BWAR_D_broadside_airship__UpgradeSocket" type="Node3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__Airship" unique_id=1565020307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0.35000002)
+
+[node name="BWAR_D_broadside_airship__FixedBase" type="Node3D" parent="BWAR_D_broadside_airship__Model" unique_id=1501744324]
+
+[node name="BWAR_D_broadside_airship__DockCradle0_52" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__FixedBase" unique_id=1807755621]
+mesh = ExtResource("18_kgi6i")
+
+[node name="BWAR_D_broadside_airship__DockCradle-0_52" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__FixedBase" unique_id=902813394]
+mesh = ExtResource("19_1hy6j")
+
+[node name="BWAR_D_broadside_airship__DockFoot0_52" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__FixedBase" unique_id=1892151752]
+mesh = ExtResource("20_vdrfg")
+
+[node name="BWAR_D_broadside_airship__DockFoot-0_52" type="MeshInstance3D" parent="BWAR_D_broadside_airship__Model/BWAR_D_broadside_airship__FixedBase" unique_id=28522056]
+mesh = ExtResource("21_fb6i3")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1906023347]
+libraries/ = SubResource("AnimationLibrary_d52px")

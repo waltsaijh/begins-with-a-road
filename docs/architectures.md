@@ -15,6 +15,7 @@
 | `tools/` | 原生建置、離線素材產生、Web 測試匯出與驗證工具 |
 | `reports/` | 精簡保留的歷史效能結論，不存例行測試產物 |
 | `docs/` | 架構導覽與詳細系統說明 |
+| `.agents/skills/` | 專案可重用工作流程；Blender 建築製作見 [3D Modeling Skill](../.agents/skills/bwar-modeling/SKILL.md) |
 | `bin/` | 遊戲執行需要的原生擴充建置產物 |
 | `build/`、`.godot/` | 匯出成品與本機快取，不是遊戲設定來源 |
 
@@ -34,7 +35,7 @@
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
 | 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
 | 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與收藏 UI |
-| 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果 |
+| 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果；外觀factory適配GLB包裝層及舊幾何fallback，視覺動畫由實際攻擊／部署事件驅動；渲染Resource與離線色盤衍生網格提供正式／Ghost共用的A/B識別色，見 [Art Slice F](art_slice_f.md) |
 | 鏡頭與環境 `camera`／`environment` | 鏡頭平移、縮放與旋轉、雲海與環境呈現 |
 
 ## scripts/ 結構

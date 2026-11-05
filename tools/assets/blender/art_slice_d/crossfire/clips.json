@@ -1,0 +1,26 @@
+{
+  "fire_north": {
+    "frames": 25,
+    "actions": {
+      "BWAR_D_crossfire__RecoilAssembly0": "BWAR_D_crossfire__fire_north__RecoilAssembly0"
+    }
+  },
+  "fire_east": {
+    "frames": 25,
+    "actions": {
+      "BWAR_D_crossfire__RecoilAssembly1": "BWAR_D_crossfire__fire_east__RecoilAssembly1"
+    }
+  },
+  "fire_south": {
+    "frames": 25,
+    "actions": {
+      "BWAR_D_crossfire__RecoilAssembly2": "BWAR_D_crossfire__fire_south__RecoilAssembly2"
+    }
+  },
+  "fire_west": {
+    "frames": 25,
+    "actions": {
+      "BWAR_D_crossfire__RecoilAssembly3": "BWAR_D_crossfire__fire_west__RecoilAssembly3"
+    }
+  }
+}

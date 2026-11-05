@@ -1,6 +1,6 @@
 # Agent 工作共識
 
-- 2026-11-03 最新 Git 授權：使用者在道路／橋頭／流線及受光側路肩暗部完成後要求「git更新並push到遠端」，授權提交目前全部相依成果並正常推送 origin/experiment/routing-sandbox；各實作階段的不 commit／push 註記為此次授權前的歷史。仍不改 main worktree、不 merge／rebase／reset／clean 或強制推送。
+- 2026-11-05 最新 Git 授權：使用者在 Art Slice F 完成後要求「git更新 並 push到遠端」，授權提交目前累積的 Modeling Skill、建模來源、Art Slice D／E／F 資產與整合、測試及文件，並正常推送 origin/experiment/routing-sandbox；各實作階段的不 commit／push 註記為此次授權前的歷史。可重建 ZIP 與 Blender 自動備份留本機並忽略。仍不改 main worktree、不 merge／rebase／reset／clean 或強制推送。
 
 本文件供接手本專案的 agents 閱讀，彙整截至目前已記錄的遊戲設計、實作決策與工作約定。新討論產生或修改共識時，更新對應段落；被取代的決策應明確修正，避免同時保留互相矛盾的規則。這不是逐字聊天紀錄，也不把尚未確認的想法寫成既定需求。
 
@@ -146,6 +146,17 @@
 - 雲海與柱底漸變使用 Compatibility 可用的近似，不依賴體積霧或 Forward+。死亡／AOE 特效可編輯且回收，不影響傷害與波次結算。
 
 ## UI、命名與素材
+
+- 2026-11-05 [Art Slice F塔種識別色](docs/art_slice_f.md)：暖灰白建築主體保留，只在功能區使用青綠／鋼藍／赭金／磚紅／灰紫／青藍。可重建設定在 assets/data/rendering/tower_color_identity.tres，Variant預設B，A為原暖灰白回退；不改卡牌accent_color。離線build_integrated_towers的--identity僅建立color_identity/b/共享網格，與A只有COLOR不同，沿用solid_color材質與原動畫。正式／Ghost同factory套用，沒有新增遊戲UI。A/B各84放置／旋轉及事件動畫、三組GPU比較、網格資料與重跑hash檢查通過；本輪未測Web／真人辨識。GLB更換時先重建integrated A，再重建B。
+
+- 2026-11-05 [Art Slice E正式接入](docs/art_slice_e.md)：六塔TowerDefinition.visual_model引用assets/models/towers/integrated/的獨立wrapper；TowerBodyVisual依實際body適配，舊model保留不相容形狀fallback與音效。GLB衍生純色網格離線合併，同組六塔共31個mesh instance。imported_tower_visual由真正攻擊／部署事件播放一次性動畫；十字按實際ALL命中方向、空艇按左右舷分開；巨弓拉弦不延遲權威傷害或更改冷卻。新預覽與正式模型同源，保留原色與既有格面紅綠提示。Lv2/3維持數值／標籤，本輪使用相同Lv1幾何。桌面整合／既有回歸已通過；Web匯出受缺失路網WASM阻擋，未通過Web驗收。
+
+- 2026-11-05 [Art Slice D](tools/assets/blender/art_slice_d/model-spec.md) 完成六塔第一版功能配色、10個一次性動畫與Godot資產準備。新資產限於 assets/models/towers/art_slice_d/，含GLB、.import、獨立外觀場景及共用solid_color離線烘焙網格；尚未替換正式模型／TowerDefinition。十字四向與空艇左右舷動畫保持獨立；專屬匯入腳本清除Godot補入的不相關方向固定軌道。正式接入仍需TowerBodyVisual、砲口／瞄準NodePath、事件與冷卻時序、升級／預覽適配，不將巨弓約3秒視覺片段視為新的攻擊間隔。Blender來源與預覽仍在工具側。
+
+- 2026-11-04 [防禦塔家族純建模](tools/assets/blender/tower_family/model-spec.md)：以巨弓C為風格基準完成哨塔、兵營、迫擊砲、十字火力、飛行艇的Blender／Python／GLB及比較圖，均為工具側Art Slice，無動畫或正式接入。實際占格分別1×1、1×1、2×2、2×2、1×2；迫擊砲不同preset的角落錨點不同，未來外觀掛載須依規格調整，不移動邏輯錨點。巨弓未重製；空艇固定支座與Airship分離，六砲位於艇身。仍未完成Godot材質烘焙與TowerBodyVisual掛載。
+- 2026-11-04 [Great Ballista 第二輪](tools/assets/blender/great_ballista_round2/model-spec.md) 依使用者指定以C / Detailed驗證兩色與攻擊動態，仍為工具側Blender Art Slice：暖灰白＋少量功能深色，3秒簡單pivot循環；本輪不改正式戰鬥、不強行接入Godot。C作為這次實驗基底不等於已選為正式遊戲模型，後續採用仍依使用者指示。
+
+- 2026-11-03 新增專案 [3D Modeling Skill](.agents/skills/bwar-modeling/SKILL.md)：後續 Blender MCP 建築製作先讀該 Skill；美術以「遠看迷宮、中看戰術符號、近看微縮結構」、單主色與功能幾何為準，沿用格子、朝向、TowerBodyVisual 與純色材質契約。Blender 原始檔／Python 存於 tools/assets/blender/，正式接入的 GLB 存於 assets/models/ 對應分類，Godot 外觀以 .tscn 包裝。Skill 初建當次僅文件；2026-11-04 的 [Great Ballista A/B/C](tools/assets/blender/great_ballista_slice/model-spec.md) 為獨立 Art Slice，GLB 暫存在工具側 exports/，沒有接入 Godot；三版只是細節密度實驗，尚未選定正式版本。
 
 - 保持畫面簡潔：透明頂部時間線、金幣、倍速與暫停；商店直接展開在遊戲畫面，不加全畫面遮罩。一般遊戲不常駐顯示除錯統計或滑鼠 tooltip。
 - 手牌與商店共用鏡像弧形排版；hover 上提 6 原始 px，手牌選中時上提 24 原始 px（Hand 的 Selected Lift），選中／hover／還原從當前位置平滑過渡，選取切換預設 0.22 實際秒（Selection Seconds）。選中卡面以 ±0.6°、3.6 秒週期緩慢搖動，取消選中在 0.22 秒內淡出搖動；參數在 card_view.tscn 的 Selection Motion。搖動只作用於 Visuals 子節點，外層 Button 命中區穩定，不放大或置頂；上提的命中延伸跟隨實際上提動畫，保留原下緣位置。
