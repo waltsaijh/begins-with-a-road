@@ -90,7 +90,7 @@ scripts/
 | `levels/presentation/` | 將 session 進度投影到時間線、起點對話框、餘額與下一波兵種列；協調準備期流量預覽、處理倍速、暫停過渡、選單與玩家意圖 |
 | `enemies/spawning/` | 把波次配方與已準備的導航計畫轉成帶有整數出生刻度、路線及數值快照的排程，批次準備各兵種／入口的配額並共用該波唯讀世界座標，再實際生成敵人，追蹤待出生／存活／擊殺／抵達並判定清場 |
 
-`levels/` 也提供自動資源目錄、DAG 前置檢查、通關 ID 保存及一次性交接。`menus/` 接收目錄的顯示資料並延遲建立單一預覽；`LevelSession` 只在最後一波完成時回報通關，不依賴選單 UI。
+`levels/` 也提供自動資源目錄、DAG 前置檢查、通關與圖鑑解鎖 ID 保存及一次性交接。`menus/` 接收目錄的顯示資料並延遲建立單一預覽；`LevelSession` 只在最後一波完成時回報通關，不依賴選單 UI。
 
 關卡決定「目前進行哪一波、何時允許開波」；出生模組決定「該波每位成員何時出生、採用哪份已固定資料」。出生排程與敵群放在一起，因此正式關卡與獨立測試場景可共用同一個生成入口。
 
@@ -165,3 +165,5 @@ Phase 4 沿用 `enemies/troops` 資料型別；`spawning` 將整群配額展開�
 Phase 5 的 `levels` 負責防線生命、終局與四次獎勵時序，`levels/presentation` 提供共用結果／Boss 資訊。Boss 沿用 `enemies/troops` 與 `combat` 的能力／傷害生命週期，沒有第二套管理器。`tests/balance` 驅動正式系統做可重現實驗；`tools/balance` 負責參數匯出、獨立帳本、批次執行及分析，與正式 runtime 分離。選用的 `combat` trace hook 預設關閉，詳細規格見 [Phase 5](phase5.md)。
 
 2026-11-03：cards/definitions 的正式候選解析讀取 Tower Tile Editor 已標記的基礎組合，不複製幾何；towers/ 的塔體幾何提供實例、威脅與預覽一致的局部中心／方向，顯示組件依 footprint 快取並由塔實例控制三段外觀。cards/presentation 維持塔體、道路、射程三層顯示；多格細節與驗證見 [塔體與預覽](tower_visuals_and_preview.md)。
+
+UI Slice A：敵人 presentation 接實際出生訊號，持有每局已遭遇／未讀佇列，並共用模型預覽與圖鑑版面；HUD 管理詳情頁的暫停／鏡頭鎖定，interface 的 inspection_panel 僅隔離輸入。遺物圖示列仍消費 RunRelics；保存只由 LevelProgress 擴充 v1 ConfigFile 的 codex section。詳見 [UI Slice A](ui_slice_a.md)。

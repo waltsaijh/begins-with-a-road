@@ -68,9 +68,9 @@ func verify() -> void:
 	scene.level_finished.connect(func(): completed[0] += 1)
 	check(scene.get_node("TileMap").get_used_cells().size() == 24, "Level did not restore its authored terrain")
 	check(not wave.active and wave.enemy_count == 3 and scene.current_wave == 0, "Level did not prepare the first wave without auto-starting")
-	check(scene.timeline.mouse_filter == Control.MOUSE_FILTER_IGNORE and scene.timeline.wave_index == 0, "Timeline blocks input or starts at the wrong position")
+	check(scene.timeline.mouse_filter == Control.MOUSE_FILTER_STOP and scene.timeline.wave_index == 0, "Timeline accepts expansion input and starts at the first wave")
 	var viewport_width := get_viewport().get_visible_rect().size.x
-	check(is_equal_approx(scene.timeline.size.x, viewport_width*0.5) and is_equal_approx(scene.timeline.position.x+scene.timeline.size.x*0.5, viewport_width*0.5), "Timeline is not half-width and horizontally centered")
+	check(scene.timeline.size.x <= 300 and is_equal_approx(scene.get_node("LevelHUD").status_row_rect.get_center().x,viewport_width*0.5), "Compact status row is centered as a group")
 	check(scene.find_children("*", "OptionButton", true, false).is_empty(), "Removed troop/distribution dropdowns remain")
 	check(wave.controls.spawn_button.get_parent() == scene.get_node("LevelHUD/WorldActions") and shop.view.get_node_or_null("Root/Balance") == null, "Start button did not move to its world anchor or wallet remained in shop")
 	check(is_equal_approx(scene.timeline.node_fraction(0), 1.0/3.0) and is_equal_approx(scene.timeline.node_fraction(2), 1.0), "Wave markers include an extra interval before the level end")
@@ -154,6 +154,7 @@ func verify() -> void:
 		await get_tree().process_frame
 	check(scene.finished and completed[0] == 1 and wave.controls.spawn_button.disabled and not wave.start_wave(), "Completed level allowed extra waves or repeated completion")
 	for control: Control in scene.find_children("*", "Control", true, false):
+		if scene.relic_choice.get_node("RelicBar").is_ancestor_of(control) or control == scene.enemy_intelligence.toggle or control == scene.timeline or control == scene.run_status.get_node("Integrity") or control == scene.get_node("LevelHUD/Header/Balance") or control in [scene.get_node("LevelHUD").speed_button,scene.get_node("LevelHUD").pause_button]: continue
 		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
 	shop.open_shop()
 	shop.view.finish_animation()

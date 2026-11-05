@@ -1,5 +1,25 @@
 # Routing Sandbox — Phase 5 交接
 
+## 最新 Git 更新授權：2026-11-06
+
+使用者要求「git更新並push到雲端」，授權提交本輪 UI Slice A、頂列／時間線與集中置中成果、資源、相關測試及文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD 3f692fe，fetch 後本分支與遠端同步；origin/main 的新增提交未合併。本次沿用剛完成的 headless96／rendered99 及相關流程／時間線回歸，不另重跑遊戲測試；提交前核對 staged diff --check。測試log／截圖仍留在忽略的 .godot/。下方未commit／push為本次授權前的階段快照。不改main worktree、不做merge／rebase／reset／clean或強制推送。
+
+## 最新 UI 布局：集中置中與同步位移，2026-11-06
+
+沿用未提交成果，整組資訊依可見項目置中，固定16px間距；時間線展開／收合的0.18秒動畫同步帶動兩側圖標移動，不再貼齊畫面兩端，空遺物／無通知不保留固定槽。保留所有節點引用、tooltip、通知與暫停行為。headless整合96／rendered99、rendered level_flow／ui_scene_templates均failures0；日誌 .godot/ui-centered-*.log，截圖原目錄已更新並檢視。未commit／push，Web／長局未測。
+## 最新 UI 追修：頂列與時間線，2026-11-06
+
+沿用下節全部未提交成果。防線改盾牌圖示＋數值，與金幣／遺物／時間線／敵軍未讀通知／加速及暫停放在同一頂列；補上各項 hover 資訊。緊湊未來波次改空心圈、移除其底部細進度條；兩模式依 ACT 加雙菱形遺物節點（Frontier四次，自訂最終獎勵旗標保留）。未改戰鬥、導航或十五波流程。
+
+本輪 headless整合92／Compatibility rendered95，failures0；rendered level_flow／ui_scene_templates／pause_menu亦各0。實際頂列、空心圈、兩模式遺物及hover截圖已檢視，日誌 .godot/ui-topbar-*.log，截圖仍在 .godot/test-results/ui_slice_a/（覆蓋為最新版本，新增health_tooltip／relic_node_tooltip／relic_milestone_active）。Web／完整15波／真人未測，user://環境限制同下節。未commit／push。細節見 [UI Slice A](ui_slice_a.md)。
+## 最新 UI：Slice A，2026-11-06
+
+起始 branch experiment/routing-sandbox／HEAD 3f692fe，工作區乾淨；本輪未 commit／push。完成四塔商品的單排商店（輔助設施保留但暫不販售）、hover／點擊展開的緊湊時間線、持有遺物圖示列，以及實際出生後的未讀通知／共用敵軍圖鑑。詳情向 LevelHUD 借用暫停並還原原狀態；通關 v1 保存加入 codex section，舊檔相容。沒有修改原生／導航、戰鬥／波次 Resource 或模型。
+
+本輪 PASS：新整合 headless 78／rendered 81；商店 headless／rendered、cards、拖牌、traffic100、relic stacking／rewards／mechanisms113／rendered input、rendered level_flow／HUD／pause_menu／timeline templates、wave_spawn_groups、troop_resources、level_catalog、synergy rendered input67，failures皆0。初輪舊測試固定6張商品、3兵種、立即出生與舊空艇節點路徑已更新為目前契約；初輪解析／取樣問題已修正重跑。實際 Frontier UI 及800×600／1600×900截圖已檢視。日誌 .godot/ui-slice-*.log，截圖 .godot/test-results/ui_slice_a/。git diff --check 另於交付前核對。
+
+預設user://／shader cache受環境寫入權限限制，部分既有整合測試留下保存警告；新增跨局／舊檔保存回歸使用隔離的可寫路徑且通過。未跑Web（仍缺路網WASM）、完整15波、效能或真人驗收。完整責任／入口／限制見 [UI Slice A](ui_slice_a.md)。下方為歷史階段紀錄。
+
 ## 最新 Git 更新授權：2026-11-05
 
 使用者在 Art Slice F 完成後要求「git更新 並 push到遠端」，本次提交累積的 Modeling Skill、Blender 建模來源／腳本／預覽、Godot 資產、Art Slice E 正式接入及 F 配色與測試文件。成果提交為0776f4b。開始核對 HEAD 為9b9a7f9，首次fetch時同步；推送前遠端新增兩筆提交至df4e224，因分岔被拒。使用者以「好」明確授權合併遠端後正常push；本次merge無衝突，遠端與原基準無檔案差異，合併後僅補記授權文件。目標仍為 origin/experiment/routing-sandbox。可重建 ZIP 及 Blender 自動備份加入忽略，保留本機檔案；未操作 main worktree、rebase／reset／clean 或強制推送。以下各階段「未commit／push」為當時快照。本次 Git 更新沿用剛完成的 F 測試，未重跑遊戲測試；提交前執行 staged diff --check。

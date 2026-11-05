@@ -166,3 +166,7 @@ godot --path . res://scenes/level.tscn --quit-after 180
 - [tower_visuals/gallery.tscn](tower_visuals/gallery.tscn)：人工1–6／R／A；加 -- --capture 會存六塔等級與射程對照圖。
 
 規格與限制見 [塔體與預覽](../docs/tower_visuals_and_preview.md)。
+
+## UI Slice A
+
+F6 或命令列執行 res://tests/ui_slice_a/hud.tscn；headless檢查保存、四塔卡池、通知／暫停與RNG，實際渲染另檢查真實滑鼠／鍵盤、十種模型、三種尺寸並輸出截圖。測試使用隔離保存，不寫玩家通關檔。現行商店四商品＋重刷牌，情報需實際遭遇後解鎖；取代本文件較早的雙排及準備期直接情報假設。結果、依賴與限制見 [UI Slice A](../docs/ui_slice_a.md)。

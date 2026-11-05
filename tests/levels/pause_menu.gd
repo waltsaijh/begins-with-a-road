@@ -117,7 +117,7 @@ func verify() -> void:
 	hud.set_paused(true)
 	check(get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation")
 	await frames(2)
-	check(hud._menu_buttons.size() == 4, "Pause menu does not have four actions")
+	check(hud._menu_buttons.size() == 5, "Pause menu includes enemy codex alongside four existing actions")
 	var locale := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_TW")
 	check(hud.restart_button.text == "重新開始" and hud.settings_button.text == "設定", "New menu items lack Chinese translations")
@@ -298,7 +298,8 @@ func verify() -> void:
 	hud.set_paused(false)
 	scene._on_start_requested()
 	scene._process(1.5)
-	wave._process(0.0)
+	# Frontier's first group begins at tick 24; advance the test to that spawn.
+	wave._process(6.1)
 	shop.coins = 750
 	var relics: RunRelics = scene.get_node("TowerMap").relics
 	check(relics.acquire(relics.catalog.find(&"protagonist")), "Restart fixture did not acquire a relic")

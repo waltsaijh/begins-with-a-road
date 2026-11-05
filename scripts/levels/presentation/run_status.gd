@@ -15,7 +15,11 @@ func setup(value: Node3D) -> void:
 	refresh()
 func refresh() -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
-	$Integrity.text = ("Integrity %d / %d" if english else "防線 %d / %d") % [session.base_health,session.level.base_health]
+	$Integrity.text = str(session.base_health)
+	$Integrity.tooltip_text = ("Defense integrity: %d / %d\nEnemies reaching the goal damage the defense. A siege behemoth reaching it ends the run." if english else "防線生命：%d / %d\n敵人抵達終點會損傷防線；攻城巨獸抵達即失敗。") % [session.base_health,session.level.base_health]
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and session != null: refresh()
 func _process(_delta: float) -> void:
 	if boss == null: return
 	var enemy: Node3D = boss.get_ref()

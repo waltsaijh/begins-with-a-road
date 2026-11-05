@@ -6,17 +6,20 @@ var relics: RunRelics
 var offers: Array[RelicDefinition] = []
 var choosing := false
 var _committing := false
+var _inspected: RelicDefinition
+var _inspection_hud: Node
 @onready var modal: Control = $Modal
 @onready var row: HBoxContainer = $Modal/Center/Layout/Cards
 
 func _process(_delta: float) -> void:
 	# Keep the normal HUD pause control reachable; the pause menu owns its overlay.
-	visible = not get_tree().paused
+	visible = not get_tree().paused or $Collection.visible
 
 func setup(manager: RunRelics) -> void:
 	relics = manager
 	relics.changed.connect(_refresh_collection)
-	$InventoryButton.pressed.connect(func(): $Collection.visible = not $Collection.visible)
+	$Collection.close_requested.connect(close_collection)
+	$Collection/Paper/Details/Close.pressed.connect(close_collection)
 	_refresh_collection()
 
 func begin() -> bool:
@@ -27,7 +30,7 @@ func begin() -> bool:
 	choosing = true
 	_committing = false
 	$Collection.hide()
-	$InventoryButton.disabled = true
+	$RelicBar.hide()
 	for relic in offers:
 		var card: Button = Card.instantiate()
 		row.add_child(card)
@@ -82,23 +85,80 @@ func _finish_choice(relic: RelicDefinition) -> void:
 	modal.hide()
 	choosing = false
 	_committing = false
-	$InventoryButton.disabled = false
+	$RelicBar.visible = not relics.held.is_empty()
 	selected.emit(relic)
 
 func _refresh_collection() -> void:
-	$InventoryButton.text = "%s · %d" % [tr("relic.collection"), relics.held.size()]
-	for child in $Collection/Scroll/Items.get_children(): child.free()
-	if relics.held.is_empty():
-		var empty := Label.new()
-		empty.text = tr("relic.empty")
-		empty.add_theme_color_override("font_color",Color("34504e"))
-		$Collection/Scroll/Items.add_child(empty)
+	for child in $RelicBar/Items.get_children(): child.free()
+	$RelicBar.visible = not choosing and not relics.held.is_empty()
 	for id: StringName in relics.held:
 		var relic := relics.catalog.find(id)
-		var label := Label.new()
-		label.add_theme_color_override("font_color",Color("34504e"))
-		label.add_theme_font_size_override("font_size",18)
-		label.custom_minimum_size.x = 390
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.text = "%s ×%d\n%s" % [tr(relic.name_key), relics.held[id], tr(relic.description_key)]
-		$Collection/Scroll/Items.add_child(label)
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(38,38)
+		button.tooltip_text = "%s ×%d\n%s" % [tr(relic.name_key),relics.held[id],tr(relic.description_key)]
+		var normal := StyleBoxFlat.new()
+		normal.bg_color = Color(relic.presentation_color(),0.12)
+		normal.border_color = Color(relic.presentation_color().darkened(0.2),0.65)
+		normal.set_border_width_all(1)
+		normal.set_corner_radius_all(3)
+		button.add_theme_stylebox_override("normal",normal)
+		var hover := normal.duplicate()
+		hover.bg_color.a = 0.28
+		for state in ["hover","pressed","focus"]: button.add_theme_stylebox_override(state,hover)
+		var icon := TextureRect.new()
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.texture = relic.icon
+		icon.position = Vector2(5,5)
+		icon.size = Vector2(28,28)
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if relic.tower != null:
+			var material := ShaderMaterial.new()
+			material.shader = IconMask
+			icon.material = material
+			icon.self_modulate = relic.presentation_color().darkened(0.45)
+		button.add_child(icon)
+		if relics.held[id] > 1:
+			var count := Label.new()
+			count.text = "×%d" % relics.held[id]
+			count.position = Vector2(18,20)
+			count.add_theme_font_size_override("font_size",12)
+			count.add_theme_color_override("font_color",Color("244c52"))
+			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			button.add_child(count)
+		button.pressed.connect(open_collection.bind(relic))
+		$RelicBar/Items.add_child(button)
+	if $Collection.visible and _inspected != null: _show_relic()
+
+func open_collection(relic: RelicDefinition) -> void:
+	if choosing or relic == null or not relics.held.has(relic.id): return
+	_inspection_hud = get_parent().get_node_or_null("LevelHUD")
+	if _inspection_hud == null or not _inspection_hud.begin_inspection(self): return
+	_inspected = relic
+	_show_relic()
+	$Collection.show()
+	$Collection/Paper/Details/Close.grab_focus()
+
+func _show_relic() -> void:
+	$Collection/Paper/Details/Title.text = "%s ×%d" % [tr(_inspected.name_key),relics.held.get(_inspected.id,0)]
+	var icon: TextureRect = $Collection/Paper/Details/Icon
+	icon.texture = _inspected.icon
+	icon.material = null
+	icon.self_modulate = Color.WHITE
+	if _inspected.tower != null:
+		var material := ShaderMaterial.new()
+		material.shader = IconMask
+		icon.material = material
+		icon.self_modulate = _inspected.presentation_color().darkened(0.45)
+	$Collection/Paper/Details/Description.text = tr(_inspected.description_key)
+	$Collection/Paper/Details/Close.text = "Close" if TranslationServer.get_locale().begins_with("en") else "關閉"
+
+func close_collection() -> void:
+	$Collection.hide()
+	if is_instance_valid(_inspection_hud): _inspection_hud.end_inspection(self)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and relics != null: _refresh_collection()
+
+func _exit_tree() -> void:
+	if is_instance_valid(_inspection_hud) and _inspection_hud.is_inside_tree(): _inspection_hud.end_inspection(self)

@@ -1,4 +1,5 @@
 extends Node3D
+const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
 const Batch = preload("res://scripts/enemies/rendering/enemy_multimesh.gd")
 const Enemy = preload("res://scenes/enemies/enemy.tscn")
 const Tile = preload("res://scripts/map/tile/tile_parameters.gd")
@@ -45,7 +46,7 @@ func import_model(directory: String) -> PackedScene:
 
 func verify() -> void:
 	var profiles := TroopCatalog.all()
-	check(profiles.size() == 3 and profiles[0] == TroopCatalog.default_troop(), "Catalog did not discover/sort shared troop assets")
+	check(profiles.size() >= 10 and profiles[0] == TroopCatalog.default_troop(), "Catalog discovers ordinary troops and Boss in shared order")
 	var soldier := TroopCatalog.find("soldier")
 	var quick := TroopCatalog.find("quickfeet")
 	var heavy := TroopCatalog.find("heavy")
@@ -62,7 +63,7 @@ func verify() -> void:
 	threat_only.path_base_cost = 0.0
 	check(soldier.evaluation(tile) == 1 and threat_only.evaluation(tile) == 8 and heavy.evaluation(tile) == -8, "Threat-only troop evaluation fixture changed")
 	check(soldier.route_selection == Troop.RouteSelection.UNIFORM and quick.route_selection == Troop.RouteSelection.SOFTMAX and heavy.route_selection == Troop.RouteSelection.SOFTMAX, "Serialized route selection changed")
-	var heavy_path := "user://heavy_roundtrip_%d.tres" % Time.get_ticks_usec()
+	var heavy_path := Artifacts.path("enemies/resources/heavy_roundtrip_%d.tres" % Time.get_ticks_usec())
 	check(ResourceSaver.save(heavy.duplicate(true), heavy_path) == OK, "Heavy resource could not be saved")
 	var heavy_copy := ResourceLoader.load(heavy_path, "", ResourceLoader.CACHE_MODE_IGNORE) as Troop
 	check(heavy_copy != null and heavy_copy.max_health == heavy.max_health and heavy_copy.max_shield == heavy.max_shield and heavy_copy.speed_multiplier == heavy.speed_multiplier, "Heavy health/shield/speed changed during serialization")
@@ -74,7 +75,7 @@ func verify() -> void:
 		for wave in act.waves:
 			for group in wave.groups:
 				check(group.troop == TroopCatalog.find(group.troop.troop_name) and not group.troop_path.is_empty(), "Level still contains embedded troop classes/overrides")
-	var directory := "user://troop_resources_%d" % Time.get_ticks_usec()
+	var directory := Artifacts.path("enemies/resources/troop_resources_%d/placeholder" % Time.get_ticks_usec()).get_base_dir()
 	DirAccess.make_dir_recursive_absolute(directory)
 	var model := import_model(directory)
 	var custom := Troop.new()

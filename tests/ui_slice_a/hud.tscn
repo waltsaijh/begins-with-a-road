@@ -1,0 +1,5 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/ui_slice_a/hud.gd" id="1"]
+[node name="UISliceA" type="Node"]
+process_mode = 3
+script = ExtResource("1")

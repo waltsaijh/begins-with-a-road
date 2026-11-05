@@ -165,7 +165,7 @@ func verify() -> void:
 	check(view.slots[0].position.y < below, "Shop deck did not rise during its entry animation")
 	await get_tree().process_frame
 	settle(cards, shop)
-	check(shop.available and not view.opened and view.slots.size() == 7 and shop.coins == ShopConstants.WAVE_REWARD, "Wave completion failed to raise the seven-card deck/reward")
+	check(shop.available and not view.opened and view.slots.size() == 5 and shop.coins == ShopConstants.WAVE_REWARD, "Wave completion raises four offers and the reroll card")
 	for i in view.slots.size():
 		var slot: Control = view.slots[i]
 		check(slot.get_node("Face/Back").visible and not slot.get_node("Face/Card").visible and not view.price_view(i).is_visible_in_tree(), "Collapsed shop exposed card fronts or prices")
@@ -184,10 +184,10 @@ func verify() -> void:
 	var reroll_price: HBoxContainer = view.price_view(0)
 	check(reroll_price.position.y >= 0.0 and reroll_price.position.y+reroll_price.size.y <= reroll_back.get_node("Icon").position.y and reroll_price.alignment == BoxContainer.ALIGNMENT_CENTER, "Reroll price is not centered inside the top of its card")
 	check(reroll_price.get_node("Number").get_theme_color("font_color") == Color.WHITE, "Reroll price is not white")
-	check(view.slots[0].position.y > view.slots[2].position.y and view.slots[2].position.y > view.slots[4].position.y, "Shop does not curve up towards the outside right")
+	check(view.slots[1].position.y > view.slots[3].position.y and view.slots[0].position.x > view.slots[4].position.x, "Single shop fan curves up to the right, ending in reroll")
 	check(view.slots[1].position.x-view.slots[0].position.x < ShopConstants.CARD_SIZE.x, "Shop cards do not overlap")
 	check(view.slots[0].scale.x < 1.0, "Shop cards did not shrink")
-	check(top_edge_gap([view.slots[1],view.slots[2],view.slots[3],view.slots[4]]) < 1.0 and top_edge_gap([view.slots[5],view.slots[6],view.slots[0]]) < 1.0, "Shop row top edges form visible steps")
+	check(top_edge_gap([view.slots[1],view.slots[2],view.slots[3],view.slots[4],view.slots[0]]) < 1.0, "Shop row top edges form visible steps")
 	var original_positions := PackedVector2Array()
 	for slot: Control in view.slots: original_positions.append(slot.position)
 	var focus_point: Vector2 = view.slots[2].get_global_transform()*(view.slots[2].size*0.5)
@@ -202,7 +202,7 @@ func verify() -> void:
 	for i in 12: await get_tree().process_frame
 	check(view._hovered == 2 and CardFanLayout.pick(view.slots, focus_point, 0, 2) == 2, "Stationary hover oscillated or moved away from its activation point")
 	# Reach overlapping cards through their exposed outside edge, including both ends.
-	for index in [0, 4, 1, 3, 2, 5, 6]:
+	for index in [0, 4, 1, 3, 2]:
 		var slot: Control = view.slots[index]
 		var x := CardFanLayout.OVERLAP+12
 		await hover_at(slot.get_global_transform()*Vector2(x, slot.size.y*0.5))
@@ -276,7 +276,7 @@ func verify() -> void:
 	settle(cards, shop)
 	check(cards.cards.size() == 5 and shop.coins == wallet-price and shop.sold[2] == 1, "Compaction mapped a click to the wrong offer")
 	check(arrival_checks == [true, true], "Second purchase did not insert from below")
-	check(view.active_indices() == PackedInt32Array([0, 2, 4, 5, 6]), "Sold slots remain in compact layout")
+	check(view.active_indices() == PackedInt32Array([0, 2, 4]), "Sold slots remain in compact layout")
 	check_compact(view)
 	await screenshot(Artifacts.path("cards/shop_sold.png"))
 	# Let both flips actually finish: snapping the layout or immediately
@@ -297,7 +297,7 @@ func verify() -> void:
 	wallet = shop.coins
 	if DisplayServer.get_name() == "headless": await click_button(reroll_back)
 	else: await click_at(reroll_price.get_global_transform()*(reroll_price.size*0.5))
-	check(shop.deals == deals+1 and shop.coins == wallet-shop.reroll_price and shop.sold == PackedByteArray([0, 0, 0, 0, 0, 0]), "Reroll click did not replace all six offers and charge once")
+	check(shop.deals == deals+1 and shop.coins == wallet-shop.reroll_price and shop.sold == PackedByteArray([0, 0, 0, 0]), "Reroll replaces four offers and charges once")
 	check(view.rerolling and reroll_back.disabled, "Successful reroll did not spin or block repeated clicks")
 	check(not shop.reroll() and shop.deals == deals+1, "Reroll charged again while its icon was spinning")
 	var spin: Tween = view._reroll_motion
@@ -305,7 +305,7 @@ func verify() -> void:
 	spin.custom_step(maxf(0.0, 0.125-spin.get_total_elapsed_time()))
 	var reroll_icon: Control = reroll_back.get_node("Icon")
 	check(absf(reroll_icon.rotation-TAU*0.125) < 0.02, "Reroll did not ease in during the first quarter of its animation")
-	check(view._entering.size() == 6 and view._animating, "Reroll did not insert six new shop cards")
+	check(view._entering.size() == 4 and view._animating, "Reroll inserts four new shop cards")
 	view._motion.pause()
 	var reroll_y: float = view.slots[4].position.y
 	view._motion.custom_step(0.08)
@@ -320,7 +320,7 @@ func verify() -> void:
 	shop.close_shop()
 	shop.open_shop()
 	settle(cards, shop)
-	check(view.active_indices().size() == 7 and view.slots[4].get_node("Face/Card").visible, "Closing during reroll lost the new stock")
+	check(view.active_indices().size() == 5 and view.slots[4].get_node("Face/Card").visible, "Closing during reroll lost the new stock")
 	check_compact(view)
 	var tiles := map.get_used_cells().size()
 	if DisplayServer.get_name() == "headless":
@@ -386,7 +386,7 @@ func verify() -> void:
 	await screenshot(Artifacts.path("cards/shop_hover.png"))
 	for control: Control in scene.find_children("*", "Control", true, false):
 		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
-	var report := {"failures": failures, "seven_back_cards": true, "four_towers_two_support_and_reroll": true, "prices": true, "purchase_and_reroll": true, "outside_click_no_world_edit": true, "hand_fold_restore": true, "successful_placement_consumes": true, "wave_start_hides": true, "arrival_and_kill_rewards": true, "duplicate_reward_guard": true, "animation_reversal": true, "no_modal_overlay": true, "shallow_overlapping_fan": true, "gold_icons": true, "sold_card_hidden": true, "smaller_cards": true, "mirrored_outer_arc": true, "hover_focus": true, "stable_hover": true, "hover_keeps_neighbours": true, "hover_lift_only": true, "continuous_top_edge": true, "hand_insert_from_below": true, "persistent_hand_views": true, "compact_shop": true, "reroll_insert_from_below": true, "minimal_hud": true}
+	var report := {"failures": failures, "four_offers_and_reroll_back_cards": true, "four_towers_and_reroll": true, "prices": true, "purchase_and_reroll": true, "outside_click_no_world_edit": true, "hand_fold_restore": true, "successful_placement_consumes": true, "wave_start_hides": true, "arrival_and_kill_rewards": true, "duplicate_reward_guard": true, "animation_reversal": true, "no_modal_overlay": true, "shallow_overlapping_fan": true, "gold_icons": true, "sold_card_hidden": true, "smaller_cards": true, "mirrored_outer_arc": true, "hover_focus": true, "stable_hover": true, "hover_keeps_neighbours": true, "hover_lift_only": true, "continuous_top_edge": true, "hand_insert_from_below": true, "persistent_hand_views": true, "compact_shop": true, "reroll_insert_from_below": true, "minimal_hud": true}
 	print("CARD_SHOP_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):
 		FileAccess.open(Artifacts.path("cards/shop_windows.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "  ")+"\n")

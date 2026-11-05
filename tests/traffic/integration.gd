@@ -161,24 +161,24 @@ func run() -> void:
 	shop.view.set_available(true)
 	shop.open_shop()
 	shop.view.finish_animation()
-	check(shop.offers.size() == 6 and shop.view.slots.size() == 7,"four plus two plus original reroll card")
-	for i in 6: check((shop.offers[i].tower != null) == (i < 4),"pool separation")
-	check(shop.view.slots[1].position.y < shop.view.slots[5].position.y,"two distinct rows")
-	check(shop.view.slots[0].position.x > shop.view.slots[6].position.x,"reroll at bottom right")
+	check(shop.offers.size() == 4 and shop.view.slots.size() == 5,"four tower offers plus original reroll card")
+	for card: BuildCard in shop.offers: check(card.tower != null and card.traffic == null,"normal shop excludes support")
+	check(shop.roll_traffic_cards(2).size() == 2,"support remains available to tools")
+	check(shop.view.slots[0].position.x > shop.view.slots[4].position.x,"reroll at right")
 	var before_cards: Array = shop.offers.duplicate()
 	var coins: int = shop.coins
 	var reroll_price: int = shop.reroll_price
 	check(shop.reroll(),"shared reroll succeeds")
 	check(shop.coins == coins-reroll_price,"single reroll fee")
-	for i in 6: check(shop.offers[i] != before_cards[i],"both pools re-dealt")
+	for i in 4: check(shop.offers[i] != before_cards[i],"tower offers re-dealt")
 	check(shop.view.rerolling and not shop.reroll(),"original animation blocks duplicate reroll")
 	shop.view._stop_reroll_animation()
 	shop.view.finish_animation()
 	await screenshot("shop")
-	var purchased: BuildCard = shop.offers[4]
+	var purchased: BuildCard = shop.offers[0]
 	coins = shop.coins
-	check(shop.buy(4) and not shop.buy(4),"support purchase exactly once")
-	check(cards.cards[-1] == purchased and shop.coins == coins-purchased.price,"support price snapshot and shared inventory")
+	check(shop.buy(0) and not shop.buy(0),"tower purchase exactly once")
+	check(cards.cards[-1] == purchased and shop.coins == coins-purchased.price,"price snapshot and shared inventory")
 	var saved_towers: Array = shop.catalog.duplicate()
 	var saved_support: Array = shop.traffic_catalog.duplicate()
 	shop.catalog.clear()

@@ -142,7 +142,7 @@ func verify() -> void:
 	await frames()
 	# Inspect the actual baked airship at close range, including its firing markers.
 	var ship: DefenseTower = session.get_node("TowerMap").upgrade_target(ANCHORS[3])
-	var base: Node3D = ship._visual.get_node("FixedBase")
+	var base: Node3D = ship._visual.find_children("*__FixedBase","Node3D",true,false)[0] if ship._visual.has_method("_part") else ship._visual.get_node("FixedBase")
 	var base_transform := base.global_transform
 	var flight: Node3D = ship.patrol_visual()
 	var docked := flight.position
@@ -200,7 +200,7 @@ func verify() -> void:
 	left(option_point,false)
 	await get_tree().create_timer(0.4).timeout
 	check(session.get_node("TowerMap").relics.held.has(selected.id) and not session.choosing_relic and not cards.input_suspended, "Real reward card click acquires and resumes preparation")
-	choice.get_node("InventoryButton").pressed.emit()
+	choice.get_node("RelicBar/Items").get_child(0).pressed.emit()
 	check(choice.get_node("Collection").visible, "Acquired collection can be inspected")
 	await snapshot("collection")
 	var weak: WeakRef = weakref(session.get_node("TowerMap").relics)

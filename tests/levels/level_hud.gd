@@ -54,6 +54,9 @@ func screenshot(path: String) -> void:
 
 func verify() -> void:
 	var scene: Node3D = load("res://scenes/level.tscn").instantiate()
+	# Pause checks need an immediate first spawn, independent of Frontier edits.
+	scene.level = scene.level.duplicate(true)
+	scene.level.acts[0].waves[0].groups[0].start_tick = 0
 	add_child(scene)
 	for i in 120:
 		if not scene.get_node("PortalMap").computing: break

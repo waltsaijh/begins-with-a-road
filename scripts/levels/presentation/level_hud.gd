@@ -9,6 +9,14 @@ var _settings_camera: Camera3D
 var _settings_veil_motion: Tween
 var _pause_veil_alpha := 0.0
 var _returning_home := false
+var inspection_owner: Node
+var _inspection_was_requested := false
+var _inspection_was_paused := false
+var _inspection_scale := 1.0
+var _inspection_focus: Control
+var _header_layout_busy := false
+var _header_signature: Array = []
+var status_row_rect := Rect2()
 const SPEEDS := [1.0, 2.0, 4.0]
 const StartCallout = preload("res://scenes/levels/components/start_wave_callout.tscn")
 var start_callouts: Array[Button] = []
@@ -54,10 +62,17 @@ func _ready() -> void:
 	start_markers = [start_marker]
 	_pause_veil_alpha = $PauseBlocker/WhiteVeil.color.a
 	speed_button.pressed.connect(cycle_speed)
+	if _cards != null:
+		_cards.get_node("Shop").balance_changed.connect(_update_wallet_tooltip)
 	pause_button.pressed.connect(func(): set_paused(not pause_requested))
 	resume_button.pressed.connect(set_paused.bind(false))
 	restart_button.pressed.connect(request_restart)
 	home_button.pressed.connect(request_return_home)
+	var codex: Button = $PauseBlocker/Menu/Margin/Actions/Codex/Button
+	_menu_buttons.append(codex)
+	codex.pressed.connect(func():
+		var guide: Node = get_parent().get("enemy_intelligence")
+		if guide != null: guide.open_codex())
 	ScreenTransition.finished.connect(_on_transition_finished)
 	settings_page = SettingsScene.instantiate()
 	add_child(settings_page)
@@ -69,6 +84,9 @@ func _ready() -> void:
 	Engine.time_scale = SPEEDS[speed_index]
 	_update_labels()
 	_position_callout()
+	$Header/WaveTimeline.resized.connect(_layout_status_row)
+	get_viewport().size_changed.connect(_layout_status_row)
+	_layout_status_row()
 
 func open_settings() -> void:
 	if not pause_requested or ScreenTransition.active: return
@@ -96,6 +114,61 @@ func _fade_settings_veil(reveal: bool) -> void:
 
 func _process(_delta: float) -> void:
 	_position_callout()
+	$Header/WaveTimeline.set_reward_active(get_parent().get("choosing_relic") == true)
+	_layout_status_row()
+
+## Center the visible information as one row. Timeline width drives every
+## position during its existing real-time tween, keeping the gaps constant.
+func _layout_status_row() -> void:
+	if _header_layout_busy or not is_node_ready(): return
+	_header_layout_busy = true
+	var session := get_parent()
+	var items: Array[Control] = []
+	var widths: Array[float] = []
+	var status: Node = session.get("run_status")
+	if is_instance_valid(status) and not status.get_node("Integrity").visibility_changed.is_connected(_layout_status_row): status.get_node("Integrity").visibility_changed.connect(_layout_status_row)
+	if is_instance_valid(status) and status.get_node("Integrity").visible:
+		items.append(status.get_node("Integrity"))
+		widths.append(56.0)
+	items.append($Header/Balance)
+	widths.append(56.0)
+	var choice: Node = session.get("relic_choice")
+	if is_instance_valid(choice) and not choice.get_node("RelicBar").visibility_changed.is_connected(_layout_status_row): choice.get_node("RelicBar").visibility_changed.connect(_layout_status_row)
+	if is_instance_valid(choice) and choice.get_node("RelicBar").visible:
+		var bar: Control = choice.get_node("RelicBar")
+		var count: int = bar.get_node("Items").get_child_count()
+		items.append(bar)
+		widths.append(minf(176.0,count*38.0+maxi(0,count-1)*6.0))
+	var timeline: Control = $Header/WaveTimeline
+	var timeline_index := items.size()
+	items.append(timeline)
+	widths.append(0.0)
+	var guide: Node = session.get("enemy_intelligence")
+	if is_instance_valid(guide) and not guide.toggle.visibility_changed.is_connected(_layout_status_row): guide.toggle.visibility_changed.connect(_layout_status_row)
+	if is_instance_valid(guide) and guide.toggle.visible:
+		items.append(guide.toggle)
+		widths.append(80.0)
+	items.append($Header/Actions)
+	widths.append(72.0)
+	var gap := 16.0
+	var remaining := gap*(items.size()-1)
+	for width in widths: remaining += width
+	var viewport_width := get_viewport().get_visible_rect().size.x
+	timeline.manage_header_width(viewport_width-remaining-40.0)
+	widths[timeline_index] = timeline.size.x
+	var total := remaining+timeline.size.x
+	var signature := [viewport_width,items,widths]
+	if signature != _header_signature:
+		_header_signature = signature
+		var cursor := (viewport_width-total)*0.5
+		status_row_rect = Rect2(cursor,34,total,38)
+		for i in items.size():
+			items[i].anchor_left = 0.0
+			items[i].anchor_right = 0.0
+			items[i].position.x = cursor
+			items[i].size.x = widths[i]
+			cursor += widths[i]+gap
+	_header_layout_busy = false
 
 func set_start_available(available: bool) -> void:
 	if not is_inside_tree(): return
@@ -179,13 +252,21 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _update_labels()
 
 func _update_labels() -> void:
+	var english := TranslationServer.get_locale().begins_with("en")
 	speed_button.text = ""
 	speed_button.icon = SPEED_ICONS[speed_index]
 	pause_button.icon = PauseIcon
+	speed_button.tooltip_text = ("Game speed: %d×\nClick to cycle 1× / 2× / 4×." if english else "遊戲速度：%d 倍\n點擊切換 1／2／4 倍速。") % SPEEDS[speed_index]
+	pause_button.tooltip_text = "Pause game · open menu" if english else "暫停遊戲並開啟選單"
+	if _cards != null: _update_wallet_tooltip(_cards.get_node("Shop").coins)
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
 	settings_button.text = tr("ui.pause.settings")
 	home_button.text = tr("ui.pause.home")
+	$PauseBlocker/Menu/Margin/Actions/Codex/Button.text = "Enemy codex" if TranslationServer.get_locale().begins_with("en") else "敵軍圖鑑"
+
+func _update_wallet_tooltip(amount: int) -> void:
+	$Header/Balance.tooltip_text = ("Gold: %d\nBuy tower cards or refresh the shop." if TranslationServer.get_locale().begins_with("en") else "金幣：%d\n用於購買塔牌與重刷商店。") % amount
 
 func cycle_speed() -> void:
 	if pause_requested or ScreenTransition.active: return
@@ -195,6 +276,7 @@ func cycle_speed() -> void:
 
 func set_paused(value: bool) -> void:
 	if _returning_home: return
+	if is_instance_valid(inspection_owner) and not value: return
 	if value == pause_requested: return
 	if not value and settings_page.visible:
 		settings_page.hide()
@@ -238,6 +320,7 @@ func _input(event: InputEvent) -> void:
 	if ScreenTransition.active:
 		get_viewport().set_input_as_handled()
 		return
+	if is_instance_valid(inspection_owner): return
 	if not pause_requested: return
 	if settings_page.is_visible_in_tree(): return
 	var camera := get_viewport().get_camera_3d()
@@ -286,3 +369,31 @@ func _exit_tree() -> void:
 	if _pause_menu_motion != null: _pause_menu_motion.kill()
 	get_tree().paused = false
 	Engine.time_scale = 1.0
+
+## Inspection panels borrow the existing HUD pause/hand transition, preserving
+## both an already-open pause menu and an external tree pause on return.
+func begin_inspection(owner_panel: Node) -> bool:
+	if is_instance_valid(inspection_owner): return inspection_owner == owner_panel
+	if ScreenTransition.active or settings_page.visible or _returning_home: return false
+	if get_parent().get("choosing_relic") == true or get_parent().get("finished") == true: return false
+	_inspection_was_requested = pause_requested
+	_inspection_was_paused = get_tree().paused
+	_inspection_scale = Engine.time_scale
+	_inspection_focus = get_viewport().gui_get_focus_owner()
+	set_paused(true)
+	inspection_owner = owner_panel
+	$PauseBlocker/Menu.hide()
+	_set_settings_navigation_locked(true)
+	return true
+
+func end_inspection(owner_panel: Node) -> void:
+	if inspection_owner != owner_panel: return
+	inspection_owner = null
+	_set_settings_navigation_locked(false)
+	set_paused(_inspection_was_requested)
+	$PauseBlocker/Menu.visible = _inspection_was_requested
+	if not _inspection_was_requested:
+		get_tree().paused = _inspection_was_paused
+		Engine.time_scale = _inspection_scale
+	if is_instance_valid(_inspection_focus) and _inspection_focus.is_visible_in_tree(): _inspection_focus.grab_focus()
+	_inspection_focus = null

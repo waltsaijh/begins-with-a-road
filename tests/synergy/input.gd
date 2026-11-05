@@ -66,9 +66,9 @@ func verify() -> void:
 		check(action._hovered and preview.selected_origin == 0 and action.get_node("NextWaveIntel").selected == item.profile,"new troop hover filters correct origin and profile")
 		await click(item.get_node("Info").get_global_rect().get_center())
 		check(session.enemy_intelligence.panel.visible and not wave.active and not session._wave_starting,"Info opens details without starting a wave")
-		check(session.enemy_intelligence.description.text.contains(item.profile.body_size),"intelligence shows tags and route behavior")
+		check(session.enemy_intelligence.title.text == "???" or session.enemy_intelligence.detail.get_node("Appearance/Stats").text.contains(item.profile.type_description()),"codex conceals unencountered enemies and localizes known types")
 		await capture("case_%d_intelligence" % case)
-		await click(session.enemy_intelligence.get_node("Screen/Panel/Layout/Close").get_global_rect().get_center())
+		await click(session.enemy_intelligence.layout.get_node("Close").get_global_rect().get_center())
 		if case < 3:
 			var rat := TroopCatalog.find("rat_swarm")
 			var guard := TroopCatalog.find("shield_guardian")
