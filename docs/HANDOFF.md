@@ -1,5 +1,9 @@
 # Routing Sandbox — Phase 1–4 交接
 
+2026-11-05 鏡頭左右鍵對調（HEAD `6a58b02` 後）：左鍵由卡牌以外起拖平移，右鍵可由地面、卡牌或其他 UI 起拖繞中心旋轉；保留 4px 點擊／拖曳分流、左鍵卡牌拖放、單擊右鍵旋轉卡牌及原旋轉速度／平滑、暫停與設定 navigation lock。平移捕捉後可跨卡牌，左鍵直接按在卡牌（含停用牌／商品／牌背）則保留原操作。教學中英文、README、驗收提示及操作共識同步更新，取代下方歷史記錄的右鍵平移／左鍵旋轉。
+
+本次 headless camera_orbit、pause_navigation、tutorial/intro 通過；Godot 4.7.2 Compatibility 實際 camera_orbit、pause_navigation、pause_menu、card_drag_placement、tutorial/intro 全通過，涵蓋角速度／完整畫圓、左右鍵點擊分流、跨商店平移、卡牌上右鍵旋轉、卡牌拖放不動鏡頭、暫停血條投影／設定阻擋及完整三波教學。翻譯匯入與 `git diff --check` 通過。證據在 `.godot/left-pan-right-orbit-2026-11-05/`；未跑完整回歸、Web 瀏覽器或長局平衡。
+
 2026-11-05 教學改為首關與三波：此版取代下方五步教學初版的「買牌即通關／獨立可選」設計。tutorial 為 1 ACT、3 波（4／6／8 名步兵，獎勵 20／10／10）；Frontier 直接要求 tutorial，Bridge 直接要求 tutorial 與 frontier，依既有 DAG 排為 tutorial → frontier → bridge，舊的後續關卡完成紀錄也不能略過教學。首波後維持五步商店／升級引導，買到新塔只解除教學規則並轉為自由實戰，繼續第 2、3 波；第 3 波與普通最後 ACT 遺物獎勵完成才保存通關及解鎖。
 
 初始牌改為 intro.tres 的 Starting Cards 引用三個獨立 starting_01～03.tres，可改 Tower／Tile Preset 及順序；文案讀實際塔名、升級 hologram 搜尋同種塔，升級牌不再限定第一個卡位。修改入口與資料限制見 assets/data/tutorial/README.md。Godot 4.7.2 headless tutorial/intro、level_catalog 及 Compatibility 實際 intro、main_menu 全通過，涵蓋三波、購買後仍未通關、自由放新塔、ACT 獎勵、第一關預選／後續解鎖及舊紀錄守衛、修改初始牌順序與升級目標、重玩重置；`git diff --check` 通過。證據在 `.godot/tutorial-three-waves-2026-11-05/`；教學測試仍以工具清敵，未驗長局平衡、完整回歸或 Web 瀏覽器。

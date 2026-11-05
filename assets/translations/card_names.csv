@@ -132,7 +132,7 @@ relic.debug_reroll,Reroll relics (Debug),重新隨機抽選（Debug）
 ui.maps.title.tutorial,First Steps,第一條防線
 ui.maps.description.tutorial,Learn camera controls and reshape roads with cards before upgrading your first tower.,練習鏡頭操作、用卡牌改變道路，再升級你的第一座塔。
 tutorial.step,Tutorial · {step} / 5,教學・{step} / 5
-tutorial.camera,Try right-drag to pan and the wheel to zoom. Left-drag around the screen center to rotate.,按住右鍵拖曳平移、滾輪縮放；按住左鍵繞畫面中心拖曳旋轉。請各試一次。
+tutorial.camera,Try left-drag outside cards to pan and the wheel to zoom. Right-drag around the screen center to rotate.,在卡牌以外按住左鍵拖曳平移、滾輪縮放；按住右鍵繞畫面中心拖曳旋轉。請各試一次。
 tutorial.camera_progress,{pan} Pan   {zoom} Zoom   {orbit} Rotate,{pan} 平移　{zoom} 縮放　{orbit} 旋轉
 tutorial.first,Select the {first_tower} card and place it on the golden hologram without rotating. Watch the road bend around the tower.,選擇{first_tower}卡，依金色 hologram 原方向放置。注意：塔占住原路，卡牌附帶的道路讓敵人繞行。
 tutorial.rotated,Select the {second_tower} card. Use R or a right click to rotate it 90 degrees clockwise and match the golden hologram.,選擇{second_tower}卡，按 R 或單擊右鍵順時針旋轉 90 度，依金色 hologram 放置，讓道路繞過第二座塔。

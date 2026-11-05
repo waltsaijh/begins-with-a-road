@@ -129,10 +129,11 @@ func verify() -> void:
 	var point := point_for(cell)
 	var count: int = cards.cards.size()
 	var angle: float = camera.azimuth
+	var focus: Vector3 = camera.focus
 	drag_to(point)
 	await frames(3)
 	check(cards.hand.is_dragging() and cards.selected == 0 and cards.preview.visible, "Dragging did not select the card and show the world hologram")
-	check(cards.cards.size() == count and is_equal_approx(camera.azimuth, angle) and camera._orbit_press == null, "A held card drag placed early or started camera rotation")
+	check(cards.cards.size() == count and is_equal_approx(camera.azimuth, angle) and camera.focus.is_equal_approx(focus) and camera._orbit_press == null and camera._pan_press == null, "A held card drag placed early or moved the camera")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		viewport.get_texture().get_image().save_png(Artifacts.path("cards/card_drag_preview.png"))

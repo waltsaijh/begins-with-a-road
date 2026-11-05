@@ -82,7 +82,7 @@ godot --editor --path . -- --test-card-resource-refresh
 
 `godot --path . --script tests/enemies/solid_material.gd` 核對道路／木橋的 surface 合併、塔／三兵種的材質身分、烘焙步態參數、特殊材質排除，以及原 StandardMaterial3D 與共用材質的實際像素差異；結果放 `.godot/test-results/rendering/shared_material/`。Headless 只驗證資料，不能替代像素檢查。工具由測試引用，正式匯出仍排除 tests／tools。
 
-`camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、右鍵跨過商店卡牌及卡牌上起拖／放開、中心死區、跨 UI 捕捉／放開、卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
+`camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、左鍵平移跨過商店卡牌／放開、右鍵由卡牌起拖旋轉、中心死區、跨 UI 捕捉／放開、左鍵卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
 
 `cards/card_drag_placement` 使用獨立 viewport 與實際滑鼠輸入驗證較小的 hover 上提、選中上提與平滑切換、卡面搖動及穩定命中範圍，另驗證手牌拖放、點選後點地圖、有效／無效落點、拖到手牌或商店牌背時取消選取、UI 排除、保留旋轉、鏡頭不被起動，以及 Esc／暫停／開波／離開視窗取消。拖曳預覽截圖與結果寫入 `.godot/test-results/cards/`。
 

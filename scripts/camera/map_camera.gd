@@ -78,12 +78,11 @@ func _advance_orbit(real_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	# Decide click versus drag before GUI/gameplay can act on the press. Cards
-	# retain their normal input; non-card clicks are delivered on release.
-	# Right-button navigation must reach the camera before cards consume GUI
-	# motion, including when the pointer crosses a shop slot or its price.
-	var pan_drag: bool = event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_RIGHT) != 0
-	var pan_button: bool = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT
-	if pan_drag or pan_button or _pan_press != null or _orbit_press != null or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
+	# retain left-button input; clicks are delivered only after a gesture ends.
+	# Capture navigation before GUI motion, including across cards and prices.
+	var navigation_drag: bool = event is InputEventMouseMotion and (event.button_mask & (MOUSE_BUTTON_MASK_LEFT | MOUSE_BUTTON_MASK_RIGHT)) != 0
+	var navigation_button: bool = event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT]
+	if navigation_drag or navigation_button or _pan_press != null or _orbit_press != null:
 		if handle_navigation_input(event): get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -99,8 +98,10 @@ func handle_navigation_input(event: InputEvent) -> bool:
 	if _navigation_locked: return false
 	if _replaying_click: return false
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.button_mask & MOUSE_BUTTON_MASK_RIGHT: return true
 			if event.pressed:
+				if _over_card(event.position): return false
 				_stop_navigation()
 				_pan_press = event.duplicate()
 				_pan_previous = event.position
@@ -110,20 +111,18 @@ func handle_navigation_input(event: InputEvent) -> bool:
 				_stop_pan()
 				if click != null: _deliver_click.call_deferred(click, event.duplicate())
 			return true
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.button_mask & MOUSE_BUTTON_MASK_RIGHT: return true
+		if event.button_index == MOUSE_BUTTON_RIGHT:
 			if not event.pressed:
 				if _orbit_press == null: return false
 				var click := _orbit_press if not _orbiting else null
 				_stop_orbit(true)
 				if click != null: _deliver_click.call_deferred(click, event.duplicate())
 				return true
-			if not _over_card(event.position):
-				# A new gesture takes control without the previous easing tail.
-				_stop_navigation()
-				_orbit_press = event.duplicate()
-				_orbit_previous = event.position
-				return true
+			# Right dragging may start over cards; their left-button input stays free.
+			_stop_navigation()
+			_orbit_press = event.duplicate()
+			_orbit_previous = event.position
+			return true
 		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			if event.pressed:
 				var direction := -1.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
@@ -132,7 +131,7 @@ func handle_navigation_input(event: InputEvent) -> bool:
 			return true
 	elif event is InputEventMouseMotion:
 		if _pan_press != null:
-			if not event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
+			if not event.button_mask & MOUSE_BUTTON_MASK_LEFT:
 				_stop_pan()
 				return false
 			if not _panning and event.position.distance_to(_pan_press.position) < orbit_drag_threshold: return true
@@ -141,7 +140,7 @@ func handle_navigation_input(event: InputEvent) -> bool:
 			_pan_previous = event.position
 			return true
 		if _orbit_press != null:
-			if not event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+			if not event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
 				_stop_orbit()
 				return false
 			if not _orbiting and event.position.distance_to(_orbit_press.position) < orbit_drag_threshold:

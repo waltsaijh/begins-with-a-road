@@ -37,11 +37,11 @@ func click_at(point: Vector2) -> void:
 	click.pressed = false
 	_viewport.push_input(click, true)
 
-func right(point: Vector2, pressed: bool) -> void:
+func left(point: Vector2, pressed: bool) -> void:
 	var event := InputEventMouseButton.new()
 	event.position = point
-	event.button_index = MOUSE_BUTTON_RIGHT
-	event.button_mask = MOUSE_BUTTON_MASK_RIGHT if pressed else 0
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
 	event.pressed = pressed
 	_viewport.push_input(event, true)
 
@@ -107,12 +107,12 @@ func verify() -> void:
 		check(is_equal_approx(camera.size, size_before/pow(1.12, wheel.factor)), "Paused camera could not zoom or handled one wheel event twice")
 		var focus_before: Vector3 = camera.focus
 		var drag := InputEventMouseMotion.new()
-		drag.button_mask = MOUSE_BUTTON_MASK_RIGHT
+		drag.button_mask = MOUSE_BUTTON_MASK_LEFT
 		drag.position = Vector2(560, 320)
 		drag.relative = Vector2(60, 20)
-		right(drag.position-drag.relative, true)
+		left(drag.position-drag.relative, true)
 		_viewport.push_input(drag, true)
-		right(drag.position, false)
+		left(drag.position, false)
 		check(not camera.focus.is_equal_approx(focus_before), "Paused camera could not pan")
 		click_at(cards.hand.views[1].get_global_transform_with_canvas()*(cards.hand.views[1].size*0.5))
 		wave.controls.spawn_requested.emit()
@@ -186,12 +186,12 @@ func verify() -> void:
 		await RenderingServer.frame_post_draw
 		check(is_health_pixel(_viewport.get_texture().get_image(), old_pixel, health_color), "Health bar did not appear above the frozen enemy")
 	var motion := InputEventMouseMotion.new()
-	motion.button_mask = MOUSE_BUTTON_MASK_RIGHT
+	motion.button_mask = MOUSE_BUTTON_MASK_LEFT
 	motion.position = Vector2(620, 340)
 	motion.relative = Vector2(120, 40)
-	right(motion.position-motion.relative, true)
+	left(motion.position-motion.relative, true)
 	_viewport.push_input(motion, true)
-	right(motion.position, false)
+	left(motion.position, false)
 	await frames(3)
 	var moved_pixel := health_sample(camera, head, bar_size)
 	check(moved_pixel.distance_to(old_pixel) > 50, "Camera pan did not move the health projection")
