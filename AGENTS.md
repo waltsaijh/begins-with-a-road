@@ -1,6 +1,6 @@
 # Agent 工作共識
 
-- 2026-11-05 最新 Git 授權：使用者在 Art Slice F 完成後要求「git更新 並 push到遠端」，授權提交目前累積的 Modeling Skill、建模來源、Art Slice D／E／F 資產與整合、測試及文件，並正常推送 origin/experiment/routing-sandbox；各實作階段的不 commit／push 註記為此次授權前的歷史。可重建 ZIP 與 Blender 自動備份留本機並忽略。仍不改 main worktree、不 merge／rebase／reset／clean 或強制推送。
+- 2026-11-05 最新 Git 授權：使用者在 Art Slice F 完成後要求「git更新 並 push到遠端」，授權提交目前累積的 Modeling Skill、建模來源、Art Slice D／E／F 資產與整合、測試及文件，並正常推送 origin/experiment/routing-sandbox；首次推送遇遠端新增兩筆提交而分岔，使用者再以「好」明確授權本次合併遠端分支後正常 push。此為本次 merge 的例外授權；各實作階段的不 commit／push 註記為此次授權前的歷史。可重建 ZIP 與 Blender 自動備份留本機並忽略。仍不改 main worktree、不擅自進行其他 merge／rebase／reset／clean 或強制推送。
 
 本文件供接手本專案的 agents 閱讀，彙整截至目前已記錄的遊戲設計、實作決策與工作約定。新討論產生或修改共識時，更新對應段落；被取代的決策應明確修正，避免同時保留互相矛盾的規則。這不是逐字聊天紀錄，也不把尚未確認的想法寫成既定需求。
 
