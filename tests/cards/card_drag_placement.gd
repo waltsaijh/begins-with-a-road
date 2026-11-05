@@ -184,14 +184,19 @@ func verify() -> void:
 	motion(back_point, MOUSE_BUTTON_MASK_LEFT)
 	left(back_point, false)
 	check(cards.selected == -1 and cards.cards.size() == count and shop.coins == wallet and shop.deals == deals and not shop.view.opened, "Dropping onto a shop back did not cancel focus or triggered a transaction")
-	# Esc cancels the captured drag, and its release must not place anything.
+	# Esc pauses gameplay and cancels capture; the release cannot place anything.
 	drag_to(point)
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
 	viewport.push_input(escape, true)
 	left(point, false)
-	check(cards.selected == -1 and cards.cards.size() == count and not cards.hand.is_dragging(), "Esc did not cancel dragging safely")
+	check(hud.pause_requested and cards.cards.size() == count and not cards.hand.is_dragging(), "Esc did not pause and cancel dragging safely")
+	escape.pressed = false
+	viewport.push_input(escape,true)
+	escape.pressed = true
+	viewport.push_input(escape,true)
+	check(not hud.pause_requested,"Esc did not resume after cancelling drag capture")
 	# Pausing cancels dragging; resuming still allows an ordinary card click.
 	drag_to(point)
 	hud.set_paused(true)

@@ -154,7 +154,10 @@ func verify() -> void:
 		await get_tree().process_frame
 	check(scene.finished and completed[0] == 1 and wave.controls.spawn_button.disabled and not wave.start_wave(), "Completed level allowed extra waves or repeated completion")
 	for control: Control in scene.find_children("*", "Control", true, false):
-		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
+		if control in [scene.get_node("LevelHUD").speed_button,scene.get_node("LevelHUD").pause_button] or control.has_meta("relic_id"): continue
+		if control.name == "Body" and control.get_parent().get_script() == preload("res://scripts/levels/presentation/troop_intel_item.gd"): continue
+		check(control.tooltip_text.is_empty(), "Unexpected gameplay hover tooltip: "+str(control.get_path()))
+	check(scene.tutorial == null and not shop.purchase_rule.is_valid() and not shop.reroll_rule.is_valid(),"Ordinary levels inherited tutorial restrictions")
 	shop.open_shop()
 	shop.view.finish_animation()
 	check(shop.buy(0), "Wallet purchase check failed")

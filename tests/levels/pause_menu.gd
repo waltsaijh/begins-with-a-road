@@ -249,12 +249,12 @@ func verify() -> void:
 		tab.pressed = false
 		get_viewport().push_input(tab, true)
 		check(page.is_ancestor_of(get_viewport().gui_get_focus_owner()), "Keyboard focus escaped behind the modal page")
-	for mouse_button in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE]:
+	for mouse_button in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
 		var press := InputEventMouseButton.new()
 		press.position = Vector2(10, 10)
 		press.button_index = mouse_button
 		press.pressed = true
-		press.button_mask = MOUSE_BUTTON_MASK_LEFT if mouse_button == MOUSE_BUTTON_LEFT else MOUSE_BUTTON_MASK_MIDDLE
+		press.button_mask = MOUSE_BUTTON_MASK_LEFT if mouse_button == MOUSE_BUTTON_LEFT else MOUSE_BUTTON_MASK_RIGHT
 		get_viewport().push_input(press, true)
 		var drag := InputEventMouseMotion.new()
 		drag.position = Vector2(130, 120)
@@ -268,7 +268,7 @@ func verify() -> void:
 	wheel.position = Vector2(10, 10)
 	get_viewport().push_input(wheel, true)
 	await frames(3)
-	check(camera.global_transform.is_equal_approx(camera_pose) and camera.focus.is_equal_approx(camera_focus) and camera.size == camera_size and camera._orbit_press == null, "Settings leaked orbit, pan, zoom or a pending click to the background")
+	check(camera.global_transform.is_equal_approx(camera_pose) and camera.focus.is_equal_approx(camera_focus) and camera.size == camera_size and camera._orbit_press == null and camera._pan_press == null, "Settings leaked orbit, pan, zoom or a pending click to the background")
 	check(not pressed_background[0] and shop.coins == coins and scene.timeline.progress == progress, "Settings leaked clicks or changed paused gameplay")
 	background.queue_free()
 	var escape := InputEventKey.new()
@@ -294,7 +294,7 @@ func verify() -> void:
 	await frames(2)
 	check(camera.size != old_size, "Camera navigation did not resume in the pause menu")
 	TranslationServer.set_locale(locale)
-	# Restart a live wave at 4x with altered instance state, rather than an empty level.
+	# Restart a live wave at 3x with altered instance state, rather than an empty level.
 	hud.set_paused(false)
 	scene._on_start_requested()
 	scene._process(1.5)
@@ -306,7 +306,7 @@ func verify() -> void:
 	hud.cycle_speed()
 	check(wave.active and not wave.living_enemies().is_empty(), "Restart fixture did not start a live wave")
 	hud.set_paused(true)
-	check(get_tree().paused and Engine.time_scale == 0.0, "Live 4x wave did not pause immediately")
+	check(get_tree().paused and Engine.time_scale == 0.0, "Live 3x wave did not pause immediately")
 	get_tree().set_meta(RESTART_STATE, {"failures": failures, "scene_id": scene.get_instance_id()})
 	await click(hud.restart_button)
 	if not is_inside_tree(): return

@@ -1,5 +1,6 @@
 extends Node3D
 signal cards_changed
+signal card_placed(card: BuildCard, tower: Node3D, cell: Vector3i, rotation_steps: int)
 signal traffic_preview_changed(effect: Dictionary)
 var traffic_candidate := {}
 ## Input orchestration. BuildCard is data, TowerMap is the commit authority.
@@ -178,7 +179,9 @@ func add_card(card: BuildCard) -> bool:
 func place_selected(cell: Vector3i) -> Node3D:
 	if input_suspended or selected < 0 or selected >= cards.size():
 		return null
-	var tower: Node3D = towers.place_card(cards[selected], cell, turns)
+	var card := cards[selected]
+	var rotation_steps := turns
+	var tower: Node3D = towers.place_card(card, cell, turns)
 	if tower == null:
 		_dirty = true
 		return null
@@ -187,6 +190,7 @@ func place_selected(cell: Vector3i) -> Node3D:
 	select_card(-1)
 	hand.remove_card(removed)
 	cards_changed.emit()
+	card_placed.emit(card,tower,cell,rotation_steps)
 	return tower
 
 func rotate_card(amount: int) -> void:
@@ -214,7 +218,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if input_suspended or selected < 0 or not event is InputEventMouseButton or not event.pressed or event.button_mask & MOUSE_BUTTON_MASK_MIDDLE:
+	if input_suspended or selected < 0 or not event is InputEventMouseButton or not event.pressed or (event.button_index == MOUSE_BUTTON_LEFT and event.button_mask & MOUSE_BUTTON_MASK_RIGHT):
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT:
 		place_selected(placement.pick_cell(event.position))

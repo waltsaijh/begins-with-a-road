@@ -113,7 +113,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			_consume_release = false
-			if not _interaction_enabled or collapsed or stowed or event.button_mask & MOUSE_BUTTON_MASK_MIDDLE: return
+			if not _interaction_enabled or collapsed or stowed or event.button_mask & MOUSE_BUTTON_MASK_RIGHT: return
 			var index := CardFanLayout.pick(views, event.position, 0, _hovered)
 			if index < 0 or views[index].disabled or views[index].mouse_filter == Control.MOUSE_FILTER_IGNORE: return
 			_drag_candidate = views[index]

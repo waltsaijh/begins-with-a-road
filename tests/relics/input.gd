@@ -182,7 +182,17 @@ func verify() -> void:
 	check(session.choosing_relic and cards.input_suspended and not session.get_node("EnemyWave").start_allowed, "ACT completion enters mandatory reward phase")
 	var choice: CanvasLayer = session.relic_choice
 	var hud: CanvasLayer = session.get_node("LevelHUD")
-	hud.set_paused(true)
+	var backdrop: ColorRect = choice.get_node("Modal/Backdrop")
+	check(backdrop.get_global_rect().is_equal_approx(Rect2(Vector2.ZERO,Vector2(render_viewport.size))), "Reward dimmer covers the entire viewport, including the header")
+	var before_roll: Dictionary = manager.held.duplicate()
+	var before_roll_coins: int = cards.get_node("Shop").coins
+	var old_card: WeakRef = weakref(choice.row.get_child(0))
+	check(choice.debug_reroll_button.is_visible_in_tree(), "Debug reward reroll button is visible")
+	await click_control(choice.debug_reroll_button)
+	check(old_card.get_ref() == null and choice.row.get_child_count() == 3, "Real debug button click rebuilds the three reward cards")
+	check(manager.held == before_roll and cards.get_node("Shop").coins == before_roll_coins and session.choosing_relic and cards.input_suspended, "Debug reroll preserves inventory, coins and reward phase locks")
+	await click_control(hud.pause_button)
+	check(get_tree().paused, "Full-screen reward dimmer keeps the header pause button reachable")
 	check(not choice.choose(choice.offers[0]), "Paused reward cannot acquire")
 	var paused_cards: int = cards.cards.size()
 	check(not refill() and cards.cards.size() == paused_cards, "Paused test tool cannot refill cards")
@@ -200,9 +210,35 @@ func verify() -> void:
 	left(option_point,false)
 	await get_tree().create_timer(0.4).timeout
 	check(session.get_node("TowerMap").relics.held.has(selected.id) and not session.choosing_relic and not cards.input_suspended, "Real reward card click acquires and resumes preparation")
-	choice.get_node("InventoryButton").pressed.emit()
-	check(choice.get_node("Collection").visible, "Acquired collection can be inspected")
-	await snapshot("collection")
+	var inventory: Control = choice.inventory
+	await frames()
+	check(choice.get_node_or_null("InventoryButton") == null and choice.get_node_or_null("Collection") == null,"Old collection interface was not removed")
+	var icons: HBoxContainer = inventory.get_node("Icons")
+	var owned := 0
+	for amount in manager.held.values(): owned += int(amount)
+	check(inventory.visible and icons.get_child_count() == owned,"Each acquired relic copy should have an icon")
+	check(icons.get_child(owned-1).get_meta("relic_id") == selected.id,"Newest acquired relic was not appended to the right")
+	check(icons.get_child(owned-1).tooltip_text.contains(tr(selected.name_key)),"Relic icon lost its name/description tooltip")
+	check(not cards.hand.is_ancestor_of(inventory),"Relic row is still parented to the hand")
+	check(absf(inventory.position.x-inventory.screen_margin.x)<1 and absf(inventory.get_rect().end.y+inventory.screen_margin.y-render_viewport.get_visible_rect().size.y)<1,"Relics did not keep their independent screen margin")
+	for i in icons.get_child_count()-1:
+		check(icons.get_child(i).get_global_rect().end.x < icons.get_child(i+1).get_global_rect().position.x and is_equal_approx(icons.get_child(i).position.y,icons.get_child(i+1).position.y),"Relic icons are not arranged left to right")
+	await snapshot("hand_relic_icons")
+	var fixed_position := inventory.global_position
+	var hand_root: Control = cards.hand.get_node("Cards")
+	var original_hand_position := hand_root.position
+	hand_root.position.y += 80
+	await frames()
+	check(inventory.global_position.is_equal_approx(fixed_position),"Moving the hand root moved the independent relic row")
+	hand_root.position = original_hand_position
+	cards.hand.set_stowed(true)
+	cards.hand.finish_animation()
+	await frames()
+	check(inventory.visible and inventory.get_global_rect().end.y < render_viewport.size.y,"Combat stowing hid relics or moved them below the screen")
+	check(inventory.global_position.is_equal_approx(fixed_position),"Stowing the hand moved the relic row")
+	cards.hand.set_stowed(false)
+	cards.hand.finish_animation()
+	await frames()
 	var weak: WeakRef = weakref(session.get_node("TowerMap").relics)
 	session.queue_free()
 	await frames()

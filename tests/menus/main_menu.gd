@@ -38,6 +38,9 @@ func click(button: Control, settle_transition := true) -> void:
 		await frames(2)
 
 func verify() -> void:
+	var progress: Node = root.get_node("LevelProgress")
+	progress.load_progress(Artifacts.path("menus/main_menu_completed.cfg"))
+	progress._completed.clear()
 	transition = root.get_node("ScreenTransition")
 	transition.covered.connect(func():
 		var image := root.get_texture().get_image()
@@ -89,6 +92,9 @@ func verify() -> void:
 	await transition.finished
 	await frames(2)
 	var selection: Control = menu.map_selection
+	check(selection.maps[0].id == "tutorial" and selection.selected == 0,"Tutorial is not the first selected level")
+	progress.mark_completed("tutorial")
+	await click(selection.next_button)
 	var preview: Node3D = menu.map_previews.get_child(0)
 	var definition: MenuMapDefinition = preview.definition
 	check(current_scene == menu and selection.visible and menu._selecting and not menu.home.visible and not bridge.visible, "Start should open selection without starting gameplay")
@@ -251,14 +257,14 @@ func verify() -> void:
 	check(hud.settings_page.visible and level.get_node("Camera3D")._navigation_locked, "In-game settings no longer work after entering from the menu")
 	hud.settings_page.close()
 	hud.set_paused(false)
-	# Return from a real paused 4x battle, keeping simulation frozen until covered.
+	# Return from a real paused 3x battle, keeping simulation frozen until covered.
 	level._on_start_requested()
 	level._process(1.5)
 	var wave: Node = level.get_node("EnemyWave")
 	wave._process(0.0)
 	hud.cycle_speed()
 	hud.cycle_speed()
-	check(wave.active and hud.speed_index == 2, "Return-home fixture is not an active 4x battle")
+	check(wave.active and hud.speed_index == 2, "Return-home fixture is not an active 3x battle")
 	hud.set_paused(true)
 	check(hud.home_button.text == "Back to main menu", "Pause action was not renamed")
 	await create_timer(0.4, true, false, true).timeout
@@ -287,6 +293,7 @@ func verify() -> void:
 	check(root.msaa_3d == Viewport.MSAA_4X and TranslationServer.get_locale().begins_with("en"), "Returning home discarded user settings")
 	var fresh_menu: Node3D = current_scene
 	await click(fresh_menu.start_button)
+	await click(fresh_menu.map_selection.next_button)
 	await click(fresh_menu.map_selection.start_button)
 	check(fresh_menu.map_selection.get_run_options() == {"difficulty": "standard", "starting_hand": "random", "extra_events": false}, "New menu retained the previous run's prototype choices")
 	await click(fresh_menu.map_selection.start_button)

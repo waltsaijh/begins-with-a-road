@@ -17,21 +17,27 @@
 
 升級不呼叫道路提交、障礙物更新或導航重建，不改原塔 transform、下一次攻擊時間、接戰目標、友軍數量或復活計時。塔與友軍保存目前血量比例。攻擊 Resource、友軍設定及冷卻均屬實例，不寫回共享資源。
 
-世界預覽以目標原塔與原朝向呈現綠／紅 hologram、有效攻擊格與 `Lv.n → Lv.n+1`；不顯示卡牌道路、不顯示旋轉提示。失敗保留牌，成功顯示短暫等級回饋。一般 Hover 才顯示塔名／等級。
+世界預覽以目標原塔與原朝向呈現綠／紅 hologram、有效攻擊格與 `Lv.n → Lv.n+1`；不顯示卡牌道路、不顯示旋轉提示。失敗保留牌，成功顯示短暫等級回饋。一般 Hover 才顯示塔名／等級；共用螢幕對話框位於 `scenes/towers/components/tower_hover.tscn`，塔名靠左、Lv.n 靠右，與「開始下一波」統一使用 Noto Sans TC Light、16px 青灰色文字（Color(0.2,0.36,0.38)）、不加描邊，欄間 12px，框寬依名稱與等級所需尺寸貼合，不保留固定最小寬。框體與開波提示共用 `scenes/interface/components/speech_bubble_frame.tscn` 的淡色底、青灰邊框、切角與下方尖角，左右內距 12px、上下內距 8px。尖角以相機投影維持在塔上方，字體與框體不隨鏡頭縮放改變，所有控制項不攔截滑鼠；投影位置在相機後方或完全離開畫面時隱藏。升級後的短暫回饋沿用相同樣式與定位，只共用一個臨時實例。根節點為 CanvasLayer 7，TowerHover 子節點的顯示層級高於開波提示的 LevelHUD Layer 6；重疊時塔提示在上層。TowerHover 使用 Always 處理並在遊戲暫停或 TowerMap 停用時立即隱藏，避免暫停後留下較高層的提示。
 
 ## 資料與流程
 
-`assets/data/relics/` 包含 17 專屬、4 通用及 catalog；RelicDefinition 保存 ID、雙語名稱／描述 key、圖示、TowerDefinition 適用身分、參數與重複限制。所有專屬 `repeatable=false / max_stacks=1`。
+已持有圖示使用 `scenes/relics/relic_inventory.tscn`，獨立掛在 RelicChoice CanvasLayer，單項為 `components/relic_inventory_item.tscn`；不與 Hand/Cards 建立節點或定位依賴。28×28px 圖示由左至右依取得順序排列，間距 6px，每份遺物各一個，最新取得的在最右方，通用重複份數不合併。Screen Margin 預設左距 16px、列底距畫面底部 216px，只隨 viewport 尺寸維持固定留白；卡牌 hover、選取、數量、收合、上下動畫與空手皆不影響圖示位置。管理器 changed 事件更新純顯示的取得順序與 tooltip，不修改持有量、效果或 RNG；手動移除後同步縮短，暫停與三選一時隱藏。專屬圖示使用塔卡相同的 alpha mask／加深色，通用保留原 SVG 顏色。名稱與說明由 hover tooltip 提供，移除舊收藏面板及其與敵軍情報的互斥依賴。
+
+`assets/data/relics/` 包含 17 專屬、4 通用及 catalog；RelicDefinition 保存 ID、雙語名稱／描述 key、圖示、TowerDefinition 適用身分、參數與重複限制。17 件專屬的 icon 各自引用 `assets/sprites/relics/<id>.png`，4 件通用保留同目錄的 SVG。所有專屬 `repeatable=false / max_stacks=1`。
 
 TowerMap 持有 `RunRelics`，其持有數及 RNG 只屬當局。建造／移除更新鄰塔支援與孤立條件，取得遺物立即重新計算現有塔；後建塔在提交後接上相同效果。重開、離場會整體釋放，不存在 Autoload 持有狀態或修改塔 Resource 的殘留。
 
-三選一卡面與圖示共用配色：專屬以對應 TowerDefinition.accent_color 為主色，塔圖示沿用手牌的 alpha mask shader 與 45% 加深色；通用保留 SVG 原色，以 RelicDefinition.accent_color（預設圖示灰綠 #798c86）提供卡面主色。底色採淡色混合、邊框與標題使用較深同色系，hover／pressed 加深底色，disabled 的短暫選中回饋也保留該色系。每張卡複製自己的 StyleBox，保留共用範本的形狀／尺寸，避免三張互相覆寫。
+三選一卡面與圖示共用配色：專屬以對應 TowerDefinition.accent_color 為主色，專屬圖示沿用手牌的 alpha mask shader 與 45% 加深色；通用保留 SVG 原色，以 RelicDefinition.accent_color（預設圖示灰綠 #798c86）提供卡面主色。底色採淡色混合、邊框與標題使用較深同色系，hover／pressed 加深底色，disabled 的短暫選中回饋也保留該色系。每張卡複製自己的 StyleBox，保留共用範本的形狀／尺寸，避免三張互相覆寫。
 
 CombatSystem 沿用共用索引及飛行紀錄，`relic_combat.gd` 只處理巡航、齊射、處決等需要時間狀態的機制。AttackPayload 快照本次傷害、目標體型倍率、冰霜與擊退；命中時仍能獨立於來源塔執行。兵營沿用 FriendlySoldier／BarracksSystem，沒有 17 套塔腳本。
 
-每個 ACT 完成後先等既有砲彈結束，鎖住建造／商店／開波，再三選一。選擇立即取得效果並短暫標示選中卡，之後才進入 ACT 擴張；最後 ACT 選完後結束開波。暫停保留選擇狀態，頂部暫停仍可操作；左上可查看收藏。正式 Frontier 維持三 ACT、每 ACT 三波。
+每個 ACT 完成後先等既有砲彈結束，鎖住建造／商店／開波，再三選一。選擇立即取得效果並短暫標示選中卡，之後才進入 ACT 擴張；最後 ACT 選完後結束開波。暫停保留選擇狀態，頂部暫停仍可操作；已取得遺物以獨立橫向圖示列固定於左下手牌附近，最新取得的一份加在最右方；不再提供左側「本局遺物」按鈕及收藏面板。正式 Frontier 維持三 ACT、每 ACT 三波。
 
 ## 獎勵池
+
+Debug 版本在卡列下方提供「重新隨機抽選（Debug）」按鈕；release 不顯示，`debug_reroll()` 亦拒絕執行。僅於選擇中、未暫停及未提交時呼叫原 `RunRelics.options()`，更新三張卡而不扣款、不取得遺物、不推進 ACT 或改變鎖定。原通用／弱關聯／隨機槽、唯一性與上限仍適用，與上一輪可能部分重複；候選池耗盡保留目前畫面。選取後立即停用，避免回饋的 0.25 秒內重抽。
+
+三選一介面由 `relic_choice.tscn` 保存：Modal/Backdrop 覆蓋完整 viewport，包含頂部 HUD，使用原深色 70% 透明度；Backdrop 忽略滑鼠，獨立 Blocker 從頂部 80px 下方開始攔截背景，保留頂部暫停點擊。Center 對整個畫面置中，標題 24px、與卡列間距 20px。單張 `relic_card.tscn` 為 184×272px，略大於 144×208px 手牌，三張間距 20px；內距 16px、圖示區 64×64px、名稱 18px、說明 14px、內容間距 12px，維持完整文字換行與原配色／選取流程。
 
 1. 通用槽從未到持有上限的通用遺物等機率抽取。
 2. 弱關聯槽從場上存在塔種的可取得專屬抽取，每件權重為 `weak_base_weight + weak_count_weight * sqrt(count)`，預設 `1 + 0.25√count`。一座權重 1.25，六座約 1.612，不是六倍。兵營的兩件與其他塔的三件都各自是候選項。
@@ -82,6 +88,6 @@ CombatSystem 沿用共用索引及飛行紀錄，`relic_combat.gd` 只處理巡�
 
 ## 驗證與限制
 
-測試入口及人工步驟見 [驗收說明](../tests/relics/README.md)。Phase 3 歷史驗收在 `.godot/test-results/relics/acceptance.md`；後續回歸以各次 log／完成標記及 HANDOFF 的日期為準，不視為永久通過承諾。MVP 未做長局平衡、極限塔量效能或 Web 瀏覽器驗收；專屬圖示目前沿用塔種圖示。所有 17 件機制均有實作，沒有以純數值替代巡航、處決、貫穿、擊退或遠程友軍。
+測試入口及人工步驟見 [驗收說明](../tests/relics/README.md)。Phase 3 歷史驗收在 `.godot/test-results/relics/acceptance.md`；後續回歸以各次 log／完成標記及 HANDOFF 的日期為準，不視為永久通過承諾。MVP 未做長局平衡、極限塔量效能或 Web 瀏覽器驗收；專屬圖示已改為各遺物自己的 PNG。所有 17 件機制均有實作，沒有以純數值替代巡航、處決、貫穿、擊退或遠程友軍。
 
 獨立 playground 右上提供可收合的「自由增添／移除遺物」面板，不需要先完成 ACT。點名稱展開同一 viewport 內可捲動的 21 項清單，不使用原生 PopupMenu；選取後可查看效果、持有數／上限，透過 RunRelics.acquire／remove 逐份增減。刷新只更新項目文字，不在選取事件中清空重建清單。唯一專屬及通用上限照常生效，移除後可再取得，暫停禁止增減。移除會重新計算現有塔及重刷價格、停止巡航並復位模型、取消未發出的齊射及移除增援第三槽位並釋放接戰；移除主角不降級但恢復上限。已發放金幣、既有命中狀態及在途攻擊快照保留。面板固定於視窗右側，展開清單及移除按鈕在 800×600 亦可完整顯示；補齊缺少的塔牌使用 B 或面板按鈕，只依手牌 TowerDefinition 判斷六種塔中缺少的種類，每種補一張；忽略 TilePreset 差異，原牌及重複牌保留，齊全時不加牌，按住不連續觸發，暫停禁止補牌；F8 保留給 Godot 的停止執行。正式關卡不載入此工具。

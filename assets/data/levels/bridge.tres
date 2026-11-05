@@ -23,7 +23,7 @@ metadata/_custom_type_script = "uid://cfka2isrnffdy"
 [resource]
 script = ExtResource("2_nllan")
 level_id = "bridge"
-required_to_complete_levels = PackedStringArray("frontier")
+required_to_complete_levels = PackedStringArray("tutorial", "frontier")
 terrain = ExtResource("5_gv56x")
 acts = Array[ExtResource("1_fn762")]([SubResource("Resource_pntgv")])
 metadata/_custom_type_script = "uid://4q4c3cox24l5"

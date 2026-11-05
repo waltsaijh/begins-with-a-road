@@ -9,7 +9,7 @@ var _settings_camera: Camera3D
 var _settings_veil_motion: Tween
 var _pause_veil_alpha := 0.0
 var _returning_home := false
-const SPEEDS := [1.0, 2.0, 4.0]
+const SPEEDS := [1.0, 2.0, 3.0]
 const StartCallout = preload("res://scenes/levels/components/start_wave_callout.tscn")
 var start_callouts: Array[Button] = []
 var start_markers: Array[Node3D] = []
@@ -17,7 +17,7 @@ const PauseIcon = preload("res://assets/sprites/interface/pause.png")
 const SPEED_ICONS: Array[Texture2D] = [
 	preload("res://assets/sprites/interface/speed_1x.png"),
 	preload("res://assets/sprites/interface/speed_2x.png"),
-	preload("res://assets/sprites/interface/speed_4x.png"),
+	preload("res://assets/sprites/interface/speed_4x.png"), # Three-chevron third preset.
 ]
 var speed_index := 0
 var _start_was_disabled := false
@@ -166,11 +166,10 @@ func _position_one_callout(action: Button, marker: Node3D, camera: Camera3D, vie
 	var point := camera.unproject_position(anchor)
 	var rest := point-Vector2(action.size.x*0.5, action.size.y+start_anchor_gap)
 	var tower := camera.unproject_position(marker.global_position+Vector3.UP*start_collapse_height)
-	var hover: float = action.get("hover_amount")
-	var center := tower.lerp(rest+action.size*0.5, _callout_reveal)-Vector2(0, hover*2.0)
+	var center := tower.lerp(rest+action.size*0.5, _callout_reveal)
 	action.pivot_offset = action.size*0.5
 	action.position = center-action.size*0.5
-	action.scale = Vector2.ONE*maxf(0.001, _callout_reveal)*lerpf(1.0, 1.035, hover)
+	action.scale = Vector2.ONE*maxf(0.001, _callout_reveal)
 	action.modulate.a = minf(1.0, _callout_reveal*2.0)
 	# Each entrance independently follows/clips against the moving camera.
 	action.visible = viewport.get_visible_rect().intersects(action.get_global_rect())
@@ -181,7 +180,9 @@ func _notification(what: int) -> void:
 func _update_labels() -> void:
 	speed_button.text = ""
 	speed_button.icon = SPEED_ICONS[speed_index]
+	speed_button.tooltip_text = "%dx · Tab" % int(SPEEDS[speed_index])
 	pause_button.icon = PauseIcon
+	pause_button.tooltip_text = "Esc"
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
 	settings_button.text = tr("ui.pause.settings")
@@ -238,8 +239,16 @@ func _input(event: InputEvent) -> void:
 	if ScreenTransition.active:
 		get_viewport().set_input_as_handled()
 		return
-	if not pause_requested: return
 	if settings_page.is_visible_in_tree(): return
+	if event is InputEventKey:
+		var shortcut: int = event.physical_keycode if event.physical_keycode else event.keycode
+		if shortcut == KEY_ESCAPE or (shortcut == KEY_TAB and not pause_requested):
+			if event.pressed and not event.echo:
+				if shortcut == KEY_ESCAPE: set_paused(not pause_requested)
+				else: cycle_speed()
+			get_viewport().set_input_as_handled()
+			return
+	if not pause_requested: return
 	var camera := get_viewport().get_camera_3d()
 	if event is InputEventMouse:
 		# Menu input reaches the camera's click/drag arbitration before GUI.
@@ -251,9 +260,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey:
 		var key: int = event.physical_keycode if event.physical_keycode else event.keycode
-		if key == KEY_ESCAPE and event.pressed and not event.echo:
-			set_paused(false)
-		elif key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in _menu_buttons:
+		if key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in _menu_buttons:
 			return
 	elif event is InputEventMouse:
 		# Deliver release events so dragging out of a menu button clears its press.

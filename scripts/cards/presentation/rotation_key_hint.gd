@@ -23,7 +23,7 @@ func follow(camera: Camera3D, anchor: Vector3, delta: float) -> void:
 	if not get_viewport_rect().has_point(point):
 		reset()
 		return
-	# Hover timing stays in real seconds even when combat runs at 2x or 4x.
+	# Hover timing stays in real seconds even when combat runs at 2x or 3x.
 	_elapsed += delta/maxf(Engine.time_scale, 0.001)
 	var progress := clampf((_elapsed-hover_seconds)/reveal_seconds, 0.0, 1.0)
 	var eased := 1.0-pow(1.0-progress, 2.0)

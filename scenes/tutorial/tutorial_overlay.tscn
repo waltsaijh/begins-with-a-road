@@ -1,0 +1,56 @@
+[gd_scene format=3]
+[sub_resource type="StyleBoxFlat" id="paper"]
+bg_color = Color(0.95,0.97,0.95,0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39,0.55,0.55,1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
+[node name="TutorialOverlay" type="CanvasLayer"]
+layer = 8
+process_mode = 3
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 20.0
+offset_top = 176.0
+offset_right = 304.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("paper")
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Rows" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+[node name="Title" type="Label" parent="Panel/Margin/Rows"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+theme_override_font_sizes/font_size = 18
+[node name="Body" type="Label" parent="Panel/Margin/Rows"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+[node name="Progress" type="Label" parent="Panel/Margin/Rows"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+[node name="Return" type="Button" parent="Panel/Margin/Rows"]
+visible = false
+layout_mode = 2
+text = "tutorial.return"
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+theme_override_colors/font_hover_color = Color(0,0,0,1)
+flat = true

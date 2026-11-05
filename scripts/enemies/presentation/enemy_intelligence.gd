@@ -22,8 +22,6 @@ func _ready() -> void:
 func setup(owner_session: Node) -> void:
 	session = owner_session
 	session.preparation_changed.connect(_preparation)
-	session.relic_choice.get_node("Collection").visibility_changed.connect(func():
-		if session.relic_choice.get_node("Collection").visible: panel.hide())
 
 func _preparation(available: bool) -> void:
 	if not available:
@@ -48,7 +46,6 @@ func _preparation(available: bool) -> void:
 func show_profile(profile: Troop) -> void:
 	if profile == null or get_tree().paused: return
 	selected = profile
-	if session != null: session.relic_choice.get_node("Collection").hide()
 	title.text = profile.localized_name()
 	description.text = profile.intelligence_text()
 	description.text += "\n\nHP %s · ×%s" % [str(profile.max_health),str(profile.speed_multiplier)]
@@ -59,4 +56,4 @@ func show_profile(profile: Troop) -> void:
 
 func _process(_delta: float) -> void:
 	$Screen.visible = not get_tree().paused and (session == null or not session.choosing_relic)
-	if session != null: toggle.visible = not profiles.is_empty() and not session.relic_choice.get_node("Collection").visible
+	if session != null: toggle.visible = not profiles.is_empty()

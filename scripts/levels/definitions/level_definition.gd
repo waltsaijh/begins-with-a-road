@@ -11,6 +11,8 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export_group("Gameplay")
 @export var terrain: PackedScene
 @export var acts: Array[ActDefinition] = []
+## Null runs the ordinary level rules without teaching restrictions.
+@export var tutorial: TutorialDefinition
 
 func progress_id() -> String:
 	if not level_id.strip_edges().is_empty(): return level_id.strip_edges()
@@ -36,6 +38,9 @@ func configuration_error() -> String:
 	var terrain_error: String = layout.get("error", "無法讀取地形端點")
 	if not terrain_error.is_empty(): return terrain_error
 	if acts.is_empty(): return "Level needs at least one ACT"
+	if tutorial != null:
+		var tutorial_error := tutorial.configuration_error()
+		if not tutorial_error.is_empty(): return tutorial_error
 	for act in acts:
 		if act == null or act.waves.is_empty(): return "Each ACT needs waves"
 		for wave in act.waves:
