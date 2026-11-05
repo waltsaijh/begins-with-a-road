@@ -11,6 +11,13 @@ const LIGHT := Color("e8dcc0")
 static var cache := {}
 
 static func create(definition: TowerDefinition, body: Array[Vector2i]) -> Node3D:
+	if definition.visual_model != null:
+		var authored := definition.visual_model.instantiate()
+		if authored.has_method("supports_body") and authored.supports_body(definition.footprint if body.is_empty() else body):
+			authored.configure(definition,body)
+			return authored
+		authored.free()
+	if body.is_empty() or definition.deployment != null: return definition.model.instantiate()
 	var ordered := body.duplicate()
 	ordered.sort()
 	var key := str([definition.resource_path,definition.name_key,ordered])

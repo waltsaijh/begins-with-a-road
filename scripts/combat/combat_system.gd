@@ -73,6 +73,7 @@ func _process(delta: float) -> void:
 			continue
 		if BalanceTrace.enabled: BalanceTrace.sample(tower,"has_target",step)
 		var aligned := tower.aim_at(aim_position(target, tower.attack), step)
+		tower.prepare_attack_visual(tower.next_attack_time-elapsed)
 		if elapsed < tower.next_attack_time or not aligned:
 			continue
 		if not tower.attack is VolleyAttack and not tower.covers_cell(_index.cell_for(target.global_position)):

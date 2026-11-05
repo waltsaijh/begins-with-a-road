@@ -66,7 +66,8 @@ func verify() -> void:
 	if tower == null:
 		get_tree().quit(1)
 		return
-	check(tower.get_node("Visual/Base").mesh.get_surface_count() == 1 and tower.get_node("Visual/AimPivot/Weapon").mesh.get_surface_count() == 1, "Tower rigid parts must be baked and shared")
+	var rigid_parts:=tower.get_node("Visual").find_children("*","MeshInstance3D",true,false)
+	check(rigid_parts.size()==2 and rigid_parts.all(func(n):return n.mesh.get_surface_count()==1), "Tower rigid parts must be baked and shared")
 	await ready_map(scene)
 	# Wide-region portal representatives can add distance; keep the current
 	# abstraction, and verify the resulting routes actually avoid the obstacle.

@@ -1,0 +1,38 @@
+{
+  "great_ballista": {
+    "frames": 36,
+    "fps": 12,
+    "preview_seconds": 3.0,
+    "source": "Blender render"
+  },
+  "watchtower": {
+    "frames": 13,
+    "fps": 12,
+    "preview_seconds": 1.0833333333333333,
+    "source": "Blender render"
+  },
+  "barracks": {
+    "frames": 37,
+    "fps": 12,
+    "preview_seconds": 3.0833333333333335,
+    "source": "Blender render"
+  },
+  "mortar": {
+    "frames": 19,
+    "fps": 12,
+    "preview_seconds": 1.5833333333333333,
+    "source": "Blender render"
+  },
+  "crossfire": {
+    "frames": 52,
+    "fps": 12,
+    "preview_seconds": 4.333333333333333,
+    "source": "Blender render"
+  },
+  "broadside_airship": {
+    "frames": 34,
+    "fps": 12,
+    "preview_seconds": 2.8333333333333335,
+    "source": "Blender render"
+  }
+}

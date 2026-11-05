@@ -1,0 +1,62 @@
+{
+  "watchtower": {
+    "triangles": 484,
+    "export_vertices": 828,
+    "mesh_count": 17,
+    "surfaces": 17,
+    "materials": 2,
+    "nodes": 22,
+    "animations": 0,
+    "textures": 0,
+    "external_dependencies": 0,
+    "sha256": "02fa03f680dacee9aa0f532c3d1eb0018a49763066d1a8432c829f27872f17af"
+  },
+  "barracks": {
+    "triangles": 716,
+    "export_vertices": 1176,
+    "mesh_count": 17,
+    "surfaces": 17,
+    "materials": 2,
+    "nodes": 21,
+    "animations": 0,
+    "textures": 0,
+    "external_dependencies": 0,
+    "sha256": "fdfc417022733eb11c3ac35dce863b508e5901e9d9266a19f3cf6fc36ec23fa0"
+  },
+  "mortar": {
+    "triangles": 492,
+    "export_vertices": 792,
+    "mesh_count": 9,
+    "surfaces": 10,
+    "materials": 2,
+    "nodes": 15,
+    "animations": 0,
+    "textures": 0,
+    "external_dependencies": 0,
+    "sha256": "f8c2fd70df5d4d0852679743d5ce7437608e1fc2abcd055e856fc0bca92f1e78"
+  },
+  "crossfire": {
+    "triangles": 612,
+    "export_vertices": 984,
+    "mesh_count": 11,
+    "surfaces": 15,
+    "materials": 2,
+    "nodes": 22,
+    "animations": 0,
+    "textures": 0,
+    "external_dependencies": 0,
+    "sha256": "c4699850314f0141e9ea0e33d16deebca866b155d2c6c42bb6e4daf791b0e795"
+  },
+  "broadside_airship": {
+    "triangles": 936,
+    "export_vertices": 1566,
+    "mesh_count": 21,
+    "surfaces": 27,
+    "materials": 2,
+    "nodes": 34,
+    "animations": 0,
+    "textures": 0,
+    "external_dependencies": 0,
+    "sha256": "7e62dcf6ec5706d72ef8dcdddae7e09e6a6b1d87f9fcbb4bb8601f392e693dc0"
+  }
+}

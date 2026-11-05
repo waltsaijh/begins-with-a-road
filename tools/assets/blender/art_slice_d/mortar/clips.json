@@ -1,0 +1,9 @@
+{
+  "fire": {
+    "frames": 37,
+    "actions": {
+      "BWAR_D_mortar__RecoilAssembly": "BWAR_D_mortar__fire__RecoilAssembly",
+      "BWAR_D_mortar__Suspension": "BWAR_D_mortar__fire__Suspension"
+    }
+  }
+}

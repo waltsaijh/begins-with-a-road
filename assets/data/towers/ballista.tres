@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://c6qnwdotfkw8i"]
 
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/ballista.tscn" id="art_slice_e"]
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/ballista.tres" id="1_37xr8"]
 [ext_resource type="Resource" path="res://assets/data/towers/ranges/ballista.tres" id="2_guvrq"]
 [ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="3_37xr8"]
@@ -28,6 +29,7 @@ preset_path = "res://assets/data/tile_presets/ballista_04.tres"
 
 [resource]
 script = ExtResource("5_1kgwr")
+visual_model = ExtResource("art_slice_e")
 name_key = "tower.ballista.name"
 preset_group = "base"
 model = ExtResource("4_57dd7")

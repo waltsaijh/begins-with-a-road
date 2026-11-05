@@ -151,13 +151,15 @@ func _ready() -> void:
 	attack = definition.attack.duplicate(true) if definition.attack != null else null
 	deployment = definition.deployment.duplicate(true) if definition.deployment != null else null
 	if definition.model != null:
-		_visual = preload("res://scripts/towers/body_visual.gd").create(definition,body_cells()) if not body_cells().is_empty() and definition.deployment == null else definition.model.instantiate()
+		_visual = preload("res://scripts/towers/body_visual.gd").create(definition,body_cells())
 		_visual.name = "Visual"
 		add_child(_visual)
 		if placement_preset != null: _visual.position += placement_preset.model_offset
-		if not definition.aim_pivot_path.is_empty():
+		if _visual.has_method("aim_pivot"):
+			_aim_pivot = _visual.aim_pivot()
+		elif not definition.aim_pivot_path.is_empty():
 			_aim_pivot = _visual.get_node(definition.aim_pivot_path) as Node3D
-		if not definition.muzzle_path.is_empty():
+		if not _visual.has_method("muzzle_position") and not definition.muzzle_path.is_empty():
 			_muzzle = _visual.get_node(definition.muzzle_path) as Marker3D
 	# The complete footprint already has a flush foundation in TileVisuals.
 
@@ -272,6 +274,12 @@ func aim_at(target: Vector3, delta: float) -> bool:
 func prepare_shot(target: Node3D) -> void:
 	if _visual != null and _visual.has_method("prepare_target"): _visual.prepare_target(target)
 
+func prepare_attack_visual(remaining: float) -> void:
+	if _visual != null and _visual.has_method("wind_up"): _visual.wind_up(remaining,attack_interval)
+
+func present_deployment() -> void:
+	if _visual != null and _visual.has_method("deploy"): _visual.deploy()
+
 ## Query only: firing must never rotate the model or bypass smooth aiming.
 func muzzle_position() -> Vector3:
 	if _visual != null and _visual.has_method("muzzle_position"): return _visual.muzzle_position()
@@ -281,7 +289,9 @@ func muzzle_position() -> Vector3:
 	return origin.to_global(definition.muzzle_offset if definition != null else TowerConstants.MUZZLE_OFFSET)
 
 func present_shot(target: Node3D,effects: Node = null) -> void:
-	if _visual != null and _visual.has_method("fire"): _visual.fire(target,effects)
+	if _visual == null: return
+	if _visual.has_method("fire_event"): _visual.fire_event(target,effects,attack_interval)
+	elif _visual.has_method("fire"): _visual.fire(target,effects)
 
 func take_damage(amount: float) -> void:
 	if is_queued_for_deletion() or health <= 0 or not is_finite(amount) or amount <= 0:

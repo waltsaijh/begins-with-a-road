@@ -22,6 +22,11 @@ __pycache__/
 *.py[cod]
 node_modules/
 
+# Rebuildable Blender delivery archives and automatic save backups.
+/tools/assets/blender/*.zip
+/tools/assets/blender/**/*.blend[0-9]*
+/tools/assets/blender/**/.godot/
+
 # Local credentials; sample configuration may be committed.
 .env
 .env.*

@@ -1,0 +1,66 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_00.res" id="1_giu1e"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_01.res" id="2_w4dyl"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/integrated/barracks_part_02.res" id="3_opvdn"]
+
+[sub_resource type="Animation" id="Animation_gq14x"]
+resource_name = "open_close"
+length = 3.0
+step = 0.041666668
+tracks/0/type = "rotation_3d"
+tracks/0/imported = true
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_D_barracks__Model/BWAR_D_barracks__DoorLeft")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.25, 1, 0, 0, 0, 1, 0.29166666, 1, 0, 0.00803627, 0, 0.9999677, 0.33333334, 1, 0, 0.030742949, 0, 0.99952734, 0.375, 1, 0, 0.065989874, 0, 0.9978203, 0.41666666, 1, 0, 0.11157734, 0, 0.99375576, 0.45833334, 1, 0, 0.1652073, 0, 0.98625886, 0.5, 1, 0, 0.22448602, 0, 0.9744774, 0.5416667, 1, 0, 0.2869638, 0, 0.9579415, 0.625, 1, 0, 0.41189185, 0, 0.9112328, 0.6666667, 1, 0, 0.46989295, 0, 0.88272345, 0.7083333, 1, 0, 0.5223605, 0, 0.8527248, 0.75, 1, 0, 0.567754, 0, 0.8231983, 0.7916667, 1, 0, 0.6048258, 0, 0.7963578, 0.8333333, 1, 0, 0.6325469, 0, 0.77452207, 0.875, 1, 0, 0.64997286, 0, 0.75995743, 0.9166667, 1, 0, 0.65605915, 0, 0.75470954, 1.75, 1, 0, 0.65605915, 0, 0.75470954, 1.7916666, 1, 0, 0.65280706, 0, 0.75752425, 1.8333334, 1, 0, 0.64339006, 0, 0.7655385, 1.875, 1, 0, 0.62824476, 0, 0.7780158, 1.9166666, 1, 0, 0.6077466, 0, 0.79413104, 1.9583334, 1, 0, 0.5822552, 0, 0.8130061, 2, 1, 0, 0.55215025, 0, 0.83374465, 2.0416667, 1, 0, 0.51786226, 0, 0.85546404, 2.0833333, 1, 0, 0.47989345, 0, 0.8773268, 2.125, 1, 0, 0.4388308, 0, 0.8985697, 2.1666667, 1, 0, 0.39534917, 0, 0.91853094, 2.25, 1, 0, 0.30423674, 0, 0.9525965, 2.2916667, 1, 0, 0.25832507, 0, 0.9660581, 2.3333333, 1, 0, 0.2133981, 0, 0.9769653, 2.375, 1, 0, 0.17039943, 0, 0.9853751, 2.4166667, 1, 0, 0.13027267, 0, 0.9914782, 2.4583333, 1, 0, 0.09394643, 0, 0.9955773, 2.5, 1, 0, 0.06232462, 0, 0.99805593, 2.5416667, 1, 0, 0.036282044, 0, 0.9993416, 2.5833333, 1, 0, 0.016665746, 0, 0.9998611, 2.625, 1, 0, 0.004301025, 0, 0.99999076, 2.6666667, 1, 0, 0, 0, 1, 3, 1, 0, 0, 0, 1)
+tracks/1/type = "rotation_3d"
+tracks/1/imported = true
+tracks/1/enabled = true
+tracks/1/path = NodePath("BWAR_D_barracks__Model/BWAR_D_barracks__DoorRight")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1, 0.25, 1, 0, 0, 0, 1, 0.29166666, 1, 0, -0.00803627, 0, 0.9999677, 0.33333334, 1, 0, -0.030742949, 0, 0.99952734, 0.375, 1, 0, -0.065989874, 0, 0.9978203, 0.41666666, 1, 0, -0.11157734, 0, 0.99375576, 0.45833334, 1, 0, -0.1652073, 0, 0.98625886, 0.5, 1, 0, -0.22448602, 0, 0.9744774, 0.5416667, 1, 0, -0.2869638, 0, 0.9579415, 0.625, 1, 0, -0.41189185, 0, 0.9112328, 0.6666667, 1, 0, -0.46989295, 0, 0.88272345, 0.7083333, 1, 0, -0.5223605, 0, 0.8527248, 0.75, 1, 0, -0.567754, 0, 0.8231983, 0.7916667, 1, 0, -0.6048258, 0, 0.7963578, 0.8333333, 1, 0, -0.6325469, 0, 0.77452207, 0.875, 1, 0, -0.64997286, 0, 0.75995743, 0.9166667, 1, 0, -0.65605915, 0, 0.75470954, 1.75, 1, 0, -0.65605915, 0, 0.75470954, 1.7916666, 1, 0, -0.65280706, 0, 0.75752425, 1.8333334, 1, 0, -0.64339006, 0, 0.7655385, 1.875, 1, 0, -0.62824476, 0, 0.7780158, 1.9166666, 1, 0, -0.6077466, 0, 0.79413104, 1.9583334, 1, 0, -0.5822552, 0, 0.8130061, 2, 1, 0, -0.55215025, 0, 0.83374465, 2.0416667, 1, 0, -0.51786226, 0, 0.85546404, 2.0833333, 1, 0, -0.47989345, 0, 0.8773268, 2.125, 1, 0, -0.4388308, 0, 0.8985697, 2.1666667, 1, 0, -0.39534917, 0, 0.91853094, 2.25, 1, 0, -0.30423674, 0, 0.9525965, 2.2916667, 1, 0, -0.25832507, 0, 0.9660581, 2.3333333, 1, 0, -0.2133981, 0, 0.9769653, 2.375, 1, 0, -0.17039943, 0, 0.9853751, 2.4166667, 1, 0, -0.13027267, 0, 0.9914782, 2.4583333, 1, 0, -0.09394643, 0, 0.9955773, 2.5, 1, 0, -0.06232462, 0, 0.99805593, 2.5416667, 1, 0, -0.036282044, 0, 0.9993416, 2.5833333, 1, 0, -0.016665746, 0, 0.9998611, 2.625, 1, 0, -0.004301025, 0, 0.99999076, 2.6666667, 1, 0, 0, 0, 1, 3, 1, 0, 0, 0, 1)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ow4vd"]
+_data = {
+&"open_close": SubResource("Animation_gq14x")
+}
+
+[node name="BWAR_D_barracks" type="Node3D" unique_id=738331701]
+
+[node name="BWAR_D_barracks__Model" type="Node3D" parent="." unique_id=363528646]
+metadata/extras = {
+"anchor": "(0,0,0)",
+"animation": "none",
+"art_slice_only": true,
+"footprint_godot": "[[0, 0]]",
+"forward_godot": "-Z"
+}
+
+[node name="BWAR_D_barracks__DoorLeft" type="Node3D" parent="BWAR_D_barracks__Model" unique_id=962924030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.135, 0.35, -0.235)
+
+[node name="BWAR_D_barracks__DoorLeaf-1" type="MeshInstance3D" parent="BWAR_D_barracks__Model/BWAR_D_barracks__DoorLeft" unique_id=355333523]
+mesh = ExtResource("1_giu1e")
+
+[node name="BWAR_D_barracks__DoorRight" type="Node3D" parent="BWAR_D_barracks__Model" unique_id=150723057]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.135, 0.35, -0.235)
+
+[node name="BWAR_D_barracks__DoorLeaf1" type="MeshInstance3D" parent="BWAR_D_barracks__Model/BWAR_D_barracks__DoorRight" unique_id=399770765]
+mesh = ExtResource("2_w4dyl")
+
+[node name="BWAR_D_barracks__FixedBase" type="Node3D" parent="BWAR_D_barracks__Model" unique_id=2117240052]
+
+[node name="BWAR_D_barracks__DeploymentExit" type="Node3D" parent="BWAR_D_barracks__Model/BWAR_D_barracks__FixedBase" unique_id=1878038466]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, -0.46)
+
+[node name="BWAR_D_barracks__UpgradeSocket" type="Node3D" parent="BWAR_D_barracks__Model/BWAR_D_barracks__FixedBase" unique_id=954834118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_D_barracks__Model/BWAR_D_barracks__FixedBase" unique_id=1163465039]
+mesh = ExtResource("3_opvdn")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1240317861]
+libraries/ = SubResource("AnimationLibrary_ow4vd")

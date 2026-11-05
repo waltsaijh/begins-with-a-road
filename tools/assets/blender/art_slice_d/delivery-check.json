@@ -1,0 +1,72 @@
+{
+  "great_ballista": {
+    "clips": [
+      "attack"
+    ],
+    "materials": 4,
+    "meshes": 46,
+    "surfaces": 46,
+    "glb_sha256": "741174d4f1a51f58322c4dea492f971d009b3d468474b861b6bfb466503872ae",
+    "apng_crc_sequence_pass": true,
+    "frames": 36
+  },
+  "watchtower": {
+    "clips": [
+      "fire"
+    ],
+    "materials": 3,
+    "meshes": 17,
+    "surfaces": 17,
+    "glb_sha256": "135da4c5e40f94ba9162a85e103e360764094ef95d753e53681fe0383ea77dfa",
+    "apng_crc_sequence_pass": true,
+    "frames": 13
+  },
+  "barracks": {
+    "clips": [
+      "open_close"
+    ],
+    "materials": 4,
+    "meshes": 19,
+    "surfaces": 19,
+    "glb_sha256": "20b1a6985b5c1ef7ecb448b94fdee72b1f0d35a5a375f1da1f5cb1b5a0662dbd",
+    "apng_crc_sequence_pass": true,
+    "frames": 37
+  },
+  "mortar": {
+    "clips": [
+      "fire"
+    ],
+    "materials": 3,
+    "meshes": 9,
+    "surfaces": 10,
+    "glb_sha256": "bc1d9b91a6e96265d1c717350901a26393d852a7395f9587f0c51150de766bc3",
+    "apng_crc_sequence_pass": true,
+    "frames": 19
+  },
+  "crossfire": {
+    "clips": [
+      "fire_north",
+      "fire_east",
+      "fire_south",
+      "fire_west"
+    ],
+    "materials": 3,
+    "meshes": 11,
+    "surfaces": 15,
+    "glb_sha256": "b4177ded5c598526631cd5f64d225f24ed10419b0f39e124beada19f86730f97",
+    "apng_crc_sequence_pass": true,
+    "frames": 52
+  },
+  "broadside_airship": {
+    "clips": [
+      "fire_port",
+      "fire_starboard"
+    ],
+    "materials": 3,
+    "meshes": 21,
+    "surfaces": 27,
+    "glb_sha256": "a657c37f0ad2ea78d5fdae5c76ccc899f9c8facf1932d8cbb8119f4f751336fc",
+    "apng_crc_sequence_pass": true,
+    "frames": 34
+  }
+}

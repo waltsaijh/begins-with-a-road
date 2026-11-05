@@ -1,0 +1,18 @@
+{
+  "fire_port": {
+    "frames": 33,
+    "actions": {
+      "BWAR_D_broadside_airship__PortGun1": "BWAR_D_broadside_airship__fire_port__PortGun1",
+      "BWAR_D_broadside_airship__PortGun2": "BWAR_D_broadside_airship__fire_port__PortGun2",
+      "BWAR_D_broadside_airship__PortGun3": "BWAR_D_broadside_airship__fire_port__PortGun3"
+    }
+  },
+  "fire_starboard": {
+    "frames": 33,
+    "actions": {
+      "BWAR_D_broadside_airship__StarboardGun1": "BWAR_D_broadside_airship__fire_starboard__StarboardGun1",
+      "BWAR_D_broadside_airship__StarboardGun2": "BWAR_D_broadside_airship__fire_starboard__StarboardGun2",
+      "BWAR_D_broadside_airship__StarboardGun3": "BWAR_D_broadside_airship__fire_starboard__StarboardGun3"
+    }
+  }
+}
