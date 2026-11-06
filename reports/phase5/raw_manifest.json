@@ -1,0 +1,3377 @@
+[
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_approach_heavy_11.jsonl",
+    "sha256": "b64218719b11def2e012564ab377efcebe2a6ebc6882fe8032106a39e9944ab5",
+    "bytes": 20145
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "d1d71249401a81c6a7cd134daf2da0a8769966786ddc995a031215c19c620bcf",
+    "bytes": 25361
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_approach_soldier_11.jsonl",
+    "sha256": "0ee126f7b8061de7f2476531e5896b39a582a762148957de69b62a922bf5fc75",
+    "bytes": 18454
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "189cbef5de79a88c014b3c166876a8000b0b855336ce17189300262bb9496663",
+    "bytes": 18040
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_away_heavy_11.jsonl",
+    "sha256": "a8219cccc09dfeb165dbb0e7bb690329302e415249b07082c5ad2841b631a1e1",
+    "bytes": 9242
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "1798a9076bd32268411f97a4b40d1b45580f8a0bbf07232f644c2aac79faf189",
+    "bytes": 19940
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_away_soldier_11.jsonl",
+    "sha256": "f1ea77c975384e4b9176badb1752b2982be14ccc7003f4262e3f6844759eae4c",
+    "bytes": 9370
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_away_winged_beast_11.jsonl",
+    "sha256": "6bd17e7f6ceba46ea2d1c649686685d0e829e6964092e5421faa348a87095baf",
+    "bytes": 9683
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_parallel_heavy_11.jsonl",
+    "sha256": "def0bebe9086af312f4be8c8e556df102bcf220402316fe1cea10fbdb7c9dacc",
+    "bytes": 17179
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "3b71208e75c50b4a05cb711a29fd48326091017b09adcba262aea0d4543c2ee3",
+    "bytes": 24060
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_parallel_soldier_11.jsonl",
+    "sha256": "c7fea3c86ee31d458fa8859d64029fcffed280c6ac675841ec3d7ddb012f8c62",
+    "bytes": 17372
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "5321d4770f08e12996304ea11b3bf750435f5443bee0412fa82525ac56b97c43",
+    "bytes": 17938
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_approach_heavy_11.jsonl",
+    "sha256": "32acde02541112821d0ad356a26e81970804b605cbca427e651b1b09b24df1c8",
+    "bytes": 40279
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "2c0d85198fce1ed3a6629a0d1481ab283cab55a6183cb7f403b5212bc4f80ab5",
+    "bytes": 27347
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_approach_soldier_11.jsonl",
+    "sha256": "4e345b52e165fbca04bb6671a06a7d71f0d0be38ddf0507fc61a37fbb93edbc4",
+    "bytes": 15951
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "d88e3c09c91b5d31815e1c18f4486828f7f00a7939d3b7e85ff63298233f77c2",
+    "bytes": 9825
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_away_heavy_11.jsonl",
+    "sha256": "d73179b78b65af2daccc21a6edddbff373722f3be85a9d328ed4c6081ef69cb5",
+    "bytes": 39375
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "0a7b0aad9a46ce68d5295e9235d737562a35abad582df8eb067d1d5fb2179f01",
+    "bytes": 26795
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_away_soldier_11.jsonl",
+    "sha256": "a800b712e5bedaee9f383b16adc0aeed056e22ae29502c2d522d10c724bd72ca",
+    "bytes": 15607
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_away_winged_beast_11.jsonl",
+    "sha256": "492be76e73e8853669da2ada637c623481e70af758d8635f2379a4c2c1a2df18",
+    "bytes": 9625
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_parallel_heavy_11.jsonl",
+    "sha256": "94ae1253415f285db947b1c69d5db6613e44085449cc7fba9fc08a02a1664c3f",
+    "bytes": 40264
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "e70d4dcc76234a81a0e734b52f34f739c2d747bf7b5eeb2742678214b5834606",
+    "bytes": 27056
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_parallel_soldier_11.jsonl",
+    "sha256": "66b06782e65843dd83c8aec7aafd343ecd487dc179858b87b0715d8291ea4bb7",
+    "bytes": 15845
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "98398fb71c2ef438182f7d73bb58fdab66d69f36ec1f6755fa4855e071bcb016",
+    "bytes": 9698
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_approach_heavy_11.jsonl",
+    "sha256": "9021da1d1cfb9d01609c705f866f633827addbdb04f1df01cece4fcf303c14a7",
+    "bytes": 23216
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "db8f7de7a457bfee395570776932ff255c9532a14c58a001c968fbb5911ab397",
+    "bytes": 27476
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_approach_soldier_11.jsonl",
+    "sha256": "8440b6fe034c52a35ad834822bd3269b180d8eb308758ed27910e4d136d28f3a",
+    "bytes": 21510
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "48eb109b2ac21f254d88fd518cef4e149dec0094d68c7bf8084a230b2cba4443",
+    "bytes": 18132
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_away_heavy_11.jsonl",
+    "sha256": "af22a389f26b1d174d2877154c504795368afee8481c3933fef5248b4bad79ef",
+    "bytes": 9294
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "c74e604255d12991f0ab495749be94408fcc345ef97647d51e2bca59f1b589dc",
+    "bytes": 20040
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_away_soldier_11.jsonl",
+    "sha256": "89bd2cfce98be5b04e90bdec1ebbdbc8c09af2253493296093cbf475e05996b0",
+    "bytes": 9422
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_away_winged_beast_11.jsonl",
+    "sha256": "565f9c8b326adcc55330e942be2bea1d6ef96ffad714b1f1587030fb53d2307b",
+    "bytes": 9735
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_parallel_heavy_11.jsonl",
+    "sha256": "25bb5ca3dc5c7f93610e8dee17c8c83dc338d810891effad404cda429402b214",
+    "bytes": 17271
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "8aa0c98215633814b5e7c0fe391f8ad736c53069ec0e6d8c1cfc4b8625100668",
+    "bytes": 26186
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_parallel_soldier_11.jsonl",
+    "sha256": "530471e5998f3a5ed636bccba9c9d57b1ba360a2e7fb15edfc67175171491d12",
+    "bytes": 17464
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "7372be90dcd62b1dd9a7ad2e5fd4cbc904759edb37ec5c3c1ca7d01a57b211e5",
+    "bytes": 18030
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_approach_heavy_11.jsonl",
+    "sha256": "4b3f9eebb1740d57703b2250715212129df9dfaf0b11096bfe547eae35d0b962",
+    "bytes": 33512
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "cc5f51cad86c0a975606926c9308225f5499fad0ee8fd421619090812368a774",
+    "bytes": 40152
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_approach_soldier_11.jsonl",
+    "sha256": "03de1f1fa3e6598f5e7942f0ba25ded169ed47c66566e43651d38eb7e3286a2e",
+    "bytes": 23493
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "9b9dfe6d42c106a7f14e1d5c6a3fe30f98a07da4755bb3dacef2298cb1ea97a8",
+    "bytes": 18129
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_away_heavy_11.jsonl",
+    "sha256": "136629b86da22f36d6f7c8b3652911219fc2892d946092eee7682717aeef8699",
+    "bytes": 32728
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "9f5cefb8ae8b23bfb4c345da738ac589145fba29721b624f1295ecabc9d8380c",
+    "bytes": 39296
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_away_soldier_11.jsonl",
+    "sha256": "873361db4d982e25d10694199624c13534fe267ef518e63592ffd0a877c2f131",
+    "bytes": 22957
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "088d0221ab818d695ebc40fda5b6ee8b8313cde3dfd4445f896d89f85cbffff1",
+    "bytes": 17737
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "198fc6fb339fa11f66d9f38abf79f93b4f6e31de76a282eb3e1145b0f359f8d3",
+    "bytes": 38448
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "9827bfb9c78c12e20ccac03999e62681144b92a78d5fdc81dc4af8d2a8ac7136",
+    "bytes": 44323
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "9b66c2b4c7f1dec5feab10f40d3603b2d22e2a5497aef7301d0f35224bb089e7",
+    "bytes": 24402
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "63361294beb929943726b3382bae26a806ac7dc7d18bf7b58e43ab3f6c8cf753",
+    "bytes": 22114
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_approach_heavy_11.jsonl",
+    "sha256": "4b0dde96543f4880fa75bd18eb8c66161ef955213116e605126262742898b483",
+    "bytes": 17637
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "ac4ed93d32c69751a914573b18186a6d331e4d3c3c6acd608c063f281ac0bc67",
+    "bytes": 28743
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_approach_soldier_11.jsonl",
+    "sha256": "502aefc8ba1ffd82dd71d773aa483c13b026b228ad483801e32e20e6e41e04ad",
+    "bytes": 14250
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "a46b91df6c285abc806c61cbbdebae2fb4e30bd5505a6c2cfcb643d266e0bb92",
+    "bytes": 9779
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_away_heavy_11.jsonl",
+    "sha256": "94a9659f2e7e21c99dc0316b05efd83341b469636ef3ef6c4912c192b2935d59",
+    "bytes": 16596
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "88660eb9a1700e2d3e536708d69bce0f2e8fa8a9fd4d28b48bb13b28b5749d32",
+    "bytes": 27494
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_away_soldier_11.jsonl",
+    "sha256": "4212dea2c4dd7039eed4bb793964e25cbb67273e7e4d596f4d66502b48e7b783",
+    "bytes": 13930
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_away_winged_beast_11.jsonl",
+    "sha256": "d783ef34b327c660897ee3dcd4df6a9ce1d35b8c84920ad4d33e60f9de5af687",
+    "bytes": 9579
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_parallel_heavy_11.jsonl",
+    "sha256": "8281d172231d8e7f7092f3fce09c518d9df4ba1ab43d18ea3341d4b664d74a6b",
+    "bytes": 18494
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "59ee3d02c41d9b69f523320f400564880c711d3fd725ce026e19e4403edf4628",
+    "bytes": 27766
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_parallel_soldier_11.jsonl",
+    "sha256": "b30775d8a9e61a27b6ed0e97d1514f33b390df00427d876f6ce678668fa3dbc2",
+    "bytes": 14153
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "41fad4c0a1769f74c5ef5ba257d4905ebbc36d64f2e2dd955cd620300bcab8be",
+    "bytes": 9653
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_approach_heavy_11.jsonl",
+    "sha256": "ffac0408be2d4e7e61cb267dafcfe09eac11c57ff3a5f697c627f0dcba683887",
+    "bytes": 35708
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "581142391dd11953ad140109652ab773dc2bc5aaa126cea31cef3f85c2af5b03",
+    "bytes": 32705
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_approach_soldier_11.jsonl",
+    "sha256": "a3f30b3ee2635f026c68b7133220c2d7eb460452360ccd397c43c264c3c9c79a",
+    "bytes": 32652
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "e33af00f093a2b9103626ca8d7988c4dab402f369c2208bbe2dd84b0498e3027",
+    "bytes": 25612
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_away_heavy_11.jsonl",
+    "sha256": "cf535e833fc4717948799da8aaec76a1c4ccc40ff8583d83a98545fea3f8c754",
+    "bytes": 34266
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "fae8b992cd7e7a330182b5e875333378f81c4508fa90a362be0b18423aef7c7e",
+    "bytes": 31989
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_away_soldier_11.jsonl",
+    "sha256": "ddf4adef2213ac97e8ee48e525393aaf8d3584767648c05bc48e37842d4d8e0e",
+    "bytes": 31197
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_away_winged_beast_11.jsonl",
+    "sha256": "2bec17737a28c28eb6001380066d5f5b50d2524df0f1fc371fbe3e25c07b3e85",
+    "bytes": 25028
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_parallel_heavy_11.jsonl",
+    "sha256": "a5ac39fb82b0073aa7b846e2ec10303cc1cb2ce6e8edcfc9c68b15f26667ae1b",
+    "bytes": 38852
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "ed44064dc75776de8856d4c69bb7f04b5275e7d7d86e22ff72ce72bf522296a4",
+    "bytes": 33375
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_parallel_soldier_11.jsonl",
+    "sha256": "1268d644fc27d7a4513a0e6218795fde0c528cbedd7841b8f064afc26320df78",
+    "bytes": 33526
+  },
+  {
+    "path": ".godot/phase5/baseline-v2/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "ed45f58fb503aacbdd93c69ac4f0a0daee2bb41c54967389d6f71fd80f8ee1a4",
+    "bytes": 25521
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_approach_heavy_11.jsonl",
+    "sha256": "dc46c23313369e43c0c557d81186eab1359864da8856bbb7bc2db4dbe9ab1ceb",
+    "bytes": 25015
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "7a2c483ca60069e9f856da317b45dc0e4e9bf55f73e51905be40103ae62423fa",
+    "bytes": 30705
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_approach_soldier_11.jsonl",
+    "sha256": "80929d4240c6c51587c0053bf74312d342526ec8fcda90bdc61cfa8d06d1a242",
+    "bytes": 22802
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "80cd39351c8fc849398c206e8281436ba066e1b1e5bff80bb45474b873c0fa16",
+    "bytes": 22127
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_away_heavy_11.jsonl",
+    "sha256": "bcddab9ec66e48c2a0ac5594554c245a0723a90e03ceb10907259fbec7aac673",
+    "bytes": 11241
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "77855c2012e2a5ec82456b7129257ba1833092f3015e56ec942a438ddfc11a17",
+    "bytes": 24027
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_away_soldier_11.jsonl",
+    "sha256": "90515cd584ca65299aeefdc32fb8b5f6d8244ba563699ba24e55738e493012b6",
+    "bytes": 11369
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_away_winged_beast_11.jsonl",
+    "sha256": "4ba4c2681d337c3f5089648898ecba99fe2d5f80685232a3559c21c0901eb860",
+    "bytes": 11682
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_parallel_heavy_11.jsonl",
+    "sha256": "4b5bbc901632b010c422f97076415f3bc2fba5a9f89f10eb45d70e7a70046e06",
+    "bytes": 21266
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "c4294289a7ad3175d32bee92de2aaa559ecdf0b5c641737189f01df4bccb2534",
+    "bytes": 29157
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_parallel_soldier_11.jsonl",
+    "sha256": "84bd1ebd5a7d762b1fa35fd00eb6ba7924d8e8075e694b22a7587efa794ea117",
+    "bytes": 21459
+  },
+  {
+    "path": ".godot/phase5/damage2/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "ef000b52de302a4a2f3c771dd5b06cd37ef67015740d266f0cedc1cd0223a5a8",
+    "bytes": 22025
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_approach_heavy_11.jsonl",
+    "sha256": "eaddaa1fddc846550b78f2867667fd08223b312cb9cfe281fccf43e953c29851",
+    "bytes": 34147
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "b2736ebb55cc9e49af72a0c9eb932dc16cae6d3560f559a9dd926c096d6435fc",
+    "bytes": 32129
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_approach_soldier_11.jsonl",
+    "sha256": "733188cadc3a8ce9af1e614e77045ea42d36b8ea32508dfde3e079d18cb6791a",
+    "bytes": 19516
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "0a531666a77a73557378bbba996110801a88f043fe80e4f48b7339734614820b",
+    "bytes": 11824
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_away_heavy_11.jsonl",
+    "sha256": "d55607ded743f8ce68345542d18f5b6c0392c689bf020fdfe4b071bc67048c7a",
+    "bytes": 33531
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "730e192950a22898dab616db911e0e908d46fd525a3c9b6ba054618f185c8f51",
+    "bytes": 31593
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_away_soldier_11.jsonl",
+    "sha256": "f9e9b9a2fa6c4114f6152be0a5bc9685fc863fa779d28a035722d313ea6c0804",
+    "bytes": 19172
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_away_winged_beast_11.jsonl",
+    "sha256": "b6363e7c656456a2a5502bb918b80cb6223670595cf57f45e94798422ac54c20",
+    "bytes": 11624
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_parallel_heavy_11.jsonl",
+    "sha256": "68044052a4d7903abb2f6c4004bd43135b070d24df2067d74b8066727f6ab943",
+    "bytes": 34075
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "7006a59f6732edff84961b92686d336cb49ebed14184e8ea43ae20515df98517",
+    "bytes": 31803
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_parallel_soldier_11.jsonl",
+    "sha256": "5283ff2b87a539458612f1c352df10ef4ae1512f020bc93eda49cd3feb7cc98d",
+    "bytes": 19410
+  },
+  {
+    "path": ".godot/phase5/damage2/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "19b710525779abfe4a24e11c5ba82e3d8644f5d63c0ff9fdd289567105700f9d",
+    "bytes": 11697
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_approach_heavy_11.jsonl",
+    "sha256": "2736c630196c095368c343b2fb98463570c1b2e96796e2c998e4315faab173d5",
+    "bytes": 28925
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "880115d2269bc7d7d658b294923bd24a66d8924efd72924011b944f8b4ab57b4",
+    "bytes": 33342
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_approach_soldier_11.jsonl",
+    "sha256": "673f8c41bdc71c625d5e72848d6a62c2e3f36d15bb0fd1d9c26a586baf59517d",
+    "bytes": 26689
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "81ba1e116ed3dfb0183c28e832c8d1640098898e4699012627daa25497387d5a",
+    "bytes": 22251
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_away_heavy_11.jsonl",
+    "sha256": "011d521ba3f48f38a99ab19feb160631d4e5c6e77721a4859fcb9541f180fa6c",
+    "bytes": 11293
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "34d262f5e489aba68a3bf300372873280d5a3ee7e23d561de9d17c6005a2aa0f",
+    "bytes": 24127
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_away_soldier_11.jsonl",
+    "sha256": "8a6a2ad5ecb76286245835945a0f24a2d261602f0c86c0d90ef3f4978824de9c",
+    "bytes": 11421
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_away_winged_beast_11.jsonl",
+    "sha256": "77b65eee5a0b8e393d379c21e6291f4826d2a0cc80340f1966ab92649c02b17d",
+    "bytes": 11734
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_parallel_heavy_11.jsonl",
+    "sha256": "a3af8d7c7a62d911ae80f4f9c7d0e2c0beef3a4b67f3661ee2cc63602d62dc50",
+    "bytes": 21390
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "ff5f1f24b1f8cbba5a5ae7c4c6964ebadc99dbd6d338ea025913ab3bf68b9b36",
+    "bytes": 31780
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_parallel_soldier_11.jsonl",
+    "sha256": "aa434f6ed7be009f53d08a8f1def19457789b0f1890d52aa51692213e799a8ca",
+    "bytes": 21583
+  },
+  {
+    "path": ".godot/phase5/damage2/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "08d8ea46992a45fcc116c46423abaf32281a26027b3b3829d2a521d706769122",
+    "bytes": 22149
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_approach_heavy_11.jsonl",
+    "sha256": "4429692edec917e64915518f87679f4cf499bc3277430583d350eb4d8671e45e",
+    "bytes": 41862
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "42b0c5907e74107b3366b8480d73607e1422486bfa76cced2c3c51b325562cb0",
+    "bytes": 49183
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_approach_soldier_11.jsonl",
+    "sha256": "0e2042bee70986f3b13c22a83369c4694b6fc8225d4ddaf74f9ebb2073d4f19e",
+    "bytes": 29146
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "038a1d9960958071711c4245ab836bd467730110294f8b4cfb0bce5181f3f316",
+    "bytes": 22216
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_away_heavy_11.jsonl",
+    "sha256": "bba41aad94fcc12f1223fda038f12b62d1cabe5954afc316851bdb9b27bb2f57",
+    "bytes": 41078
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "d0b95a0c2a72d761a624b957af67b1a95a73f4ca7533a9608a39e60218f0ded4",
+    "bytes": 48327
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_away_soldier_11.jsonl",
+    "sha256": "e40e81918e62dcf4306186719e7aa30f8b7dbd6ead8d538360691ee9eedb8ff5",
+    "bytes": 28610
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "ef912ce2ce4aaaa07005c9c3e71f7fa0934c18cefc0bbb3d3f3bd40ece3cd863",
+    "bytes": 21824
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "89ae84d74488782611a8a050c031c4abf0873208940ebb1e775f967c1b82f203",
+    "bytes": 48134
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "aca87fedc1000e4d54f5217785a9d0e5f93cdd896ccda8a9cd784e492e3f777c",
+    "bytes": 54412
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "5c467cb5056cbedcbfc59072ea4ba6d1360ffbccff762a91e9fc55057b586557",
+    "bytes": 30316
+  },
+  {
+    "path": ".godot/phase5/damage2/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "05da6fbe1162d609744237551399c5e675da18f553a27237a1d451f51dd50053",
+    "bytes": 27245
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_approach_heavy_11.jsonl",
+    "sha256": "de7af486f2cc5a88d30323757b69a5b8a85798083e14c1d5a1c7d59c99408dbb",
+    "bytes": 24420
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "2a3a10f19ffbd4d65316e76322fcf700096444c43e36ae10e7d2ab1b706c6fd1",
+    "bytes": 34984
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_approach_soldier_11.jsonl",
+    "sha256": "d2ff993667c7697c22ed0979d58538aee2c5a2892ecd027f0f459915e9d192b2",
+    "bytes": 17573
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "942bb1577f7c99ecf34deea8a607829ba7bfc112fbc861bb22fab1d75be052cd",
+    "bytes": 11778
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_away_heavy_11.jsonl",
+    "sha256": "60a51c463574357d54724ab6017250bc557e45610606abefc7cb960acc9fa07c",
+    "bytes": 23108
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "de2d799917aa7e2d6ce4d414c403758685f68ffd717c968de30e9fb64f8792c8",
+    "bytes": 33574
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_away_soldier_11.jsonl",
+    "sha256": "b9bfeacb358c0f82187cdb1fd9a914241d782ced8752274c7c4a2b266f7c95fc",
+    "bytes": 17253
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_away_winged_beast_11.jsonl",
+    "sha256": "96510bcf975d1100b080d5942ce5b0b78f1701e2326b252020ebc504434b89e4",
+    "bytes": 11578
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_parallel_heavy_11.jsonl",
+    "sha256": "1d1a44ee3fb83a8b10451bb6d01efeafad7a735ba6829152dbe5b22c3d4da712",
+    "bytes": 23888
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "bb402f331848a4341bddc849d19a4524222b35c778c4266bdc56dd63435ec693",
+    "bytes": 34679
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_parallel_soldier_11.jsonl",
+    "sha256": "6aa3682538be0ee9b309f8d5a5c4b0636d04bdd37ecc07365f141d8e9bb24a3a",
+    "bytes": 16639
+  },
+  {
+    "path": ".godot/phase5/damage2/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "0e69e0e7d0059a49ab578d30526f174647ef3db353186ee62f5d30fa4c925c78",
+    "bytes": 11652
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_approach_heavy_11.jsonl",
+    "sha256": "625f4df7309f7d0e26d16b6bad16444fd4d42827c6d68ad6bf09b7cb3c0dd66e",
+    "bytes": 44916
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "9537cd1f82f86b7e88e1c1b6ea57e0265879c18e9d26ad7cfa114c2b51a730a2",
+    "bytes": 40198
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_approach_soldier_11.jsonl",
+    "sha256": "f7a972be80d66288d1e137b74c96da4cf01a0b06611dc747afede2109b4a0249",
+    "bytes": 30973
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "384e7bdb3328c5eae4579cef9a025577b567532f7d62c3e8f2acd3cbd8a0e048",
+    "bytes": 21737
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_away_heavy_11.jsonl",
+    "sha256": "6bf57266df50d069fe47fba4074ad43654cf36c2c91bc6df50fe547bd3948926",
+    "bytes": 43281
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "49c55fabcd0b6e089db043b83552179112ca818a547ce18b82b7a96d6ba5f0f7",
+    "bytes": 39482
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_away_soldier_11.jsonl",
+    "sha256": "260bddf26f144917b6e717e81e6891e68892c64f640ab334966a940f3c25f466",
+    "bytes": 30389
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_away_winged_beast_11.jsonl",
+    "sha256": "ad97f46b13dff0733210219a91d5843c6edd16134280eadf7156c56aab689f48",
+    "bytes": 21345
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_parallel_heavy_11.jsonl",
+    "sha256": "9557e3ed9916277d280e528afec29fc8c83c1e94d9d837079e83df97a9159de8",
+    "bytes": 46514
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "f2aecc0ad683500bf388bfbd22c99eb03e7095f520b0791672a2b27e96133d5a",
+    "bytes": 41094
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_parallel_soldier_11.jsonl",
+    "sha256": "53a6d532624e3c5be17f1001f45afeb400620d467f32bb600a021a6c1e791fa8",
+    "bytes": 30907
+  },
+  {
+    "path": ".godot/phase5/damage2/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "e71a9adf76e9958bd6ee2c2b2d24eaf1a58f41bec5f3fdcd8fe9d01a6aa38cd7",
+    "bytes": 21642
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_approach_heavy_11.jsonl",
+    "sha256": "7df5d96c1d33b39deb648d248f2ece9cbb5cbf2d7be434133e315ec6c69c41fb",
+    "bytes": 25015
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "d1a9997b6d39dd2e2f566483f9db6bcfd928ffba829e902517c7a66764764c96",
+    "bytes": 30705
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_approach_soldier_11.jsonl",
+    "sha256": "3b9e99a2380b9b75243db3fe9a28fb4605c2fc6340be4228c8d04af8f629f119",
+    "bytes": 22802
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "7be0f9e9e747569806dbea1548ac6a247d0662e7cb0d14f5b8db8411cb2df168",
+    "bytes": 21993
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_away_heavy_11.jsonl",
+    "sha256": "a1a43a7b33fac77a8659a50532b30449a9796d8f48259e40e1dfdd00b07b27aa",
+    "bytes": 11241
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "781ccdf66285634160a49b30e8d6293ec374fa6c2e90515560cbc371806c5010",
+    "bytes": 24027
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_away_soldier_11.jsonl",
+    "sha256": "04204a6151dca682affa1115bf5155beee7d2bb53221f9402549783f2412f3bf",
+    "bytes": 11369
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_away_winged_beast_11.jsonl",
+    "sha256": "5d591d0d5061df1931057fe6cb8fe7da009b26befa541087c76a750e558b50b5",
+    "bytes": 11682
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_parallel_heavy_11.jsonl",
+    "sha256": "20d0c0e82b7afd1e9e48d512eab8e5aac94764a67c65c71f8146e8d25c3c3c69",
+    "bytes": 21266
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "bf06633ee9f0a5840f3a374ccf538f0b651e0695ad66ab860c0296fe32b6100c",
+    "bytes": 29157
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_parallel_soldier_11.jsonl",
+    "sha256": "c551b4b709c21d6ebf77246fbd395a3326318445260e99ecd8dc5b5ac236b2d4",
+    "bytes": 21459
+  },
+  {
+    "path": ".godot/phase5/damage3/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "5f9ad135bf3dda5ee777875c5a8002bdf68b67ee63f5a0e6f2990e315b4b05ff",
+    "bytes": 21891
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_approach_heavy_11.jsonl",
+    "sha256": "44fd18d857f322e3e219912c2c439b4fe6d4c7ea256e7af358330adbcf74e75a",
+    "bytes": 28525
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "5de3a79911016183f9b891c6236d2c79b6062e7f32cb35ceb51aaf11a04f7bd4",
+    "bytes": 32141
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_approach_soldier_11.jsonl",
+    "sha256": "5245bb4b3a4e9e8ebb47011eb94c1ad7365ca0f0b4fc85fe8ce0f5acded3b6fc",
+    "bytes": 19544
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "198b2f8da9a5266fd0286cdb88f9b8f1fbd5a4d2e5700e56c91a155c96458b78",
+    "bytes": 11824
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_away_heavy_11.jsonl",
+    "sha256": "b085e643b5e0d44a2780ddee40d5b156465f0bfd4242e5f409a7682916d820d4",
+    "bytes": 28013
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "cd0934a16236942e49460ffcc41aa9ebece6e1db106b9d20b6298f6ec08db077",
+    "bytes": 31605
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_away_soldier_11.jsonl",
+    "sha256": "b8dc4b8d179aa129abdc6a48323ad86723d9aaed595e7ee88406d1c22fb68cbc",
+    "bytes": 19200
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_away_winged_beast_11.jsonl",
+    "sha256": "bdd677d3e92c06e9b37f6b0ad42a9a46c3ce25115789a0bae8eefb3833c42336",
+    "bytes": 11624
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_parallel_heavy_11.jsonl",
+    "sha256": "30212d13e7af90dc4b9e373de2cff3364a47ddc9f00db52049f22fae60bd34b5",
+    "bytes": 28439
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "11177b01d5ea9bfa9fae691a8106adebdf124028ea580bd3065fd7e243959092",
+    "bytes": 31815
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_parallel_soldier_11.jsonl",
+    "sha256": "62f683ea8fa1483bdd9b129f387f08bce243b109cb7b3e0c6cac805e79c71e90",
+    "bytes": 19438
+  },
+  {
+    "path": ".godot/phase5/damage3/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "2f4dbd6082cd4d98d6feb6e980f472541d1c2cb10f74bfe3cd13a6cd177f480d",
+    "bytes": 11697
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_approach_heavy_11.jsonl",
+    "sha256": "3f942027a3a96ee38803753d233762690e430deaad27840ecd90ddc9c2481e5f",
+    "bytes": 28925
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "be46271ae3e1731ed0681e147b468e26b28e4775cd40890919ed70943f9d86e7",
+    "bytes": 33342
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_approach_soldier_11.jsonl",
+    "sha256": "2c86c9181f2622fc028f65dd9f97b953614ddf7d767de23ea932d34acd5e4e39",
+    "bytes": 26689
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "aa3fa0c6cd9ecbd53e47a71862a88cae7310debe9b9ae7e2862aa41bd8cf198d",
+    "bytes": 22251
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_away_heavy_11.jsonl",
+    "sha256": "5e1ad07adeec515c414a0687441d753407f7816c6a8ca2875ee328f5bd7e3ea3",
+    "bytes": 11293
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "89f36a9d97843f99a11dde0802efc96a650d6beeeeb425243e9583ea5a9dbd0c",
+    "bytes": 24127
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_away_soldier_11.jsonl",
+    "sha256": "93102494bb93ddd4bd69cbdd70c32f2b50f58c114651c77200960341e9951ed9",
+    "bytes": 11421
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_away_winged_beast_11.jsonl",
+    "sha256": "79ffeb2dfd0a77bd6e2beea332c292344526bad48aae356f9af321e740251d6d",
+    "bytes": 11734
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_parallel_heavy_11.jsonl",
+    "sha256": "584889a109e9730130a73254c33956e2fbd4b9caeec10797bca9f40271f30dba",
+    "bytes": 21390
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "8840613f3a16dc808767b9314070f23f856dcaf61e3e43c3679e888e5208fc3d",
+    "bytes": 31780
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_parallel_soldier_11.jsonl",
+    "sha256": "cb2423c70552da2a53552790ff0355054a58cba3f2285e9731d532ad112ce138",
+    "bytes": 21583
+  },
+  {
+    "path": ".godot/phase5/damage3/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "26b206b24e2d28061e0e1bbc475a02fa9b9981bb86ba398e301ef6091d0d4d7f",
+    "bytes": 22149
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_approach_heavy_11.jsonl",
+    "sha256": "e1cedfb2182f1b7299b25f28a0b70e1ff3503199a06b278ac2b643e6d22cd3e7",
+    "bytes": 41963
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "99359c7ba6b5295c04ddea4882653e9bb08ff4763f6a2264f9b2e9b7690c6f39",
+    "bytes": 49256
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_approach_soldier_11.jsonl",
+    "sha256": "fb44711f9a278717807c3d078361d7063b26f6d71cc8cae2ff032713275f3b57",
+    "bytes": 29202
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "03ce3acbd3a5362ab792c30a3398040c5c23233d4396cca6f76c8647154adb98",
+    "bytes": 22248
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_away_heavy_11.jsonl",
+    "sha256": "cc413f5079ac7ce54bc728261fc8fd85de89a5faa35242db3a1b01a9e9e8e7f5",
+    "bytes": 41179
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "c21b421cb8c0707c1f2e7a4e8ee77f89b162b6f63b4cf33e050ed601bb0c30dc",
+    "bytes": 48400
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_away_soldier_11.jsonl",
+    "sha256": "321ce7db27012fd1b8f7a676178ce6298d338ea40f982eb8f67990faed574024",
+    "bytes": 28666
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "3b533c17177089078fb768b40fb12d54b50f3ab2a41e0ffe061b2aba2dcd7a45",
+    "bytes": 21856
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "b9965ee67347218172248dbd9beb4cd0315bb0a7010a44ed6962b263410adde0",
+    "bytes": 48257
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "73fbba0b7eb8e093fb8e3273f869fbe2925c17063077aa3c37dcdf92b1e4f573",
+    "bytes": 54492
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "a7f139ecf1d8f268377511c490125eb6dd472b907b9ea878a74d33e8c096f627",
+    "bytes": 30376
+  },
+  {
+    "path": ".godot/phase5/damage3/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "e298d8e11825cc9a31bf24e2e37eadcdebd2189e58374e616fcd39efa96aa9a7",
+    "bytes": 27293
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_approach_heavy_11.jsonl",
+    "sha256": "18d9667c5e6ba9cd243b2b22de53214142fbf809a0158868f7d89b52454156ec",
+    "bytes": 24420
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "a98c7e02babf4c1e9072b14fa0a3a770c6c5acf8b3e9d3c7086d457bd3df6678",
+    "bytes": 34984
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_approach_soldier_11.jsonl",
+    "sha256": "a78916ab6a6183fb1e4dfeeee43d70d0f450a65cece4da53155fc49ea4b4fdc9",
+    "bytes": 17573
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "e49114f74bd5969c354048c748d43f872ecb9d70ad7bbb16213c69886f11faf0",
+    "bytes": 11778
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_away_heavy_11.jsonl",
+    "sha256": "1c1e9a0a2d11f163f67c9c2e949bc2aac72ecdb3cda26f8aaa673f07c65e867c",
+    "bytes": 23108
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "e0ffb3ecfcf3ae52883a192f20daf79c571458772ad9be8ccb87dcf3ac548302",
+    "bytes": 33574
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_away_soldier_11.jsonl",
+    "sha256": "18cf33887d397a8464deeacb05a0cb509b4477edb5f5e7ec00b11a414f613b3a",
+    "bytes": 17253
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_away_winged_beast_11.jsonl",
+    "sha256": "33ba15735f3ffb4652cdad1c1667ab0c58d44e7a49ec14d466660451289afcb1",
+    "bytes": 11578
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_parallel_heavy_11.jsonl",
+    "sha256": "974225248f1ec346926ba6b2ca5f9df1377878017515c9252e0a9800e0641fff",
+    "bytes": 23888
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "4dca4a769a2f4c2beac526a871ce1a4da33a8c447490b50790b0d449d3a9018c",
+    "bytes": 34679
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_parallel_soldier_11.jsonl",
+    "sha256": "90845b2d49ecedce8b81b502a643206c4f5aff85b70517c8a0949f927b445e79",
+    "bytes": 16639
+  },
+  {
+    "path": ".godot/phase5/damage3/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "a41c23de1b9ca7389b61b524196c5941f331bfcac448bbbd26c35386ea7e0759",
+    "bytes": 11652
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_approach_heavy_11.jsonl",
+    "sha256": "d5f1dfc3174b31966a6d7b4c7ac9175a75a2271636a05a0f4e82bace5799a88b",
+    "bytes": 44080
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "2cdd76650057a4076293f8115831916aba4d06d35db172c9a4f16f4d6a9d0d44",
+    "bytes": 40198
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_approach_soldier_11.jsonl",
+    "sha256": "d4dd1739652792b686de2aca5246078f0ce9d1a20cf8c50c0db9b7ff5ffc7591",
+    "bytes": 30981
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "34db442f16688d1b70e09cf71bd104450bce3c2c4b030b5c53c0db046245d12e",
+    "bytes": 21745
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_away_heavy_11.jsonl",
+    "sha256": "812b4d7a04ab094c361bcc08b2341c1af1d6ca4a290e349263112282c4e6c11f",
+    "bytes": 42066
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "403db008ab66f8f0b1f1088c1a74d7cb9813b3cecd7772eaa0adcdc18c1ce081",
+    "bytes": 39482
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_away_soldier_11.jsonl",
+    "sha256": "0f1aaf9f3c7de917dbe2d674537c21f1e25cb416a64422b0b2d8705271959911",
+    "bytes": 30397
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_away_winged_beast_11.jsonl",
+    "sha256": "fbc44a8459cfabf61f6bc58062ba0dff17fc723cbb48d2b86b7026cf359172e2",
+    "bytes": 21353
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_parallel_heavy_11.jsonl",
+    "sha256": "6b5a2b17acc087da5846736356269f309360b75238303cc3a8d2cf17279c410a",
+    "bytes": 45260
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "62618334f24e22a48f346286966ef3e3d478037fd2b4b6a508e55dbd9b095089",
+    "bytes": 41094
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_parallel_soldier_11.jsonl",
+    "sha256": "26a01c5b0433475ae433e36de0052799fb8316339562dc35fbbaeab4e47d435c",
+    "bytes": 30915
+  },
+  {
+    "path": ".godot/phase5/damage3/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "29f89ae6be4e7ef65f29735b24d2690e7750dc619e9ed6564e7e9df633629b38",
+    "bytes": 21650
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_approach_heavy_11.jsonl",
+    "sha256": "acf471a89e3bbdb13bcced88c4bf38b00bddc9577906d1af5c6860d986f797bc",
+    "bytes": 25188
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "2220523f0973a2f1a3e1799c6a67f3fc217e117c92fbb1cec5c7952f14533721",
+    "bytes": 30896
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_approach_soldier_11.jsonl",
+    "sha256": "ec014c2621836b93c050f7eccb8cacdffa4c5a13fc8db9b9fb8d1a2abed529bc",
+    "bytes": 22957
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "a5ee21a5865243e44aa58ee80829e43afc28332cff0e700fd3528f71006b4413",
+    "bytes": 22273
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_away_heavy_11.jsonl",
+    "sha256": "931e50cf75d3e1711912cbecbffb5f2cfb52bea349996128b237adb94b8b8be5",
+    "bytes": 11315
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "cd2857440d9312d64958e597b00175366face4952190f81057ce9bbc3dd35976",
+    "bytes": 24173
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_away_soldier_11.jsonl",
+    "sha256": "ff58b83ac7407d4fb08be8f1e945a651c9e8255c103801f50adfda80a7836580",
+    "bytes": 11443
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_away_winged_beast_11.jsonl",
+    "sha256": "1d9fb24223e421db65be12f024e54db8c734217d8a6d33aec3452d46d15ca892",
+    "bytes": 11756
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_parallel_heavy_11.jsonl",
+    "sha256": "7f25bfa0633dc3207d26767df12b67328da6f2c02fe2555c131a3290cd98da99",
+    "bytes": 21412
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "2e0ed054b4166ef5e262a02e630b28d889c8556e66346f0b521219ae702e4ea5",
+    "bytes": 29339
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_parallel_soldier_11.jsonl",
+    "sha256": "e883aac505092f9e87b68c9930266a99bf37b90658ed74cc56b87856dbfcf424",
+    "bytes": 21605
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "e60f3d4df765a5e64fa63c93e8d6ac16d2ee75ad64c061926bc102c2a77d0e63",
+    "bytes": 22171
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_approach_heavy_11.jsonl",
+    "sha256": "04037185b34600f9129139f774aac28cd2fc299180f890acefe5fd2797b7ea96",
+    "bytes": 39266
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "9b10b38ef27c718f708ad6534f3c3859ecbf28ef9aca11251a6abaa4d3a5f7cd",
+    "bytes": 31560
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_approach_soldier_11.jsonl",
+    "sha256": "cf08e70664180b8e0f626e4b691583684afe6114f8ee54821b0bcff7d602a1b8",
+    "bytes": 19644
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "707e26d0083d85676def659d27489e78e87f5eb15583a1cfdd0a17fa460f69c6",
+    "bytes": 11898
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_away_heavy_11.jsonl",
+    "sha256": "a4cf2a30b33d9a4d6759c0770b8d01f41d541611069ec6770e81714183365b5d",
+    "bytes": 38562
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "63ac37a4b96f696677ce7f0ba5fb3a3afec95286016e4195d2425b309499619d",
+    "bytes": 31040
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_away_soldier_11.jsonl",
+    "sha256": "36f391f0116b254ea199ea91612ee9058e0b08b2c8f71e29ba4f314ab361c942",
+    "bytes": 19300
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_away_winged_beast_11.jsonl",
+    "sha256": "b7f2c75d636f11111020ef30c13f1e01dc7f30ddd5bf593883a20b46bda74602",
+    "bytes": 11698
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_parallel_heavy_11.jsonl",
+    "sha256": "31d71de1408452091e04d5634007ad8097f125897a3f1b2747c208a5d9a7bfbd",
+    "bytes": 39203
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "b4e15b9d187a5b298baec4acaf1a9edd76cece6bc7190f2d687434a66363636c",
+    "bytes": 31247
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_parallel_soldier_11.jsonl",
+    "sha256": "bbb0034833d69f478d68f9392d1a740dc55d6e505e2b30481978aa5f8198eed6",
+    "bytes": 19538
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "e58c1de229dd99d3caf3296aed9e8512ec546674c99b39eb66ec9649111c02dd",
+    "bytes": 11771
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_approach_heavy_11.jsonl",
+    "sha256": "3e11353160a1ebade96755771e3042543a4f7e83cc46e26173de24ce1ebdb610",
+    "bytes": 29125
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "e07ac1eeec5fe527e14c798070af565917834b3f261e966e13f6ea573f4e5b9c",
+    "bytes": 33551
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_approach_soldier_11.jsonl",
+    "sha256": "f56588c54dd9f48c5787e1748db9826c160ca4e155275dd14b951e8b3a8ba685",
+    "bytes": 26874
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "49b0bfbeb844e60aa4a9f9abfd7d0853a619301d456a1ea39da75ff2fb4cc6af",
+    "bytes": 22397
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_away_heavy_11.jsonl",
+    "sha256": "772382860eff4ef05d1345b8e5ef0d7e13f571edf3ed27f19a0ee5a4dedd2d8a",
+    "bytes": 11367
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "158a4e1c12c44a2d3ca5617ce3af4dd6936464c20927dd56f5bd43eac42534b4",
+    "bytes": 24273
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_away_soldier_11.jsonl",
+    "sha256": "3ccafb648aa559a57b9534b34a0e0a87f02f92b4a11bc30bc1c764b0acb51652",
+    "bytes": 11495
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_away_winged_beast_11.jsonl",
+    "sha256": "88234d25d6309c8cefc7151d576dd7754ff0f8d88948e0a4c62fca52d42705c4",
+    "bytes": 11808
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_parallel_heavy_11.jsonl",
+    "sha256": "8f61fc2d4a07fac548ecc400374b71000e584a87105f7c8031ea3a5f0b422f82",
+    "bytes": 21536
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "1e0f77307dbf20b42918811ebc99862f55204e84c9cfe8fdb9a757c45496b4d3",
+    "bytes": 31980
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_parallel_soldier_11.jsonl",
+    "sha256": "0f6ae73b8e7d464de4cf41fb36e037e9e559981a4372ba34f31bb77919cd1333",
+    "bytes": 21729
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "046fa7539566fc013680baf757441d20069805b90fdb4141b6601b9ed9ec7b9b",
+    "bytes": 22295
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_approach_heavy_11.jsonl",
+    "sha256": "b074a93b1e14f6efaada3cd631dec699e47c3a67060b27504cb2bd91946ed135",
+    "bytes": 42156
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "06ae40fb681f322254547f2cf75833eaf6c7dfc991bf4b2f79910c9209c181d8",
+    "bytes": 49504
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_approach_soldier_11.jsonl",
+    "sha256": "3b421f5eaf5a67a3157d9ad63cdc45a937e384e8bdc0ea0004ef10969d14e923",
+    "bytes": 29347
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "fcf0e57882bda1352342c0d57eec025da5cfbb65f978a8684a0ec3b85d08af15",
+    "bytes": 22363
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_away_heavy_11.jsonl",
+    "sha256": "aeabeacb806f6affb7b70a4abfc652f87bd8b5c95e9447c9453edec2af45cdcb",
+    "bytes": 41372
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "e86f15304027b814ff8ab58d4fd1e4d680f601dbce0f41a359bf8fe827b42211",
+    "bytes": 48648
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_away_soldier_11.jsonl",
+    "sha256": "1b1fe323ef1e06fc05f2088edcad49eb630d7e7bcd1e08ad06e829cb71fc1c73",
+    "bytes": 28811
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "d23d7fd7f22951ec7a7b234a5ce6c9e56023692b2b7ff7cf58175b21e2c5c780",
+    "bytes": 21971
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "4d1aebdeac21056deffdfce4fb5c375eda0d716d91cff3502a839e8825f925a5",
+    "bytes": 48473
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "c447c6255206c2b94bc9d116daf22e048fb05a66ecff8b1d715b373605b92ca9",
+    "bytes": 54772
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "8cb9542e536cb00fdf1a5d2db63d2f609384b152bf2c7f1352fce16a0cce6b5c",
+    "bytes": 30526
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "a1e7263a447b08d0b3358728a785bbe6f677025962118dc71878bd8431f2e208",
+    "bytes": 27428
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_approach_heavy_11.jsonl",
+    "sha256": "31eb7c4a37a953f189b2f35e81e7d4cdcebcc8ea2e8714100ddea96d1c604afa",
+    "bytes": 24590
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "133155a7366c737b281ef37bb6eb76d4a5655afd30503a5a24eee2c0d0e0d82f",
+    "bytes": 35208
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_approach_soldier_11.jsonl",
+    "sha256": "e10bda38e164aeb21f09caf4cda8c8a3bd89984a0b8062b7bea084e7b0d86896",
+    "bytes": 17692
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "424710b6d48133f01d1e9861afdeba4565544aebcb06043749e86f2ba73a8a5c",
+    "bytes": 11852
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_away_heavy_11.jsonl",
+    "sha256": "cf86f8a1ed384303bb89e74ace3e19de5af1a6230d145188892646c6d97da80e",
+    "bytes": 23272
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "fbe39c6de075eb99b5456209ffd45c104e9ddea767c56140126a20b3833d0b1e",
+    "bytes": 33792
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_away_soldier_11.jsonl",
+    "sha256": "72e59ee5ead75221d24af6b2479587bc2553d3b9d338ebe5a0264e352cd6f364",
+    "bytes": 17372
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_away_winged_beast_11.jsonl",
+    "sha256": "906130befff91042f030c243db0b87fe7803143f84fcbdac815ad4f10f2afcc2",
+    "bytes": 11652
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_parallel_heavy_11.jsonl",
+    "sha256": "68d02299438cf6762da9caf037356baffe198edafd023f67a9042d602097fda5",
+    "bytes": 24055
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "816c6ba2a6efd9b7de9befe46dddff85718b3e4bd7e6af34e4f88ad185f6d775",
+    "bytes": 34903
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_parallel_soldier_11.jsonl",
+    "sha256": "43850bb005b4fa2d5ff637a060ee07573a7dee4fc8aae4ab5fcdce40a2d5abb5",
+    "bytes": 16752
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "e52e5db8fb664d9c77d0d5b0e08265808146451ed17673b6aa8d97b86aa8b029",
+    "bytes": 11726
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_approach_heavy_11.jsonl",
+    "sha256": "d60e84f3d32b8e02cb94915652e92fd03679e9dc20212688b83b3573a8d5cd50",
+    "bytes": 45252
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "89631eac0a7188bd18efcdece144de04be2f69196cf5bd4a0354b2717232d5ad",
+    "bytes": 41847
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_approach_soldier_11.jsonl",
+    "sha256": "8b08e7f3bc29259f5833a0cd7490fa0082fdd5c0c5d309b985649f9dbfa1d524",
+    "bytes": 41206
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "a695d0d119c458724b9113f70c4578a515e4c7a5d1d764269747536fc5838cab",
+    "bytes": 32127
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_away_heavy_11.jsonl",
+    "sha256": "37c8ba8817b547e7c79beb5f5786523cb7c0d3347fc003a9fc89944db9eb5e7b",
+    "bytes": 43630
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "ca06679f367161a1f94e1e6cfb7355e783f3d4886acb6b05a228795fd57112a2",
+    "bytes": 39918
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_away_soldier_11.jsonl",
+    "sha256": "e2aac5c1f98197b305f5b170f01caadc4d9dfffaeaa375ece6dad5e2cc16a72f",
+    "bytes": 39983
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_away_winged_beast_11.jsonl",
+    "sha256": "0a13ee5a3fc9b845424207854f266a1d51e34dfbbc809b4995d3e307483e1eae",
+    "bytes": 31543
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_parallel_heavy_11.jsonl",
+    "sha256": "4131401c01f54c46ee68ddfd39c6e2d10e37ad694d24c9787a00941539702a71",
+    "bytes": 49346
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "6fb5ffda7601afe13ed94810fcce2755d1314cc1404bde87de73497be77e0dbf",
+    "bytes": 41548
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_parallel_soldier_11.jsonl",
+    "sha256": "6bba4a24fa4a2d61a18d9bdac593db2f47165f2d1f41c7eae5b18cdd72cf3572",
+    "bytes": 42387
+  },
+  {
+    "path": ".godot/phase5/candidate1-arena/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "a843de6bfde1518c93c6a22d55d70262a2b9380e3f1818bbddf3fe1fdd0be4f7",
+    "bytes": 38388
+  },
+  {
+    "path": ".godot/phase5/pilot2/generalist_11.jsonl",
+    "sha256": "b1c9ed1c12b9b5e954d43ec4588e69e0d29597c5a3acde87683a2d7694f55906",
+    "bytes": 3297435
+  },
+  {
+    "path": ".godot/phase5/pilot23/generalist_23.jsonl",
+    "sha256": "e0d08ce47544e9daa67a4646e805789ba587f61cb053a7b137d76052312e15e7",
+    "bytes": 6018482
+  },
+  {
+    "path": ".godot/phase5/pressure/generalist_11.jsonl",
+    "sha256": "d3fbae30c4027d09b560a49c306370b1accb420ca1378cc52dc8175a0b9f9709",
+    "bytes": 3264123
+  },
+  {
+    "path": ".godot/phase5/scarcity/generalist_11.jsonl",
+    "sha256": "ef14c415c602b49d977e2931adb3fc10b996c7efdb4909e42c4286413656779d",
+    "bytes": 4064603
+  },
+  {
+    "path": ".godot/phase5/candidate2-11/generalist_11.jsonl",
+    "sha256": "968e91c5df18f4bb9107c9e70457707b2462633904ae5503d705aa9d663b6aff",
+    "bytes": 3894046
+  },
+  {
+    "path": ".godot/phase5/candidate2-23/generalist_23.jsonl",
+    "sha256": "645378d7b5bab48283424a498f9dfc4815243d21a940d0fd79af987e55385279",
+    "bytes": 5354220
+  },
+  {
+    "path": ".godot/phase5/reward75-11/generalist_11.jsonl",
+    "sha256": "19f4fb9f15b87e00a35dab8310cac69d34c4a4140a64b32701b86dac95794559",
+    "bytes": 4030254
+  },
+  {
+    "path": ".godot/phase5/reward75-23/generalist_23.jsonl",
+    "sha256": "44fa6ce7eb5e3fd18b746d085151bc32897b6211401328509b7b9ba7c7244ac1",
+    "bytes": 5503228
+  },
+  {
+    "path": ".godot/phase5/speed125-23/generalist_23.jsonl",
+    "sha256": "b0e2cbf480543d581ec303d67a76fd6c3d5b713697045978ba553837251302a1",
+    "bytes": 5832019
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_approach_heavy_11.jsonl",
+    "sha256": "19ab85e070a2a541e99a8a4659e7e2e2a8321bc6eddb0ea6123ba19ac6f65a97",
+    "bytes": 27772
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "2e919ad2d63c46f29acedc7290b04d43bf513dda7e5d63c1737f8605c9b46efc",
+    "bytes": 33680
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_approach_soldier_11.jsonl",
+    "sha256": "b8c3f5fa8d630ebde7dbae29b5c496be1cd111a59b74348580d2717c13001c4f",
+    "bytes": 25353
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "96228f40e671156cd59d99a256ff34c491adf4f6ee372163020483909d710f75",
+    "bytes": 24583
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_away_heavy_11.jsonl",
+    "sha256": "678ec06124945a67517dc36fa610d6a2ca9cc044d6720acebba16874d6d482a9",
+    "bytes": 12835
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "3b878f92bbb1331b45417f621dec555095b68824420d6b49bfa7f20f79d4f824",
+    "bytes": 26469
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_away_soldier_11.jsonl",
+    "sha256": "b651def1b0c545035c2beb928df51515c2fb584fe9e15b7b93d9eed854d1f195",
+    "bytes": 12967
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_away_winged_beast_11.jsonl",
+    "sha256": "cc816e2f5605c96dabc43fd69e4126578b146e8170d7639181c58244aa64effe",
+    "bytes": 13290
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_parallel_heavy_11.jsonl",
+    "sha256": "6471e67d5d142a48171c77398881468ce30fbcfd647dd854218e5cd9f7cc8f38",
+    "bytes": 23708
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "c24a0c0b796440e5ac9dfeb3eec7a9def99a6ed0a41b02919e6fb3ad3eb4fbaa",
+    "bytes": 32027
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_parallel_soldier_11.jsonl",
+    "sha256": "fe66a2933db3b5dd654ca4d89dfac26831ecd64df834b04dafb705cbf6b9f07f",
+    "bytes": 23905
+  },
+  {
+    "path": ".godot/phase5/tower-final/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "0cfe3bc029c09400cd21236163d3da4dc91a25f791fd939791256ceac4573ec0",
+    "bytes": 24481
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_approach_heavy_11.jsonl",
+    "sha256": "c6b8428812fb5e2ba0c1ef1810e37d6583592564d1157ec181400ce700669b0d",
+    "bytes": 42885
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "62d6b85799862b915af2dde6679a0925421f2bd1e272ab4d694baecfdff64d8b",
+    "bytes": 34451
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_approach_soldier_11.jsonl",
+    "sha256": "cbea2997b436538601467b5b8a6878e43e37c3d6df7033b91eca5894209c7bf1",
+    "bytes": 21827
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "768e46b5c7f39c3dc679df02ef3a765fe1c2473ed5d98220284c8d058275c531",
+    "bytes": 13440
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_away_heavy_11.jsonl",
+    "sha256": "7afc2ab4db8898333514dc9799a6565dfa1bdc6de8c3c09ef7dd5a90ac110b3e",
+    "bytes": 42173
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "855f24f2d998adbb6f731d6761e751e390fdcb6348afc5a04d3f435321959885",
+    "bytes": 33923
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_away_soldier_11.jsonl",
+    "sha256": "dc6c84c480cbcb3f50138587a17b913d3bf30e5787825f7dd2470ab349e83305",
+    "bytes": 21475
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_away_winged_beast_11.jsonl",
+    "sha256": "09a4d404edbdb519be1ff9aa4d24152c5897f35ab4d5f4aacf4790ce2f6f3bd5",
+    "bytes": 13232
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_parallel_heavy_11.jsonl",
+    "sha256": "73db1342149c7952bfe60f55773177db0fbb3e2235ce15cc5d44e60d6c1fafdd",
+    "bytes": 42823
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "3722c68d903c2e8c22071e9afa4cd7d62efb2121ad8a22187ff29b1513a8c344",
+    "bytes": 34139
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_parallel_soldier_11.jsonl",
+    "sha256": "90dafc06f6d38317bdfaeaf8daa695c4d819d93b4f034dcff43c828b9aa0c2e2",
+    "bytes": 21722
+  },
+  {
+    "path": ".godot/phase5/tower-final/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "3d2f90af1bb718a670945e5ccfdf06383324b484f01029f4807989b702e4b918",
+    "bytes": 13313
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_approach_heavy_11.jsonl",
+    "sha256": "8f6166f40997eda7dd13a84deec29ebc5dfb1b7df4ed484212030a4a0015a9dc",
+    "bytes": 31999
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "c40ee4d78a24e9fb33b61913ca400925a4918cd931c0de2533f849b85f77587e",
+    "bytes": 36529
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_approach_soldier_11.jsonl",
+    "sha256": "0e0f6959753f4570c0061200ad4ee113fc2b115436f58c3b6453132906b9d556",
+    "bytes": 29557
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "e648e50ff9abbef9c46fdb411eb53454dac8599c4b0ee6333a862367ca4d8188",
+    "bytes": 24709
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_away_heavy_11.jsonl",
+    "sha256": "0348e340f4b588c0c90405c1beb3c75bba4d2ed9207fb08bebbea57cab7c1b5f",
+    "bytes": 12889
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "c3250c090073bbbe7e22a4f7015f1c9c7a68be56d288c75114c88868210cd3ad",
+    "bytes": 26571
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_away_soldier_11.jsonl",
+    "sha256": "0623dcfc53948d3637d1bcc9941082fae3d5ee7d53e7d56494361bd3e969f8e8",
+    "bytes": 13021
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_away_winged_beast_11.jsonl",
+    "sha256": "1fd4399246fb569947363eac22af7cc8d438c70344745f6e715d2ff2ea92bcfa",
+    "bytes": 13344
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_parallel_heavy_11.jsonl",
+    "sha256": "7c47e125d3cf47598895fd2e3b85f0badedd53b1e061aafc73f5d80da5ccb62a",
+    "bytes": 23834
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "d02e0b09af12705f4640f95f3049ae9c956f9291c1ce3891b7ccec3bdbc5f656",
+    "bytes": 34862
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_parallel_soldier_11.jsonl",
+    "sha256": "779f58a5a2ca4e14976df09c452acfa9d98cbd828d01e0ea0c464a10cbb52ed0",
+    "bytes": 24031
+  },
+  {
+    "path": ".godot/phase5/tower-final/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "be0f7b0d298634702739ad772383d04037b49962f236f2a991c467e9d52729e7",
+    "bytes": 24607
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_approach_heavy_11.jsonl",
+    "sha256": "25d746cfd7f65c8d31e36d33f26810bf2df5500ff4c6481e9e941d382302b5e9",
+    "bytes": 46022
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "b71379a3da9c5901a255881e453cb12c2525d738a04d7bfb655a2284a46ffca9",
+    "bytes": 53666
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_approach_soldier_11.jsonl",
+    "sha256": "76631f02f53415ff4f27b40354db84ffa0300d18c9c1e3939964b4b5ecc6cc10",
+    "bytes": 32225
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "e1c7835b64eea353408dbeedf426a65b3bc006a91cfdcae5779d1c1954c58414",
+    "bytes": 24675
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_away_heavy_11.jsonl",
+    "sha256": "920ba3a781e80e34873e1b3f9d5c9cf5725c501623f6af7c148448332aa6d791",
+    "bytes": 45230
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "680258d184519ff8065024435f5172ffecbf9d3ed649105d92ea0e87271e53d3",
+    "bytes": 52802
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_away_soldier_11.jsonl",
+    "sha256": "fd526ee934982dd2e8bfa2ccdd9f7159d26056c72729c12168a7a8a9a9427de3",
+    "bytes": 31681
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "7ce4026f14327822d596d7786ce321918879654f7a019946e99a8d84f6f8129f",
+    "bytes": 24275
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "60513d6c712ea2c0bb32556be8ea9cae16363d896ef2a0e169b2d6a1acf32054",
+    "bytes": 52819
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "28303f61cfff98ecdecc6470acfe5435d212fd7bd2bc0232abd515b4a630d8e2",
+    "bytes": 59350
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "fe58be527a464ed4aec62f5d5893c5005cd2b24b4d8284d166d364c0ef0b613c",
+    "bytes": 33500
+  },
+  {
+    "path": ".godot/phase5/tower-final/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "e27c1c8ee7105033a9279da08a6af8697fc0b936b7621743d99672801f9d8752",
+    "bytes": 30124
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_approach_heavy_11.jsonl",
+    "sha256": "9282ed92e94cb9526d56862e0a6c7dca3f4819ef083305c3396f24b57493df3f",
+    "bytes": 30666
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "c97718f123929dbd37c982192918cc277e869eb5dd0be607afb2bd8d1a81546d",
+    "bytes": 40179
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_approach_soldier_11.jsonl",
+    "sha256": "9e8fa41417a58cb04c92b447b639b6e45f5d86905dfded96e92ac9365d8ed2cb",
+    "bytes": 24124
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "7a8aca8032908a127d1aacef2959b9ab2892e5e3485d2dfd1ed11c2b1e7b50ca",
+    "bytes": 13390
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_away_heavy_11.jsonl",
+    "sha256": "2d01014153f59875f0177a2b2da8d09b91ea775d37a0aaf1a9483ee089750165",
+    "bytes": 29632
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "20e1ef760309fcee4769dd5442a598905739593b08cd69616da5c7dd6113a69b",
+    "bytes": 38659
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_away_soldier_11.jsonl",
+    "sha256": "1eee7bc3c5879d42fd3dad5eff70b3de4f5bb8c172a84a33f9134523d2de0ea1",
+    "bytes": 23716
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_away_winged_beast_11.jsonl",
+    "sha256": "d24abad91333e724c18520698a976f0e8cb98171b9c5bd9a26243dde945a214c",
+    "bytes": 13182
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_parallel_heavy_11.jsonl",
+    "sha256": "aa48d8f60746be5d22a7317913a9cfa09070cf06eb71846fe50f97dea8758bd2",
+    "bytes": 30582
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "a0371f46cf59b7d2d3e445573727d1b2a6bde882e309f6ab0a889d14b0a5f89a",
+    "bytes": 39865
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_parallel_soldier_11.jsonl",
+    "sha256": "a6ffd4a459f1c34d6756d4af2904ee4e3532e9ea5aa2298bc5ebb71331a475bc",
+    "bytes": 23554
+  },
+  {
+    "path": ".godot/phase5/tower-final/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "b2d8306457526866ab16b490ec90e59f12b1c4b68b147ea37a7cbedff653269b",
+    "bytes": 13264
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_approach_heavy_11.jsonl",
+    "sha256": "e8cff1feb6b47c781a0ecf1abf5ccfe1772b81bf7f69bae3bdad07f83fd5f437",
+    "bytes": 49432
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "3a4ea8ba12957a4b529e8bff4a5216462b8f0d44c1e3f5d3e692a00c9792b804",
+    "bytes": 45489
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_approach_soldier_11.jsonl",
+    "sha256": "11567e0623400cbe61d06de075d539bcc0b75a98e7debbd8f0ea4e539916cfd3",
+    "bytes": 45038
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "552e5216d04a51e94144bdc46fad6bb27fd589650ab3ad0521468b89f418ee1f",
+    "bytes": 35201
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_away_heavy_11.jsonl",
+    "sha256": "cf8ae723e98c80e1b8c230a85c86799e528a9a4967960fb8a022393b04c55110",
+    "bytes": 47738
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "b671ccddb45291f4ad09ca8d28cba3bfe32d0219764a7635b1a2f899fac7e4cd",
+    "bytes": 43458
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_away_soldier_11.jsonl",
+    "sha256": "cbe834a4ac49c0c9f63f42c4026183e43d83474022b32d4a6ff01464f44337a6",
+    "bytes": 43775
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_away_winged_beast_11.jsonl",
+    "sha256": "555a3e56134b6ef960b744ee3fcda65754717ae362f5bf12032171b590979649",
+    "bytes": 34609
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_parallel_heavy_11.jsonl",
+    "sha256": "d00a4b7ca0f1a3f2dde2de9f9fb208ec17b3793a1b5b270fce57ab74b0c81020",
+    "bytes": 53846
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "5a621f0c934f38cba9f464995aa5aa585b2370749f70d74fdc5092b60311af70",
+    "bytes": 45192
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_parallel_soldier_11.jsonl",
+    "sha256": "0d80ec178374949d375681a268abefbc78fdda9331aaac34daeddf9edc223010",
+    "bytes": 46315
+  },
+  {
+    "path": ".godot/phase5/tower-final/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "b7c10d7835362d43909ee2a74697de1ad67c494b77d14154426bbdacf3e2ef0a",
+    "bytes": 41942
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_approach_heavy_11.jsonl",
+    "sha256": "77dfd2e94124ffc3f8c6e75c99f5b24eab657d831fee247e3ce7065430fce7c7",
+    "bytes": 29270
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "d7eb36c9c79d0b6501509a0be5b25f5d417a7aeaf2a71ef189ab62d944d4248d",
+    "bytes": 35060
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_approach_soldier_11.jsonl",
+    "sha256": "c88288bae1221c498f5bed54a6f08d723605375a7224775e0376e48221e66bf4",
+    "bytes": 26817
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "603496893fbaf7ad5900ef4f567c518e3caf80a708d39a74617eca573ea04f72",
+    "bytes": 24497
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_away_heavy_11.jsonl",
+    "sha256": "cc1282d8f335c108a0b9db491bc0bbf04fefe83d8c7aae4b89d81a75d990b5a5",
+    "bytes": 12835
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "674a05fdae4519562c4376fe4b718dc0931358f68b5d2526f0fa070d7eaae91a",
+    "bytes": 26469
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_away_soldier_11.jsonl",
+    "sha256": "2f056ee7d448af105789728ee4a7714edd995a8f3021f01493bd4aff8747324f",
+    "bytes": 12967
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_away_winged_beast_11.jsonl",
+    "sha256": "cb230f294465d75505a26f376d14a1ae7a27c4c15bbd6c3e6bfa7f22b7033e6c",
+    "bytes": 13290
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_parallel_heavy_11.jsonl",
+    "sha256": "fad7f9a628aad6ff924a15634fea5813f775d35ce4edfc8fe917eeda60aa9294",
+    "bytes": 23804
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "e6ec78649597725023fe7540f8cb2b22597178b3f5740d960935d98a26c4a98f",
+    "bytes": 33395
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_parallel_soldier_11.jsonl",
+    "sha256": "03feeb7bf4c5d74cfc6453558080c9539562855bc281a1411f2dac5ca0b1993c",
+    "bytes": 24001
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "2df2e5a019c43f85be0794c40ac3955a13dd1b3af3cd926fd86408c98afd044f",
+    "bytes": 24395
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_approach_heavy_11.jsonl",
+    "sha256": "42f363ff56a7ccf46dd5a6bed1a8d02a583872c0f5419b64f911f6a474cc01c0",
+    "bytes": 22738
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "50a7e4f80dc183e9c3010cb5170f140e9d6e098e5090e6b9bb056f957813754a",
+    "bytes": 35362
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_approach_soldier_11.jsonl",
+    "sha256": "af52e7757598dc3d41c0c5999756d80ffab0818cd16dea44bf3b3779e5315ad4",
+    "bytes": 29782
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "b428a1f62040f0aab09bd5c46f90b9a1a84d1477e9bdb1300cab44fa3998a3d4",
+    "bytes": 13440
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_away_heavy_11.jsonl",
+    "sha256": "5564e92a9daa8e569353859af980899a9cac319757eaad10a4385b3b3a24e8ba",
+    "bytes": 22370
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "c8c61214b0e38303866af92b1ec03026ddf077ffa7781cc92da3b561bd92fadd",
+    "bytes": 34818
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_away_soldier_11.jsonl",
+    "sha256": "a6276e3233da565e17d5663fdc377d2500c7d4234201748e0263e7a533bc04fd",
+    "bytes": 29302
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_away_winged_beast_11.jsonl",
+    "sha256": "8f00dd19cc2d829eef1dbbd0ed852b634b8ac2a57af424cb404d2873802ba731",
+    "bytes": 13232
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_parallel_heavy_11.jsonl",
+    "sha256": "eb7b8f33b6114fcf9321866706682857aad7fb5f45bac81f83ed8345e78eefd9",
+    "bytes": 22651
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "0ef9f1313704a18d293e4426d96e14a7b0ecf11d524fef9a620814e4180fbf71",
+    "bytes": 35037
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_parallel_soldier_11.jsonl",
+    "sha256": "9736576fad374c91a9b491ddaf26c50cd40f741779a12bcadbc918079771b74e",
+    "bytes": 29694
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "38455521450c87b6ee1148c07fd26d6a915d80a65cfabbc73d761874363a3629",
+    "bytes": 13313
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_approach_heavy_11.jsonl",
+    "sha256": "a6b82f8cea6026ded7e4b62579210e0152aca1bad4fecd06494c46a4dfb26bac",
+    "bytes": 33396
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "d9992b1ade42a4f724f51b6974e7ab621bc04fdc0703971d21bd7bd8453d8338",
+    "bytes": 37909
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_approach_soldier_11.jsonl",
+    "sha256": "fc8c795725fb7120b60fc2b94c33e232439a26729708cbe1312ba5c13ece7d97",
+    "bytes": 29634
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "ad223fde1339b2e4f8f1e624dae6048e30b0165497c086ec4204b1a9dbb53493",
+    "bytes": 24757
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_away_heavy_11.jsonl",
+    "sha256": "77b808e5c942f1fa2223b44de262d91f99cba32378ac5b0d0f668bcc13b34441",
+    "bytes": 12889
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "4e4dc3cc7eb5a9eafb9bb06cf98006c6d156373e1d359a12d8618ea811e3c445",
+    "bytes": 26571
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_away_soldier_11.jsonl",
+    "sha256": "1ad3c9bfc1cbcb65e42153f294e6767fce7a40e23c7bd6832aee65019a577e56",
+    "bytes": 13021
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_away_winged_beast_11.jsonl",
+    "sha256": "baf7b816a399e0ad0773b0dffcad55aae2b385cd10ce41fccf649962360c1b5f",
+    "bytes": 13344
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_parallel_heavy_11.jsonl",
+    "sha256": "471e30d709b92980be116605e59c4adca659eda58f9a6bb9ed43cd923a99aebc",
+    "bytes": 29299
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "ee059f0e48219cf988797771a4ec50d12236e2dd31f4f85880fda7153b2a9fcb",
+    "bytes": 36248
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_parallel_soldier_11.jsonl",
+    "sha256": "64e3fc58fdaf13e2df3ecd89299277786666827eec01648695aed61bdd5263ed",
+    "bytes": 24079
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "9fa19cfae80fbcb587ce0eae46190799fed2d626519f3533cd2b210057ee526b",
+    "bytes": 24655
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_approach_heavy_11.jsonl",
+    "sha256": "5e0c7510ba1ea73643b9411d9ea0d5f5ef23949d989187fc9b9451f166416697",
+    "bytes": 43877
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "5877f0a56cd0c96ad426fe2c764ffe5c8ddde142dd70c0a1dd5bc721e49dd159",
+    "bytes": 53389
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_approach_soldier_11.jsonl",
+    "sha256": "483236f0f4295ec905a17b088d0fd37925478e84bc08af009f855b5f5591c756",
+    "bytes": 35077
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "549266d82b5c7a515e279a888d7ab310f7fa01110e813cc27bed87f40e116885",
+    "bytes": 24755
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_away_heavy_11.jsonl",
+    "sha256": "d43dd0b13762d0f4644bcf5e989003613ae3c3d3ad43d6375555dc8abf5c2770",
+    "bytes": 43125
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "2968cd88671d343440714ae044d3c7179fcc0b07d3618bb4507c2505008c4736",
+    "bytes": 52533
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_away_soldier_11.jsonl",
+    "sha256": "ce8afbbea47f76cc8df0a5604268cdb3eab84dae20f0748253c1c2e8d065cdb7",
+    "bytes": 34485
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "5d38a66ba360546f978d2e6c6d94a8d656df59fda39d877d042c30ec7d110147",
+    "bytes": 24355
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "64752e147da650e8ace91cc901db7106c91a15a3ffd6e994847f753e9c0fa230",
+    "bytes": 51696
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "a62b63576b653275da7d543b2a489c6061b5925f090e306e43b7d09fafde0edc",
+    "bytes": 60015
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "edcfaf0918477dd011127da849923eb39a250bc098c18563324b7e583495cec3",
+    "bytes": 35008
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "c4032f5cc016e0ff49d14c2c1be40413ab7ee0958fd119f8a98c2b5aa8ed5759",
+    "bytes": 35784
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_approach_heavy_11.jsonl",
+    "sha256": "1ce86bebcc4a57eb0f51b01f2918a4196dc5db7701c21afe39b2f923229aac89",
+    "bytes": 27580
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "94f490932040ff3a93feb6c3c408317a9ed481453ca1d29917163a69831efd8a",
+    "bytes": 41082
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_approach_soldier_11.jsonl",
+    "sha256": "6512713cb249a7ed12ec9672cba62a381d443a9f80774b16efc378895955c472",
+    "bytes": 24652
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "cae453b8cbe3cb00584a98fa03077033a9377cd6b2e253f8121e19ffae171008",
+    "bytes": 13390
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_away_heavy_11.jsonl",
+    "sha256": "1397d06c4393277b34b7cc5da82531ed46506c5e00fae0a8c44e89c602ac43ff",
+    "bytes": 26648
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "b3bfb8b5212fad4627eb1e72a58c6de56e6283d1b0e922145d35cadd5debf5a4",
+    "bytes": 40439
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_away_soldier_11.jsonl",
+    "sha256": "48f4598cb21c14add18225377cf549ad7f3992c8d7fd41b2fc2e329925220986",
+    "bytes": 23292
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_away_winged_beast_11.jsonl",
+    "sha256": "14aa4ce7cd61376548f0a26c8d372a032965b4944da6c612d4929b861c926f4f",
+    "bytes": 13182
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_parallel_heavy_11.jsonl",
+    "sha256": "a03ab969d007df853ea1f53e006b9d217dd090f7084d591d1998aed57dc92d0a",
+    "bytes": 30650
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "dd8175ed904df469609b83a191aac1398eff80dbec7f99782131a052e87ab33d",
+    "bytes": 40324
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_parallel_soldier_11.jsonl",
+    "sha256": "8937115ef41f3fd0f5a4fad2ca908584947288dec772084ad78c0e5b932ff01e",
+    "bytes": 25853
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "619f018636276ee97e66f7e118d4dd6a84a6f9c790f6b7008cbd444682f97e6f",
+    "bytes": 13264
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_approach_heavy_11.jsonl",
+    "sha256": "27b1ac325ee9812a6b961aec4b400e6fdb5c39c521d697857a8570354d6a4114",
+    "bytes": 52710
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "7015f20a0758df6f666c7df40c5bdac17e1b208ab9e25317a99f166d5848322a",
+    "bytes": 45364
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_approach_soldier_11.jsonl",
+    "sha256": "a191f93d2083005a1ba426aaedb1e782b8307f13b88517ac362da4c2e66bec63",
+    "bytes": 45167
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "6d917d1c7959f2a9f1775019d9ba00d2421e895954d77e3b572b3673a25654ea",
+    "bytes": 35460
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_away_heavy_11.jsonl",
+    "sha256": "9c15faadee723513c437caff42a94c5ebfa973be90988d8b4743255c4f208144",
+    "bytes": 51764
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "514f5314065e9e67393c074a6a6dc173d721266ca95b0f24f86590cd4655115a",
+    "bytes": 44631
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_away_soldier_11.jsonl",
+    "sha256": "7ab6814d28fbb01c172a89c6f114179e2f18b16e7032bc81db9cf909d5303e67",
+    "bytes": 44380
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_away_winged_beast_11.jsonl",
+    "sha256": "258405e1e666cbdbff4b6109a7d612dde4db7d7424a40f1b8ac1432087df3233",
+    "bytes": 34868
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_parallel_heavy_11.jsonl",
+    "sha256": "3224790f65c4cf0d54b76d2f27bfc8b63d625b2fa9e24954d1c7f0315510d029",
+    "bytes": 56664
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "583c04c9905d9b746a0b25772c60c4b1849a7812dcffce1d456a57b2e79eef49",
+    "bytes": 46373
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_parallel_soldier_11.jsonl",
+    "sha256": "ced104db99455da3d8839af994e078c00a5faa7b3f068f57de02e8eab84c4948",
+    "bytes": 47779
+  },
+  {
+    "path": ".godot/phase5/tower-lv3/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "0e4cc47dadf8c5710a4bfaae2c0a5747f1a1be1c73d7b28cab7db1c227c5ede8",
+    "bytes": 46286
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/boss_0_0_11.jsonl",
+    "sha256": "b285e000e17f9b4f19d71229ee605a6f369bb6a1a17d298602209eb22fb103c5",
+    "bytes": 98501
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/boss_0_1_11.jsonl",
+    "sha256": "d58b766fa97a0c683ddbad6099778db90b20058904365ef74e7b35a64251ce6a",
+    "bytes": 99095
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/boss_1_0_11.jsonl",
+    "sha256": "8b7f3ad62a9c2473c078b0f2cf3d45f475b75dc9b29690330d04c0e31b4458b1",
+    "bytes": 92433
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/boss_1_1_11.jsonl",
+    "sha256": "338c94e2e424e0bf26edf4e9989b0e6d027700a4718c80f6ab792af6c3a7b9fb",
+    "bytes": 93038
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/disable_0_0_11.jsonl",
+    "sha256": "c4293f55233063fac2b942e8a1a238c849587688e0c649ab39af7f0e431c06e3",
+    "bytes": 126192
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/disable_0_1_11.jsonl",
+    "sha256": "a721568e1c4e3a460fe4714a0f2abd483517a7a6bc2a4e72aed09091c6bdb1b4",
+    "bytes": 133911
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/disable_1_0_11.jsonl",
+    "sha256": "54852be3cc2457c6017ec4c4607d02a44066f164f8e318cc32f2b837b053a745",
+    "bytes": 114092
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/disable_1_1_11.jsonl",
+    "sha256": "ebf278463eb9c44341eff5d9cfe47953123cb373c888a004df2a9dae572bc25e",
+    "bytes": 121832
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/flying_0_0_11.jsonl",
+    "sha256": "22eee24bd65b6b71b877a40eb571d2ee70d5684582e6126e810f6bea97d12e5c",
+    "bytes": 156422
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/flying_0_1_11.jsonl",
+    "sha256": "45a662755f31cfd93ef955d4716287a0fdd9d03c91c8059ed843cc55de61071f",
+    "bytes": 156897
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/flying_1_0_11.jsonl",
+    "sha256": "2ff438d717dc76721aa51a1cf7f8f6db18d542c45ea906be7fdd249044c2215f",
+    "bytes": 138347
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/flying_1_1_11.jsonl",
+    "sha256": "4edee49e6a3c749e1cedef0f8700a70dc32251a709da250853186d667bcba43c",
+    "bytes": 138860
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/guardian_0_0_11.jsonl",
+    "sha256": "8ba11a1d4794b026fc1639d5970dc67c66bbe2c84573b036d92d2e73c32f7945",
+    "bytes": 145760
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/guardian_0_1_11.jsonl",
+    "sha256": "f791077546bab57fb2c9a22451786ef76a1f0c595b82efbc91d8a17e5f082be7",
+    "bytes": 151286
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/guardian_1_0_11.jsonl",
+    "sha256": "07fc7f6095fb3922738e407804ee2456d5433164a3a56493459e1863380ad464",
+    "bytes": 145459
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/guardian_1_1_11.jsonl",
+    "sha256": "d7fb69ce23750b16055b4b57e9c0f80ac66a711a378a1040d3423cf982e9b25b",
+    "bytes": 150971
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/healing_0_0_11.jsonl",
+    "sha256": "90fc246fda3ced6b690090bae3031aa8b3af3890b3f1369b85763a54ba1a1b64",
+    "bytes": 132599
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/healing_0_1_11.jsonl",
+    "sha256": "c8e28ceab7fb987faa99969b3127ac10ba2eea2df33d5d6132fa0f4df09d719f",
+    "bytes": 131361
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/healing_1_0_11.jsonl",
+    "sha256": "11951432c776cb59b6accca38e4eac4f0b671a4b51240f8c9f2c18d44e37104e",
+    "bytes": 140069
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/healing_1_1_11.jsonl",
+    "sha256": "3edc2292460634527f44a69a675b1d57f8f1c54d99aec1e0dd09d01f079f9408",
+    "bytes": 136758
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/scout_0_0_11.jsonl",
+    "sha256": "704238e9bc70b1f09a409acab09db22509618a499d406c700c3ddd8b0304c147",
+    "bytes": 129748
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/scout_0_1_11.jsonl",
+    "sha256": "f460504fe03e22077cb5b2d6b9d7f7ec098e109ca58e2f575a0b69e5a6f7793f",
+    "bytes": 123776
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/scout_1_0_11.jsonl",
+    "sha256": "92bff76b068eb8ded8804e76187d1ed0f5a4078fff1b0b55b168c99ef8bfcc39",
+    "bytes": 114795
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/scout_1_1_11.jsonl",
+    "sha256": "3e889fa4756dfe46ff171f5a12af0fe9ed57ad3bd0c48d72957b84e25e2d4221",
+    "bytes": 115363
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/swarm_0_0_11.jsonl",
+    "sha256": "25ad05fb26b165ea3524d3a4334cc51a9947ade49a30281ed7d26027728ee14f",
+    "bytes": 157361
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/swarm_0_1_11.jsonl",
+    "sha256": "738dd38a971e805d9bfb09c18e9fc36c59520a011313c609f409110e0f9f7dda",
+    "bytes": 157816
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/swarm_1_0_11.jsonl",
+    "sha256": "6923836d59651c0e73fa9991cae57891885a48ce3ae7894487b2fdd746cdb63f",
+    "bytes": 130128
+  },
+  {
+    "path": ".godot/phase5/counterfactual-v2/swarm_1_1_11.jsonl",
+    "sha256": "6df548d1f5b83eb412fa41844742fdd6c9782ded28d52d8252ce965d6735d4f9",
+    "bytes": 129171
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/boss_0_0_23.jsonl",
+    "sha256": "68e75d6be6ec99a334134090034113d7b4e10ebafe99cbab4697e6045dafe64d",
+    "bytes": 126468
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/boss_0_1_23.jsonl",
+    "sha256": "444f92f9f9b1739eb104578dcb0c8efd7cd7f8d547f634bde9f0b45e672c0d6e",
+    "bytes": 127201
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/boss_1_0_23.jsonl",
+    "sha256": "cbce258c5a9eb9564731cec41e1cfd8b6acd965fb39231c6900fed170c33c24f",
+    "bytes": 120442
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/boss_1_1_23.jsonl",
+    "sha256": "eb6487efa7e3f73edd00586014576adb9aba122dbc548b1892b5f221db1c568f",
+    "bytes": 121184
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/disable_0_0_23.jsonl",
+    "sha256": "85ae7623ffffaca12e6f276c2a3116a6b0c74e3c69be883804e1f74d2761b24f",
+    "bytes": 151782
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/disable_0_1_23.jsonl",
+    "sha256": "b88a7206b6088f3a19258c58d1b2bf09f46877aea501934a6d07676c056b03f4",
+    "bytes": 154377
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/disable_1_0_23.jsonl",
+    "sha256": "21f03fb4ac6a8669001f413686344653f0f3ffd2cf8f8837f039e4411fef1494",
+    "bytes": 138551
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/disable_1_1_23.jsonl",
+    "sha256": "e130473780b5cb275cf6079088b24feae19cd5b52e10f8edddfa598333849bfe",
+    "bytes": 137501
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/flying_0_0_23.jsonl",
+    "sha256": "df621f48f7f230249984bb8ff51095b6935974a0cd64e6765e14f32e543a40c9",
+    "bytes": 195108
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/flying_0_1_23.jsonl",
+    "sha256": "75d8380b46eae887658525de60cedf4d9c3a3c747b96302279362cfba466ce05",
+    "bytes": 195722
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/flying_1_0_23.jsonl",
+    "sha256": "22059910e2f4516f849cab312bc6608557fe64fbb7fb2d1b7a1a99d71a671ce5",
+    "bytes": 164783
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/flying_1_1_23.jsonl",
+    "sha256": "f318dd51f977e266f36af8421f45b6418eb859e89dfc8e7745f3fde43e8c7884",
+    "bytes": 165452
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/guardian_0_0_23.jsonl",
+    "sha256": "fb7e6b0e69264f6fcb3129b7185e81c8f537beb354b52cf60ffcfb007ef21b8b",
+    "bytes": 179554
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/guardian_0_1_23.jsonl",
+    "sha256": "145f1e33ac218e01bec9bbb4ec6c178cbd5981768f992e278abc2a48f57dcfbc",
+    "bytes": 177973
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/guardian_1_0_23.jsonl",
+    "sha256": "f1adab9dea7ab06747a686a4e7baf6c78ff2639e6e3746e8a83d18993af655e2",
+    "bytes": 179213
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/guardian_1_1_23.jsonl",
+    "sha256": "a02236905e70da8ce1d835d2f61c0a41a45a3f921a5c6881662af53a3087a522",
+    "bytes": 177633
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/healing_0_0_23.jsonl",
+    "sha256": "0f1095f9cb7929933e739f6796f758bfa4b6d08a0a385c7b267773c5fec4c354",
+    "bytes": 161693
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/healing_0_1_23.jsonl",
+    "sha256": "b6d5bb6e7ad4f55b09371d53f3e99e2e0f7212ae83d9eb08032d069853e64be2",
+    "bytes": 170000
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/healing_1_0_23.jsonl",
+    "sha256": "52155e0baf6dc44c17526412d66d428a5cd2cc34ee6ce30f3f13543a46197db8",
+    "bytes": 167169
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/healing_1_1_23.jsonl",
+    "sha256": "88777acca0b17e888078d430a339aa70c138fe6f862316c32ea1828346febb43",
+    "bytes": 174966
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/scout_0_0_23.jsonl",
+    "sha256": "2363779bd42dd3cfcfb0baa68032848c27059b48932b60f917226a7c217961b1",
+    "bytes": 155358
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/scout_0_1_23.jsonl",
+    "sha256": "2d2db157fadfebb51125c11ceac5794c58854010e82d65cd9c273127ab8e5ac1",
+    "bytes": 149324
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/scout_1_0_23.jsonl",
+    "sha256": "259c89f8aaffe6d826b60eae5849e5e2aa9e9da35a3f965e7a543bda4801d523",
+    "bytes": 139533
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/scout_1_1_23.jsonl",
+    "sha256": "8d29a8ec8b52a12876ebc5d0c0a03c232618572044b8be7cb66edabc135c009d",
+    "bytes": 140251
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/swarm_0_0_23.jsonl",
+    "sha256": "a8dff913db818281a9e356b4ff9dea3b166bdc4c061f007252709009e4cd8f85",
+    "bytes": 185625
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/swarm_0_1_23.jsonl",
+    "sha256": "4238b45fdc9823dc4abf4ff1b819635d2880f3050b6cef6adf9c8a3d5ca450da",
+    "bytes": 189841
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/swarm_1_0_23.jsonl",
+    "sha256": "1d165aaf4184264c12612aad6023da3c6ad3a04c24ef1da3e5209e0974030980",
+    "bytes": 157319
+  },
+  {
+    "path": ".godot/phase5/counterfactual23/swarm_1_1_23.jsonl",
+    "sha256": "eca9bc33fcbfb0397c6aade8209d4690957a48da5e6cfca936ebbcede26df87d",
+    "bytes": 163243
+  },
+  {
+    "path": ".godot/phase5/rendered-pilot/generalist_11.jsonl",
+    "sha256": "05585bfc69a075efbf52ae25c4e1d5496323797defcaf1d7e9754a58c9fdd93b",
+    "bytes": 4655222
+  },
+  {
+    "path": ".godot/phase5/rendered-final/generalist_11.jsonl",
+    "sha256": "2d1f8d8020faeb791b64a002c9a01daaf9c8f5054de5666a1c263828b4ab0537",
+    "bytes": 4864849
+  },
+  {
+    "path": ".godot/phase5/candidate3-barracks-11/barracks_11.jsonl",
+    "sha256": "5c7c72ab4c84ae2076cc65c131bb4c87bb17a82f162b3fcdd07eccfa76267631",
+    "bytes": 5386800
+  },
+  {
+    "path": ".godot/phase5/candidate3-barracks-23/barracks_23.jsonl",
+    "sha256": "64194460af20b844f3f77fa13dd674238693156f7fbcf3615b59cfb89e9845a7",
+    "bytes": 7086900
+  },
+  {
+    "path": ".godot/phase5/candidate3-core-11/core_11.jsonl",
+    "sha256": "80597b1fe5bc49c32222d9a7ca16f33b364295f164184294c3036a7779364043",
+    "bytes": 2775959
+  },
+  {
+    "path": ".godot/phase5/candidate3-damage-11/damage_11.jsonl",
+    "sha256": "fb8ab4aa4898fe43b2411008eacb8e82906d513f95b0d83b227993cdd6abbdb9",
+    "bytes": 4713980
+  },
+  {
+    "path": ".godot/phase5/candidate3-damage-23/damage_23.jsonl",
+    "sha256": "34677b1a572eb3f9597f26a335bcc33b5e583d39a0db355b7beb4d8e0b5743ad",
+    "bytes": 3797148
+  },
+  {
+    "path": ".godot/phase5/candidate3-generalist-11/generalist_11.jsonl",
+    "sha256": "14cbb1c5b8b6bf8ef732a6a79e3f3d59b7efd44b2c4f3d451d87e720e58441d4",
+    "bytes": 4363792
+  },
+  {
+    "path": ".godot/phase5/candidate3-generalist-23/generalist_23.jsonl",
+    "sha256": "807da90c17c787497270ae9aaa8bdac12f610e61613857fcb842071503bc885a",
+    "bytes": 5574737
+  },
+  {
+    "path": ".godot/phase5/candidate3-heavy-11/heavy_11.jsonl",
+    "sha256": "a04a8f3756a5a7be5365edb553cb83334a27e5e850a68d1e0a801be13d94fc1d",
+    "bytes": 4832585
+  },
+  {
+    "path": ".godot/phase5/candidate3-heavy-23/heavy_23.jsonl",
+    "sha256": "14bfaaec28becee81cab7078e20563157abdfdb94845d26d7ae77637087a79b2",
+    "bytes": 3835979
+  },
+  {
+    "path": ".godot/phase5/candidate3-swarm-11/swarm_11.jsonl",
+    "sha256": "bccb3b7e5ef1aaabf24f8be4e25d7f67bc3a4f6fa684e65fcaaeca85a2e1ef3e",
+    "bytes": 4200341
+  },
+  {
+    "path": ".godot/phase5/holdout-core-307/core_307.jsonl",
+    "sha256": "afc8df234c74987373322aa21bb139e14685fdd589a9f46664bd83201afc24bf",
+    "bytes": 4476549
+  },
+  {
+    "path": ".godot/phase5/holdout-generalist-101/generalist_101.jsonl",
+    "sha256": "22f0cd9f8ad70447d17a73eb6fd1f6b39428ce30ddb76d416d10517e681210d2",
+    "bytes": 5421971
+  },
+  {
+    "path": ".godot/phase5/sensitivity-flat9/generalist_23.jsonl",
+    "sha256": "da23e778a6ac790892aced4732ee159a8607df276251b52db3706fbfcfd5ccf2",
+    "bytes": 5735706
+  },
+  {
+    "path": ".godot/phase5/sensitivity-oldprices/generalist_23.jsonl",
+    "sha256": "7ff59036658dea4269a69134bfef273cf0c6b0e3ee4ff72c49827943da82285b",
+    "bytes": 5975788
+  },
+  {
+    "path": ".godot/phase5/sensitivity-price120/generalist_23.jsonl",
+    "sha256": "49aeb454756c146b42c518932002410e5166391bfb5437bf5d5a74fd486a349d",
+    "bytes": 6161702
+  },
+  {
+    "path": ".godot/phase5/sensitivity-price80/generalist_23.jsonl",
+    "sha256": "424c56cafa64b395f0f953ae9fd56df376d2d577cef8ca698835f3561327120e",
+    "bytes": 6245301
+  },
+  {
+    "path": ".godot/phase5/actual-final-replay/generalist_23.jsonl",
+    "sha256": "82fec91bb0e60c435e647f0f31eafd8387c06020af7090b465dfeb11fa4f4495",
+    "bytes": 6347503
+  },
+  {
+    "path": ".godot/phase5/candidate3-core-23/core_23.jsonl",
+    "sha256": "dfb66a1b43d770da8a3f565b0b3b279d8850a195fdb8d65ebdca7f506315ef0b",
+    "bytes": 4488956
+  },
+  {
+    "path": ".godot/phase5/candidate3-route-11/route_11.jsonl",
+    "sha256": "13e9a621f65c3f9afb0bbd7289a038d79c8523522a0edf426cadb4ae6e65f5b9",
+    "bytes": 5549229
+  },
+  {
+    "path": ".godot/phase5/candidate3-route-23/route_23.jsonl",
+    "sha256": "68c9221e1d2cbeb54204793935db74649ac33cf349cb8f04170574df735f198e",
+    "bytes": 6203377
+  },
+  {
+    "path": ".godot/phase5/candidate3-swarm-23/swarm_23.jsonl",
+    "sha256": "fb639ecc3ea3fd006880bf734b42581d5518e25b7fc45ae0d75096f5b97ae4f2",
+    "bytes": 7085043
+  },
+  {
+    "path": ".godot/phase5/holdout-barracks-307/barracks_307.jsonl",
+    "sha256": "4e76ab33a00d22a0f7f44e454feb1c7343d69e88d0cb14929d52f7340fc905a8",
+    "bytes": 4850048
+  },
+  {
+    "path": ".godot/phase5/holdout-swarm-101/swarm_101.jsonl",
+    "sha256": "9ad7217ea89724a123c260c1c9b43377e308e0ed0024972c7890508b13222351",
+    "bytes": 6172552
+  },
+  {
+    "path": ".godot/phase5/sensitivity-disable150/generalist_23.jsonl",
+    "sha256": "21d51ebaf3feb85401e1d86832a3b054b045ee87f3bcd1e3cb91c8408ac347ad",
+    "bytes": 6518449
+  },
+  {
+    "path": ".godot/phase5/sensitivity-growth70/generalist_23.jsonl",
+    "sha256": "d6b7e6c93581499621bc46907e6da552751c8de7869ea4e974ad0c5a263c6c94",
+    "bytes": 6906240
+  },
+  {
+    "path": ".godot/phase5/sensitivity-healing150/generalist_23.jsonl",
+    "sha256": "71e617ae285c0f4622faf549458bfb1eb11399ac825669495975e6cdbbe30219",
+    "bytes": 6662662
+  },
+  {
+    "path": ".godot/phase5/sensitivity-hp120/generalist_23.jsonl",
+    "sha256": "8a0625ad0d4fa56bb722a71c413466a05b41124ad25503fb3ad1e716d004088a",
+    "bytes": 5763657
+  },
+  {
+    "path": ".godot/phase5/sensitivity-interval75/generalist_23.jsonl",
+    "sha256": "3516e5d22a5c6cd054b9a15f08dba2b9a4b29274c1048655397bd0db2b35c9b8",
+    "bytes": 6616875
+  },
+  {
+    "path": ".godot/phase5/sensitivity-reward120/generalist_23.jsonl",
+    "sha256": "4bf11bb8fef7246055111c9b34c7c6b73f85c09662eed04e2d61fa42c261515a",
+    "bytes": 6179348
+  },
+  {
+    "path": ".godot/phase5/sensitivity-reward80/generalist_23.jsonl",
+    "sha256": "ec80df76c537106a9d58506899c22261714456ab255199d048cc68697eee1a81",
+    "bytes": 7832739
+  },
+  {
+    "path": ".godot/phase5/sensitivity-speed120/generalist_23.jsonl",
+    "sha256": "0079b785aca4ecbc1f6b6b101056e45d7681dae8aaca79ed0b65c53b7b7e4c14",
+    "bytes": 6496368
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_approach_heavy_11.jsonl",
+    "sha256": "db96f2355a9b636397b469485292dc73b9686b662a48a96aa972ad886a124a4f",
+    "bytes": 35687
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "e6c17aaa50312e994e77709c08308a4e240454215d7de5cdfc73166ac6a7bae8",
+    "bytes": 42471
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_approach_soldier_11.jsonl",
+    "sha256": "4f75b50884bdc0166a16ace7b2ebbca9d3042a4d34257c59644e524200cb99b4",
+    "bytes": 32440
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "a215bfdbe4a5303333b2ef909aad70b59179e18b7aeaa9d9bcddfb77606bd19f",
+    "bytes": 31256
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_away_heavy_11.jsonl",
+    "sha256": "74f54027117eb552af958798f1836d9be4ed583ef34a5e2aba393d725a24b754",
+    "bytes": 16196
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "85aa058718e78e1624c49f87ee56baa952944f88ef163eb52a97f8335f492311",
+    "bytes": 33142
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_away_soldier_11.jsonl",
+    "sha256": "f6a10073a221f0bd279f327f02219f44c213a411f116953085ea422ca07a6cc0",
+    "bytes": 16328
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_away_winged_beast_11.jsonl",
+    "sha256": "7b3ba0a313bb8b1a3191dcaa0c1415159c0c690f06b3a5712d7d6acee07951a7",
+    "bytes": 16651
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_parallel_heavy_11.jsonl",
+    "sha256": "4443d669fa15e2fa3f6d29066008a4bdea9955f418ba63499dd5287c8f861fb3",
+    "bytes": 30381
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "233085b56a955a4e0e3d08e4f7f95c80a96ddfc5a0d47f63cb0afbefcc42c5e2",
+    "bytes": 40390
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_parallel_soldier_11.jsonl",
+    "sha256": "83ee537904be8737fa112d149bfaac09962cad0c8ed234a9a3493bff972de640",
+    "bytes": 30578
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "e7af303a12f8aeae4a7799c6ebcba2b896b08482baa2b442939cfe55d6541f40",
+    "bytes": 31154
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_approach_heavy_11.jsonl",
+    "sha256": "6ddb9f6522c7b32691516149e63d3729fb70d2cde4742f910bb58980315a3fa4",
+    "bytes": 70189
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "ef861fd8884d46d50f48db3a4b17bf017a55521e5d2a42daea7becaa63332e67",
+    "bytes": 45850
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_approach_soldier_11.jsonl",
+    "sha256": "c0cbd59486e9a3a91c0919ad07485c4eadb4a00b3cfe3d116515d1cd53fff027",
+    "bytes": 27672
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "066265e4d247ac9165632f0fc17272ae50122ea7ed5b91c7f3d20e7daba076f6",
+    "bytes": 16801
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_away_heavy_11.jsonl",
+    "sha256": "4c14e34481907f2a1ac17e80b576fb220d23a1a9bb8392038e20400484454d1b",
+    "bytes": 69277
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "4f483c16e8a68eccda846d64aa7edcf62b427a26783975585740c7899b282625",
+    "bytes": 45290
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_away_soldier_11.jsonl",
+    "sha256": "66984d0186bba9c75e6a88dae10506006de7773f3cc5967ef20b1401b7671b6a",
+    "bytes": 27320
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_away_winged_beast_11.jsonl",
+    "sha256": "2adedf00bb0c9ba5aadedd8b89150f0143fcc75e26c90f42f6e448472e0ef191",
+    "bytes": 16593
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_parallel_heavy_11.jsonl",
+    "sha256": "c6a0f65fd5a399a16443ecabd928b112c953518c2baa1d49c0bc90152b0254c1",
+    "bytes": 70157
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "7a958dea601f1ee336d9a52ab2e0d6efdd3be890895aff4b54796d5e96d44527",
+    "bytes": 45552
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_parallel_soldier_11.jsonl",
+    "sha256": "a3c13795cd6002356c29c352c6d12b8a1b46f85fc9c79fa2a57ebb16419ffd4a",
+    "bytes": 27567
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "d16e74adb81fd629bfcd9b2b4c9d852ae44388b78eeed7530b18ddff927faa02",
+    "bytes": 16674
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_approach_heavy_11.jsonl",
+    "sha256": "1c6b61ef6e15a3c274067d52970b6ffda20b30020136dd38499fc3321b6e0fa5",
+    "bytes": 41100
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "03aef4c282d22534a68e88dce9b7a7467157b196492e1f5c0bc84884b67dcb15",
+    "bytes": 46151
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_approach_soldier_11.jsonl",
+    "sha256": "05fd2761b955747f87dae72c412db9a3b48b434826881bd4188e1f28629a0270",
+    "bytes": 37838
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "287569e7076354d4ffb4ba9401aad840bdd76b02672749f06761c0a6809d9288",
+    "bytes": 31350
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_away_heavy_11.jsonl",
+    "sha256": "400960380092bea14e15b7bc0f0238f645fa5983955a2a8540d9db1e3ee70c9d",
+    "bytes": 16250
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "0bc1d07c1f8d52e002bb6a70341c14068f311f0bbf2208f2d7028f47f45347b4",
+    "bytes": 33244
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_away_soldier_11.jsonl",
+    "sha256": "5b11be4e7600fad6b656fa8a25dda3c6a8fde2eed29a06616527b83164fe206d",
+    "bytes": 16382
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_away_winged_beast_11.jsonl",
+    "sha256": "675c0a40c1560fc15f308ccd476005b21e4a6ecb1870ff48741514ff12771092",
+    "bytes": 16705
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_parallel_heavy_11.jsonl",
+    "sha256": "639a43d445912d941d6728612d665a7872f1d95a0d16a57030c8598763ecb5c5",
+    "bytes": 30475
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "5ece90c653f09dc004b11de29c5c320b861760e47773714becb2c4c155e0a655",
+    "bytes": 44075
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_parallel_soldier_11.jsonl",
+    "sha256": "f4cc2defed45104984fc5667acd9f73774e7d8c31723ba5227e030f4290c8d32",
+    "bytes": 30672
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "e3fce455d577a5c5b25fc43b758a8be844fa1cbad9bfc7364aa2e57b2704b6cf",
+    "bytes": 31248
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_approach_heavy_11.jsonl",
+    "sha256": "229d9a314f6b4613a6d01fdf6db394f0e342e1d42219a94bcf17f546c91a8d72",
+    "bytes": 59456
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "a6f5156bf1b75901b01d948c9f00c7809b39d2fcf76227d51b21b301171fa6c8",
+    "bytes": 68442
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_approach_soldier_11.jsonl",
+    "sha256": "aa4e029bfba6f9a1753958dca5d21f7a4bfe0e350142197f401d56906410cf25",
+    "bytes": 41381
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "c25ad48c78e1826a65931c20be33ffb5076932328a09936b1e4f9d2b09eb28e4",
+    "bytes": 31347
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_away_heavy_11.jsonl",
+    "sha256": "fa5b7958c895a7602e116aba67c794b4a9613bed1bb22e4ab453738077090ff5",
+    "bytes": 58664
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "548dfc225a93909d0fcab986d9c24e9c79ae76ea35572cc6d895e19afe4020e8",
+    "bytes": 67578
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_away_soldier_11.jsonl",
+    "sha256": "1cb0a34bff97f5677fadbf0b5cc1b554e779fdee0df97642753a4a44265fc4e0",
+    "bytes": 40837
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "bf23e4eb35ce0e85c256f05be00360e59d1d720d90695cd85a88e2ad68a378d0",
+    "bytes": 30947
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "5dc414df32b2216234557328f111c964ee28e612010411a072a6837b4e5a9689",
+    "bytes": 68323
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "ae76d0264b5beb4b1302cf48e7c1ec56b7bf00b6002560cd6ec899eaf19892ba",
+    "bytes": 75992
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "af654bd66c1553cb75c4a42897a000f2a2b7836658f0170ab49f1871fe7cdfba",
+    "bytes": 43070
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "6542221f91a3e34c8cfe3b951017ec846e57656f781cf1cc8ec265d162917286",
+    "bytes": 38452
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_approach_heavy_11.jsonl",
+    "sha256": "2e97f11f86f4b61d16d23ee0a7b9cbb3c95b803cf1f81b1f8c257367f55a3dca",
+    "bytes": 39503
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "9dd84ac2fe9ecfc3c89eb176ddfdc3afe3506109ed2eae3cf2b1562ff3b33b43",
+    "bytes": 51098
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_approach_soldier_11.jsonl",
+    "sha256": "8404dfecbd0e26e8ad575cb3d7b5de6511e5427916d5233ab38a76f4fc2e82b2",
+    "bytes": 30916
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "c53a3fd36887e6ce0fb556289c7f0df104a1a705db6c8152c708a581821dd5d9",
+    "bytes": 16751
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_away_heavy_11.jsonl",
+    "sha256": "9a3e877bfe9e6019f684a8aadc231f4d2c95ef253ec1c733c1fc66f26cb4a01f",
+    "bytes": 38334
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "826b6b51823efb4269141fe6a4c3349f7a8b46ab240471913d997d0e6e75bd8f",
+    "bytes": 49287
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_away_soldier_11.jsonl",
+    "sha256": "09d6b1e0c9bd1ca8e06b774532756f2bd833ccb45448b5188ce06ad69ace1cba",
+    "bytes": 30508
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_away_winged_beast_11.jsonl",
+    "sha256": "dadd91084abb5db80851567de6c7c78a209ebc7bc2150229265da45d003eed73",
+    "bytes": 16543
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_parallel_heavy_11.jsonl",
+    "sha256": "8a4c118ba97d8248ce16e1c21be524c79a53d5b1edf10586256c698b790bab5b",
+    "bytes": 39421
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "a3e8cc412e91aa7cecb028a341d6899b4166fb3d15edc22f5e7f51fe617ad66f",
+    "bytes": 50784
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_parallel_soldier_11.jsonl",
+    "sha256": "07990fe50ce2f143dc5730d09840b64c7fa70e5dc8ea65a81c94dc3e84e10d4c",
+    "bytes": 30211
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "7efba45040f06a8a93a737f82cbe1c52197e88067c2695a67f302801a13a4220",
+    "bytes": 16625
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_approach_heavy_11.jsonl",
+    "sha256": "c60cbd1165a8552c06e0b8c92bdc0f9802b9a36c812080c755132bd2b77c2e56",
+    "bytes": 64246
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "7a71e2a10e16ed9e8005e6f99c51618e6cb835e3375a88709ae67e2aa12c86c8",
+    "bytes": 56051
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_approach_soldier_11.jsonl",
+    "sha256": "98ce7bbbc57de2d4f44f2cc39a5a152db8eb060c85e966ac837c1fd246866b5d",
+    "bytes": 58334
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "8fe630b2866f4fadb93d9377798e81efee853bfa70988e3d6cb5fbd15ecafdfb",
+    "bytes": 45064
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_away_heavy_11.jsonl",
+    "sha256": "cb6b6f9d1b3f859dc30f2ac3ad27f3fcc6f3fe9da9a3200c63689c27babbb024",
+    "bytes": 62276
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "12230bee7b4c59c6a2dbeaf6af76bef7fc51a08e0318979aa9249f179fb4818c",
+    "bytes": 55327
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_away_soldier_11.jsonl",
+    "sha256": "80ae081317cdac909f50a2e8c9473591cb14bace8bb4c3264e2b888a77f3e6dc",
+    "bytes": 56351
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_away_winged_beast_11.jsonl",
+    "sha256": "e045065632d8d856417b11019fca8a86a64909f07a39e23e4b15acdf65c3b0d8",
+    "bytes": 44472
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_parallel_heavy_11.jsonl",
+    "sha256": "6ae637d14baed61a638602ab95bfbd51b92551dcee58d9d248d2d9a5794db032",
+    "bytes": 69990
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "6bb0c81a82ac61a10abaeb52594730f48351dbc41c64091af5529ddf1831537e",
+    "bytes": 57465
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_parallel_soldier_11.jsonl",
+    "sha256": "49a1c764aa32c676c752523c5f94a76d9293e878359e16dee261beb4647c4f35",
+    "bytes": 59983
+  },
+  {
+    "path": ".godot/phase5/baseline-reproduced/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "ae404adcac655702db27be6786273525a3dd24795e9393e4e2483d7c05534561",
+    "bytes": 44973
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_approach_heavy_11.jsonl",
+    "sha256": "4a001f72f00f819fcfa0d559affbc0fa79bac3d04a4b7cf40e7fc0f7ad0c994d",
+    "bytes": 35687
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_approach_rat_swarm_11.jsonl",
+    "sha256": "6cd43bc369c3c642cdf431eb88db5cf31c11b19c7b400e6e55411295677fde06",
+    "bytes": 42471
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_approach_soldier_11.jsonl",
+    "sha256": "581cc636b2556e68e6348c2eb27c60eb21909cc1935cbc89c1d3aa5788a35cb4",
+    "bytes": 32440
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_approach_winged_beast_11.jsonl",
+    "sha256": "830c9dab41a5ab3b9e76ce5ddeaebcde5faa2ee3fe8b93871251e7b1811150ef",
+    "bytes": 31256
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_away_heavy_11.jsonl",
+    "sha256": "6a18cbf12a7113009f9ca8d22e81c4913f355e0430c7e76d7db8c5ad7fbdf658",
+    "bytes": 16196
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_away_rat_swarm_11.jsonl",
+    "sha256": "877045ed54ee9b4ece2c8f18d235444fbe81b28d3a68c8a5da329ef0aff7a5dd",
+    "bytes": 33142
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_away_soldier_11.jsonl",
+    "sha256": "4bd24b490568e11fb5bf07ef1b587bd8939c776d538e66efa0e1c90e697a9db7",
+    "bytes": 16328
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_away_winged_beast_11.jsonl",
+    "sha256": "1e70da1d5cb2288906845bbdd7638596cc253363c5ec8e6ae9815d2e8f2be329",
+    "bytes": 16651
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_parallel_heavy_11.jsonl",
+    "sha256": "0e457e6182bc5d340982a1ba25955b009170df80c17ba15661e1bf8e971c75da",
+    "bytes": 30381
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_parallel_rat_swarm_11.jsonl",
+    "sha256": "f24cd6c4ec13740a3ee9bb04e9a40aca4c24c534875b10e83bee550df708bc8b",
+    "bytes": 40390
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_parallel_soldier_11.jsonl",
+    "sha256": "d925ad4638a696b88c5740795a7b72990b5faca7c3f314041dd25c1d5885601e",
+    "bytes": 30578
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/ballista_parallel_winged_beast_11.jsonl",
+    "sha256": "922bf01f63062aad8dced2b122addcb29dedb180d08358e892b60a2f791430b1",
+    "bytes": 31154
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_approach_heavy_11.jsonl",
+    "sha256": "d14f1c615d46673e0ac2b27299004612e41e5be071d4a415deb2df30f7a9f6ef",
+    "bytes": 70195
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_approach_rat_swarm_11.jsonl",
+    "sha256": "2a04400a498aa2df477d19bed805020a8623f2bb3c5472a0d202439afad60435",
+    "bytes": 45831
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_approach_soldier_11.jsonl",
+    "sha256": "a95d38ab197826e34cdf0e5f25776bca0f75d08d5cb6675382a5c9d0decd55dd",
+    "bytes": 27672
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_approach_winged_beast_11.jsonl",
+    "sha256": "c76fdc056041ac4b926132dd1c664f226734f8e46a747d7fa2d4047f566f9e4e",
+    "bytes": 16801
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_away_heavy_11.jsonl",
+    "sha256": "c6c05cb14a30c92a4022f02b3be6dfe4ac09476864222e479db17d6b340cef16",
+    "bytes": 69283
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_away_rat_swarm_11.jsonl",
+    "sha256": "41d8249ea12389b3dd5b849ecc9a04d83a854962b24ca90f5392b6e3b8d64ea6",
+    "bytes": 45271
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_away_soldier_11.jsonl",
+    "sha256": "9972bd7a8d27b2809dcb32e0364f5d0e8521e2bbcee080c4c911215db40fd662",
+    "bytes": 27320
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_away_winged_beast_11.jsonl",
+    "sha256": "45c847a7a1836279be403c3e184e59db28d72d15528eede56d063deaccd88ecc",
+    "bytes": 16593
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_parallel_heavy_11.jsonl",
+    "sha256": "866d380949a2634d65dc7770d5976d8000f13cd4ae66cd83ac271458575eaf0a",
+    "bytes": 70181
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_parallel_rat_swarm_11.jsonl",
+    "sha256": "0e6c3a5665d5ebe322569d42c8ad894d0f2a4e470a98f7bd3510522f16518753",
+    "bytes": 45542
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_parallel_soldier_11.jsonl",
+    "sha256": "eecc7ba95e97939d702bfca754d3d123fd4ca7729022494ee4431e62563c5b73",
+    "bytes": 27567
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/barracks_parallel_winged_beast_11.jsonl",
+    "sha256": "48b938aa8a477f93e4ea88c923629825670ee8b987ee6647fe127ed0a24660ca",
+    "bytes": 16674
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_approach_heavy_11.jsonl",
+    "sha256": "bee734c9c4590bfa90b5cbe1e86ed79ec2991f3243b033ce62bee65c9d77e80c",
+    "bytes": 41100
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_approach_rat_swarm_11.jsonl",
+    "sha256": "4000804ce9badeaaa7f19654f62dd652e417ecbcb84ebb57a1a6e7f7c8471f44",
+    "bytes": 46148
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_approach_soldier_11.jsonl",
+    "sha256": "19f6523970f66c5ec69c9c0abbf691dda6b28fd783748dc03ea0bcb8ad951fb1",
+    "bytes": 37838
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_approach_winged_beast_11.jsonl",
+    "sha256": "368a01d729215934c75c5f655c3309b00110dbf990b0eb3e40a56fb62e5c4d61",
+    "bytes": 31350
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_away_heavy_11.jsonl",
+    "sha256": "c30285fa8c80883c0b19d8f61cb9190038576721bc84c7e0ddb5cd026e9066da",
+    "bytes": 16250
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_away_rat_swarm_11.jsonl",
+    "sha256": "d50ce0b1cdef84fe082a444c940d52a8510a3181a0c39dcec0d25b720aa4d8ad",
+    "bytes": 33244
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_away_soldier_11.jsonl",
+    "sha256": "99ce1d643a18dcb19f0bc2933af276e4bd40355484079283db48c9fe20bb270a",
+    "bytes": 16382
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_away_winged_beast_11.jsonl",
+    "sha256": "1ce8fe13f33af165fa4144d13975abb8947c9dc706f4b1891adcd6df252c2bc4",
+    "bytes": 16705
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_parallel_heavy_11.jsonl",
+    "sha256": "7cd38d5ec0f36f78bce68e1c8abfa0c4d520c2124523a93ae3d124588d208c35",
+    "bytes": 30475
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_parallel_rat_swarm_11.jsonl",
+    "sha256": "c520871877d4f24d6896cda4ece1d1780d3503701937bcc022d035183cf2579f",
+    "bytes": 44078
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_parallel_soldier_11.jsonl",
+    "sha256": "fbe1c197cde35634c38ec08fbc22cba22a84e8dc6eaf001ec09031623be2f000",
+    "bytes": 30672
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/broadside_parallel_winged_beast_11.jsonl",
+    "sha256": "fe10b25d50caf8b12a45a7596048e0589b26efe5d3eb2e436c66f51c7e7b60ee",
+    "bytes": 31248
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_approach_heavy_11.jsonl",
+    "sha256": "9f88a0ba05a21cbcd4775ed4e8c5e1be2854bec78b38f18d17796b04fb4ba736",
+    "bytes": 59456
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_approach_rat_swarm_11.jsonl",
+    "sha256": "4a72d943adf4eff4d4370a9be408dfcc12233d2803eff1fc503852a72bfd4df3",
+    "bytes": 68444
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_approach_soldier_11.jsonl",
+    "sha256": "94b9acd431c091a8ab72e874e2f8709812adebd657f8991cc0c0e06f8a2feef7",
+    "bytes": 41381
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_approach_winged_beast_11.jsonl",
+    "sha256": "ee4dc74f68d29f37b83717a57a662a7dba1a7c2fe3461844fc6775826adec1cf",
+    "bytes": 31347
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_away_heavy_11.jsonl",
+    "sha256": "f7542521ea562babb1692944fe4a00be5606edebde4cd32071739154bccfa222",
+    "bytes": 58664
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_away_rat_swarm_11.jsonl",
+    "sha256": "356e2783e019a302c0c11a73ffbdc56c7e7655ba321e955d0a4546e3efa10322",
+    "bytes": 67580
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_away_soldier_11.jsonl",
+    "sha256": "ebedac58fcb471f62a80bc992de18b821d7f57bb49e9e777d810d0efb5ecb009",
+    "bytes": 40837
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_away_winged_beast_11.jsonl",
+    "sha256": "ee626b46468ae0f53745dd94e3da85e0fb910f104607f0d023dd9cedbcade84b",
+    "bytes": 30947
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_parallel_heavy_11.jsonl",
+    "sha256": "95b42d3d1f597017fa64654e480e17478cb340c4a1f529edeac1f5e8442e4823",
+    "bytes": 68323
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_parallel_rat_swarm_11.jsonl",
+    "sha256": "946242a402312bd1d78ec97c28e2b7af75f2e4bc415aa35a792cc26977970215",
+    "bytes": 75995
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_parallel_soldier_11.jsonl",
+    "sha256": "64d8162f9ed3abccbd125d78a51ae464e3bad44e6079006a01f29c721d2c97bd",
+    "bytes": 43070
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/crossfire_parallel_winged_beast_11.jsonl",
+    "sha256": "1aa98bb988df68ce52846018304db28a88d2c93e278c0d3b0f20bb43ee9c04dc",
+    "bytes": 38452
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_approach_heavy_11.jsonl",
+    "sha256": "6d7ab922c4e0a5f437f7825957f2f642407fee52a3cbb7e3ee5893bb052e5004",
+    "bytes": 36039
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_approach_rat_swarm_11.jsonl",
+    "sha256": "5a10ef357f1bde361f412bbbd253f643ce8d06827c7c2f75b44f9fcab6943120",
+    "bytes": 51100
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_approach_soldier_11.jsonl",
+    "sha256": "e0ff45b7cad9fe5c8a5e433c74fe5981d4677fe42c5fbfbdb2b4e04abc1fd8e7",
+    "bytes": 30916
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_approach_winged_beast_11.jsonl",
+    "sha256": "6adcf6d24af5b6be6a40fedf9c858e5cb2aaae77086fa2e30e92dbee31e2ae41",
+    "bytes": 16751
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_away_heavy_11.jsonl",
+    "sha256": "3124158056ece8d94a3733db20940c8a8fc206dc510a2a51c5f1f4051bac3b9e",
+    "bytes": 34964
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_away_rat_swarm_11.jsonl",
+    "sha256": "f74c3996889425ae407af820badd30b8ac3920101b5ec1f91c37da3acc805b18",
+    "bytes": 49291
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_away_soldier_11.jsonl",
+    "sha256": "d9ad98ceaf43bd7851feda06da2e78dc50c8fd2c8e2fe439889774468d294bdc",
+    "bytes": 30508
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_away_winged_beast_11.jsonl",
+    "sha256": "915ce5cd14c540baa7ef9b8ff1f90d7124cc50de42cd41021100bcd64c479193",
+    "bytes": 16543
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_parallel_heavy_11.jsonl",
+    "sha256": "e6595f4ca4bc25e390c1ce1bda6611756fb32ec316ba32a370ed1e72054339f3",
+    "bytes": 38244
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_parallel_rat_swarm_11.jsonl",
+    "sha256": "5d8b1e1db1442f15e8904740f584f77b0100ac6e0b1460945c2ae02d121f2adb",
+    "bytes": 49606
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_parallel_soldier_11.jsonl",
+    "sha256": "8414d1a21e473a8ff94cd1b2d48fbfea5a0951c737c1385542d7fb5c8fa8a63f",
+    "bytes": 30830
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/mortar_parallel_winged_beast_11.jsonl",
+    "sha256": "e0e4d069272e306396079d04bbfd2c649743d75e19543a9a1aca3f1149b564dd",
+    "bytes": 16625
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_approach_heavy_11.jsonl",
+    "sha256": "6f4b3906e04e47e2f009cc3c5941a777e004f0a1e51cdb9baf7dbe32789bb09a",
+    "bytes": 64246
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_approach_rat_swarm_11.jsonl",
+    "sha256": "ef43d674544c06d6cc7414b236c738093e3756bd96c3a425e5f26dd8d696c3bc",
+    "bytes": 56051
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_approach_soldier_11.jsonl",
+    "sha256": "76720522c725ce4a05f48a667a590639b353f27e4c9b6ec2b13d7e94dd8159cf",
+    "bytes": 58334
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_approach_winged_beast_11.jsonl",
+    "sha256": "e2ea6d3c14d1344726af2888b0d5c70b64e8996e7b55eedff8cedbc434e01e7e",
+    "bytes": 45064
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_away_heavy_11.jsonl",
+    "sha256": "40cde405a6d433a2a966a551dd6ea748215fb26335f723fa33956e5f5b90fc56",
+    "bytes": 62276
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_away_rat_swarm_11.jsonl",
+    "sha256": "c08ed226195feaf311b0131f9b492cd182ea813912aaf5018c452444fbbfceb3",
+    "bytes": 55327
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_away_soldier_11.jsonl",
+    "sha256": "0757d34c944457d10d755bdbe94923e028237857873d11724d025b8aacfaa655",
+    "bytes": 56351
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_away_winged_beast_11.jsonl",
+    "sha256": "67599b5c353fbe1a927a9f3df3341234e104ccae35d5d1f375104f918a08717e",
+    "bytes": 44472
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_parallel_heavy_11.jsonl",
+    "sha256": "8f0204091dde575a8915b9fc19463354221460927c77be03ea5c694b73e2d5d5",
+    "bytes": 69990
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_parallel_rat_swarm_11.jsonl",
+    "sha256": "33479aaa0ea670e7d56e4c59901a9f061f9bf2d03308aac5a92e7d12d0b8d115",
+    "bytes": 57501
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_parallel_soldier_11.jsonl",
+    "sha256": "c59ae5efe72d1d221e544da874724011f6c0ae4053e72e516f94308131dc3e5a",
+    "bytes": 59988
+  },
+  {
+    "path": ".godot/phase5/baseline-legacy-rng/sentry_parallel_winged_beast_11.jsonl",
+    "sha256": "1ac9d5c5e5a113ce8ac57eda186595b3fd2aa5bfbb0898349ea3465187831efe",
+    "bytes": 44973
+  },
+  {
+    "path": ".godot/phase5/reroll-first/generalist_23.jsonl",
+    "sha256": "502cd85db048f1ccf6b1ea36160311610625190ac5924a5147c5ad16014539f8",
+    "bytes": 6796960
+  }
+]

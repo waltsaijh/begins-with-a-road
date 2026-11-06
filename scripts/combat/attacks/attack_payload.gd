@@ -7,9 +7,11 @@ var _source: WeakRef
 var small_multiplier := 1.0
 var frost := {}
 var knockback := 0.0
+var source_id := ""
 
 func _init(tower: Node3D, target: Node3D, attack: TowerAttack) -> void:
 	_source = weakref(tower)
+	if BalanceTrace.enabled: source_id = BalanceTrace.tower_id(tower)
 	damage = tower.damage_against(target)*attack.damage_multiplier
 	if tower is DefenseTower:
 		small_multiplier = tower.relic_value(&"small_fry", &"damage_multiplier", 1.0)
@@ -21,10 +23,12 @@ func _init(tower: Node3D, target: Node3D, attack: TowerAttack) -> void:
 
 func apply(target: Node3D) -> void:
 	if not is_instance_valid(target) or not target.can_be_targeted():
+		if BalanceTrace.enabled: BalanceTrace.event("miss",source_id,{"reason":"original_target_unavailable"})
 		return
 	var actual := damage
 	if target.troop != null and target.troop.has_tag(&"small"): actual *= small_multiplier
-	target.take_damage(actual)
+	if BalanceTrace.enabled: BalanceTrace.event("hit",source_id,{"target":target.enemy_id,"raw_damage":actual})
+	target.take_damage(actual,source_id)
 	if not target.can_be_targeted():
 		return
 	var source := _source.get_ref() as Node3D

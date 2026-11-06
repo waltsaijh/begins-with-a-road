@@ -1,0 +1,9 @@
+{
+  "frames_checked": 72,
+  "non_projectile_vertex_frame_excursions": 0,
+  "nonmanifold_edges": 0,
+  "nonpositive_determinants": 0,
+  "loop_matrix_max_error": 0.0,
+  "owned_objects": 138,
+  "owned_actions": 11
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "reward75-11",
+    "args": [
+      "--policy=generalist",
+      "--seed=11",
+      "--reward=0.75",
+      "--config=candidate2-reward75",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres"
+    ]
+  },
+  {
+    "id": "reward75-23",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--reward=0.75",
+      "--config=candidate2-reward75",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres"
+    ]
+  },
+  {
+    "id": "speed125-23",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--speed=1.25",
+      "--config=candidate2-speed125",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres"
+    ]
+  }
+]

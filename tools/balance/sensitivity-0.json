@@ -1,0 +1,73 @@
+[
+  {
+    "id": "sensitivity-price80",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-price80",
+      "--reward=0.75",
+      "--price=0.8"
+    ]
+  },
+  {
+    "id": "sensitivity-flat9",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-flat9",
+      "--reward=0.75",
+      "--price-mode=flat9"
+    ]
+  },
+  {
+    "id": "sensitivity-hp120",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-hp120",
+      "--reward=0.75",
+      "--hp=1.2"
+    ]
+  },
+  {
+    "id": "sensitivity-reward80",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-reward80",
+      "--reward=0.6"
+    ]
+  },
+  {
+    "id": "sensitivity-interval75",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-interval75",
+      "--reward=0.75",
+      "--interval=0.75"
+    ]
+  },
+  {
+    "id": "sensitivity-disable150",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-disable150",
+      "--reward=0.75",
+      "--disable=1.5"
+    ]
+  }
+]

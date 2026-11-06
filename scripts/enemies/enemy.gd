@@ -32,6 +32,7 @@ var heal_clock := 0.0
 var sabotage_clock := 0.0
 var cast_remaining := 0.0
 var cast_target: WeakRef
+var cast_targets: Array[WeakRef] = []
 var ability_visual: Node3D
 
 func can_be_targeted() -> bool:
@@ -42,7 +43,7 @@ func add_shield(amount: float) -> void:
 		shield += amount
 		max_shield = maxf(max_shield, shield)
 
-func take_damage(amount: float) -> void:
+func take_damage(amount: float, source := "unattributed") -> void:
 	if not can_be_targeted() or not is_finite(amount) or amount <= 0:
 		return
 	amount *= 1.0-float(abilities.get("damage_reduction",0.0))
@@ -50,6 +51,7 @@ func take_damage(amount: float) -> void:
 	shield = maxf(0.0, shield-absorbed)
 	var applied := minf(health, amount-absorbed)
 	health -= applied
+	if BalanceTrace.enabled: BalanceTrace.event("damage",str(enemy_id),{"amount":absorbed+applied,"hp":applied,"shield":absorbed,"overkill":maxf(0,amount-absorbed-applied),"remaining":health+shield,"source":source})
 	if health <= 0:
 		if is_instance_valid(engaged_by): engaged_by.release()
 		_finished = true
@@ -62,6 +64,7 @@ func heal(amount: float) -> float:
 	if not can_be_targeted() or not is_finite(amount) or amount <= 0: return 0.0
 	var gained := minf(amount,max_health-health)
 	health += gained
+	if BalanceTrace.enabled and gained > 0: BalanceTrace.event("heal",str(enemy_id),{"amount":gained,"remaining":health+shield})
 	return gained
 
 func set_effect_icon(id: StringName, icon: Texture2D) -> void:
@@ -80,6 +83,7 @@ func apply_slow(multiplier: float, duration: float, icon: Texture2D = null) -> v
 		set_effect_icon(&"slow", icon)
 	_slow_multiplier = minf(_slow_multiplier, multiplier)
 	_slow_remaining = maxf(_slow_remaining, duration)
+	if BalanceTrace.enabled: BalanceTrace.event("debuff",str(enemy_id),{"kind":"slow","multiplier":_slow_multiplier,"seconds":_slow_remaining})
 
 func _speed_factor(delta: float) -> float:
 	var factor := _slow_multiplier
@@ -101,6 +105,7 @@ func _speed_factor(delta: float) -> float:
 func apply_frost(strength: float, duration: float, cap: float) -> void:
 	if not can_be_targeted() or not is_finite(strength) or not is_finite(duration) or strength <= 0 or duration <= 0 or not is_finite(cap) or cap <= 0 or cap >= 1: return
 	_frost.append({"strength":strength,"remaining":duration,"cap":cap})
+	if BalanceTrace.enabled: BalanceTrace.event("debuff",str(enemy_id),{"kind":"frost","strength":strength,"seconds":duration})
 	set_effect_icon(&"frost",preload("res://assets/sprites/effects/slowness.png"))
 
 func knock_back(distance: float) -> void:
@@ -129,6 +134,7 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, sha
 	sabotage_clock = float(abilities.get("sabotage_interval",6.0))
 	cast_remaining = 0.0
 	cast_target = null
+	cast_targets.clear()
 	enemy_id = id
 	route = selected_route
 	# Spawn scheduling owns immutable packed snapshots; external callers keep

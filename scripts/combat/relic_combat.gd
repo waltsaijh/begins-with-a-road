@@ -27,7 +27,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 				tower.prepare_shot(victim)
 				combat.visuals.add_beam(tower.muzzle_position(),victim.global_position+Vector3.UP*0.3,Color("f7de80"),0.1,0.35)
 				combat.visuals.restored_bursts.emit(victim.global_position,"respawn")
-				victim.take_damage((victim.health+victim.shield)/maxf(0.000001,1.0-float(victim.abilities.get("damage_reduction",0.0))))
+				victim.take_damage((victim.health+victim.shield)/maxf(0.000001,1.0-float(victim.abilities.get("damage_reduction",0.0))),BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "hunting")
 				tower.relic_clocks[&"hunting"] = combat.elapsed+tower.relic_value(&"hunting", &"period")
 	if tower.has_relic(&"rapid_fire"):
 		var ready: float = tower.relic_clocks.get(&"rapid_fire",combat.elapsed+tower.relic_value(&"rapid_fire", &"period"))
@@ -42,7 +42,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 			candidates.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
 			for side in [-1,1]:
 				if side < 0 and tower.has_relic(&"crew_concentration"): continue
-				var side_targets: Array[Node3D] = candidates.filter(func(enemy): return signf(tower.patrol_visual().to_local(enemy.global_position).x) == side)
+				var side_targets: Array[Node3D] = candidates.filter(func(enemy): return signf(tower.patrol_visual().to_local(enemy.global_position).x-TowerBodyGeometry.origin(tower.definition,tower.body_cells()).x) == side)
 				var preferred: Node3D = combat.enemy_abilities.preferred(tower,side_targets)
 				if preferred != null:
 					side_targets.erase(preferred)
@@ -52,6 +52,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 					tower.attack.fire(combat,tower,victim)
 					tower.present_shot(victim,combat.visuals)
 					combat.shots_fired += 1
+					if BalanceTrace.enabled: BalanceTrace.event("attack",BalanceTrace.tower_id(tower),{"target":victim.enemy_id,"kind":"rapid_fire","damage":tower.damage})
 					break
 			tower.rapid_remaining -= 1
 			tower.rapid_next += tower.relic_value(&"rapid_fire", &"spacing")

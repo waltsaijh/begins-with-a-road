@@ -1,0 +1,32 @@
+{
+	"barracks": {
+		"baked_meshes": 19,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	},
+	"broadside_airship": {
+		"baked_meshes": 21,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	},
+	"crossfire": {
+		"baked_meshes": 11,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	},
+	"great_ballista": {
+		"baked_meshes": 46,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	},
+	"mortar": {
+		"baked_meshes": 9,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	},
+	"watchtower": {
+		"baked_meshes": 17,
+		"marker3d": true,
+		"shared_material": "res://assets/materials/solid_color.tres"
+	}
+}

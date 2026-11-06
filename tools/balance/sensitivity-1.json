@@ -1,0 +1,73 @@
+[
+  {
+    "id": "sensitivity-price120",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-price120",
+      "--reward=0.75",
+      "--price=1.2"
+    ]
+  },
+  {
+    "id": "sensitivity-oldprices",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-oldprices",
+      "--reward=0.75",
+      "--price-mode=original"
+    ]
+  },
+  {
+    "id": "sensitivity-speed120",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-speed120",
+      "--reward=0.75",
+      "--speed=1.2"
+    ]
+  },
+  {
+    "id": "sensitivity-reward120",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-reward120",
+      "--reward=0.9"
+    ]
+  },
+  {
+    "id": "sensitivity-healing150",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-healing150",
+      "--reward=0.75",
+      "--healing=1.5"
+    ]
+  },
+  {
+    "id": "sensitivity-growth70",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--level-resource=res://tests/balance/config/candidate2_frontier.tres",
+      "--late-interval=0.5",
+      "--config=sensitivity-growth70",
+      "--reward=0.75",
+      "--growth=0.7"
+    ]
+  }
+]

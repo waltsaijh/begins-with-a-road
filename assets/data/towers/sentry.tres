@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://ctxkqyv56ojbu"]
 
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/sentry.tscn" id="art_slice_e"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://d267iu2yunnih" path="res://assets/sprites/towers/sentry.png" id="1_yfivi"]
 [ext_resource type="PackedScene" uid="uid://c3ps5lqrpn65o" path="res://assets/models/towers/sentry.tscn" id="2"]
@@ -26,13 +27,16 @@ preset_path = "res://assets/data/tile_presets/blasting.tres"
 
 [resource]
 script = ExtResource("1")
+visual_model = ExtResource("art_slice_e")
 name_key = "tower.sentry.name"
+preset_group = "base"
 model = ExtResource("2")
+card_price = 9
 icon = ExtResource("1_yfivi")
 accent_color = Color(0.52, 0.8, 0.83, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
 attack_area = ExtResource("5_area")
-default_damage = 25.0
+default_damage = 12.0
 attack_interval = 0.5
 attack = ExtResource("3_attack")
 aim_pivot_path = NodePath("AimPivot")

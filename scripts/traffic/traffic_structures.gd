@@ -42,7 +42,7 @@ func validate(definition: TrafficStructureDefinition, at: Vector2i, turns: int) 
 	if (wave != null and wave.active) or (cards != null and cards.input_suspended): return "目前不能建造"
 	if tower_map.occupied.has(at) or at in tower_map.controller.terminal_cells(): return "不能覆蓋防禦塔或端點"
 	for existing: DefenseTower in tower_map.towers.values():
-		if existing.definition.deployment != null and at == existing.grid_cell+BuildCard.rotate_cell(Vector2i(0,-1),existing.rotation_steps): return "不能覆蓋兵營駐點"
+		if existing.definition.deployment != null and at == existing.garrison_cell(): return "不能覆蓋兵營駐點"
 	for existing: TrafficStructure in occupied.get(at, []):
 		if not definition.can_share(existing.definition): return "此處已有互斥設施"
 	var map: GridMap = tower_map.map
@@ -71,6 +71,7 @@ func place(definition: TrafficStructureDefinition, at: Vector2i, turns: int) -> 
 	occupied[at].append(instance)
 	instance.tree_exiting.connect(_remove_index.bind(instance))
 	_publish()
+	if BalanceTrace.enabled: BalanceTrace.event("traffic_place",str(at),{"definition":definition.resource_path,"remaining_waves":instance.remaining_waves,"effect":instance.effect})
 	return instance
 
 func remove(instance: TrafficStructure) -> bool:
@@ -81,6 +82,7 @@ func remove(instance: TrafficStructure) -> bool:
 
 func _remove_index(instance: TrafficStructure) -> void:
 	if not instances.has(instance): return
+	if BalanceTrace.enabled: BalanceTrace.event("traffic_remove",str(instance.grid_cell),{"definition":instance.definition.resource_path,"remaining_waves":instance.remaining_waves})
 	instances.erase(instance)
 	_participants.erase(instance)
 	var at := instance.grid_cell
@@ -106,6 +108,7 @@ func finish_wave() -> void:
 	for instance in _participants.duplicate():
 		if not is_instance_valid(instance) or not instances.has(instance): continue
 		instance.remaining_waves -= 1
+		if BalanceTrace.enabled: BalanceTrace.event("traffic_age",str(instance.grid_cell),{"remaining_waves":instance.remaining_waves})
 		if instance.remaining_waves <= 0: remove(instance)
 	_participants.clear()
 

@@ -1,6 +1,8 @@
 extends Node3D
 ## Allocate routes by wave index/total, shuffle departure order, then move.
 signal enemy_spawned(enemy: Node3D)
+signal enemy_leaked(enemy: Node3D)
+signal enemy_killed(enemy: Node3D)
 signal wave_finished
 signal wave_started
 signal routes_changed
@@ -47,10 +49,14 @@ var _wave_health := EnemyConstants.MAX_HEALTH
 var _wave_shield := 0.0
 var _wave_speed := EnemyConstants.MOVE_SPEED
 var total := 0
+@export var spawn_seed := 91573
+var spawn_rng := RandomNumberGenerator.new()
+var damage_received := 0.0
 var _committed_routes: Array[Dictionary] = []
 var visuals: MultiMeshInstance3D
 
 func _ready() -> void:
+	spawn_rng.seed = spawn_seed
 	visuals = VisualBatch.new()
 	visuals.name = "EnemyMultiMesh"
 	add_child(visuals)
@@ -81,9 +87,11 @@ func _on_plan_ready() -> void:
 func start_wave() -> bool:
 	if not start_allowed or active or controller == null or controller.computing:
 		return false
+	var cards := get_node_or_null("../CardPlacement")
+	if cards != null and is_instance_valid(cards.construction) and not cards.construction.entries.is_empty(): return false
 	_scheduled = definition != null
 	if _scheduled:
-		var schedule := WaveSpawnSchedule.build(definition, controller, _next_enemy_id, true, additional_start_indices)
+		var schedule := WaveSpawnSchedule.build(definition, controller, _next_enemy_id, true, additional_start_indices,null,spawn_rng)
 		if schedule.is_empty():
 			_update_button()
 			return false
@@ -104,6 +112,7 @@ func start_wave() -> bool:
 	alive = 0
 	completed = 0
 	killed = 0
+	damage_received = 0.0
 	active = true
 	_auto_started = true
 	_countdown = 0.0
@@ -111,6 +120,7 @@ func start_wave() -> bool:
 	elapsed_tick = 0
 	routes_changed.emit()
 	wave_started.emit()
+	if BalanceTrace.enabled: BalanceTrace.event("wave_start","wave",{"total":total,"pending":_pending.size()})
 	_update_button()
 	return true
 
@@ -202,6 +212,7 @@ func apply_definition(value: WaveDefinition) -> bool:
 	return true
 
 func _process(delta: float) -> void:
+	if BalanceTrace.enabled and BalanceTrace.context.get("kind","") == "interactive": BalanceTrace.time += maxf(0.0,delta)
 	if not active or _pending.is_empty():
 		return
 	if _scheduled:
@@ -229,6 +240,7 @@ func _spawn_entry(data: Dictionary) -> void:
 	enemy.abilities = data.get("abilities",enemy.troop.ability_snapshot()).duplicate(true)
 	enemy.arrived.connect(_on_arrived)
 	enemy.died.connect(_on_enemy_died)
+	enemy.damaged.connect(func(_enemy, amount: float): damage_received += amount)
 	enemy.tree_exiting.connect(_on_enemy_exiting.bind(enemy), CONNECT_ONE_SHOT)
 	add_child(enemy)
 	_living[enemy] = true
@@ -237,12 +249,17 @@ func _spawn_entry(data: Dictionary) -> void:
 	spawned += 1
 	alive += 1
 	enemy_spawned.emit(enemy)
+	if BalanceTrace.enabled: BalanceTrace.event("spawn",str(enemy.enemy_id),{"troop":enemy.troop.troop_name,"hp":enemy.health,"shield":enemy.shield,"route":str(data.route.cells),"start":data.get("start_index",0)},"spawn")
 
 func _on_arrived(enemy: Node3D) -> void:
+	if BalanceTrace.enabled: BalanceTrace.event("leak",str(enemy.enemy_id),{"troop":enemy.troop.troop_name,"remaining":enemy.health+enemy.shield})
+	enemy_leaked.emit(enemy)
 	_release_enemy(enemy, true)
 
 func _on_enemy_died(enemy: Node3D) -> void:
 	killed += 1
+	if BalanceTrace.enabled: BalanceTrace.event("death",str(enemy.enemy_id),{"troop":enemy.troop.troop_name})
+	enemy_killed.emit(enemy)
 	_release_enemy(enemy, false)
 
 func living_enemies() -> Array[Node3D]:
@@ -261,9 +278,21 @@ func _release_enemy(enemy: Node3D, reached_goal: bool) -> void:
 	alive -= 1
 	if reached_goal:
 		completed += 1
-	if _pending.is_empty() and alive == 0:
+	if active and _pending.is_empty() and alive == 0:
 		active = false
+		if BalanceTrace.enabled: BalanceTrace.event("wave_end","wave",{"spawned":spawned,"killed":killed,"leaked":completed})
 		wave_finished.emit()
+	_update_button()
+
+func abort_wave() -> void:
+	# Set inactive before clearing children; teardown must never finish a wave.
+	active = false
+	start_allowed = false
+	_pending.clear()
+	for enemy in _living.keys():
+		if is_instance_valid(enemy):
+			enemy.set_process(false)
+			enemy.queue_free()
 	_update_button()
 
 ## Do not let construction invalidate an enemy's already committed remaining trip.

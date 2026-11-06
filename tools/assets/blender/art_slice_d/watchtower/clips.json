@@ -1,0 +1,8 @@
+{
+  "fire": {
+    "frames": 25,
+    "actions": {
+      "BWAR_D_watchtower__RecoilAssembly": "BWAR_D_watchtower__fire__RecoilAssembly"
+    }
+  }
+}

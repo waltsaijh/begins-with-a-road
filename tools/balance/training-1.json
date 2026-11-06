@@ -1,0 +1,52 @@
+[
+  {
+    "id": "candidate3-damage-11",
+    "args": [
+      "--policy=damage",
+      "--seed=11",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-barracks-11",
+    "args": [
+      "--policy=barracks",
+      "--seed=11",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-generalist-23",
+    "args": [
+      "--policy=generalist",
+      "--seed=23",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-heavy-23",
+    "args": [
+      "--policy=heavy",
+      "--seed=23",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  },
+  {
+    "id": "candidate3-route-23",
+    "args": [
+      "--policy=route",
+      "--seed=23",
+      "--reward=0.75",
+      "--late-interval=0.5",
+      "--config=candidate3"
+    ]
+  }
+]

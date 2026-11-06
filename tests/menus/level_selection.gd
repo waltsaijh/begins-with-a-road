@@ -158,6 +158,11 @@ func verify():
 	await frames(6)
 	check(previous.get_ref()==null and current_scene.level==second,"Restart fell back to Frontier")
 	check(not progress.snapshot().has(second.progress_id()),"Restart during combat incorrectly recorded completion")
+	var selected: LevelDefinition = current_scene.level
+	current_scene.run_status.restart()
+	await get_tree().scene_changed
+	await frames(6)
+	check(current_scene.level == selected,"Result-screen restart fell back to Frontier")
 	finish(directory)
 func finish(directory: String):
 	progress.save_path=old_path

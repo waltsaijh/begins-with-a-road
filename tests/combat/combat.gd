@@ -36,6 +36,8 @@ func fixture() -> Node3D:
 	scene.get_node("TowerMap").tower_scene = test_tower_scene
 	add_child(scene)
 	scene.get_node("TowerMap").combat.set_process(false)
+	scene.get_node("TowerMap").combat.enemy_abilities.set_process(false)
+	scene.get_node("TowerMap").combat.barracks.set_process(false)
 	scene.get_node("TowerMap").combat.visuals.set_process(false)
 	wave.set_process(false)
 	wave.enemy_spawned.connect(func(enemy: Node3D): enemy.set_process(false))

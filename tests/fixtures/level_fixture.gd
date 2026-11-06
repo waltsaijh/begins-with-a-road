@@ -37,3 +37,15 @@ static func level(id: String, required := PackedStringArray(), vertical := false
 	act.waves = [wave]
 	result.acts = [act]
 	return result
+
+## Adapt older single-entrance experiments without changing their topology.
+static func single_start(level: LevelDefinition) -> void:
+	var map := level.terrain.instantiate() as GridMap
+	var found := false
+	for child in map.get_children():
+		if child is TerrainEndpoint and child.role == TerrainEndpoint.Role.START:
+			if found: child.free()
+			else: found = true
+	level.terrain = PackedScene.new()
+	level.terrain.pack(map)
+	map.free()

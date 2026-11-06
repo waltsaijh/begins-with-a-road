@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bbbacy17o88ue"]
+
+[ext_resource type="Script" uid="uid://bukkkoeg4bsju" path="res://tests/tower_tile_editor/playground.gd" id="1"]
+
+[node name="TowerTileEditor" type="Node3D" unique_id=1011155650]
+script = ExtResource("1")
+open_editor = true

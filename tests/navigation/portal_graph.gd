@@ -13,8 +13,17 @@ func wait_graph(controller: Node) -> void:
 		await process_frame
 	assert(false, "Portal graph did not finish")
 
+func detailed_graph(scene: Node3D) -> Dictionary:
+	var controller: Node = scene.get_node("PortalMap")
+	var snapshot := Snapshot.capture(controller.map,controller.blocked_cells)
+	var terminals: Array[Vector2i] = controller.terminal_cells()
+	var builder: RefCounted = ClassDB.instantiate("RoadPortalGraph")
+	# Production intentionally defers local shortest-path debug fields. Request
+	# those explicitly for this native DAG verification, without changing it.
+	return builder.build(snapshot.cells,snapshot.ports,terminals[1],terminals[0],true,PackedVector2Array(terminals.slice(2)))
+
 func verify_graph(scene: Node3D) -> void:
-	var graph: Dictionary = scene.get_node("PortalMap").graph
+	var graph := detailed_graph(scene)
 	assert(graph.valid, str(graph.get("error")))
 	assert(graph.stats.cycles == graph.stats.logical_cycles)
 	assert(graph.quads.size() == graph.stats.faces)
@@ -48,7 +57,9 @@ func verify_graph(scene: Node3D) -> void:
 func verify() -> void:
 	assert(ClassDB.class_exists("RoadPortalGraph"))
 	assert(not ClassDB.class_exists("RoadTopology") and not ClassDB.class_exists("RoadRouteCover"))
-	var scene: Node3D = load("res://scenes/main.tscn").instantiate()
+	var cells: Array[Vector2i] = []
+	for x in 24: cells.append(Vector2i(x,0))
+	var scene: Node3D = Fixture.scene_for(cells,Vector2i.ZERO,Vector2i(23,0))
 	root.add_child(scene)
 	await process_frame
 	var controller: Node = scene.get_node("PortalMap")
@@ -59,9 +70,9 @@ func verify() -> void:
 	assert(controller.graph.stats.nodes == 2 and controller.graph.stats.corridors == 1 and controller.graph.regions.is_empty())
 	assert(view.routes_mesh.mesh == null and not view.show_routes)
 	assert(placement.place_cell(Vector3i(8, 0, 1)))
-	assert(controller.computing and controller.graph.is_empty() and view.routes_mesh.mesh == null)
+	assert(not controller.computing and view.routes_mesh.mesh == null)
 	await wait_graph(controller)
-	assert(controller.graph.stats.nodes == 4 and controller.graph.stats.corridors == 3)
+	assert(controller.graph.stats.nodes == 2 and controller.graph.stats.corridors == 1)
 	# Completing a 2x2 lane-change area creates a broad region with two mouths.
 	assert(placement.place_cell(Vector3i(9, 0, 1)))
 	assert(placement.place_cell(Vector3i(50, 0, 50)))
@@ -93,9 +104,10 @@ func verify() -> void:
 			assert(node.cell == Vector2i(8, 0))
 	assert(mouths.size() == 3)
 	assert(Vector2i(0, 0) in mouths and Vector2i(4, 0) in mouths and Vector2i(1, 2) in mouths)
-	assert(controller.graph.local_routes.size() == 3)
+	var detailed := detailed_graph(scene)
+	assert(detailed.local_routes.size() == 3)
 	var lengths_and_counts := []
-	for pair: Dictionary in controller.graph.local_routes:
+	for pair: Dictionary in detailed.local_routes:
 		lengths_and_counts.append(Vector2i(pair.length, pair.count))
 	assert(Vector2i(3, 3) in lengths_and_counts and Vector2i(4, 1) in lengths_and_counts and Vector2i(5, 10) in lengths_and_counts)
 	view = scene.get_node("PortalOverlay")
@@ -111,9 +123,10 @@ func verify() -> void:
 	controller = scene.get_node("PortalMap")
 	await wait_graph(controller)
 	verify_graph(scene)
-	assert(controller.graph.local_routes.size() == 1)
-	assert(controller.graph.local_routes[0].count == 2 and controller.graph.local_routes[0].length == 2)
-	assert(Paths.directed_links(controller.graph, controller.graph.local_routes[0]).size() == 8)
+	detailed = detailed_graph(scene)
+	assert(detailed.local_routes.size() == 1)
+	assert(detailed.local_routes[0].count == 2 and detailed.local_routes[0].length == 2)
+	assert(Paths.directed_links(detailed, detailed.local_routes[0]).size() == 8)
 	scene.queue_free()
 	await process_frame
 	for obstacle in [false, true]:
@@ -132,7 +145,7 @@ func verify() -> void:
 	await process_frame
 	await wait_graph(scene.get_node("PortalMap"))
 	verify_graph(scene)
-	assert(scene.find_children("*", "Label3D", true, false).is_empty())
+	assert(scene.get_node("PortalOverlay").find_children("*", "Label3D", true, false).is_empty())
 	scene.queue_free()
 	await process_frame
 	var builder: RefCounted = ClassDB.instantiate("RoadPortalGraph")

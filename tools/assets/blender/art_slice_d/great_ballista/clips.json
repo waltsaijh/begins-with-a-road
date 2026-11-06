@@ -1,0 +1,15 @@
+{
+  "attack": {
+    "frames": 72,
+    "actions": {
+      "BWAR_D_great_ballista__WeaponMount": "BWAR_D_great_ballista__attack__WeaponMount",
+      "BWAR_D_great_ballista__BowString-1": "BWAR_D_great_ballista__attack__BowString-1",
+      "BWAR_D_great_ballista__BowString1": "BWAR_D_great_ballista__attack__BowString1",
+      "BWAR_D_great_ballista__TensionLink": "BWAR_D_great_ballista__attack__TensionLink",
+      "BWAR_D_great_ballista__Slider": "BWAR_D_great_ballista__attack__Slider",
+      "BWAR_D_great_ballista__BoltCarrier": "BWAR_D_great_ballista__attack__BoltCarrier",
+      "BWAR_D_great_ballista__LimbPivot-1": "BWAR_D_great_ballista__attack__LimbPivot-1",
+      "BWAR_D_great_ballista__LimbPivot1": "BWAR_D_great_ballista__attack__LimbPivot1"
+    }
+  }
+}

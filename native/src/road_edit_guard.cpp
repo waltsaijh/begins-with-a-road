@@ -12,6 +12,9 @@ Dictionary RoadEditGuard::prepare(const PackedInt32Array &cells,const PackedByte
     for(int i=0;i<ports.size();++i) input.push_back({cells[i*2],cells[i*2+1],ports[i]});
     std::vector<std::pair<int,int>> ends;
     for(int i=0;i<terminals.size();++i) {Vector2i cell(terminals[i]);ends.push_back({cell.x,cell.y});}
-    result["valid"]=guard.prepare(input,ends);result["route_tiles"]=guard.route_tiles;return result;
+    result["valid"]=guard.prepare(input,ends);result["route_tiles"]=guard.route_tiles;
+    PackedInt32Array route_cells;
+    for(int i:guard.route_cell_indices) {route_cells.push_back(input[i].x);route_cells.push_back(input[i].y);}
+    result["route_cells"]=route_cells;return result;
 }
 bool RoadEditGuard::add_cell(Vector2i cell) {return guard.add_cell(cell.x,cell.y);}

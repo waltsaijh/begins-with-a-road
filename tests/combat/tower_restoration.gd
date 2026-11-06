@@ -142,7 +142,7 @@ func verify_card_placement() -> void:
 	var tower_map: Node = scene.get_node("TowerMap")
 	for key: String in ["mortar","ballista","broadside","crossfire","barracks"]:
 		var definition: TowerDefinition = load("res://assets/data/towers/"+key+".tres")
-		for candidate in definition.tile_preset_candidates: check(candidate.resolve_preset() != null,"Invalid restored candidate: "+key)
+		for candidate in definition.preset_candidates(): check(candidate.resolve_preset() != null,"Invalid restored candidate: "+key)
 		for turns in 4:
 			var card := BuildCard.from_parts(definition,definition.first_tile_preset())
 			check(cards.add_card(card),"Restored card could not enter normal hand: "+key)
@@ -152,7 +152,7 @@ func verify_card_placement() -> void:
 			var error: String = tower_map.validate_card(card,anchor,turns)
 			check(error.is_empty(),"Restored rotated card placement rejected: "+key+error)
 			cards.preview.show_at(scene.get_node("TileMap"),card,anchor,turns,error.is_empty())
-			check(cards.preview.ghost != null and cards.preview.range_cells == definition.attack_cells_at(Vector2i(5,5),turns),"Restored model/range preview differs from definition: "+key)
+			check(cards.preview.ghost != null and cards.preview.range_cells == definition.effective_attack_cells(card.tower_anchor(Vector2i(5,5),turns),card.tower_facing(turns),1,false,-1,TowerBodyGeometry.local_cells(card.tile_preset)),"Restored model/range preview differs from definition: "+key)
 			var before: int = cards.cards.size()
 			var placed: DefenseTower = cards.place_selected(anchor)
 			check(placed != null and placed.rotation_steps == turns and cards.cards.size() == before-1,"Restored normal hand commit failed: "+key)
@@ -216,7 +216,7 @@ func verify_barracks() -> void:
 	get_tree().paused = false
 	check(unit.health == paused_health and foe.global_position == position,"Pause advanced friendly contact combat")
 	allies._process(1.0)
-	check(foe.health == 96 and unit.health == 35,"Friendly attack or enemy counterattack values incorrect")
+	check(foe.health == 100-unit.settings.damage and unit.health == 35,"Friendly attack or enemy counterattack values incorrect")
 	unit.take_damage(100)
 	check(unit.dead and foe.engaged_by == null,"Friendly death did not release enemy")
 	foe._process(0.1)

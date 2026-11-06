@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/imported_tower_visual.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/broadside_art.tscn" id="2"]
+
+[node name="TowerVisual" type="Node3D"]
+script = ExtResource("1")
+tower_kind = "broadside"
+
+[node name="Art" parent="." instance=ExtResource("2")]

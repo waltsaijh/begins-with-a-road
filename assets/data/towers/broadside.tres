@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://wi7jm2k8d4eq"]
 
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/broadside.tscn" id="art_slice_e"]
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/broadside.tres" id="1_xpn7g"]
 [ext_resource type="Resource" path="res://assets/data/towers/ranges/broadside.tres" id="2_av4gk"]
 [ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="3_xpn7g"]
@@ -28,13 +29,15 @@ preset_path = "res://assets/data/tile_presets/broadside_04.tres"
 
 [resource]
 script = ExtResource("5_l6yb8")
+visual_model = ExtResource("art_slice_e")
 name_key = "tower.broadside.name"
+preset_group = "base"
 model = ExtResource("4_ggahg")
-card_price = 12
+card_price = 8
 icon = SubResource("CompressedTexture2D_x372t")
 accent_color = Color(0.7882353, 0.63529414, 0.92941177, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
 attack_area = ExtResource("2_av4gk")
-default_damage = 8.0
+default_damage = 16.0
 attack = ExtResource("1_xpn7g")
 tile_preset_candidates = Array[ExtResource("6_odhbd")]([SubResource("Resource_1ljdw"), SubResource("Resource_nf4w8"), SubResource("Resource_ilwns"), SubResource("Resource_3g8r7")])

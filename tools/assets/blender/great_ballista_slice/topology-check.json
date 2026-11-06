@@ -1,0 +1,23 @@
+{
+  "A": {
+    "nonmanifold_edges": 0,
+    "vertices_outside_footprint": 0,
+    "nonpositive_determinants": 0,
+    "meshes": 23,
+    "duplicate_names": 0
+  },
+  "B": {
+    "nonmanifold_edges": 0,
+    "vertices_outside_footprint": 0,
+    "nonpositive_determinants": 0,
+    "meshes": 39,
+    "duplicate_names": 0
+  },
+  "C": {
+    "nonmanifold_edges": 0,
+    "vertices_outside_footprint": 0,
+    "nonpositive_determinants": 0,
+    "meshes": 46,
+    "duplicate_names": 0
+  }
+}

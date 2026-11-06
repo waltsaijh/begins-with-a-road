@@ -19,10 +19,10 @@ func set_patrol_offset(offset: float) -> void:
 	motion_root().position = _motion_rest+Vector3(offset,0,0)
 func prepare_target(target: Node3D) -> void:
 	target_position = motion_root().to_local(target.global_position)
-	side = -1 if target_position.x < 0 else 1
+	side = -1 if target_position.x < Vector3(get_meta("body_center",Vector3.ZERO)).x else 1
 func muzzle_position() -> Vector3:
 	var markers := muzzles()
-	if kind == 3: markers = markers.filter(func(n): return signf(motion_root().to_local(n.global_position).x) == side)
+	if kind == 3: markers = markers.filter(func(n): return signf(motion_root().to_local(n.global_position).x-Vector3(get_meta("body_center",Vector3.ZERO)).x) == side)
 	markers.sort_custom(func(a,b): return a.global_position.distance_squared_to(motion_root().to_global(target_position)) < b.global_position.distance_squared_to(motion_root().to_global(target_position)))
 	if not markers.is_empty(): return markers[0].global_position
 	return motion_root().to_global(Vector3(0,0.7,0))
@@ -37,7 +37,7 @@ func fire(_target: Node3D,effects: Node = null) -> void:
 		effects.play_restored_shot(kind,shot_sound)
 		var markers := muzzles()
 		for marker in markers:
-			if kind == 3 and signf(motion_root().to_local(marker.global_position).x) != side: continue
+			if kind == 3 and signf(motion_root().to_local(marker.global_position).x-Vector3(get_meta("body_center",Vector3.ZERO)).x) != side: continue
 			effects.restored_bursts.emit(marker.global_position,["arrow","shell","bolt","broadside","radial"][kind])
 func _process(delta: float) -> void:
 	pulse = maxf(0,pulse-delta*3)

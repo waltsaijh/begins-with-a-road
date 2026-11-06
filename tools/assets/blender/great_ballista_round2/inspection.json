@@ -1,0 +1,33 @@
+{
+  "triangles": 1352,
+  "mesh_objects": 46,
+  "materials": {
+    "main": "#DFD9CE",
+    "functional_dark": "#465155"
+  },
+  "bounds_min": [
+    -0.49000000953674316,
+    -1.4149999618530273,
+    0.0
+  ],
+  "bounds_max": [
+    1.2899999618530273,
+    0.49000000953674316,
+    0.800000011920929
+  ],
+  "size": [
+    1.7799999713897705,
+    1.9049999713897705,
+    0.800000011920929
+  ],
+  "source_sha256": "14d55a0b2910f5e2bf3d378fe51c39b800c50371b2a4854f3bf2268eef4b300f",
+  "animation": {
+    "frames": 72,
+    "fps": 24,
+    "draw_units": 0.24,
+    "upper_recoil_units": 0.07,
+    "max_limb_flex_degrees": 5,
+    "reload_frame": 59
+  },
+  "non_round2_objects_unchanged": true
+}

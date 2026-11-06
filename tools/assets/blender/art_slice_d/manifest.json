@@ -1,0 +1,376 @@
+{
+  "great_ballista": {
+    "source": "tools\\assets\\blender\\great_ballista_round2\\model.blend",
+    "source_sha256": "b7d6a71ef3fa917abeca5e8e1a8951dcc7416e57685956e11e746f1a536e249a",
+    "footprint": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "clips": {
+      "attack": {
+        "frames": 72,
+        "seconds": 2.9583333333333335,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 1352,
+      "mesh_objects": 46,
+      "materials": 4,
+      "bounds_min": [
+        -0.49000000953674316,
+        -1.4149999618530273,
+        0.0
+      ],
+      "bounds_max": [
+        1.2899999618530273,
+        0.49000000953674316,
+        0.800000011920929
+      ],
+      "size": [
+        1.7799999713897705,
+        1.9049999713897705,
+        0.800000011920929
+      ]
+    },
+    "muzzles": {
+      "Muzzle": [
+        0.0,
+        0.49000000953674316,
+        0.7099999785423279
+      ]
+    }
+  },
+  "watchtower": {
+    "source": "tools\\assets\\blender\\tower_family\\watchtower\\model.blend",
+    "source_sha256": "ddeddfb1a8e47330dd0aac152deb3862f01f8bb394e17ca7ab522af1a13390ee",
+    "footprint": [
+      [
+        0,
+        0
+      ]
+    ],
+    "clips": {
+      "fire": {
+        "frames": 25,
+        "seconds": 1.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 484,
+      "mesh_objects": 17,
+      "materials": 3,
+      "bounds_min": [
+        -0.3400000035762787,
+        -0.33000001311302185,
+        0.0
+      ],
+      "bounds_max": [
+        0.3400000035762787,
+        0.4000000059604645,
+        1.4925000667572021
+      ],
+      "size": [
+        0.6800000071525574,
+        0.7300000190734863,
+        1.4925000667572021
+      ]
+    },
+    "muzzles": {
+      "ArrowRelease": [
+        0.0,
+        0.4000000059604645,
+        1.4800000190734863
+      ]
+    }
+  },
+  "barracks": {
+    "source": "tools\\assets\\blender\\tower_family\\barracks\\model.blend",
+    "source_sha256": "ea310a1ef38bbc01ce900f53e0bd4dcacd64e3bb144c77a97dda4f1943051313",
+    "footprint": [
+      [
+        0,
+        0
+      ]
+    ],
+    "clips": {
+      "open_close": {
+        "frames": 73,
+        "seconds": 3.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 804,
+      "mesh_objects": 19,
+      "materials": 4,
+      "bounds_min": [
+        -0.4399999976158142,
+        -0.4300000071525574,
+        0.0
+      ],
+      "bounds_max": [
+        0.4399999976158142,
+        0.4300000071525574,
+        0.8899999856948853
+      ],
+      "size": [
+        0.8799999952316284,
+        0.8600000143051147,
+        0.8899999856948853
+      ]
+    },
+    "muzzles": {}
+  },
+  "mortar": {
+    "source": "tools\\assets\\blender\\tower_family\\mortar\\model.blend",
+    "source_sha256": "b57e6f0c9eac87fe7b299f5bb65f78bbcfd195602b352659c67124bd8ef598f0",
+    "footprint": [
+      [
+        0,
+        0
+      ],
+      [
+        -1,
+        0
+      ],
+      [
+        -1,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "clips": {
+      "fire": {
+        "frames": 37,
+        "seconds": 1.5,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 492,
+      "mesh_objects": 9,
+      "materials": 3,
+      "bounds_min": [
+        -1.3899999856948853,
+        -1.3899999856948853,
+        0.0
+      ],
+      "bounds_max": [
+        0.38999998569488525,
+        0.38999998569488525,
+        1.2949527502059937
+      ],
+      "size": [
+        1.7799999713897705,
+        1.7799999713897705,
+        1.2949527502059937
+      ]
+    },
+    "muzzles": {
+      "Muzzle0": [
+        -0.5,
+        -0.2800000011920929,
+        1.0499999523162842
+      ]
+    }
+  },
+  "crossfire": {
+    "source": "tools\\assets\\blender\\tower_family\\crossfire\\model.blend",
+    "source_sha256": "2c90d496c45dafec699d056b298563aa05798591b6004f6754b8e4167db19ed2",
+    "footprint": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        -1
+      ],
+      [
+        1,
+        -1
+      ]
+    ],
+    "clips": {
+      "fire_north": {
+        "frames": 25,
+        "seconds": 1.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      },
+      "fire_east": {
+        "frames": 25,
+        "seconds": 1.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      },
+      "fire_south": {
+        "frames": 25,
+        "seconds": 1.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      },
+      "fire_west": {
+        "frames": 25,
+        "seconds": 1.0,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 612,
+      "mesh_objects": 11,
+      "materials": 3,
+      "bounds_min": [
+        -0.4300000071525574,
+        -0.43000003695487976,
+        0.0
+      ],
+      "bounds_max": [
+        1.4300000667572021,
+        1.4300000667572021,
+        0.7699999809265137
+      ],
+      "size": [
+        1.8600000739097595,
+        1.860000103712082,
+        0.7699999809265137
+      ]
+    },
+    "muzzles": {
+      "Muzzle0": [
+        0.5,
+        1.4299999475479126,
+        0.5199999809265137
+      ],
+      "Muzzle1": [
+        1.4299999475479126,
+        0.5,
+        0.5199999809265137
+      ],
+      "Muzzle2": [
+        0.5,
+        -0.4300000071525574,
+        0.5199999809265137
+      ],
+      "Muzzle3": [
+        -0.4300000071525574,
+        0.5,
+        0.5199999809265137
+      ]
+    }
+  },
+  "broadside_airship": {
+    "source": "tools\\assets\\blender\\tower_family\\broadside_airship\\model.blend",
+    "source_sha256": "270e75c08e5650471dc42ae94d4c278bdadeb431639cedd53e702db457bb6b30",
+    "footprint": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "clips": {
+      "fire_port": {
+        "frames": 33,
+        "seconds": 1.3333333333333333,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      },
+      "fire_starboard": {
+        "frames": 33,
+        "seconds": 1.3333333333333333,
+        "reset_error": 0.0,
+        "body_outside_footprint_samples": 0,
+        "below_floor_samples": 0
+      }
+    },
+    "geometry": {
+      "triangles": 936,
+      "mesh_objects": 21,
+      "materials": 3,
+      "bounds_min": [
+        -0.47999998927116394,
+        -1.3899999856948853,
+        0.0
+      ],
+      "bounds_max": [
+        0.47999998927116394,
+        0.4000000059604645,
+        1.6200000047683716
+      ],
+      "size": [
+        0.9599999785423279,
+        1.7899999916553497,
+        1.6200000047683716
+      ]
+    },
+    "muzzles": {
+      "Muzzle(-1, 0)": [
+        -0.47999998927116394,
+        -1.0,
+        0.75
+      ],
+      "Muzzle(-1, 1)": [
+        -0.47999998927116394,
+        -0.5,
+        0.75
+      ],
+      "Muzzle(-1, 2)": [
+        -0.47999998927116394,
+        -0.019999999552965164,
+        0.75
+      ],
+      "Muzzle(1, 0)": [
+        0.47999998927116394,
+        -1.0,
+        0.75
+      ],
+      "Muzzle(1, 1)": [
+        0.47999998927116394,
+        -0.5,
+        0.75
+      ],
+      "Muzzle(1, 2)": [
+        0.47999998927116394,
+        -0.019999999552965164,
+        0.75
+      ]
+    }
+  }
+}

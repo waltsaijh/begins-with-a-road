@@ -10,6 +10,8 @@ extends Resource
 			name_key = value
 			emit_changed()
 @export var model: PackedScene
+## Optional authored visual wrapper. model remains the legacy geometry/audio fallback.
+@export var visual_model: PackedScene
 ## Optional friendly deployment; soldiers are not navigation obstacles.
 @export var deployment: BarracksDeployment
 @export var growth: TowerGrowth = preload("res://assets/data/towers/growth/standard.tres")
@@ -53,13 +55,20 @@ extends Resource
 ## Fallback for models without a muzzle marker.
 @export var muzzle_offset := TowerConstants.MUZZLE_OFFSET
 @export_group("Tile Presets")
+## Empty preserves the legacy pool; base reads the editor's marked combination.
+@export var preset_group := ""
 @export var tile_preset_candidates: Array[TilePresetCandidate] = []
+
+func preset_candidates() -> Array[TilePresetCandidate]:
+	if preset_group == "base":
+		return preload("res://scripts/cards/definitions/base_preset_pool.gd").candidates(name_key.get_slice(".",1))
+	return tile_preset_candidates
 
 func localized_name() -> String:
 	return tr(name_key)
 
 func first_tile_preset() -> TilePreset:
-	for candidate in tile_preset_candidates:
+	for candidate in preset_candidates():
 		if candidate == null: continue
 		var preset := candidate.resolve_preset()
 		if preset != null: return preset
@@ -68,7 +77,7 @@ func first_tile_preset() -> TilePreset:
 func roll_tile_preset(rng: RandomNumberGenerator) -> TilePreset:
 	var options: Array[Dictionary] = []
 	var largest := 0.0
-	for candidate in tile_preset_candidates:
+	for candidate in preset_candidates():
 		if candidate == null: continue
 		var preset := candidate.resolve_preset()
 		if preset == null: continue
@@ -110,7 +119,22 @@ func attack_cells_at(anchor: Vector2i, turns := 0, radius_override := -1.0) -> A
 	if attack_area != null: return attack_area.cells_at(anchor, turns)
 	return TowerAttackArea.circle_cells(anchor, attack_radius if radius_override < 0 else radius_override)
 
-func effective_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false, radius_override := -1.0) -> Array[Vector2i]:
+func effective_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false, radius_override := -1.0, body: Array[Vector2i] = []) -> Array[Vector2i]:
+	if not body.is_empty() and deployment == null:
+		var radius := attack_radius if radius_override < 0 else radius_override
+		var base := TowerBodyGeometry.base_cells(self,body,radius*factor if attack_area == null else radius)
+		var center := TowerBodyGeometry.origin(self,body)
+		var covered := {}
+		for offset in base:
+			if attack_area == null or factor == 1:
+				if not right_only or offset.x > center.x: covered[offset] = true
+			else:
+				for y in range(ceili(center.y+(offset.y-center.y-0.5)*factor),ceili(center.y+(offset.y-center.y+0.5)*factor)):
+					for x in range(ceili(center.x+(offset.x-center.x-0.5)*factor),ceili(center.x+(offset.x-center.x+0.5)*factor)):
+						if not right_only or x > center.x: covered[Vector2i(x,y)] = true
+		var cells: Array[Vector2i] = []
+		for offset: Vector2i in covered: cells.append(anchor+BuildCard.rotate_cell(offset,turns))
+		return cells
 	if factor == 1 and not right_only: return attack_cells_at(anchor, turns, radius_override)
 	var local: Array[Vector2i] = []
 	if attack_area == null:
@@ -128,12 +152,12 @@ func effective_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_o
 		if not right_only or offset.x > 0: result.append(anchor+BuildCard.rotate_cell(offset,turns))
 	return result
 
-func patrol_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false) -> Array[Vector2i]:
+func patrol_attack_cells(anchor: Vector2i, turns: int, factor := 1.0, right_only := false, body: Array[Vector2i] = []) -> Array[Vector2i]:
 	var reach := 0
 	for offset in attack_cells_at(Vector2i.ZERO): reach = maxi(reach,absi(offset.x))
 	var covered := {}
 	for step in range(-reach,reach+1):
-		for cell in effective_attack_cells(anchor+BuildCard.rotate_cell(Vector2i(step,0),turns),turns,factor,right_only): covered[cell] = true
+		for cell in effective_attack_cells(anchor+BuildCard.rotate_cell(Vector2i(step,0),turns),turns,factor,right_only,-1.0,body): covered[cell] = true
 	var result: Array[Vector2i] = []
 	result.assign(covered.keys())
 	return result

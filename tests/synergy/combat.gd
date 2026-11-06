@@ -85,6 +85,9 @@ func run() -> void:
 func verify_guardian() -> void:
 	var tower := build("ballista",Vector2i(4,5))
 	var rat := enemy("rat_swarm",Vector2i(4,4))
+	# Survive several hits so later assertions test eligibility, not changed damage.
+	rat.health = 100
+	rat.max_health = 100
 	var guard := enemy("shield_guardian",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"guardian overrides earlier/nearer rat for single target")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))

@@ -13,6 +13,11 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var acts: Array[ActDefinition] = []
 ## Null runs the ordinary level rules without teaching restrictions.
 @export var tutorial: TutorialDefinition
+## Zero keeps independent mechanic fixtures without a loss condition.
+@export_range(0, 100, 1) var base_health := 0
+@export var reward_final_act := false
+@export_range(0, 100, 1) var starting_gold := 0
+@export var opening_shop := false
 
 func progress_id() -> String:
 	if not level_id.strip_edges().is_empty(): return level_id.strip_edges()

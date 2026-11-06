@@ -1,0 +1,302 @@
+{
+  "current": [
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\navigation-route_distribution.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "navigation/route_distribution"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\navigation-multiple_starts.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "navigation/multiple_starts"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\navigation-waypoint_routes.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "navigation/waypoint_routes"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\navigation-dead_end_edits.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "navigation/dead_end_edits"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\levels-wave_spawn_groups.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "levels/wave_spawn_groups"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\levels-terrain_endpoints.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "levels/terrain_endpoints"
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\levels-level_flow.log",
+      "errors": [],
+      "rendered": false,
+      "case": "levels/level_flow",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\levels-act_spawn_expansion.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "levels/act_spawn_expansion"
+    },
+    {
+      "exit": 0,
+      "log": ".godot\\phase5\\trace-final-checks\\traffic-integration.log",
+      "rendered": false,
+      "completed": true,
+      "status": "Current PASS",
+      "case": "traffic/integration",
+      "errors": []
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\combat-tower_restoration.log",
+      "errors": [],
+      "rendered": false,
+      "case": "combat/tower_restoration",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "exit": 0,
+      "case": "combat/attack_area",
+      "log": ".godot\\phase5\\repairs\\combat-attack_area.log",
+      "rendered": false,
+      "completed": true,
+      "errors": [],
+      "status": "Current PASS"
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\combat-combat.log",
+      "errors": [],
+      "rendered": false,
+      "case": "combat/combat",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\enemies-enemy_status.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "enemies/enemy_status"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\relics-stacking.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "relics/stacking"
+    },
+    {
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\regression-v2\\relics-rewards.log",
+      "completed": true,
+      "errors": [],
+      "rendered": false,
+      "exit": 0,
+      "case": "relics/rewards"
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\relics-mechanisms.log",
+      "errors": [],
+      "rendered": false,
+      "case": "relics/mechanisms",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\synergy-routing.log",
+      "errors": [],
+      "rendered": false,
+      "case": "synergy/routing",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\synergy-combat.log",
+      "errors": [],
+      "rendered": false,
+      "case": "synergy/combat",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\levels-level_teardown.log",
+      "errors": [],
+      "rendered": false,
+      "case": "levels/level_teardown",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\levels-road_flow_preview.log",
+      "case": "levels/road_flow_preview",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\cards-card_shop.log",
+      "case": "cards/card_shop",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\relics-input.log",
+      "case": "relics/input",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\synergy-input.log",
+      "case": "synergy/input",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\levels-pause_menu.log",
+      "case": "levels/pause_menu",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "completed": true,
+      "exit": 0,
+      "log": ".godot\\phase5\\rendered-regression\\levels-level_teardown.log",
+      "case": "levels/level_teardown",
+      "status": "Current PASS",
+      "rendered": true,
+      "errors": [
+        "ERROR: Can't create shader cache folder, no shader caching will happen: user://"
+      ]
+    },
+    {
+      "exit": 0,
+      "log": ".godot\\phase5\\trace-final-checks\\balance-rules.log",
+      "rendered": false,
+      "completed": true,
+      "status": "Current PASS",
+      "case": "balance/rules",
+      "errors": []
+    },
+    {
+      "completed": true,
+      "log": ".godot\\phase5\\final-regression\\cards-card_shop.log",
+      "errors": [],
+      "rendered": false,
+      "case": "cards/card_shop",
+      "status": "Current PASS",
+      "exit": 0
+    },
+    {
+      "case": "balance/rendered_final",
+      "rendered": true,
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\rendered-final.log",
+      "completed": true,
+      "errors": []
+    },
+    {
+      "case": "balance/defeat_input",
+      "rendered": true,
+      "status": "Current PASS",
+      "log": ".godot\\phase5\\defeat-input.log",
+      "completed": true,
+      "errors": []
+    }
+  ],
+  "other": [
+    {
+      "case": "Windows release export",
+      "status": "NOT RUN"
+    },
+    {
+      "case": "Web wasm build and browser",
+      "status": "NOT RUN"
+    },
+    {
+      "case": "Performance / memory benchmark",
+      "status": "NOT RUN"
+    },
+    {
+      "case": "Human playtesting",
+      "status": "NOT RUN"
+    },
+    {
+      "case": "Wave editor interaction after Phase 5",
+      "status": "NOT RUN"
+    }
+  ],
+  "notes": [
+    "Previous failed attempts retained in their original logs, superseded only by an actual successful rerun.",
+    "Phase 1–4 historical results not rerun in this session remain Historical PASS only; see their acceptance documents.",
+    "A game defeat in a sensitivity experiment is a valid measured outcome, not a regression-test failure."
+  ]
+}

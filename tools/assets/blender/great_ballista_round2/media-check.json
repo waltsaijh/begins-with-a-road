@@ -1,0 +1,38 @@
+{
+  "attack_preview.png": {
+    "frames": 36,
+    "fps": 12,
+    "seconds": 3,
+    "size": [
+      720,
+      640
+    ],
+    "crc_sequence_and_bounds": "PASS",
+    "lossless_reference_frames": [
+      0,
+      12,
+      15,
+      23,
+      29,
+      35
+    ]
+  },
+  "attack_game_scale.png": {
+    "frames": 36,
+    "fps": 12,
+    "seconds": 3,
+    "size": [
+      1280,
+      800
+    ],
+    "crc_sequence_and_bounds": "PASS",
+    "lossless_reference_frames": [
+      0,
+      12,
+      15,
+      23,
+      29,
+      35
+    ]
+  }
+}

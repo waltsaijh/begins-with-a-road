@@ -6,6 +6,11 @@ tile_preset.corner,Corner,轉角
 tile_preset.bridge,Bridge,跨橋
 tile_preset.flank,Flank,側翼
 tile_preset.blasting,Blasting,爆響
+construction.preset.straight,Long Road,長廊
+construction.preset.corner,Elbow,大轉角
+construction.preset.tee,Junction,分岔
+construction.preset.cross,Crossroads,交會
+construction.preset.pocket,Wide Pocket,大環繞
 card.name_format,{prefix} {tower},{prefix}{tower}
 card.unassigned,Unassigned card,未設定卡片
 troop.soldier.name,Soldier,士兵
@@ -157,3 +162,4 @@ troop.blood_mage.name,Blood Mage,血法師
 troop.winged_beast.name,Winged Beast,飛翼獸
 troop.scout.name,Scout,偵查兵
 troop.saboteur.name,Saboteur,爆破手
+troop.siege_behemoth.name,Siege Behemoth,攻城巨獸

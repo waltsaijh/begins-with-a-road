@@ -19,10 +19,10 @@ func can_acquire(relic: RelicDefinition) -> bool:
 func acquire(relic: RelicDefinition) -> bool:
 	if not can_acquire(relic): return false
 	held[relic.id] = int(held.get(relic.id,0))+1
+	if BalanceTrace.enabled: BalanceTrace.event("relic",str(relic.id),{"count":held[relic.id]},"relic")
 	var shop := tower_map.get_node_or_null("../CardPlacement/Shop") if tower_map != null else null
 	if shop != null and relic.id == &"gold":
-		shop.coins += int(relic.parameters.amount)
-		shop._refresh()
+		shop.grant_gold(int(relic.parameters.amount),"relic_gold")
 	refresh_towers()
 	changed.emit()
 	acquired.emit(relic)
@@ -124,8 +124,8 @@ func options() -> Array[RelicDefinition]:
 		result.append(selected)
 	return result
 
-func preview_cells(definition: TowerDefinition, anchor: Vector2i, turns: int) -> Array[Vector2i]:
+func preview_cells(definition: TowerDefinition, anchor: Vector2i, turns: int, body: Array[Vector2i] = []) -> Array[Vector2i]:
 	var effects := effects_for(definition)
 	var factor := float(effects.get(&"support_attack",{}).get("range_multiplier",1.0))
-	if effects.has(&"departure"): return definition.patrol_attack_cells(anchor,turns,factor,effects.has(&"crew_concentration"))
-	return definition.effective_attack_cells(anchor, turns, factor, effects.has(&"crew_concentration"))
+	if effects.has(&"departure"): return definition.patrol_attack_cells(anchor,turns,factor,effects.has(&"crew_concentration"),body)
+	return definition.effective_attack_cells(anchor, turns, factor, effects.has(&"crew_concentration"),-1.0,body)

@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://dyunxa6qn2fy2"]
 
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/mortar.tscn" id="art_slice_e"]
 [ext_resource type="Resource" path="res://assets/data/towers/attacks/mortar.tres" id="1_3eu6o"]
 [ext_resource type="Resource" path="res://assets/data/towers/growth/standard.tres" id="2_0bsys"]
 [ext_resource type="Texture2D" uid="uid://dnf66dbtgh3la" path="res://assets/sprites/towers/mortar.png" id="2_4m8w2"]
@@ -25,13 +26,15 @@ preset_path = "res://assets/data/tile_presets/mortar_04.tres"
 
 [resource]
 script = ExtResource("4_iyo7d")
+visual_model = ExtResource("art_slice_e")
 name_key = "tower.mortar.name"
+preset_group = "base"
 model = ExtResource("3_0bsys")
-card_price = 14
+card_price = 9
 icon = ExtResource("2_4m8w2")
 accent_color = Color(0.9372549, 0.7294118, 0.40784314, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
-default_damage = 8.0
+default_damage = 24.0
 attack_interval = 2.0
 attack = ExtResource("1_3eu6o")
 tile_preset_candidates = Array[ExtResource("5_s6esk")]([SubResource("Resource_u5psg"), SubResource("Resource_jlehk"), SubResource("Resource_rxcws"), SubResource("Resource_avanp")])

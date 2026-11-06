@@ -17,11 +17,14 @@ var _map_was_visible := true
 var _controller: Node
 var _appearance: Node
 var _support_mesh: Mesh
+var surface := preload("res://scripts/map/tile/appearance/road_surface.gd").new()
+var _display_items := {}
+var _display_states := {}
 
 func _ready() -> void:
 	static_tiles = GridMap.new()
 	static_tiles.name = "StaticTiles"
-	static_tiles.mesh_library = map.mesh_library
+	static_tiles.mesh_library = surface.library
 	static_tiles.cell_size = map.cell_size
 	static_tiles.cell_center_x = map.cell_center_x
 	static_tiles.cell_center_y = map.cell_center_y
@@ -96,23 +99,29 @@ func sync() -> void:
 		return # graph_changed schedules the completed snapshot.
 	global_transform = map.global_transform
 	var present := {}
+	surface.prepare(map,_controller.blocked_cells if _controller != null else {},_controller.terminal_cells() if _controller != null else [])
 	for cell in map.get_used_cells():
 		var target := Vector2i(map.get_cell_item(cell), map.get_cell_item_orientation(cell))
+		var display: int = surface.item(map,cell,target.x)
+		_display_items[cell] = display
 		present[cell] = true
 		var previous: Vector2i = _states.get(cell, Vector2i(-1, 0))
-		if target == previous:
+		if target == previous and _display_states.get(cell,-1) == display:
 			continue
+		_display_states[cell] = display
 		_states[cell] = target
 		var added := _new_cells.has(cell)
 		var changed_appearance := previous.x >= 0 and TileConstants.appearance_of(previous.x) != TileConstants.appearance_of(target.x)
 		if animate and (added or changed_appearance or jobs.has(cell)):
 			_transition(cell, previous, target, added)
 		else:
-			static_tiles.set_cell_item(cell, target.x, target.y)
+			_settle(cell)
 	for cell: Vector3i in _states.keys():
 		if not present.has(cell):
 			_remove_job(cell)
 			_states.erase(cell)
+			_display_states.erase(cell)
+			_display_items.erase(cell)
 			static_tiles.set_cell_item(cell, -1)
 	for cell: Vector3i in _riders.keys():
 		if not present.has(cell):
@@ -138,8 +147,12 @@ func _transition(cell: Vector3i, previous: Vector2i, target: Vector2i, added: bo
 	var fixed_top := not added and has_pillar and to != TileConstants.Appearance.WOOD
 	var job := {"cell": cell, "body": body, "age": age, "target": target, "previous": previous, "added": added, "fixed_top": fixed_top}
 	# Split only the pillar support; ordinary replacements use one shared mesh.
-	var item := TileConstants.base_item(target.x) if to == TileConstants.Appearance.PILLAR else target.x
-	job.model = _mesh(body, map.mesh_library.get_item_mesh(item), target.y)
+	var display_mesh: Mesh = surface.library.get_item_mesh(_display_items[cell])
+	var top := SurfaceTool.new()
+	top.begin(Mesh.PRIMITIVE_TRIANGLES)
+	top.append_from(display_mesh,0,Transform3D.IDENTITY)
+	top.set_material(display_mesh.surface_get_material(0))
+	job.model = _mesh(body,top.commit(),0)
 	if has_pillar:
 		if _support_mesh == null:
 			var source: Node3D = load("res://assets/models/tiles/variants/pillar_support.tscn").instantiate()
@@ -180,8 +193,7 @@ func _process(delta: float) -> void:
 		var job: Dictionary = jobs[cell]
 		job.age += maxf(delta, 0.0)
 		if job.age >= duration:
-			var target: Vector2i = job.target
-			static_tiles.set_cell_item(cell, target.x, target.y)
+			_settle(cell)
 			_remove_job(cell)
 		else:
 			_pose(job)
@@ -199,8 +211,7 @@ func _remove_job(cell: Vector3i, keep_rider := false) -> void:
 
 func finish() -> void:
 	for cell: Vector3i in jobs.keys():
-		var target: Vector2i = jobs[cell].target
-		static_tiles.set_cell_item(cell, target.x, target.y)
+		_settle(cell)
 		_remove_job(cell)
 	for cell: Vector3i in _riders.keys():
 		_restore_rider(cell)
@@ -211,3 +222,6 @@ func _exit_tree() -> void:
 		_restore_rider(cell)
 	if is_instance_valid(map):
 		map.visible = _map_was_visible
+
+func _settle(cell: Vector3i) -> void:
+	static_tiles.set_cell_item(cell,int(_display_items.get(cell,-1)),0)

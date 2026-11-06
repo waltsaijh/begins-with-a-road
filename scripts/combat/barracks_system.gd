@@ -54,6 +54,7 @@ func _process(delta: float) -> void:
 			var unit := Soldier.new()
 			add_child(unit)
 			unit.initialize(tower,slot,self)
+			tower.present_deployment()
 			units.append(unit)
 		owners[tower] = tower.deployment.count
 	var active: bool = combat.wave.active

@@ -24,6 +24,8 @@ enum RouteRule { COST, SHORTEST, NEWEST }
 @export_range(0.1, 30.0, 0.1) var sabotage_interval := 6.0
 @export_range(0.1, 5.0, 0.1) var sabotage_windup := 1.0
 @export_range(0.1, 10.0, 0.1) var sabotage_duration := 2.5
+@export_range(1, 4, 1) var sabotage_targets := 1
+@export_range(1, 100, 1) var base_damage := 1
 @export_range(0.0, 5.0, 0.1) var flight_height := 0.0
 @export_group("Intelligence")
 @export_multiline var ability_text := ""
@@ -153,6 +155,7 @@ func localized_name() -> String:
 	return troop_name if text == name_key else text
 
 func configuration_error() -> String:
+	if sabotage_targets < 1 or sabotage_targets > 4 or base_damage < 1: return "癱瘓目標數或基地傷害無效"
 	if cohort_size < 1 or cohort_interval_ticks < 1: return "群體大小與群內間隔必須為正整數"
 	if route_rule not in [RouteRule.COST, RouteRule.SHORTEST, RouteRule.NEWEST]: return "未知的硬性選路規則"
 	for value in [damage_reduction, taunt_radius, heal_amount, heal_radius, sabotage_radius, flight_height]:
@@ -199,7 +202,8 @@ func ability_snapshot() -> Dictionary:
 	return {"damage_reduction":damage_reduction, "taunt_radius":taunt_radius, "taunt_priority":taunt_priority,
 		"heal_amount":heal_amount, "heal_interval":heal_interval, "heal_radius":heal_radius,
 		"sabotage_radius":sabotage_radius, "sabotage_interval":sabotage_interval,
-		"sabotage_windup":sabotage_windup, "sabotage_duration":sabotage_duration}
+		"sabotage_windup":sabotage_windup, "sabotage_duration":sabotage_duration,
+		"sabotage_targets":sabotage_targets,"base_damage":base_damage}
 
 func route_description() -> String:
 	var english := TranslationServer.get_locale().begins_with("en")

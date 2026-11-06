@@ -22,8 +22,10 @@ class RoadEditGuardCore {
     }
 public:
     int route_tiles=0;
+    // Display-only union of simple goal-to-start paths, in input tile order.
+    std::vector<int> route_cell_indices;
     bool prepare(const std::vector<Tile> &tiles,const std::vector<std::pair<int,int>> &terminals) {
-        dirty=true;index.clear();parent.clear();size.clear();anchor.clear();route_tiles=0;
+        dirty=true;index.clear();parent.clear();size.clear();anchor.clear();route_tiles=0;route_cell_indices.clear();
         int n=int(tiles.size());index.reserve(n*2);
         for(int a=0;a<n;++a) if(!index.emplace(portal_detail::key(tiles[a].x,tiles[a].y),a).second) return false;
         constexpr int dx[4]={0,1,0,-1},dy[4]={-1,0,1,0};
@@ -80,6 +82,15 @@ public:
             for(int a=endpoint;a>=0 && !marked[a];a=tree_up[a]) marked[a]=true;
         }
         for(int b=0;b<int(blocks.size());++b) if(marked[n+b]) for(int v:blocks[b]) active[v]=true;
+        // Only the component rooted at the first terminal (the goal) counts.
+        // A disconnected start is not itself a complete route. Do not change
+        // the guard's existing anchors or incremental invalidation semantics.
+        std::vector<bool> goal_component(tree.size(),false);
+        queue={endpoints.front()};goal_component[endpoints.front()]=true;
+        for(size_t head=0;head<queue.size();++head) for(int b:tree[queue[head]]) if(!goal_component[b]) {goal_component[b]=true;queue.push_back(b);}
+        bool has_start=false;
+        for(size_t i=1;i<endpoints.size();++i) if(goal_component[endpoints[i]] && endpoints[i]!=endpoints.front()) has_start=true;
+        if(has_start) for(int a=0;a<n;++a) if(active[a] && goal_component[a]) route_cell_indices.push_back(a);
         parent.resize(n);std::iota(parent.begin(),parent.end(),0);size.assign(n,1);anchor.assign(n,-1);
         for(int a=0;a<n;++a) if(active[a]) {anchor[a]=a;++route_tiles;}
         for(int a=0;a<n;++a) for(int b:adjacent[a]) if(a<b && (!active[a] || !active[b])) if(join(a,b)) return false;
