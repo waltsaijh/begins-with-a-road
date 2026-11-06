@@ -3,22 +3,28 @@
 [ext_resource type="Script" path="res://scripts/combat/rendering/stylized_burst.gd" id="1"]
 
 [sub_resource type="StandardMaterial3D" id="RingMaterial"]
-resource_local_to_scene = true
 transparency = 1
 shading_mode = 0
 cull_mode = 2
+vertex_color_use_as_albedo = true
+resource_local_to_scene = true
 albedo_color = Color(0.631373, 0.392157, 0.34902, 1)
 
 [sub_resource type="StandardMaterial3D" id="ShardMaterial"]
-resource_local_to_scene = true
 transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+resource_local_to_scene = true
 albedo_color = Color(0.439216, 0.294118, 0.298039, 1)
 roughness = 0.98
 
 [sub_resource type="StandardMaterial3D" id="CoreMaterial"]
-resource_local_to_scene = true
 transparency = 1
 shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+resource_local_to_scene = true
 albedo_color = Color(0.929412, 0.756863, 0.517647, 1)
 
 [sub_resource type="TorusMesh" id="RingMesh"]

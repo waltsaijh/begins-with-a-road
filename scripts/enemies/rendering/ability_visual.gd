@@ -14,9 +14,7 @@ func _ready() -> void:
 	mesh.ring_segments = 6
 	ring.mesh = mesh
 	ring.position.y = 0.06
-	material = StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material = SolidMaterials.transparent()
 	ring.material_override = material
 	add_child(ring)
 	ring.hide()

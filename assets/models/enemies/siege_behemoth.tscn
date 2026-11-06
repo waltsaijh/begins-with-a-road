@@ -2,6 +2,7 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o3534"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.4392157, 0.29411766, 0.29803923, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -21,6 +22,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_74vcr"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.27450982, 0.3254902, 0.38039216, 1)
 metallic = 0.18
 metallic_specular = 0.25
@@ -41,6 +43,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_juhwt"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.49019608, 0.5372549, 0.5686275, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -60,6 +63,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_un8eb"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.34901962, 0.29803923, 0.2627451, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -79,6 +83,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u4h07"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.6666667, 0.5803922, 0.4117647, 1)
 metallic = 0.18
 metallic_specular = 0.25
@@ -99,6 +104,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_avy3o"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.8784314, 0.8352941, 0.7254902, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -111,10 +117,10 @@ rings = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0x4g1"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.92941177, 0.75686276, 0.5176471, 1)
 metallic_specular = 0.12
 roughness = 0.98
-emission_enabled = true
 emission = Color(0.92941177, 0.75686276, 0.5176471, 1)
 emission_energy_multiplier = 0.25
 
@@ -133,6 +139,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_johw3"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.6313726, 0.39215687, 0.34901962, 1)
 metallic_specular = 0.12
 roughness = 0.98

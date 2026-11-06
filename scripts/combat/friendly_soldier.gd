@@ -47,8 +47,7 @@ func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> vo
 		if child.has_meta("friendly_skin"): skin = child
 	if skin != null:
 		_normal = skin.material_override
-		_hit = StandardMaterial3D.new()
-		_hit.albedo_color = Color("f7e8c6")
+		_hit = SolidMaterials.opaque(Color("f7e8c6"))
 	var bar := MeshInstance3D.new()
 	bar.mesh = QuadMesh.new()
 	bar.mesh.size = Vector2(0.35,0.035)

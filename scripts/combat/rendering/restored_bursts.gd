@@ -3,28 +3,6 @@ extends Node3D
 const K = preload("res://scripts/combat/rendering/restored_art.gd")
 var bursts: Array[Dictionary] = []
 const LIMIT := 72
-var _impact_material: StandardMaterial3D
-var _resident_ring: MeshInstance3D
-
-func _ready() -> void:
-	# The fade variant is used by nothing else. If its last material were freed
-	# with a burst, every shell would relink the shader: about a second on WebGL.
-	# Shaders compile on first draw, so this sub-pixel ring must stay in view and
-	# cast shadows like a real impact, compiling every pass under the loading veil.
-	var residents := K.group(self,"ShaderResidents")
-	residents.scale = Vector3.ONE*0.00001
-	_resident_ring = K.part(residents,"ring",Vector3.ONE,Vector3.ZERO,"amber")
-	_impact_material = _resident_ring.material_override.duplicate()
-	_impact_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_impact_material.albedo_color.a = 0.0
-	_resident_ring.material_override = _impact_material
-	_attach_to_camera.call_deferred(residents)
-
-func _attach_to_camera(residents: Node3D) -> void:
-	var camera := get_viewport().get_camera_3d()
-	if camera == null: return
-	residents.reparent(camera,false)
-	residents.position = Vector3.FORWARD*(camera.near+1.0)
 
 func emit(at: Vector3, kind: String) -> void:
 	if bursts.size() >= LIMIT: return
@@ -49,8 +27,7 @@ func mortar_impact(at: Vector3, radius := 1.0) -> void:
 	var root := K.group(self,"MortarImpact",at+Vector3.UP*0.11)
 	root.scale = Vector3.ONE*maxf(0.01,radius)
 	var ring := K.part(root,"ring",Vector3.ONE,Vector3.ZERO,"amber")
-	ring.material_override = _impact_material.duplicate()
-	ring.material_override.albedo_color = K.COLORS.amber
+	ring.material_override = SolidMaterials.transparent(K.COLORS.amber)
 	var core := K.part(root,"rock",Vector3.ONE*0.48,Vector3(0,0.35,0),"amber")
 	var particles: Array[Node3D] = []
 	for i in 6: particles.append(K.part(root,"rock",Vector3.ONE*0.08,Vector3.ZERO,"dust"))

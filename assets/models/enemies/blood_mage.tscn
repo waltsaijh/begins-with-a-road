@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1"]
 
 [sub_resource type="StandardMaterial3D" id="mat1"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.54902, 0.25098, 0.329412, 1)
 roughness = 0.95
 
@@ -13,6 +15,8 @@ height = 0.48
 radial_segments = 8
 
 [sub_resource type="StandardMaterial3D" id="mat2"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.803922, 0.721569, 0.576471, 1)
 roughness = 0.95
 
@@ -23,6 +27,8 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="StandardMaterial3D" id="mat3"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
 roughness = 0.95
 
@@ -30,6 +36,8 @@ roughness = 0.95
 size = Vector3(0.11, 0.25, 0.14)
 
 [sub_resource type="StandardMaterial3D" id="mat4"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.54902, 0.25098, 0.329412, 1)
 roughness = 0.95
 
@@ -37,6 +45,8 @@ roughness = 0.95
 size = Vector3(0.12, 0.34, 0.13)
 
 [sub_resource type="StandardMaterial3D" id="mat5"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
 roughness = 0.95
 
@@ -44,6 +54,8 @@ roughness = 0.95
 size = Vector3(0.11, 0.25, 0.14)
 
 [sub_resource type="StandardMaterial3D" id="mat6"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.54902, 0.25098, 0.329412, 1)
 roughness = 0.95
 
@@ -51,6 +63,8 @@ roughness = 0.95
 size = Vector3(0.12, 0.34, 0.13)
 
 [sub_resource type="StandardMaterial3D" id="mat7"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.54902, 0.25098, 0.329412, 1)
 roughness = 0.95
 
@@ -61,6 +75,8 @@ height = 0.32
 radial_segments = 8
 
 [sub_resource type="StandardMaterial3D" id="mat8"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.396078, 0.333333, 0.290196, 1)
 roughness = 0.95
 
@@ -68,6 +84,8 @@ roughness = 0.95
 size = Vector3(0.045, 1, 0.045)
 
 [sub_resource type="StandardMaterial3D" id="mat9"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.737255, 0.411765, 0.466667, 1)
 roughness = 0.95
 
@@ -75,6 +93,8 @@ roughness = 0.95
 size = Vector3(0.18, 0.3, 0.15)
 
 [sub_resource type="StandardMaterial3D" id="mat10"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
 roughness = 0.95
 

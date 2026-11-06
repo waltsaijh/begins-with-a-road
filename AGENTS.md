@@ -159,7 +159,7 @@
 - 正式 Soldier／Quickfeet／Heavy 使用專案內 grunt／runner／brute 外觀，各有單一 surface 網格與獨立 MultiMesh，三者共用 `solid_color.gdshader`。Troop 的 GPU Model 引用離線網格與步態 Resource；Quickfeet／Heavy 直接烘焙目前保存的來源場景，不重建原型，保留配色、武器、支點與原 Walk 的 17 個線性插值關鍵影格。Soldier 維持依距離推進、停止回中立；Quickfeet／Heavy 維持依模擬時間推進、停止凍結姿勢，Quickfeet 保留 3 倍播放。正式敵群不建立逐隻模型或 AnimationPlayer；各模型獨立緊密 slot 與容量，全敵群頭頂狀態另有獨立順序，開波依模型合計人口預留。任意匯入模型未提供相符 GPU Model 時仍保留原材質／骨架／動畫。修改來源後需重新烘焙，入口與限制見 `assets/models/enemies/README.md`。視覺避讓使用固定工作量，不改邏輯位置、速度或路線；轉彎時忽略接觸並保留偏移。
 - 頭頂血量／護盾／技能／效果採共用 overlay 中的單一 MultiMeshInstance2D，依原繪製順序以共用材質及圖集合批，一次提交可重用 buffer。外觀仍取自可編輯 Appearance；矩形邊框由 shader 保持清晰，其他樣式一次烘焙。敵人清空時清除可見 instance 與圖示快取；暫停移動鏡頭時仍重新投影，不能停在原畫面位置。
 - 地塊連接與外觀分開。柱子與木橋保留合法舊配置，固定 seed 與修改順序可重現；不能為外觀變種更改導航或兵種成本。
-- 短命特效不可讓某個材質變體隨實例一起釋放：最後一個材質消失時 shader 也會刪除，下次重新連結，WebGL 上約凍結 1 秒。迫擊砲落地的淡出圓環由 RestoredBursts 掛在相機下的次像素常駐圓環持有，於載入遮罩下完成編譯。BurstEmitter 同樣在載入時預放一個次像素特效並留在回收池，避免第一次擊殺約 4 秒的編譯停頓。Shader 在首次實際繪製才編譯，常駐物件必須留在畫面內並維持與實際特效相同的陰影設定；extra_cull_margin 會隨節點縮放，不可用來保證可見，也不要放大到影響方向光陰影範圍。
+- 3D 純色材質只允許兩組 StandardMaterial3D 功能旗標，以 SolidMaterials 為準：不透明為頂點色＋emission_enabled（預設黑），半透明為 Alpha＋無光照＋雙面＋頂點色；場景與 .tres 只能改顏色與數值。每多一種組合約多編譯 5–6 個 WebGL program，會造成數秒凍結或拉長載入。材質釋放時若是該組合最後使用者，shader 會刪除，下次重新連結。BurstEmitter 於載入時預放一個次像素特效留在回收池，同時讓半透明組合常駐。舊 model 沒有 set_preview 時，hologram 保留原色，只關陰影，不換材質。
 - 地圖先提交，浮起動畫在獨立顯示層處理。只更新差異格，保留未變模型與連續動畫進度；完成後回到靜態合批。
 - 雲海與柱底漸變使用 Compatibility 可用的近似，不依賴體積霧或 Forward+。死亡／AOE 特效可編輯且回收，不影響傷害與波次結算。
 

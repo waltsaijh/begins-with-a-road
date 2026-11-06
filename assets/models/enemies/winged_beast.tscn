@@ -3,6 +3,8 @@
 [ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1"]
 
 [sub_resource type="StandardMaterial3D" id="mat1"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
 roughness = 0.95
 
@@ -13,6 +15,8 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="StandardMaterial3D" id="mat2"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
 roughness = 0.95
 
@@ -23,6 +27,8 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="StandardMaterial3D" id="mat3"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
 roughness = 0.95
 
@@ -30,6 +36,8 @@ roughness = 0.95
 size = Vector3(0.2, 0.16, 0.25)
 
 [sub_resource type="StandardMaterial3D" id="mat4"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
 roughness = 0.95
 
@@ -37,6 +45,8 @@ roughness = 0.95
 size = Vector3(0.72, 0.08, 0.65)
 
 [sub_resource type="StandardMaterial3D" id="mat5"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
 roughness = 0.95
 
@@ -47,6 +57,8 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="StandardMaterial3D" id="mat6"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
 roughness = 0.95
 
@@ -54,6 +66,8 @@ roughness = 0.95
 size = Vector3(0.06, 0.18, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="mat7"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.501961, 0.588235, 0.556863, 1)
 roughness = 0.95
 
@@ -61,6 +75,8 @@ roughness = 0.95
 size = Vector3(0.72, 0.08, 0.65)
 
 [sub_resource type="StandardMaterial3D" id="mat8"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
 roughness = 0.95
 
@@ -71,6 +87,8 @@ radial_segments = 8
 rings = 4
 
 [sub_resource type="StandardMaterial3D" id="mat9"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.768627, 0.611765, 0.337255, 1)
 roughness = 0.95
 
@@ -78,6 +96,8 @@ roughness = 0.95
 size = Vector3(0.06, 0.18, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="mat10"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.203922, 0.27451, 0.294118, 1)
 roughness = 0.95
 

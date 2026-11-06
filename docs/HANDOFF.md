@@ -1,5 +1,7 @@
 # Routing Sandbox — Phase 5 交接
 
+2026-11-06 Shader 收斂：依使用者要求將 3D 純色材質收斂為 SolidMaterials 的不透明／半透明兩組旗標（28 個場景／資源檔、151 個材質），移除 hologram 深度預通道及之前加的常駐圓環。Web tutorial 進關卡前 program 121→77（scene StandardMaterial3D 約 60→16），主選單前 84→61。放第一座塔原本是下一步舊 model hologram 首次繪製深度預通道材質，凍結 4.4–5.2 秒，現為約 0.4–0.6 秒的首次編譯；波次中 0 link、最長單幀 35ms。視覺差異：舊 model hologram 改為原色不透明，爆散碎片與落地圓環改無光照。headless mechanisms（114）、tower_restoration、tower_integration、combat_bursts、card_drag_placement、cards、tutorial/intro、level_flow、balance/rules 及實際 combat_bursts、tutorial/intro、tower_restoration 通過。cards/card_preview 在修改前的提交版 headless 即逾時，未查原因。未驗 Frontier 全程及其他 GPU／瀏覽器；瀏覽器 shader 快取對冷啟動的影響未隔離。
+
 2026-11-06 迫擊砲落地卡頓：Web 每發落地約凍結 1 秒。攔截 WebGL 呼叫確認每次落地重新連結 5 個 program，burst 結束又全部刪除；原因是 mortar_impact 複製出全專案唯一的發光＋半透明材質，釋放後 shader 隨之刪除。RestoredBursts 改由掛在相機下的次像素常駐圓環持有該變體，於載入遮罩下編譯。同次另發現第一次擊殺編譯 death_burst 的 10 個 program，造成約 4 秒凍結；BurstEmitter 改在載入時預放一個次像素特效。Web release（Frontier 同佈局前兩波、窗格顯示中）修正後 63 秒內 linkProgram／deleteProgram 皆 0，載入期 link 26→41，最長單幀 62ms；headless mechanisms（114）、tower_restoration、combat_bursts、level_flow 及實際 combat_bursts 通過。窗格隱藏時 rAF 會節流，當時約 1 秒的尖峰不可當效能數據。未驗證其他 GPU／瀏覽器或完整 15 波。
 
 2026-11-06 合併 origin/main：依使用者「merge with main」指令，將 origin/main `f72420b` 合併至 feat/ui_suggestions（原 HEAD `af3e9e5`）。保留教學、鏡頭左右鍵、1x／2x／3x、遺物圖示列與開波對話框，並納入 Phase 5 五 ACT／生命／勝敗、Tower Tile Editor、道路凹槽與 Art Slice D–F。Frontier 要求 tutorial 前置；tutorial.tres 設定 reward_final_act，維持第 3 波遺物選完才記通關。本節以下的舊 HEAD 與「未提交」敘述均為當時快照。

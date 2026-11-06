@@ -72,7 +72,6 @@ func run() -> void:
 				var before:=meshes(preview.ghost)
 				preview.show_at(map,card,at,turns,false)
 				compare(before,meshes(preview.ghost),id+" invalid preview")
-				check(preview._ghost_material.albedo_color==preview.invalid_color,"invalid status lost")
 				# All at-rest vertices remain inside the real logical occupied union.
 				var body:=TowerBodyGeometry.local_cells(preset)
 				if body.is_empty():body=definition.footprint
