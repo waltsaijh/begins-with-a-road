@@ -1,5 +1,7 @@
 # Routing Sandbox — Phase 5 交接
 
+2026-11-06 迫擊砲落地卡頓：Web 每發落地約凍結 1 秒。攔截 WebGL 呼叫確認每次落地重新連結 5 個 program，burst 結束又全部刪除；原因是 mortar_impact 複製出全專案唯一的發光＋半透明材質，釋放後 shader 隨之刪除。RestoredBursts 改由掛在相機下的次像素常駐圓環持有該變體，於載入遮罩下編譯。同次另發現第一次擊殺編譯 death_burst 的 10 個 program，造成約 4 秒凍結；BurstEmitter 改在載入時預放一個次像素特效。Web release（Frontier 同佈局前兩波、窗格顯示中）修正後 63 秒內 linkProgram／deleteProgram 皆 0，載入期 link 26→41，最長單幀 62ms；headless mechanisms（114）、tower_restoration、combat_bursts、level_flow 及實際 combat_bursts 通過。窗格隱藏時 rAF 會節流，當時約 1 秒的尖峰不可當效能數據。未驗證其他 GPU／瀏覽器或完整 15 波。
+
 2026-11-06 合併 origin/main：依使用者「merge with main」指令，將 origin/main `f72420b` 合併至 feat/ui_suggestions（原 HEAD `af3e9e5`）。保留教學、鏡頭左右鍵、1x／2x／3x、遺物圖示列與開波對話框，並納入 Phase 5 五 ACT／生命／勝敗、Tower Tile Editor、道路凹槽與 Art Slice D–F。Frontier 要求 tutorial 前置；tutorial.tres 設定 reward_final_act，維持第 3 波遺物選完才記通關。本節以下的舊 HEAD 與「未提交」敘述均為當時快照。
 
 本次合併驗證：重建 `road_graph.candidates.*` 的 Windows／Web debug 與 release，重新匯入翻譯。Godot 4.7.2 headless level_catalog、level_flow、tutorial/intro、balance/rules（67）、road_refinement/rules（744）、camera_orbit 及 Compatibility 實際 tutorial/intro、camera_orbit、menus/level_selection 通過；輸出在 `.godot/merge-main-2026-11-06/`。未跑完整回歸、Frontier 全 15 波、真人遊玩或合併後的 Web 匯出／瀏覽器。
