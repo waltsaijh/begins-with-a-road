@@ -3,7 +3,7 @@ const COLOR_IDENTITY = preload("res://assets/data/rendering/tower_color_identity
 ## Presentation-only adapter for the GLB-derived Art Slice D assets.
 ## Manual animation advance follows simulation delta; idle towers do no per-frame work.
 @export_enum("ballista","sentry","barracks","mortar","crossfire","broadside") var tower_kind := "sentry"
-var shot_sound: AudioStream
+@export var shot_sound: AudioStream
 var shot_count := 0
 var deployment_count := 0
 var side := 1

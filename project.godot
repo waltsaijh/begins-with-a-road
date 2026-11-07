@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+GameAudio="*res://scripts/audio/game_audio.gd"
 ScreenTransition="*res://scenes/interface/screen_transition.tscn"
 DisplayWarmup="*res://scripts/enemies/rendering/display_warmup.gd"
 LevelProgress="*res://scripts/levels/level_progress.gd"

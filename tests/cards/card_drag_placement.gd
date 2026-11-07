@@ -88,7 +88,13 @@ func verify() -> void:
 	var view: Button = cards.hand.views[0]
 	var rest := view.position
 	var bottom := view.get_global_transform_with_canvas()*Vector2(view.size.x*0.5, view.size.y-2.0)
+	GameAudio._effects[&"hover"].stop()
+	GameAudio._effects[&"card_hover"].stop()
 	motion(card_point())
+	check(GameAudio._effects[&"card_hover"].playing and not GameAudio._effects[&"hover"].playing, "Hand hover must play only its own card cue")
+	GameAudio._effects[&"card_hover"].stop()
+	motion(card_point()+Vector2(1, 0))
+	check(not GameAudio._effects[&"card_hover"].playing, "Moving within one hovered card must not replay the cue")
 	cards.hand.finish_animation()
 	var hovered := view.position
 	check(is_equal_approx(hovered.distance_to(rest), CardFanLayout.HOVER_LIFT*CardFanLayout.CARD_SCALE), "Hover lift did not use the smaller amount")
@@ -127,6 +133,31 @@ func verify() -> void:
 		get_tree().quit(1)
 		return
 	var point := point_for(cell)
+	# Exercise an invalid ground target as well as the capped-upgrade case below.
+	var invalid_cell := TileConstants.INVALID_CELL
+	for candidate in cards.placement.map.get_used_cells():
+		if point_for(candidate).x < 500.0: continue # Avoid entry callouts obscuring the ground.
+		if cards.towers.upgrade_target(candidate) == null and not cards.towers.validate_card(cards.cards[0], candidate, cards.turns).is_empty():
+			invalid_cell = candidate
+			break
+	check(invalid_cell != TileConstants.INVALID_CELL, "No illegal ground placement fixture")
+	if invalid_cell != TileConstants.INVALID_CELL:
+		cards.select_card(0, false)
+		motion(point_for(invalid_cell))
+		await frames(2)
+		if DisplayServer.get_name() != "headless":
+			await RenderingServer.frame_post_draw
+			viewport.get_texture().get_image().save_png(Artifacts.path("cards/invalid_ground_before.png"))
+		var before_count: int = cards.cards.size()
+		check(cards.place_selected(invalid_cell) == null and cards.cards.size() == before_count, "Invalid ground attempt must preserve the hand")
+		if DisplayServer.get_name() != "headless":
+			await frames(2)
+			await RenderingServer.frame_post_draw
+			viewport.get_texture().get_image().save_png(Artifacts.path("cards/invalid_ground_flash.png"))
+		check(cards.preview.visible and cards.preview.ground.mesh != null and cards.preview._material.get_shader_parameter("rejection_flash") > 0.5, "Rejected red ground must remain visible during the flash")
+		await get_tree().create_timer(0.45, true, false, true).timeout
+		check(is_zero_approx(cards.preview._material.get_shader_parameter("rejection_flash")), "Red ground must fade back without moving the cursor")
+		cards.select_card(-1)
 	var count: int = cards.cards.size()
 	var angle: float = camera.azimuth
 	var focus: Vector3 = camera.focus
@@ -140,6 +171,7 @@ func verify() -> void:
 	left(point, false)
 	await frames(3)
 	check(cards.cards.size() == count-1 and cards.selected == -1 and not cards.hand.is_dragging(), "Dropping on a valid tile did not consume exactly one card")
+	check(GameAudio._effects[&"placement"].playing, "A successful tower drop must play its placement sound")
 	while scene.get_node("PortalMap").computing: await frames(1)
 	# A capped tower rejects a second drop without changing the hand/map.
 	var built: DefenseTower = cards.towers.upgrade_target(cell)
@@ -154,6 +186,9 @@ func verify() -> void:
 	await frames(2)
 	left(point, false)
 	check(cards.cards.size() == count and cards.selected == 0 and scene.get_node("PortalMap").revision == revision, "An invalid drop consumed the card or changed the map")
+	check(GameAudio._effects[&"wrong_placement"].playing and cards.preview._material.get_shader_parameter("rejection_flash") > 0.9, "A rejected drop must sound and brighten the red tile overlay")
+	await get_tree().create_timer(0.45, true, false, true).timeout
+	check(is_zero_approx(cards.preview._material.get_shader_parameter("rejection_flash")), "Rejection brightness must settle back to normal")
 	# Re-dragging the selected card retains its clockwise rotation.
 	cards.rotate_card(1)
 	var hud: CanvasLayer = scene.get_node("LevelHUD")

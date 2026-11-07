@@ -9,6 +9,22 @@ func configure(definition: Dictionary, value: Variant) -> void:
 	var key := StringName(definition.key)
 	var choices: Array = definition.get("choices", [])
 	match definition.kind:
+		"slider":
+			var slider := HSlider.new()
+			slider.custom_minimum_size = Vector2(180, 32)
+			slider.min_value = 0
+			slider.max_value = 100
+			slider.step = 1
+			slider.value = float(value)
+			var percentage := Label.new()
+			percentage.custom_minimum_size.x = 48
+			percentage.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			percentage.text = "%d%%" % slider.value
+			slider.value_changed.connect(func(amount: float):
+				percentage.text = "%d%%" % amount
+				changed.emit(key, amount))
+			$Value.add_child(slider)
+			$Value.add_child(percentage)
 		"dropdown", "radio":
 			var group := ButtonGroup.new()
 			for choice: Dictionary in choices:

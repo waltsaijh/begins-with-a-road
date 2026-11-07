@@ -481,13 +481,19 @@ Web 匯出引用 `assets/web/shell.html`，白底只顯示內嵌 Godot／團隊 
 
 ## 設定頁面
 
+哨塔射擊音效使用 `assets/audio/towers/sentry_shot.wav`：固定種子程序合成弓弦 pluck、短促 release 與箭矢氣流，0.22 秒／48 kHz／16-bit mono，峰值約 0.8 並有頭尾包絡。來源與重建見 `tools/assets/build_sentry_shot.gd`。`integrated/sentry.tscn` 明確指定 `ImportedTowerVisual.shot_sound`，`configure()` 保留此設定；實際 fire_event 沿用 AttackVisuals 的 Combat bus／-20 dB／六聲道及同類 25 ms 預算，預覽不出聲。`tests/combat/tower_integration.tscn` 驗證配置後音檔仍存在，實際渲染模式額外確認開火後播放池中有該音檔且走 Combat；headless 沿用原測試的 Dummy driver 靜音規則。
+
 `settings_page.tscn` 使用全畫面透明 Control，process_mode 為 Always，直接加入 LevelHUD 的 CanvasLayer；與暫停選單共用主 viewport／canvas 及文字採樣，不經過 Window／SubViewport 的額外合成。頁面本身仍是可獨立重用的場景，不負責暫停、恢復或存取鏡頭，呼叫者決定開啟時機。
 
 左側分類使用獨立 ScrollContainer，中央選項以 setting_row.tscn 排列左側 key 與右側 value，右側固定顯示原生垂直捲軸。全畫面根節點吸收內容外的滑鼠事件；中央 Panel 隨視窗尺寸調整至 90%，最大 1120×720，保持原有留白與整數座標置中。外觀由 assets/themes/settings.tres 與場景設定。
 
-`configure(definitions, current_values)` 接受分類字典陣列及目前值；每分類有 label、options，每個選項有 key、label、kind（radio／checkbox；舊 dropdown 也映射為文字 radio），選擇型另外提供 choices（label、value），可提供 default。畫面保存獨立副本，發出 option_changed(key, value)，不存取關卡或修改引擎。radio 使用 ButtonGroup 保證互斥；切換分類保留值並回到清單頂部。open() 開啟，close() 關閉並發出 closed；主畫面與暫停選單使用同一介面。
+`configure(definitions, current_values)` 接受分類字典陣列及目前值；每分類有 label、options，每個選項有 key、label、kind（radio／checkbox／slider；舊 dropdown 也映射為文字 radio），選擇型另外提供 choices（label、value），可提供 default。slider 使用 0–100、步進 1 的 HSlider 與百分比文字，支援滑鼠及鍵盤。畫面保存獨立副本，發出 option_changed(key, value)，不存取關卡或修改引擎。radio 使用 ButtonGroup 保證互斥；切換分類保留值並回到清單頂部。open() 開啟，close() 關閉並發出 closed；主畫面與暫停選單使用同一介面。
 
-`game_settings.gd` 是獨立引擎介接層，提供分類資料、讀取與套用設定：一般分類的語言文字 radio（繁中／英文）、顯示分類的 MSAA radio（關閉／2×／4×）、音效分類的全部靜音 checkbox。LevelHUD 負責連接 signal、提供目標 viewport，並依 visibility_changed 協調宿主的背景輸入鎖定。設定立即生效，目前沒有磁碟持久化；不要描述為已完成設定存檔。新增功能只需擴充資料及介接層；新控制項種類才修改列元件。
+`game_settings.gd` 是獨立引擎介接層，提供分類資料、讀取與套用設定：一般分類的語言文字 radio（繁中／英文）、顯示分類的 MSAA radio（關閉／2×／4×）、音效分類的全部靜音 checkbox 及整體／BGM／戰鬥音效滑桿。Master 控制全部，BGM／Combat 各自送至 Master；音量以線性百分比套用，0 完全無聲，靜音不改變原音量。LevelHUD 負責連接 signal、提供目標 viewport，並依 visibility_changed 協調宿主的背景輸入鎖定。設定立即生效，目前沒有磁碟持久化；不要描述為已完成設定存檔。新增功能只需擴充資料及介接層；新控制項種類才修改列元件。
+
+`GameAudio` Autoload 在啟動時建立 BGM／Combat bus 與雙 BGM player，跨選單／選圖／關卡連續播放平時音樂。LevelSession 在 1.5 秒開波等待開始時要求播放號角並淡出平時 BGM，號角結束前 0.5 實際秒淡入戰鬥 BGM；wave_started 補接直接開波入口且不重播號角。波次等在途攻擊收尾後、勝敗、離場或失敗開波時淡回平時 BGM，不播結束號角。重複要求同狀態不重頭播放；快速返回仍在淡出的曲目直接反向淡化，取消開波也取消延遲接歌並以 0.25 秒淡掉號角。全部 BGM 播放基礎增益為 50%（與音量滑桿獨立相乘，平時、戰鬥與循環均適用），BGM bus 滑桿預設恢復為 50%，號角基礎增益為 50%（仍受 Combat／Master 控制）。一般淡化 1.5 秒，戰鬥結束／離場回平時改用 4 秒；包絡以 smoothstep 平滑起落，從當前增益接續。曲尾提前 2 秒以另一 player 從頭播放並交叉淡化，音檔原生 loop 關閉。所有包絡以單調實際時鐘更新，Always processing，不受遊戲倍速與暫停影響。號角與現有六聲道射擊池走 Combat，BGM 專走 BGM。BGM 使用使用者提供的 bgm_default.ogg／bgm_battle.ogg，來源副本位於 assets/audio/music/，原 MP3 副本已移除。OGG 的原生 loop 關閉，沿用雙 player 交叉淡化；正式執行不讀取原型專案。新 UI 點擊副本位於 assets/audio/ui/click.wav；GameAudio 監看新增 BaseButton 的 pressed，包含主選單、設定、暫停與卡牌，停用按鈕不會發出 pressed。點擊走 Master；按鈕 hover.mp3 與卡片 card_hover.mp3 副本同放 assets/audio/ui/，兩者增益皆為 0.25（click 為 1.0）、max_polyphony=1 並走 Master。一般 BaseButton 的 mouse_entered 僅對可處理、可見且啟用者發聲；CardButton 不接一般 hover，改由手牌／展開商店的穩定 hover index 變更觸發，避免動畫改變命中造成重播，游標停留同卡不重播。遺物卡以 audio_card_hover group 選用卡片聲。放塔／非法放塔副本位於 assets/audio/placement/，由 CardPlacement 權威提交結果觸發並走 Combat。非法地圖提交保留卡片與導航 revision，紅色預覽 shader 以實際時鐘短亮 0.4 秒，只改紅色格面及邊框，其他格色與攻擊範圍不變；移到新格、旋轉或轉為合法預覽即清除閃亮，不為動畫每幀重建網格。
+
+音訊回歸：`godot --headless --path . --script res://tests/menus/game_audio.gd`；移除 headless 可驗證實際音訊裝置、鍵盤滑桿及畫面（`.godot/audio-settings.png`）。涵蓋解碼／原生 loop 關閉、開波單次號角、循環重疊、取消延遲接歌、暫停／4x 實際時間、bus 路由、0 音量及三滑桿立即套用。主觀音量平衡與 Web 使用者手勢解鎖仍需真人試聽。
 
 `tests/levels/pause_menu.tscn` 包含實際渲染／滑鼠操作，驗證分類、互斥、套用、翻譯更新、合成長清單、空白邊緣及清單上的點擊／拖曳／滾輪隔離、鍵盤啟用／焦點限制、返回／Esc 保持暫停，以及重新開啟與重開關卡。亦核對頁面與暫停選單的 viewport／canvas 相同，將設定文字與同位置、同字型／字級／顏色的主 HUD Label 逐像素比對。截圖放 `.godot/test-results/settings/`。
 設定頁面以 StyleBoxEmpty 保持背景透明，不建立子視窗或離屏渲染目標。LevelHUD 使用原本 WhiteVeil，在 0.2 實際秒內增加到 Settings Veil Alpha（預設 0.82，至少保留原場景透明度），返回時恢復原值；不另加白色面板。設定開啟時隱藏起點開波對話框，避免背景按鈕干擾文字。

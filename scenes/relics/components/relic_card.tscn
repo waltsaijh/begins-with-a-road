@@ -21,7 +21,7 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
-[node name="RelicCard" type="Button"]
+[node name="RelicCard" type="Button" groups=["audio_card_hover"]]
 custom_minimum_size = Vector2(184, 272)
 theme_override_styles/normal = SubResource("normal")
 theme_override_styles/hover = SubResource("hover")

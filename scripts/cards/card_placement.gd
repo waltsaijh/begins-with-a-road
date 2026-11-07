@@ -198,13 +198,16 @@ func place_selected(cell: Vector3i) -> Node3D:
 		var error: String = construction.validate_candidate(card,cell,turns)
 		if not error.is_empty():
 			construction._result(error)
+			_rejected_placement(card, cell)
 			return null
 		if construction.mode == 2 and card.traffic == null:
 			return construction.stage_selected(cell)
 	var tower: Node3D = towers.place_card(card, cell, turns)
 	if tower == null:
 		_dirty = true
+		_rejected_placement(card, cell)
 		return null
+	GameAudio.play_effect(&"placement")
 	var removed := selected
 	cards.remove_at(removed)
 	select_card(-1)
@@ -212,6 +215,12 @@ func place_selected(cell: Vector3i) -> Node3D:
 	cards_changed.emit()
 	card_placed.emit(card,tower,cell,rotation_steps)
 	return tower
+
+func _rejected_placement(card: BuildCard, cell: Vector3i) -> void:
+	GameAudio.play_effect(&"wrong_placement")
+	if cell == TileConstants.INVALID_CELL or not card.configuration_error().is_empty(): return
+	preview.show_at(placement.map, card, cell, turns, false)
+	preview.flash_invalid()
 
 func rotate_card(amount: int) -> void:
 	if input_suspended or selected < 0:

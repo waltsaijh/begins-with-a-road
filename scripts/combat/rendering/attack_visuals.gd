@@ -18,6 +18,7 @@ func _ready() -> void:
 	# Prototype's shared six-voice / 25 ms-per-kind budget, real-time cosmetic only.
 	for i in 6:
 		var voice := AudioStreamPlayer.new()
+		voice.bus = &"Combat"
 		voice.volume_db = -20
 		add_child(voice)
 		_shot_players.append(voice)

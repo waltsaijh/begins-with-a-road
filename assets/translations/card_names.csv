@@ -46,6 +46,9 @@ ui.settings.back,Back,返回
 ui.settings.general,General,一般
 ui.settings.display,Display,顯示
 ui.settings.audio,Audio,音效
+ui.settings.master_volume,Master volume,整體音量
+ui.settings.bgm_volume,BGM volume,BGM 音量
+ui.settings.combat_volume,Combat effects volume,戰鬥音效音量
 ui.settings.language,Language,語言
 ui.settings.msaa,Anti-aliasing,抗鋸齒
 ui.settings.mute,Mute all audio,全部靜音

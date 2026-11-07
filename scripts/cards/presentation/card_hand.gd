@@ -146,6 +146,8 @@ func _input(event: InputEvent) -> void:
 func _set_hover(index: int) -> void:
 	if collapsed or stowed or not _entering.is_empty() or index == _hovered: return
 	_hovered = index
+	if index >= 0 and _interaction_enabled and not views[index].disabled:
+		GameAudio.play_effect(&"card_hover")
 	_layout(true)
 
 func finish_animation() -> void:

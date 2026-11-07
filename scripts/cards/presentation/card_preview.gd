@@ -10,7 +10,20 @@ var range_cells: Array[Vector2i] = []
 var ghost: Node3D
 var _definition: Resource
 var _ghost_stamp := ""
-var _material: StandardMaterial3D
+var _material: ShaderMaterial
+var _flash_started := -1
+var _preview_key := ""
+
+func flash_invalid() -> void:
+	_flash_started = Time.get_ticks_usec()
+	_material.set_shader_parameter("rejection_flash", 1.0)
+	set_process(true)
+
+func _process(_delta: float) -> void:
+	var age := (Time.get_ticks_usec()-_flash_started)/1000000.0
+	var strength := 1.0-smoothstep(0.0, 0.4, age)
+	_material.set_shader_parameter("rejection_flash", strength)
+	if strength <= 0.0: set_process(false)
 var hint_anchor := Vector3.ZERO
 var upgrade_mode := false
 var upgrade_label: Label3D
@@ -25,6 +38,7 @@ var displayed_ground: Array[Vector2i] = []
 func _ready() -> void:
 	_material = ground.material_override.duplicate()
 	ground.material_override = _material
+	set_process(false)
 	upgrade_label = Label3D.new()
 	upgrade_label.font = preload("res://assets/fonts/NotoSansTC-Light.ttf")
 	upgrade_label.font_size = 40
@@ -55,8 +69,11 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 	upgrade_label.hide()
 	visible = true
 	global_transform = map.global_transform
-	_material.albedo_color = Color.WHITE
-	_material.vertex_color_use_as_albedo = true
+	var key := str([card,cell,turns,valid])
+	if key != _preview_key:
+		_preview_key = key
+		_material.set_shader_parameter("rejection_flash", 0.0)
+		set_process(false)
 	var mesh := ImmediateMesh.new()
 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	var footprint := card.tower_cells(Vector2i(cell.x,cell.z),turns)

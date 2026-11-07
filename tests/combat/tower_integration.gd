@@ -110,6 +110,8 @@ func events() -> void:
 		var tower:DefenseTower=towers.place_card(card,Vector3i(7,0,7))
 		check(tower!=null,id+" event placement");if tower==null:continue
 		var visual:Node3D=tower._visual;visual.set_process(false)
+		if id=="sentry":
+			check(visual.shot_sound != null and visual.shot_sound.resource_path == "res://assets/audio/towers/sentry_shot.wav", "Sentry must retain its authored bow release sound after configuration")
 		# This regression checks visuals and combat, not Dummy audio-driver playback.
 		if DisplayServer.get_name()=="headless":visual.shot_sound=null
 		if id=="barracks":
@@ -129,6 +131,12 @@ func events() -> void:
 			combat.friendly_index_ready=false
 			combat._process(.01)
 			check(combat.shots_fired==shots+1 and visual.shot_count==1,id+" attack event not delivered")
+			if id=="sentry" and DisplayServer.get_name()!="headless":
+				var effects:Node = combat.visuals
+				var sounding := false
+				for voice:AudioStreamPlayer in effects._shot_players:
+					if voice.playing and voice.stream == visual.shot_sound and voice.bus == &"Combat": sounding = true
+				check(sounding,"Sentry firing must play its bow release through the combat bus")
 			check(not visual.last_clips.is_empty(),id+" missing animation")
 			report[id]["event_clips"]=visual.last_clips.duplicate()
 			check(tower.attack_interval==interval and tower.damage==damage and is_equal_approx(tower.next_attack_time,combat.elapsed+interval),id+" balance/cooldown changed")

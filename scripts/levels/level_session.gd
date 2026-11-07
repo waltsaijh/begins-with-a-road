@@ -226,6 +226,7 @@ func _begin_wave_start() -> void:
 	if is_instance_valid(construction) and not construction.commit().ok: return
 	if _owns_balance_trace: BalanceTrace.wave = current_wave+1
 	_wave_starting = true
+	GameAudio.begin_wave()
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
 	_opening_shop_available = get_node("CardPlacement/Shop").available
@@ -234,6 +235,7 @@ func _begin_wave_start() -> void:
 	set_process(true)
 
 func _on_wave_started() -> void:
+	GameAudio.begin_wave()
 	_wave_starting = false
 	if _wave.controls != null: _wave.controls.start_pending = false
 	timeline.set_state(current_wave, 1.0, true)
@@ -254,6 +256,7 @@ func _advance_wave_start(delta: float) -> void:
 	timeline.set_state(current_wave, progress, false)
 	if _wave_start_elapsed >= WAVE_START_SECONDS:
 		if not _wave.start_wave():
+			GameAudio.play_default()
 			_wave_starting = false
 			if _wave.controls != null: _wave.controls.start_pending = false
 			get_node("CardPlacement")._wave_start_pending = false
@@ -279,6 +282,7 @@ func _on_wave_finished() -> void:
 	_finish_wave_transition()
 
 func _finish_wave_transition() -> void:
+	GameAudio.play_default()
 	_settling_wave = false
 	set_process(false)
 	current_wave += 1
@@ -363,6 +367,7 @@ func _on_enemy_leaked(enemy: Node3D) -> void:
 
 func _end_run(won: bool) -> void:
 	if finished: return
+	GameAudio.play_default()
 	finished = true
 	victory = won
 	_wave_starting = false
@@ -387,5 +392,6 @@ func _end_run(won: bool) -> void:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"victory" if won else "defeat","base_health":base_health,"completed_waves":current_wave})
 
 func _exit_tree() -> void:
+	GameAudio.play_default()
 	if _owns_balance_trace and BalanceTrace.enabled:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"interrupted","completed_waves":current_wave})

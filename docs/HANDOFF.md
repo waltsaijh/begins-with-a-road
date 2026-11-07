@@ -1,5 +1,24 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-07 背景音樂與音量設定
+
+Git 更新：使用者以「git更新」授權將本節累積成果提交於 experiment/routing-sandbox（提交前 HEAD e5088df），不 push。本節下方各次實作的「未 commit／push」為當時快照，本次一併納入提交；其測試結果沿用已完成的實測，提交整理只重查差異及 git diff --check，不宣稱重新執行整套測試。
+
+最新 BGM 格式替換：使用 Downloads 指定的 bgm_default.ogg／bgm_battle.ogg，複製至 assets/audio/music/ 並更新 GameAudio 引用，移除舊 MP3 副本及其 .import。原生 loop=false，保留 BGM 基礎增益、設定滑桿、號角與所有淡化時序。OGG 匯入無錯誤，Compatibility 實際 game_audio failures=0（包含兩曲 OggVorbis 類型、解碼、循環重疊與開波／結束切換）；未 commit／push。
+
+新增哨塔攻擊聲：程序合成 `assets/audio/towers/sentry_shot.wav`（0.22 秒弓弦／破風），重建腳本 `tools/assets/build_sentry_shot.gd`；integrated/sentry.tscn 指定匯出的 shot_sound，沿用真實射擊事件與 Combat 音量。Godot 4.7.2 Compatibility 實際 tower_integration：84 次配置／旋轉、所有塔事件及哨塔開火時的音檔／bus 斷言通過，failures=[]、stderr 空白。未修改原攻速／傷害，未 commit／push；Web 與真人主觀混音未測。
+
+新增 hover 音效：assets/audio/ui/hover.mp3（按鈕）與 card_hover.mp3（手牌、展開商店、遺物卡），播放增益均為 click 的 25%，走 Master。音訊專項 headless 與實際 card_drag_placement 回歸均 failures=0，涵蓋種類分流、低增益、停用按鈕靜音與同卡移動不重播。快速關閉仍可能出現前述 mixer Resource 清理警告，非斷言失敗。
+
+
+本次追加（依使用者澄清修正）：全部 BGM 播放基礎增益 50%、滑桿預設恢復 50%、號角增益 50%，回平時音樂為 4 秒 smoothstep 交叉淡化。新增 Downloads 指定的 click／placement／wrong_placement 原檔副本，按鈕由 BaseButton.pressed 統一觸發、放置依提交結果觸發；非法放置只短亮紅色格面 0.4 秒。新增回歸斷言驗證預設音量、4 秒包絡、按鈕聲、成功／失敗放置聲、拒絕不消耗卡與紅色閃亮恢復。game_audio headless、card_drag_placement 實際 Compatibility 均 failures=0；已檢視 invalid_ground_before／flash 截圖，地塊區域 812 像素有明顯變化（RGB 差值總和 >10），效果不擴散至其他格色。首次新增音檔匯入前 preload 暫時報錯，素材匯入完成後測試可載入；Web 與主觀混音尚未驗證。
+
+
+本輪使用使用者指定的三份原型音檔，在 assets/audio/music/ 保存獨立副本；新增 GameAudio Autoload、正式開波／收尾／離場接線、射擊 Combat bus 及共用設定頁三個百分比滑桿。開波號角一次、戰鬥結束不播號角；音樂淡化與雙 player 循環銜接以實際時間執行，跨場景保留音樂與音量。音量設定不跨次啟動保存。完整行為與測試入口見 systems.md「設定頁面」。沒有 commit／push。
+
+本輪 Godot 4.7.2：隔離 APPDATA／LOCALAPPDATA 的 headless editor import 無錯誤；game_audio headless 與 Compatibility 實際渲染均 failures=0；既有 level_flow headless、pause_menu 實際渲染均 failures=0。音效設定截圖 .godot/audio-settings.png 已檢視，三滑桿及百分比沒有重疊。level_flow 快速關閉時有音訊播放 Resource 的清理警告；音訊專項在刪除播放器後等待 mixer 收尾，及 pause_menu 正常重玩／結束皆無此警告。主觀混音平衡、Web 匯出與瀏覽器使用者手勢音訊解鎖未測。原型專案未修改。
+
+
 ## 2026-11-07 本次 main → routing-sandbox 整合
 
 以 Sandbox `d85f60b` 為基礎完成既有 `origin/main`／`MERGE_HEAD=6141d51` 合併。授權包含 Merge Commit，不 push。以下為本次紀錄；後續兩個分支的歷史紀錄不代表現況或本次重測結果。
