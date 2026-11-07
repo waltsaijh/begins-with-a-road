@@ -101,7 +101,7 @@ func run() -> void:
 	for member: Dictionary in final_plan.get("pending", []):
 		check(_route_legal(member.route.cells, canonical), "Committed troop route uses reciprocal roads and avoids towers")
 		if member.profile == TroopCatalog.find("scout"): check(member.route.birth_wave == 1, "Scout new bypass birth is this preparation wave")
-		if member.profile == TroopCatalog.find("winged_beast"): check(member.route.cells.size()-1 == shortest.distance, "Winged Beast uses actual shortest committed path")
+		if member.profile == TroopCatalog.find("winged"): check(member.route.cells.size()-1 == shortest.distance, "Winged Beast uses actual shortest committed path")
 	var upgrade_card := Fixture.card("cross", "ballista")
 	cards.add_card(upgrade_card)
 	var upgrade_index: int = cards.cards.size()-1

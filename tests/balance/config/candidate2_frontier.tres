@@ -37,7 +37,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W2G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 10
 start_tick = 12
 interval_ticks = 10
@@ -45,7 +45,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W2G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 1
 start_tick = 0
 interval_ticks = 1
@@ -59,7 +59,7 @@ groups = Array[ExtResource("group")]([SubResource("W2G0"), SubResource("W2G1"), 
 
 [sub_resource type="Resource" id="W3G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 15
 start_tick = 12
 interval_ticks = 10
@@ -67,7 +67,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W3G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 2
 start_tick = 0
 interval_ticks = 24
@@ -105,7 +105,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W4G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 2
 start_tick = 12
 interval_ticks = 24
@@ -119,7 +119,7 @@ groups = Array[ExtResource("group")]([SubResource("W4G0"), SubResource("W4G1"), 
 
 [sub_resource type="Resource" id="W5G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 25
 start_tick = 8
 interval_ticks = 8
@@ -127,7 +127,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W5G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 3
 start_tick = 0
 interval_ticks = 20
@@ -135,7 +135,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W5G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 2
 start_tick = 8
 interval_ticks = 24
@@ -157,7 +157,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W6G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 3
 start_tick = 4
 interval_ticks = 20
@@ -165,7 +165,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W6G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 2
 start_tick = 12
 interval_ticks = 24
@@ -173,7 +173,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W6G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 enemy_count = 1
 start_tick = 24
 interval_ticks = 1
@@ -217,7 +217,7 @@ groups = Array[ExtResource("group")]([SubResource("W7G0"), SubResource("W7G1"), 
 
 [sub_resource type="Resource" id="W8G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 enemy_count = 10
 start_tick = 12
 interval_ticks = 7
@@ -247,7 +247,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W9G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 enemy_count = 8
 start_tick = 24
 interval_ticks = 7
@@ -255,7 +255,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W9G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 4
 start_tick = 0
 interval_ticks = 16
@@ -263,7 +263,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W9G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 25
 start_tick = 8
 interval_ticks = 8
@@ -277,7 +277,7 @@ groups = Array[ExtResource("group")]([SubResource("W9G0"), SubResource("W9G1"), 
 
 [sub_resource type="Resource" id="W10G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 35
 start_tick = 4
 interval_ticks = 7
@@ -285,7 +285,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W10G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 5
 start_tick = 0
 interval_ticks = 14
@@ -293,7 +293,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W10G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 enemy_count = 3
 start_tick = 12
 interval_ticks = 20
@@ -315,7 +315,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W11G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 4
 start_tick = 8
 interval_ticks = 20
@@ -323,7 +323,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W11G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 enemy_count = 12
 start_tick = 24
 interval_ticks = 6
@@ -337,7 +337,7 @@ groups = Array[ExtResource("group")]([SubResource("W11G0"), SubResource("W11G1")
 
 [sub_resource type="Resource" id="W12G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 5
 start_tick = 0
 interval_ticks = 14
@@ -345,7 +345,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W12G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 3
 start_tick = 8
 interval_ticks = 20
@@ -353,7 +353,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W12G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 enemy_count = 3
 start_tick = 16
 interval_ticks = 20
@@ -369,7 +369,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W12G4"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 30
 start_tick = 8
 interval_ticks = 7
@@ -383,7 +383,7 @@ groups = Array[ExtResource("group")]([SubResource("W12G0"), SubResource("W12G1")
 
 [sub_resource type="Resource" id="W13G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 40
 start_tick = 4
 interval_ticks = 7
@@ -391,7 +391,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W13G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 6
 start_tick = 0
 interval_ticks = 14
@@ -399,7 +399,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W13G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 4
 start_tick = 12
 interval_ticks = 20
@@ -421,7 +421,7 @@ groups = Array[ExtResource("group")]([SubResource("W13G0"), SubResource("W13G1")
 
 [sub_resource type="Resource" id="W14G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 enemy_count = 16
 start_tick = 24
 interval_ticks = 5
@@ -437,7 +437,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W14G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 enemy_count = 4
 start_tick = 16
 interval_ticks = 16
@@ -459,7 +459,7 @@ groups = Array[ExtResource("group")]([SubResource("W14G0"), SubResource("W14G1")
 
 [sub_resource type="Resource" id="W15G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 4
 start_tick = 0
 interval_ticks = 16
@@ -467,7 +467,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W15G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 enemy_count = 25
 start_tick = 8
 interval_ticks = 8
@@ -475,7 +475,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W15G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 enemy_count = 3
 start_tick = 20
 interval_ticks = 20
@@ -483,7 +483,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W15G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/siege_behemoth.tres"
+troop_path = "res://assets/data/troops/ravager.tres"
 enemy_count = 1
 start_tick = 56
 interval_ticks = 1
@@ -507,7 +507,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W15G6"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 enemy_count = 8
 start_tick = 88
 interval_ticks = 6
@@ -515,7 +515,7 @@ batch_size = 1
 
 [sub_resource type="Resource" id="W15G7"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 enemy_count = 2
 start_tick = 76
 interval_ticks = 20

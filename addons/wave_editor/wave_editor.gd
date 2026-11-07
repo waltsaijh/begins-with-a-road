@@ -351,6 +351,7 @@ func _refresh() -> void:
 	for profile in _profiles:
 		%TroopPicker.add_icon_item(profile.icon, profile.localized_name())
 		%TroopPicker.set_item_tooltip(%TroopPicker.item_count-1, profile.resource_path)
+		%TroopPicker.get_popup().set_item_icon_modulate(%TroopPicker.item_count-1, profile.accent_color)
 	%EntrancePicker.clear()
 	if level != null:
 		var layout := level.endpoint_layout()

@@ -22,7 +22,7 @@ func configure(value: Troop, amount: int) -> void:
 	profile = value
 	count = amount
 	$Body/Content/Icon.texture = value.icon
-	if not value.ability_text.is_empty(): $Body/Content/Icon.modulate = Color.WHITE
+	$Body/Content/Icon.self_modulate = value.icon_color()
 	_update_text()
 
 func _ready() -> void:

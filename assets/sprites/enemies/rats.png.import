@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c628wohk7k5ce"
-path="res://.godot/imported/quickfeet.png-d90518b713d8526c81505be025d660b1.ctex"
+uid="uid://b54ajd6dt6trl"
+path="res://.godot/imported/rats.png-9b58bd1a258b22c8ed30e8fe16cdc823.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/troops/quickfeet.png"
-dest_files=["res://.godot/imported/quickfeet.png-d90518b713d8526c81505be025d660b1.ctex"]
+source_file="res://assets/sprites/enemies/rats.png"
+dest_files=["res://.godot/imported/rats.png-9b58bd1a258b22c8ed30e8fe16cdc823.ctex"]
 
 [params]
 

@@ -214,7 +214,7 @@ _data = {
 &"Walk": SubResource("Animation_2xq7g")
 }
 
-[node name="SiegeBehemoth" type="Node3D" unique_id=38612760]
+[node name="Ravager" type="Node3D" unique_id=38612760]
 metadata/source = "card-tower-defense/art/enemies/skybridge_pawns.gd: Siege Behemoth"
 metadata/contact_size = Vector2(0.96, 0.84)
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fmhbqbrqxny1"
-path="res://.godot/imported/rat_swarm.svg-083677ea4b38ef3e2b1015645e91c734.ctex"
+uid="uid://dqpfhn8k2ljvn"
+path="res://.godot/imported/ravager.png-5378040d9367b6552505285e555a74e2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/rat_swarm.svg"
-dest_files=["res://.godot/imported/rat_swarm.svg-083677ea4b38ef3e2b1015645e91c734.ctex"]
+source_file="res://assets/sprites/enemies/ravager.png"
+dest_files=["res://.godot/imported/ravager.png-5378040d9367b6552505285e555a74e2.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

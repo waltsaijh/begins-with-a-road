@@ -1,16 +1,16 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://dmuqgyabd1pvr"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://cmhilhq0d7gm4" path="res://assets/sprites/troops/soldier.png" id="1_87ixf"]
+[ext_resource type="Texture2D" uid="uid://b2l13a2jxbna3" path="res://assets/sprites/enemies/soldier.png" id="1_87ixf"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/grunt.tscn" id="3"]
 
 [resource]
 script = ExtResource("1")
+ability_text = "標準步兵，平均分散在各條路線。"
+ability_text_en = "Standard infantry, spread evenly across the routes."
 troop_name = "soldier"
 name_key = "troop.soldier.name"
 sort_order = 0
-ability_text = "標準步兵，平均分散在各條路線。"
-ability_text_en = "Standard infantry, spread evenly across the routes."
 icon = ExtResource("1_87ixf")
 melee_damage = 5.0
 route_selection = 0

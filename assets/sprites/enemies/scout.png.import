@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bowu4k2ecwa4n"
-path="res://.godot/imported/heavy.png-4e981f90175561990652e10b57e37779.ctex"
+uid="uid://csvi48yff7k6j"
+path="res://.godot/imported/scout.png-f2381ac80dd3cbc7ee081bf7c95cd6c9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/troops/heavy.png"
-dest_files=["res://.godot/imported/heavy.png-4e981f90175561990652e10b57e37779.ctex"]
+source_file="res://assets/sprites/enemies/scout.png"
+dest_files=["res://.godot/imported/scout.png-f2381ac80dd3cbc7ee081bf7c95cd6c9.ctex"]
 
 [params]
 

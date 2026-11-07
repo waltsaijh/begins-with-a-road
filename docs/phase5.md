@@ -12,7 +12,7 @@ Tower tuning changes damage and price, and Barracks friendly damage. Geometry, t
 
 ## Siege Behemoth
 
-One final encounter adapts the legacy armored ram model and two-tower suppression mechanic. `tools/assets/build_siege_behemoth.gd` reads the legacy art sources and bakes a self-contained scene into this project. The game has no legacy-project dependency. The builder's default legacy input is read-only; inspect the generated model before rerunning to preserve hand edits.
+One final encounter adapts the legacy armored ram model and two-tower suppression mechanic. `tools/assets/build_ravager.gd` reads the legacy art sources and bakes a self-contained scene into this project. The game has no legacy-project dependency. The builder's default legacy input is read-only; inspect the generated model before rerunning to preserve hand edits.
 
 The boss is a normal `Troop`/`Enemy` with large, ground, armored and boss tags: 1,200 HP; speed multiplier .4; melee 28 every 1 s; after an 8 s cooldown starts a 1.2 s windup, then disables at most two legal towers within three cells for three seconds. It uses the current fixed route allocation, current health/shield/status pipeline and source-specific disable cleanup. Slow, frost, knockback and Barracks interception retain their ordinary rules. Hunting explicitly excludes bosses. The charge ring, links, skill bar, disabled-tower lightning and top health label expose the encounter state. Death counts normally; remaining escorts/projectiles must resolve before victory.
 

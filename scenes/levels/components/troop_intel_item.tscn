@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" path="res://scripts/levels/presentation/troop_intel_item.gd" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="2"]
+[ext_resource type="Shader" path="res://assets/shaders/ui_icon_mask.gdshader" id="3"]
+
+[sub_resource type="ShaderMaterial" id="IconMask"]
+shader = ExtResource("3")
 
 [sub_resource type="StyleBoxFlat" id="Normal"]
 bg_color = Color(0.953, 0.969, 0.953, 0.96)
@@ -56,7 +60,8 @@ custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-modulate = Color(0.20, 0.36, 0.38, 1)
+material = SubResource("IconMask")
+self_modulate = Color(0.20, 0.36, 0.38, 1)
 expand_mode = 1
 stretch_mode = 5
 

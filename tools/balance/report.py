@@ -56,7 +56,7 @@ def main():
     def troop(key,prop,default=0):return values.get(f'res://assets/data/troops/{key}.tres.{prop}',default)
     authored=json.loads((ROOT/'docs/balance/phase5_wave_proposal.json').read_text(encoding='utf-8'))
     economy=[];ca=cb=cc=cf=0
-    bounty={'soldier':1,'quickfeet':1,'heavy':3,'rat_swarm':0,'shield_guardian':3,'blood_mage':1,'winged_beast':1,'scout':1,'saboteur':1,'siege_behemoth':0}
+    bounty={'soldier':1,'quickfeet':1,'heavy':3,'rats':0,'rook':3,'bloodmage':1,'winged':1,'scout':1,'bomber':1,'ravager':0}
     for w in authored:
         count=sum(g['count'] for g in w['groups']);b=sum(g['count']*bounty[g['troop']] for g in w['groups'])
         # C keeps half the explicit completion reward and adds the normalized bounties.

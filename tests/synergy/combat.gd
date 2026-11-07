@@ -84,11 +84,11 @@ func run() -> void:
 
 func verify_guardian() -> void:
 	var tower := build("ballista",Vector2i(4,5))
-	var rat := enemy("rat_swarm",Vector2i(4,4))
+	var rat := enemy("rats",Vector2i(4,4))
 	# Survive several hits so later assertions test eligibility, not changed damage.
 	rat.health = 100
 	rat.max_health = 100
-	var guard := enemy("shield_guardian",Vector2i(4,3))
+	var guard := enemy("rook",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"guardian overrides earlier/nearer rat for single target")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))
 	check(rat.health == rat.max_health and guard.health < guard.max_health,"same-lane guardian absorbs a shot that would hit rat")
@@ -101,7 +101,7 @@ func verify_guardian() -> void:
 	combat._index.rebuild(wave.living_enemies(),map)
 	check(tower.attack.select_target(combat,tower) == rat,"inside attack range but outside taunt radius")
 	guard.global_position = world(Vector2i(4,3))
-	var second := enemy("shield_guardian",Vector2i(4,3))
+	var second := enemy("rook",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"equal guardians stable spawn order")
 	second.abilities.taunt_priority = 2
 	check(tower.attack.select_target(combat,tower) == second,"authored taunt priority wins")
@@ -114,11 +114,11 @@ func verify_guardian() -> void:
 	all.attack.fire(combat,all,rat)
 	check(rat.health < before_rat and guard.health < before_guard,"area-all fire still hits protected rat and guardian")
 	var barracks := build("barracks",Vector2i(19,6))
-	var first := enemy("rat_swarm",Vector2i(19,5))
-	var blocked := enemy("shield_guardian",Vector2i(19,5))
+	var first := enemy("rats",Vector2i(19,5))
+	var blocked := enemy("rook",Vector2i(19,5))
 	blocked.abilities.taunt_priority = 2
 	blocked.engaged_by = scene
-	var legal := enemy("shield_guardian",Vector2i(19,5))
+	var legal := enemy("rook",Vector2i(19,5))
 	combat.barracks._process(0)
 	var unit: Node3D
 	for soldier in combat.barracks.units:
@@ -130,8 +130,8 @@ func verify_guardian() -> void:
 	unit.release()
 
 func verify_heal() -> void:
-	var mage := enemy("blood_mage",Vector2i(11,4))
-	var ally := enemy("shield_guardian",Vector2i(12,4))
+	var mage := enemy("bloodmage",Vector2i(11,4))
+	var ally := enemy("rook",Vector2i(12,4))
 	var far := enemy("heavy",Vector2i(17,4))
 	ally.health = 50
 	far.health = 50
@@ -139,7 +139,7 @@ func verify_heal() -> void:
 	check(ally.health == 50,"healing waits full period")
 	combat.enemy_abilities.advance(0.11)
 	check(ally.health == 68 and far.health == 50,"heal only within radius")
-	var other := enemy("blood_mage",Vector2i(11,5))
+	var other := enemy("bloodmage",Vector2i(11,5))
 	mage.heal_clock = 0.1
 	other.heal_clock = 0.1
 	combat.enemy_abilities.advance(0.2)
@@ -147,14 +147,14 @@ func verify_heal() -> void:
 	ally.health = ally.max_health-1
 	combat.enemy_abilities.advance(3)
 	check(ally.health == ally.max_health,"healing capped at maximum")
-	var dead := enemy("rat_swarm",Vector2i(11,4))
+	var dead := enemy("rats",Vector2i(11,4))
 	dead.take_damage(100)
 	check(dead.heal(100) == 0 and not dead.can_be_targeted(),"cannot resurrect dead enemy")
 
 func verify_air() -> void:
 	var mortar := build("mortar",Vector2i(11,11))
-	var flying := enemy("winged_beast",Vector2i(11,10))
-	var ground := enemy("rat_swarm",Vector2i(11,10))
+	var flying := enemy("winged",Vector2i(11,10))
+	var ground := enemy("rats",Vector2i(11,10))
 	check(mortar.attack.select_target(combat,mortar) == ground,"ordinary mortar excludes flying targets")
 	var before: float = flying.health
 	mortar.attack.fire(combat,mortar,ground)
@@ -185,7 +185,7 @@ func verify_air() -> void:
 func verify_sabotage() -> void:
 	var tower := build("sentry",Vector2i(3,13))
 	tower.upgrade()
-	var sab := enemy("saboteur",Vector2i(3,12))
+	var sab := enemy("bomber",Vector2i(3,12))
 	var route: Dictionary = sab.route.duplicate(true)
 	var roads := map.get_used_cells()
 	var old_definition := tower.definition
@@ -208,8 +208,8 @@ func verify_sabotage() -> void:
 	tower.next_attack_time = 0
 	for i in 20: combat._process(0.1)
 	check(combat.shots_fired > shots,"normal attack resumes")
-	var second := enemy("saboteur",Vector2i(3,12))
-	var first_source := enemy("saboteur",Vector2i(3,12))
+	var second := enemy("bomber",Vector2i(3,12))
+	var first_source := enemy("bomber",Vector2i(3,12))
 	tower.apply_disable(first_source,2.5)
 	tower.apply_disable(second,2.5)
 	check(tower._disables.size() == 2,"two live sabotage sources coexist")
@@ -218,7 +218,7 @@ func verify_sabotage() -> void:
 	tower.apply_disable(second,2.5)
 	second.take_damage(1000)
 	check(not tower.is_disabled(),"source death immediately releases its disable")
-	var third := enemy("saboteur",Vector2i(3,12))
+	var third := enemy("bomber",Vector2i(3,12))
 	tower.apply_disable(third,2.5)
 	combat.enemy_abilities.clear()
 	check(not tower.is_disabled() and third.cast_target == null,"wave cleanup clears disable and cast")

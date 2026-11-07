@@ -21,7 +21,7 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var model := Node3D.new()
-	model.name = "SiegeBehemoth"
+	model.name = "Ravager"
 	model.set_meta("source","card-tower-defense/art/enemies/skybridge_pawns.gd: Siege Behemoth")
 	var parts: Dictionary = generator.create(model,"siege_behemoth")
 	var player := AnimationPlayer.new()
@@ -41,7 +41,7 @@ func _initialize() -> void:
 	for child in model.find_children("*","",true,false): child.owner = model
 	var scene := PackedScene.new()
 	scene.pack(model)
-	var error := ResourceSaver.save(scene,"res://assets/models/enemies/siege_behemoth.tscn")
+	var error := ResourceSaver.save(scene,"res://assets/models/enemies/ravager.tscn")
 	model.free()
 	print("BOSS_MODEL ",error_string(error))
 	quit(0 if error == OK else 1)

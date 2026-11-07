@@ -90,47 +90,47 @@ traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
 traffic.no_change,No forecast change: candidate routes or whole-unit quotas limit this effect,分流未變：候選路線或整數配額限制
 traffic.unavailable,No positive-weight route for the next wave,下一波沒有正權重路線
 relic.frost_ray.name,Frost Ray,冰霜射線
-relic.frost_ray.description,Making enemies slower and slower,讓敵人行動愈加緩慢
+relic.frost_ray.description,Making enemies slower and slower.,讓敵人行動愈加緩慢。
 relic.fuel_supply.name,Fuel Supply,燃料供能
-relic.fuel_supply.description,Towers around it can deal more damage,強化周圍的防禦塔的攻擊
+relic.fuel_supply.description,Towers around it can deal more damage.,強化周圍的防禦塔的攻擊。
 relic.small_fry.name,Small Fry,專打雜魚
-relic.small_fry.description,More damage to small enemies,對小體型敵人造成更高傷害
+relic.small_fry.description,More damage to small enemies.,對小體型敵人造成更高傷害。
 relic.air_strike.name,Air Strike,空中打擊
-relic.air_strike.description,Target and hit enemies in the sky,能瞄準並擊中空中的敵人
+relic.air_strike.description,Target and hit enemies in the sky.,能瞄準並擊中空中的敵人。
 relic.explosive_shell.name,Explosive Shell!,爆裂彈！
-relic.explosive_shell.description,Who doesn't like explosion? it could hit your allies by the way,誰不喜歡大爆炸呢? 但小心別炸到友軍
+relic.explosive_shell.description,Who doesn't like explosion? it could hit your allies by the way.,誰不喜歡大爆炸呢? 但小心別炸到友軍。
 relic.assembled_cannon.name,Cannon Assembled,大砲已組裝
-relic.assembled_cannon.description,Heavier but slower shot,更重也更慢的砲彈
+relic.assembled_cannon.description,Heavier but slower shot.,更重也更慢的砲彈。
 relic.departure.name,Departure,航行
-relic.departure.description,Patrol back and forth,前後往返巡航
+relic.departure.description,Patrol back and forth.,前後往返巡航。
 relic.rapid_fire.name,Rapid Fire,快速開火
-relic.rapid_fire.description,Bullet rain with a cooldown,有冷卻時間的狂轟亂炸
+relic.rapid_fire.description,Bullet rain with a cooldown.,有冷卻時間的狂轟亂炸。
 relic.crew_concentration.name,Crew Concentration,人員集中
-relic.crew_concentration.description,"Double damage, but fire only to the right",雙倍傷害，但只朝右舷開火
+relic.crew_concentration.description,"Double damage, but fire only to the right.",雙倍傷害，但只朝右舷開火。
 relic.hunting.name,Hunting,狩獵
-relic.hunting.description,Kill one enemy every 8 seconds,每 8 秒可處決一名普通敵人
+relic.hunting.description,Kill one enemy every 8 seconds.,每 8 秒可處決一名普通敵人。
 relic.protagonist.name,Become the Protagonist,成為主角
-relic.protagonist.description,No limit to how high this tower can grow,主角的成長沒有上限
+relic.protagonist.description,No limit to how high this tower can grow.,主角的成長沒有上限。
 relic.support_attack.name,Supporting Fire,支援攻擊
-relic.support_attack.description,Reach farther to lend a hand,把火力送到更遠的地方
+relic.support_attack.description,Reach farther to lend a hand.,把火力送到更遠的地方。
 relic.powerful_shot.name,Powerful Shot,強力射擊
-relic.powerful_shot.description,"One bolt, several enemies",一箭貫穿整排敵人
+relic.powerful_shot.description,"One bolt, several enemies.",一箭貫穿整排敵人。
 relic.secret_mission.name,Secret Mission,隱密任務
-relic.secret_mission.description,Hits harder when no other towers are nearby,遠離其他防禦塔，才能使出全力
+relic.secret_mission.description,Hits harder when no other towers are nearby.,遠離其他防禦塔，才能使出全力。
 relic.heavy_bolts.name,Heavy Bolts,超重型箭矢
-relic.heavy_bolts.description,A heavy hit sends enemies backward,沉重的箭矢，讓敵人步步後退
+relic.heavy_bolts.description,A heavy hit sends enemies backward.,沉重的箭矢，讓敵人步步後退。
 relic.reinforcements.name,Reinforcements,來點增援
-relic.reinforcements.description,There's always room for one more soldier,多一名士兵，多一份戰力
+relic.reinforcements.description,There's always room for one more soldier.,多一名士兵，多一份戰力。
 relic.sharpshooter.name,Sharpshooter,神射手
-relic.sharpshooter.description,No need to wait for enemies to get close,不必等敵人靠近，也能出手
+relic.sharpshooter.description,No need to wait for enemies to get close.,不必等敵人靠近，也能出手。
 relic.global_haste.name,Battle Rhythm,戰鬥節奏
-relic.global_haste.description,All towers and soldiers attack a little faster,讓防禦塔與友軍出手更快
+relic.global_haste.description,All towers and soldiers attack a little faster.,讓防禦塔與友軍出手更快。
 relic.global_damage.name,Refined Arms,精製武裝
-relic.global_damage.description,"Better weapons, harder hits",讓防禦塔與友軍打得更痛
+relic.global_damage.description,"Better weapons, harder hits.",讓防禦塔與友軍打得更痛。
 relic.gold.name,Supply Cache,補給箱
-relic.gold.description,A little gold for the road ahead,補點金幣，繼續上路
+relic.gold.description,A little gold for the road ahead.,補點金幣，繼續上路。
 relic.reroll_discount.name,Regular Discount,熟客優惠
-relic.reroll_discount.description,A familiar face gets cheaper rerolls,熟客優惠，刷新少算一點
+relic.reroll_discount.description,A familiar face gets cheaper rerolls.,熟客優惠，刷新少算一點。
 relic.collection,Relics,本局遺物
 relic.choose,Choose a relic,選擇一件遺物
 relic.debug_reroll,Reroll relics (Debug),重新隨機抽選（Debug）
@@ -156,16 +156,19 @@ tutorial.return,Return to main menu,返回主畫面
 tutorial.match_ghost,Match the highlighted card and hologram position and direction.,請依提示選牌，並配合金色 hologram 的位置與方向。
 tutorial.follow_step,Complete the current tutorial step first.,請先完成目前的教學步驟。
 relic.empty,No relics yet,尚未取得遺物
-troop.rat_swarm.name,Rat Swarm,鼠群
-troop.shield_guardian.name,Shield Guardian,盾衛兵
-troop.blood_mage.name,Blood Mage,血法師
-troop.winged_beast.name,Winged Beast,飛翼獸
+troop.rats.name,Rat Swarm,鼠群
+troop.rook.name,Shield Guardian,盾衛兵
+troop.bloodmage.name,Blood Mage,血法師
+troop.winged.name,Winged Beast,飛翼獸
 troop.scout.name,Scout,偵查兵
-troop.saboteur.name,Saboteur,爆破手
-troop.siege_behemoth.name,Siege Behemoth,攻城巨獸
+troop.bomber.name,Saboteur,爆破手
+troop.ravager.name,Siege Behemoth,攻城巨獸
 ui.pause.progress,Progress,進度
 ui.progress.towers,Our towers,我方防禦塔
 ui.progress.enemies,Enemies,敵軍
+ui.progress.relics,Relics,遺物
+ui.relic.usage.generic,General,通用
+ui.progress.stat.stacks,Hold up to {value},最多持有 {value} 份
 ui.progress.stat.damage,Damage {value},傷害 {value}
 ui.progress.stat.interval,Attacks every {value}s,每 {value} 秒攻擊
 ui.progress.stat.range,Range {value} tiles,射程 {value} 格

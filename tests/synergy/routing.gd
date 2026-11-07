@@ -26,14 +26,14 @@ func add_lane(cells: Array[Vector2i], y: int) -> void:
 			if not c in cells: cells.append(c)
 func _ready() -> void: run.call_deferred()
 func run() -> void:
-	var specs := {"rat_swarm":["small",&"ground",&"swarm"],"shield_guardian":["large",&"ground",&"armored",&"guardian"],"blood_mage":["standard",&"ground",&"support"],"winged_beast":["standard",&"flying"],"scout":["small",&"ground",&"scout"],"saboteur":["standard",&"ground",&"saboteur"]}
+	var specs := {"rats":["small",&"ground",&"swarm"],"rook":["large",&"ground",&"armored",&"guardian"],"bloodmage":["standard",&"ground",&"support"],"winged":["standard",&"flying"],"scout":["small",&"ground",&"scout"],"bomber":["standard",&"ground",&"saboteur"]}
 	for id: String in specs:
 		var troop := TroopCatalog.find(id)
 		check(troop != null and troop.configuration_error().is_empty(),"valid editable profile "+id)
 		for tag: String in specs[id]: check(troop.has_tag(StringName(tag)),id+" tag "+tag)
 		check(troop.model != null and troop.icon != null,"model and icon "+id)
-	check(TroopCatalog.find("blood_mage").route_selection == Troop.RouteSelection.UNIFORM,"mage Uniform")
-	check(TroopCatalog.find("shield_guardian").threat_weight == 0 and TroopCatalog.find("saboteur").threat_weight == 0,"guardian/saboteur no safety seeking")
+	check(TroopCatalog.find("bloodmage").route_selection == Troop.RouteSelection.UNIFORM,"mage Uniform")
+	check(TroopCatalog.find("rook").threat_weight == 0 and TroopCatalog.find("bomber").threat_weight == 0,"guardian/saboteur no safety seeking")
 	var cells: Array[Vector2i] = []
 	add_lane(cells,0)
 	add_lane(cells,-2)
@@ -153,7 +153,7 @@ func verify_schedule(cells: Array[Vector2i]) -> void:
 		await get_tree().process_frame
 		if not scene.get_node("PortalMap").computing: break
 	var controller: Node = scene.get_node("PortalMap")
-	var rat := TroopCatalog.find("rat_swarm")
+	var rat := TroopCatalog.find("rats")
 	var wave := WaveDefinition.new()
 	for count in [12,8]:
 		var group := WaveSpawnGroup.new()
@@ -161,7 +161,7 @@ func verify_schedule(cells: Array[Vector2i]) -> void:
 		group.enemy_count = count
 		group.start_tick = 0 if count == 12 else 40
 		wave.groups.append(group)
-	for id in ["winged_beast","scout","blood_mage","shield_guardian","saboteur"]:
+	for id in ["winged","scout","bloodmage","rook","bomber"]:
 		var group := WaveSpawnGroup.new()
 		group.troop = TroopCatalog.find(id)
 		group.enemy_count = 8
@@ -188,7 +188,7 @@ func verify_schedule(cells: Array[Vector2i]) -> void:
 		check(members.size() <= 5,"no surplus rat in tail cohort")
 		for i in range(1,members.size()): check(members[i].spawn_tick-members[i-1].spawn_tick == 1,"cohort short stagger")
 	check(rat_total == 20 and cohorts.size() == 5,"12+8 rats produce 5 cohorts not 20 route units")
-	var flying := TroopCatalog.find("winged_beast")
+	var flying := TroopCatalog.find("winged")
 	var baseline: Dictionary = controller.plan_for(flying)
 	var effect := {"tags":[&"flying"],"excluded_tags":[],"cells":{Vector2i(1,0):true},"multiplier":0.001}
 	check(controller.plan_for(flying,0,[effect]).route_probabilities == baseline.route_probabilities,"flying ignores all ground traffic effects")

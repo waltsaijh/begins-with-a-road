@@ -73,9 +73,9 @@ func verify() -> void:
 		hud.set_paused(false)
 		await frames(3)
 		if case < 3:
-			var rat := TroopCatalog.find("rat_swarm")
-			var guard := TroopCatalog.find("shield_guardian")
-			var mage := TroopCatalog.find("blood_mage")
+			var rat := TroopCatalog.find("rats")
+			var guard := TroopCatalog.find("rook")
+			var mage := TroopCatalog.find("bloodmage")
 			var a := lane_counts(preview.baseline,rat if case == 0 else mage)
 			var b := lane_counts(preview.baseline,guard)
 			await click(split_button.get_global_rect().get_center())
@@ -87,7 +87,7 @@ func verify() -> void:
 				observations[str(case)] = {"before":[a,b],"after":[aa,bb],"overlap_before":overlap(a,b),"overlap_after":overlap(aa,bb)}
 				check(overlap(aa,bb) < overlap(a,b),"splitting reduces guardian/support route overlap")
 		else:
-			var flyer := TroopCatalog.find("winged_beast")
+			var flyer := TroopCatalog.find("winged")
 			var old: Dictionary = preview.baseline.by_troop[flyer].duplicate(true)
 			await click(new_roads_button.get_global_rect().get_center())
 			await frames(8)

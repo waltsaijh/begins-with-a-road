@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvxaa8k6vmi74"
-path="res://.godot/imported/blood_mage.svg-4bd0d6d92ebb39b27fc68e43a6bcbb47.ctex"
+uid="uid://c0v5lfpyh11tr"
+path="res://.godot/imported/bloodmage.png-0b00f51b71a8d9ebbbfe779da01376f1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/blood_mage.svg"
-dest_files=["res://.godot/imported/blood_mage.svg-4bd0d6d92ebb39b27fc68e43a6bcbb47.ctex"]
+source_file="res://assets/sprites/enemies/bloodmage.png"
+dest_files=["res://.godot/imported/bloodmage.png-0b00f51b71a8d9ebbbfe779da01376f1.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

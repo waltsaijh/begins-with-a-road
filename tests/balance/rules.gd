@@ -25,7 +25,7 @@ func session(count: int, boss := false) -> Node:
 			var recipe := WaveDefinition.new()
 			recipe.reward = 0 if a*3+w == count-1 else 2
 			var group := WaveSpawnGroup.new()
-			group.troop = TroopCatalog.find("siege_behemoth" if boss else "soldier")
+			group.troop = TroopCatalog.find("ravager" if boss else "soldier")
 			group.enemy_count = 1
 			recipe.groups = [group]
 			act.waves.append(recipe)
@@ -52,7 +52,7 @@ func verify() -> void:
 	for act in level.acts:
 		for wave in act.waves:
 			for group in wave.groups: names[group.troop.troop_name] = true
-	check(names.size() == 10 and names.has("siege_behemoth"),"Nine ordinary troops and one boss are authored")
+	check(names.size() == 10 and names.has("ravager"),"Nine ordinary troops and one boss are authored")
 	var prices := {"sentry":9,"ballista":8,"broadside":8,"crossfire":10,"mortar":9,"barracks":8}
 	for name in prices:
 		check(load("res://assets/data/towers/"+name+".tres").card_price == prices[name],"Loaded price, not serialized text: "+name)

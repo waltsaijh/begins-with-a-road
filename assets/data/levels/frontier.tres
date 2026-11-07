@@ -27,13 +27,13 @@ interval_ticks = 6
 
 [sub_resource type="Resource" id="W2G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 12
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W2G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 1
 
 [sub_resource type="Resource" id="W2"]
@@ -44,14 +44,14 @@ reward = 9
 
 [sub_resource type="Resource" id="W3G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 12
 enemy_count = 15
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W3G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 2
 interval_ticks = 24
 
@@ -87,7 +87,7 @@ interval_ticks = 16
 
 [sub_resource type="Resource" id="W4G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 12
 enemy_count = 2
 interval_ticks = 24
@@ -100,20 +100,20 @@ reward = 11
 
 [sub_resource type="Resource" id="W5G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 8
 enemy_count = 25
 interval_ticks = 8
 
 [sub_resource type="Resource" id="W5G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 3
 interval_ticks = 20
 
 [sub_resource type="Resource" id="W5G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 8
 enemy_count = 2
 interval_ticks = 24
@@ -132,21 +132,21 @@ interval_ticks = 14
 
 [sub_resource type="Resource" id="W6G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 start_tick = 4
 enemy_count = 3
 interval_ticks = 20
 
 [sub_resource type="Resource" id="W6G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 12
 enemy_count = 2
 interval_ticks = 24
 
 [sub_resource type="Resource" id="W6G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 24
 enemy_count = 1
 
@@ -190,7 +190,7 @@ reward = 12
 
 [sub_resource type="Resource" id="W8G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 start_tick = 12
 interval_ticks = 7
 
@@ -214,20 +214,20 @@ interval_ticks = 6
 
 [sub_resource type="Resource" id="W9G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 start_tick = 24
 enemy_count = 8
 interval_ticks = 7
 
 [sub_resource type="Resource" id="W9G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 4
 interval_ticks = 16
 
 [sub_resource type="Resource" id="W9G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 8
 enemy_count = 25
 interval_ticks = 8
@@ -246,20 +246,20 @@ waves = Array[ExtResource("wave")]([SubResource("W7"), SubResource("W8"), SubRes
 
 [sub_resource type="Resource" id="W10G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 4
 enemy_count = 35
 interval_ticks = 4
 
 [sub_resource type="Resource" id="W10G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 5
 interval_ticks = 7
 
 [sub_resource type="Resource" id="W10G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 12
 enemy_count = 3
 interval_ticks = 10
@@ -278,14 +278,14 @@ interval_ticks = 6
 
 [sub_resource type="Resource" id="W11G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 8
 enemy_count = 4
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W11G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 start_tick = 24
 enemy_count = 12
 interval_ticks = 3
@@ -298,20 +298,20 @@ reward = 14
 
 [sub_resource type="Resource" id="W12G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 5
 interval_ticks = 7
 
 [sub_resource type="Resource" id="W12G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 8
 enemy_count = 3
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W12G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 16
 enemy_count = 3
 interval_ticks = 10
@@ -325,7 +325,7 @@ interval_ticks = 3
 
 [sub_resource type="Resource" id="W12G4"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 8
 enemy_count = 30
 interval_ticks = 4
@@ -344,20 +344,20 @@ waves = Array[ExtResource("wave")]([SubResource("W10"), SubResource("W11"), SubR
 
 [sub_resource type="Resource" id="W13G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 4
 enemy_count = 40
 interval_ticks = 4
 
 [sub_resource type="Resource" id="W13G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 6
 interval_ticks = 7
 
 [sub_resource type="Resource" id="W13G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 12
 enemy_count = 4
 interval_ticks = 10
@@ -377,7 +377,7 @@ reward = 15
 
 [sub_resource type="Resource" id="W14G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 start_tick = 24
 enemy_count = 16
 interval_ticks = 3
@@ -390,7 +390,7 @@ interval_ticks = 3
 
 [sub_resource type="Resource" id="W14G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 16
 enemy_count = 4
 interval_ticks = 8
@@ -410,27 +410,27 @@ reward = 15
 
 [sub_resource type="Resource" id="W15G0"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/shield_guardian.tres"
+troop_path = "res://assets/data/troops/rook.tres"
 enemy_count = 4
 interval_ticks = 8
 
 [sub_resource type="Resource" id="W15G1"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/rat_swarm.tres"
+troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 8
 enemy_count = 25
 interval_ticks = 4
 
 [sub_resource type="Resource" id="W15G2"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/blood_mage.tres"
+troop_path = "res://assets/data/troops/bloodmage.tres"
 start_tick = 20
 enemy_count = 3
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W15G3"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/siege_behemoth.tres"
+troop_path = "res://assets/data/troops/ravager.tres"
 start_tick = 56
 enemy_count = 1
 
@@ -450,14 +450,14 @@ interval_ticks = 3
 
 [sub_resource type="Resource" id="W15G6"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/winged_beast.tres"
+troop_path = "res://assets/data/troops/winged.tres"
 start_tick = 88
 enemy_count = 8
 interval_ticks = 3
 
 [sub_resource type="Resource" id="W15G7"]
 script = ExtResource("group")
-troop_path = "res://assets/data/troops/saboteur.tres"
+troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 76
 enemy_count = 2
 interval_ticks = 10

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dteebn3c32nc"
-path="res://.godot/imported/shield_guardian.svg-6e0117d7674955124181bea1ddf41c40.ctex"
+uid="uid://dbhjpym3xc7q2"
+path="res://.godot/imported/winged.png-54e756985e3648d1caf9b5b5fb6f2476.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/enemies/shield_guardian.svg"
-dest_files=["res://.godot/imported/shield_guardian.svg-6e0117d7674955124181bea1ddf41c40.ctex"]
+source_file="res://assets/sprites/enemies/winged.png"
+dest_files=["res://.godot/imported/winged.png-54e756985e3648d1caf9b5b5fb6f2476.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

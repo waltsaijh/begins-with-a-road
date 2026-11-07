@@ -111,7 +111,7 @@ All tower bodies200 HP; existing attack-area Resources, projectile speeds and ai
 | Saboteur | 75+0 | .9 | 0 | Cost/Uniform; range3, cooldown6 s, windup1 s, one tower disabled2.5 s |
 | Siege Behemoth | 1200+0 | .4 | 0 | Cost/Uniform; range3, cooldown8 s, windup1.2 s, max two towers disabled3 s |
 
-Actual speed is wave speed×troop multiplier before status. Boss melee28/1 s; ordinary melee remains in the export (Soldier5/1, Quickfeet3/.8, Heavy9/1.2, rats3/1, guardian10/1, mage3/1, flying0, scout4/1, saboteur5/1). Cooldowns restart after cast completion/cancellation, so boss pulse-to-pulse minimum is9.2 s, not8. Boss leak is fatal; Hunting cannot execute it. Slow/frost/knockback/interception retain normal rules.
+Actual speed is wave speed×troop multiplier before status. Boss melee28/1 s; ordinary melee remains in the export (Soldier5/1, Quickfeet3/.8, Heavy9/1.2, rats3/1, guardian10/1, mage3/1, flying0, scout4/1, bomber5/1). Cooldowns restart after cast completion/cancellation, so boss pulse-to-pulse minimum is9.2 s, not8. Boss leak is fatal; Hunting cannot execute it. Slow/frost/knockback/interception retain normal rules.
 
 | Wave | Composition | Count | HP+shield | Static EHP | Last spawn(s) | Completion Gold |
 |---|---|---:|---:|---:|---:|---:|

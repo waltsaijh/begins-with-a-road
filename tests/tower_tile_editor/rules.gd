@@ -130,7 +130,7 @@ func bypass() -> void:
 	for member: Dictionary in schedule.get("pending",[]):
 		for pos: Vector2 in member.route.cells: check(not towers.occupied.has(Vector2i(pos)),"Actual Soldier / Scout / Winged route avoids every footprint cell")
 		if member.profile == TroopCatalog.find("scout"): check(member.route.birth_wave == 1,"Scout uses committed new bypass history")
-		if member.profile == TroopCatalog.find("winged_beast"): check(member.route.cells.size()-1 == portal.route_history.candidates(0,true).distance,"Winged path is genuinely shortest")
+		if member.profile == TroopCatalog.find("winged"): check(member.route.cells.size()-1 == portal.route_history.candidates(0,true).distance,"Winged path is genuinely shortest")
 	session.queue_free(); await frames()
 
 func functional_anchors() -> void:
