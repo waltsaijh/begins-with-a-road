@@ -112,6 +112,14 @@ tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高�
 
 ## 建造卡
 
+異種塔不採升級預覽。`TowerMap.upgrade_target(cell, card)` 可依所持卡牌過濾塔種，只有相同 TowerDefinition 才回傳升級目標；不傳 card 的既有占格查詢契約保留。CardPlacement 游標補償與 show_upgrade、TowerMap validate／place／construction_plan 及批次草稿預覽共用此規則。不同塔種走普通放置碰撞檢查，保留所持塔的完整模型、道路與射程並標示非法，不能消耗卡片或升級其他塔。旋轉專項亦驗證異種重疊後的錯誤、完整預覽、無地圖 revision／塔等級變更，以及換回同種牌可正常升級。
+
+放置旋轉以完整塔體占格的包圍框中心為支點。`BuildCard.rotation_anchor_offset(turns, initial_turns)` 比對選牌起始方向與目前方向的全體占格中心，產生配方原點的整格補償；只使用塔體，不把道路及射程算入支點。CardPlacement 的 `pick_card_cell()` 統一供預覽、滑鼠點放與拖放使用，道路／接口、塔體模型、兵營駐點與攻擊範圍都沿用同一個補償後配方原點，因此整組一起轉向。2×2 正方形四方向的占地完全固定；長寬奇偶不同的矩形在 90° 後中心落在不同格點子集合，取最近整格（每軸最多半格），補償每次從起始方向重算，完整四轉無累積漂移。起始方向採實際可用的 default_rotation／fallback，不硬編 0。
+
+資料方法及 `place_selected(cell)` 等直接呼叫仍接受原有配方原點；地塊資源、已建塔的 placement_origin、教學 guided_cells／hologram 無需改寫。游標下已有同種塔時優先使用原命中格供升級，不把升級目標移到旋轉後的補償格。獨立 construction_batch 已存在預擺項目的旋轉仍沿用該工具原點規則。
+
+回歸 `tests/cards/rotation_pivot.tscn`：所有正式塔配置／四種起始方向、整圈無漂移與半格吸附上限；迫擊砲／交叉火力的 R／單擊右鍵／拖放、四格固定、預覽與提交、旋轉卡升級。實際渲染另輸出 `.godot/test-results/cards/pivot_<tower>_<turn>.png`；headless 亦可驗證資料及輸入。教學實際輸入測試把目標配方原點反算成游標格，仍驗證原教學指定地形落點。
+
 三張地圖均包含 `scenes/cards/card_placement.tscn`。初始三張卡先抽塔種，再依該塔的候選權重抽地塊配置；Sentry 目前包含 Corner、Bridge、Flank、Blasting。放置成功消耗、失敗保留；波次結束可由商店補充。卡面使用 `scenes/cards/components/card_view.tscn`，可在 Godot 2D 編輯器調整。底紙與灰階卡框使用 NinePatchRect，獨立塔圖示使用 TextureRect，文字使用 Label；地塊配置示意使用共用場景範本。塔的 `icon`／`accent_color` 統一提供圖示與染色，同種塔的卡片因此共用同一色彩。
 
 防禦塔 `BuildCard` 引用獨立的 `TowerDefinition` 與 `TilePreset`；後者的 `road_offsets` 為相對塔中心的 Vector2i 陣列，塔完整 footprint 的底座也會自動補齊。非空 preset.tower_footprint 覆蓋塔的預設占格，經 BuildCard 同步旋轉。道路可合併既有道路，保留既有地塊參數／合法外觀；遇已建塔完整占格時，由 TowerMap.card_ground 裁切道路並同步預覽／驗證／提交；新塔體重疊、石地、端點與設施保護仍保留。預覽以綠／紅顯示整組範圍與塔模型，滑鼠在 UI 上時隱藏。

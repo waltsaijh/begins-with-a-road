@@ -255,7 +255,7 @@ func _rebuild() -> void:
 		ghost.range_border_color = Color(0,0,0,0)
 		add_child(ghost)
 		ghost.relics = towers.relics
-		var target: DefenseTower = towers.upgrade_target(entry.anchor)
+		var target: DefenseTower = towers.upgrade_target(entry.anchor, entry.card)
 		if target != null: ghost.show_upgrade(towers.map,target,"")
 		else: ghost.show_at(towers.map,entry.card,entry.anchor,entry.turns,true)
 		ghost.upgrade_label.text = "#%d · 待確認%s" % [index+1," 升級" if target != null else ""]

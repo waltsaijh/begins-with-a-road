@@ -49,7 +49,10 @@ func place_input(card: BuildCard, cell: Vector3i, turns: int) -> Node3D:
 		key.pressed = false
 		viewport.push_input(key,true)
 	var camera: Camera3D = session.get_node("Camera3D")
-	var point := camera.unproject_position(cards.placement.map.to_global(cards.placement.map.map_to_local(cell)))
+	var offset: Vector2i = card.rotation_anchor_offset(cards.turns, cards._initial_turns)
+	var pointer_cell := cell-Vector3i(offset.x,0,offset.y)
+	if cards.towers.upgrade_target(cell, card) != null: pointer_cell = cell
+	var point := camera.unproject_position(cards.placement.map.to_global(cards.placement.map.map_to_local(pointer_cell)))
 	motion(point,Vector2.ZERO,0)
 	await frames()
 	mouse(point,MOUSE_BUTTON_LEFT,true)

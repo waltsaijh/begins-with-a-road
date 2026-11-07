@@ -18,6 +18,7 @@ var construction: Node
 @onready var rotation_hint: Control = $Hints/RotationKeyHint
 var selected := -1
 var turns := 0
+var _initial_turns := 0
 var _last_cell := TileConstants.INVALID_CELL
 var _dirty := true
 var _retry := 0.0
@@ -103,6 +104,7 @@ func select_card(index: int, toggle := true) -> void:
 			if cards[selected].allows_rotation(next):
 				turns = next
 				break
+	_initial_turns = turns
 	towers.input_enabled = selected < 0 and not input_suspended and not is_instance_valid(construction)
 	preview.visible = false
 	_reset_rotation_hint()
@@ -124,7 +126,16 @@ func _on_card_dropped(index: int, point: Vector2) -> void:
 		select_card(-1)
 		return
 	if get_viewport().gui_get_hovered_control() != null: return
-	place_selected(placement.pick_cell(point))
+	place_selected(pick_card_cell(point))
+
+## Pointer coordinates become an authored recipe origin shared by preview and commit.
+func pick_card_cell(point: Vector2) -> Vector3i:
+	var cell: Vector3i = placement.pick_cell(point)
+	if cell == TileConstants.INVALID_CELL or selected < 0 or selected >= cards.size(): return cell
+	# Upgrades continue to target the actual occupied cell under the pointer.
+	if towers.upgrade_target(cell, cards[selected]) != null: return cell
+	var offset := cards[selected].rotation_anchor_offset(turns, _initial_turns)
+	return cell+Vector3i(offset.x, 0, offset.y)
 
 func set_shop_open(value: bool) -> void:
 	_shop_open = value
@@ -254,7 +265,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if input_suspended or selected < 0 or not event is InputEventMouseButton or not event.pressed or (event.button_index == MOUSE_BUTTON_LEFT and event.button_mask & MOUSE_BUTTON_MASK_RIGHT):
 		return
 	if event.button_index == MOUSE_BUTTON_LEFT:
-		place_selected(placement.pick_cell(event.position))
+		place_selected(pick_card_cell(event.position))
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
 		rotate_card(1)
 	else:
@@ -267,7 +278,7 @@ func _process(delta: float) -> void:
 		_reset_rotation_hint()
 		_dirty = true
 		return
-	var cell: Vector3i = placement.pick_cell(get_viewport().get_mouse_position())
+	var cell: Vector3i = pick_card_cell(get_viewport().get_mouse_position())
 	if cell == TileConstants.INVALID_CELL:
 		preview.visible = false
 		_reset_rotation_hint()
@@ -292,7 +303,7 @@ func _process(delta: float) -> void:
 		if is_instance_valid(construction): construction.feedback.emit(message)
 		preview_traffic_at(cards[selected], cell, turns, _preview_error.is_empty())
 		if cards[selected].configuration_error().is_empty():
-			var target: DefenseTower = towers.upgrade_target(cell) if cards[selected].tower != null else null
+			var target: DefenseTower = towers.upgrade_target(cell, cards[selected])
 			if target != null: preview.show_upgrade(placement.map, target, _preview_error)
 			else: preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
 		else:

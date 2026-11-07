@@ -1,5 +1,11 @@
 # Agent 工作共識
 
+- 2026-11-08 最新 Git 授權：使用者要求「git更新並push到遠端」，授權提交本輪完整塔體中心旋轉、異種塔重疊預覽／升級過濾、相關測試與文件，並正常推送 origin/experiment/routing-sandbox，包含先前本機音訊提交 6163ba8。開始 HEAD 6163ba8；fetch 後本分支領先追蹤分支 1 筆、沒有落後。origin/main 有更新但本次不合併。下方未 commit／push 為本次授權前快照；不操作其他 worktree、不 merge／rebase／reset／clean、不強制推送、不動 stash。
+
+- 2026-11-08 異種塔重疊：只有所持卡牌的 TowerDefinition 與既有塔相同，才採用升級預覽／升級命中補償／權威升級。不同塔種繼續顯示所持塔牌的模型、地塊與射程，使用一般重疊驗證並標紅；放置失敗保留卡片、原塔等級與地圖。同種塔即使已滿級，仍沿用既有升級錯誤顯示。本輪與前項旋轉修改一併維持未 commit／push。
+
+- 2026-11-08 放置旋轉：正式選牌／拖牌的 R 與單擊右鍵，改繞完整塔體占格包圍框中心轉向，道路跟隨同組補償；迫擊砲／交叉火力等 2×2 正方塔四方向維持同一組占格。以選牌起始朝向作絕對基準，不逐次累加位移；長寬奇偶不同的矩形在半格差異時取最近整格，轉滿一圈回原位。BuildCard 的資料座標、place_selected 等原點 API 及教學 hologram 仍使用配方原點，由 CardPlacement.pick_card_cell 統一把游標轉成補償後的原點供預覽／點放／拖放；升級優先命中游標下的同種既有塔。單格塔與交通設施行為保留，獨立批次試驗場的既有預擺項目旋轉未改。本輪未 commit／push。
+
 - 2026-11-07 最新 Git 授權：使用者要求「git更新」，授權提交本輪 OGG BGM／號角與淡化、三類音量設定、點擊／hover／放置音效、非法放置紅格回饋、哨塔合成射擊音效，以及相關測試、重建工具與文件；本次不 push。開始 branch 為 experiment/routing-sandbox、HEAD e5088df，現有差異均為本次聊天累積成果。下列音訊階段的未 commit／push 為本次授權前快照；不操作其他 worktree、不 merge／rebase／reset／clean、不動 stash。
 
 - 2026-11-07 哨塔攻擊音效：assets/audio/towers/sentry_shot.wav 為本專案程序合成的 0.22 秒弓弦彈放／箭矢破風聲，來源工具 tools/assets/build_sentry_shot.gd；integrated/sentry.tscn 指定匯出 shot_sound，沿用真實 fire_event 與 Combat 六聲道射擊池，不在預覽播放、不改攻擊數值。實際 tower_integration 84 次配置／旋轉與開火音效接線驗證通過；未 commit／push。

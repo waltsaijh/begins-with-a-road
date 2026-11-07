@@ -1,5 +1,15 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-08 完整塔體中心旋轉
+
+Git 交付：使用者以「git更新並push到遠端」授權將本節旋轉／異種重疊成果提交並正常推送 origin/experiment/routing-sandbox，連同先前本機音訊提交 6163ba8 一起交付。開始 HEAD 6163ba8；fetch 後領先追蹤分支 1 筆、無落後，未合併 origin/main 新更新。本節下方未 commit／push 為各實作當時快照；提交整理沿用已完成的測試並核對 staged diff，不宣稱整套重測。
+
+追加異種塔重疊：只對相同 TowerDefinition 顯示升級預覽並取消游標旋轉補償；不同種維持所持牌完整預覽與一般碰撞錯誤。權威 validate／place／construction_plan 與批次草稿預覽同步使用依卡牌塔種過濾的 upgrade_target，防止顯示與提交規則分歧。最終實際 rotation_pivot 1148 checks／failures=0，stderr 空白；已檢視異種模型重疊但仍保留紅色地塊與原卡射程的截圖。本項未 commit／push。
+
+開始 HEAD 6163ba8，工作區乾淨；本輪未 commit／push。新增 BuildCard 的旋轉原點補償與 CardPlacement 共用游標取格，讓正式選牌／拖牌繞整個塔占格包圍框中心轉動，2×2 迫擊砲／交叉火力四方向保留同組格子，道路跟隨轉向。採起始方向的絕對補償，矩形半格情況作最近整格吸附，無累積漂移；升級仍命中游標下原塔。直接放置 API、教學資料／hologram、已建塔及獨立批次預擺旋轉保持原資料座標契約。
+
+本次 Godot 4.7.2 Compatibility：rotation_pivot 1132 checks／failures=0，實際 R／右鍵／拖放／旋轉後升級皆通過；tutorial/intro、camera_orbit、card_drag_placement 實際渲染回歸通過。已檢視迫擊砲／交叉火力四方向預覽代表截圖。專項早期測試 fixture 曾因未指定 typed Array 及主 viewport 合成滑鼠位置不同而失敗，改以既有測試的 SubViewport 方式後通過；實際渲染快速退出曾出現前輪已知音訊 Resource 清理警告，專項清理改等待 mixer 後，最終 headless 1132 checks／failures=0 且 stderr 空白。Web 未測，未重新執行與此變更無關的整套戰鬥／導航回歸。
+
 ## 2026-11-07 背景音樂與音量設定
 
 Git 更新：使用者以「git更新」授權將本節累積成果提交於 experiment/routing-sandbox（提交前 HEAD e5088df），不 push。本節下方各次實作的「未 commit／push」為當時快照，本次一併納入提交；其測試結果沿用已完成的實測，提交整理只重查差異及 git diff --check，不宣稱重新執行整套測試。
