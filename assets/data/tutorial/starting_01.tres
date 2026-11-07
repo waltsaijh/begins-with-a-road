@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BuildCard" format=3]
 [ext_resource type="Script" path="res://scripts/cards/definitions/build_card.gd" id="script"]
 [ext_resource type="Resource" path="res://assets/data/towers/sentry.tres" id="tower"]
-[ext_resource type="Resource" path="res://assets/data/tutorial/bridge.tres" id="preset"]
+[ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_b46a4aa7ce037ee15ceb475612745a2a.tres" id="preset"]
 [resource]
 script = ExtResource("script")
 tower = ExtResource("tower")

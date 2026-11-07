@@ -1,6 +1,6 @@
 # 教學初始手牌設定
 
-在 Godot 開啟 `intro.tres`，Inspector 的 **Starting Cards** 即為初始三張手牌，依陣列順序執行：第一張指定位置原向放置、第二張指定位置轉 90°、第三張自由合法放置。
+在 Godot 開啟 `intro.tres`，Inspector 的 **Starting Cards** 即為初始三張手牌，依陣列順序執行：第一張指定位置原向放置、第二張依 Guided Turns 轉到 hologram 方向放置（目前 180°）、第三張自由合法放置。
 
 目前三張為獨立 BuildCard，方便直接編輯：
 

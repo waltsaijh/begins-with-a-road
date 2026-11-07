@@ -52,7 +52,7 @@
 ## 五步教學關卡
 
 - 「第一條防線」（assets/data/levels/tutorial.tres）為第一關，1 ACT、3 波；Frontier 的 Required To Complete Levels 包含 tutorial，Bridge 包含 tutorial 與 frontier，透過既有 DAG 自然排序為 tutorial → frontier → bridge。後續新增關卡也須直接包含 tutorial 前置，舊的後續關卡通關紀錄不會繞過教學。沿用共用 level.tscn，地形與端點明確保存在 scenes/maps/tutorial.tscn。
-- 依序教左鍵平移／滾輪縮放／右鍵繞中心旋轉；預設三張初始牌為哨塔、迫擊砲、弩砲，搭配教學跨橋組合。前兩張依 hologram 在橫／縱道路以原向／90° 放置，各形成繞過塔占格的道路；第三張可任意合法放置。
+- 依序教左鍵平移／滾輪縮放／右鍵繞中心旋轉；預設三張初始牌為哨塔、迫擊砲、弩砲，引用 assets/data/tower_tiles/user/ 的基礎版配置（直線、L型、旁直線路），新商品交叉火力用直路，全部走新模型。前兩張依 hologram 放置：哨塔在橫路原向，迫擊砲在轉角轉 180°坐進內角，各形成繞過塔占格的道路；第三張可任意合法放置。2×2 塔在此地形沒有 90° 合法解，教學文案不寫死角度。
 - 初始牌由 assets/data/tutorial/intro.tres 的 Starting Cards 編輯，三張卡獨立為 starting_01～03.tres，可更換 Tower／Tile Preset 與重排。教學文案依實際塔名顯示，升級 hologram 尋找實際建好的同種塔，不假設升級目標必為第一張。Upgrade Card 的塔須存在初始牌任一位置，New Card 的塔不得存在初始牌；指定格／方向需配合修改後的配置，詳見該目錄 README。
 - 三張放完才開放手動首波，沿用 1.5 秒等待與戰鬥鎖定。首波四名步兵結束並等待砲彈後，保證商店的升級牌（預設哨塔），要求購買並疊到同種塔；升級後才允許付費刷新並保證新塔（預設交叉火力）。買下只完成操作引導，不記通關；清掉指定建造／商品／重刷限制，進入自由實戰，繼續手動第 2、3 波。
 - 教學三波預設 4／6／8 名步兵，獎勵 20／10／10。第三波由 reward_final_act 沿用最後 ACT 遺物選擇，選完才保存 tutorial 通關 ID 並解鎖後續關卡；不在購買新牌時結束。提示在暫停、設定、載入及遺物選擇期間隱藏。中途返回／重新開始重置本局，不保存中途步驟。

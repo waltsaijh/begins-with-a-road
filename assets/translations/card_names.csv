@@ -140,7 +140,7 @@ tutorial.step,Tutorial · {step} / 5,教學・{step} / 5
 tutorial.camera,Try left-drag outside cards to pan and the wheel to zoom. Right-drag around the screen center to rotate.,在卡牌以外按住左鍵拖曳平移、滾輪縮放；按住右鍵繞畫面中心拖曳旋轉。請各試一次。
 tutorial.camera_progress,{pan} Pan   {zoom} Zoom   {orbit} Rotate,{pan} 平移　{zoom} 縮放　{orbit} 旋轉
 tutorial.first,Select the {first_tower} card and place it on the golden hologram without rotating. Watch the road bend around the tower.,選擇{first_tower}卡，依金色 hologram 原方向放置。注意：塔占住原路，卡牌附帶的道路讓敵人繞行。
-tutorial.rotated,Select the {second_tower} card. Use R or a right click to rotate it 90 degrees clockwise and match the golden hologram.,選擇{second_tower}卡，按 R 或單擊右鍵順時針旋轉 90 度，依金色 hologram 放置，讓道路繞過第二座塔。
+tutorial.rotated,Select the {second_tower} card. Use R or a right click to rotate it until it matches the golden hologram.,選擇{second_tower}卡，按 R 或單擊右鍵旋轉到與金色 hologram 相同方向後放置，讓道路繞過第二座塔。
 tutorial.free,Place the {third_tower} card anywhere legal. Try a position and direction that keep the entrance connected to the goal.,最後一張{third_tower}自由放置。選擇你喜歡的位置與方向，記得保持入口到終點連通。
 tutorial.start,Ready? Click Start next wave above the entrance.,準備好了嗎？點入口上方的「開始下一波」。
 tutorial.combat,Watch your towers defend the road. The shop opens after the wave.,觀察防禦塔如何守住道路。這一波結束後，再到商店補強。

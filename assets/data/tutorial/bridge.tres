@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="TilePreset" format=3]
-[ext_resource type="Script" path="res://scripts/cards/definitions/tile_preset.gd" id="1"]
-[resource]
-script = ExtResource("1")
-prefix_key = "tile_preset.bridge"
-road_offsets = Array[Vector2i]([Vector2i(-1,-1),Vector2i(0,-1),Vector2i(1,-1)])
