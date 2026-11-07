@@ -117,7 +117,7 @@ func verify() -> void:
 	hud.set_paused(true)
 	check(get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation")
 	await frames(2)
-	check(hud._menu_buttons.size() == 4, "Pause menu does not have four actions")
+	check(hud._menu_buttons.size() == 5, "Pause menu does not have five actions")
 	var locale := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_TW")
 	check(hud.restart_button.text == "重新開始" and hud.settings_button.text == "設定", "New menu items lack Chinese translations")

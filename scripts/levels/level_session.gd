@@ -23,7 +23,6 @@ var _presentation_prepared := false
 var choosing_relic := false
 var _settling_wave := false
 var relic_choice: CanvasLayer
-var enemy_intelligence: CanvasLayer
 var tutorial: Node
 var base_health := 0
 var total_leaks := 0
@@ -115,9 +114,6 @@ func _ready() -> void:
 	add_child(relic_choice)
 	relic_choice.setup(get_node("TowerMap").relics)
 	relic_choice.selected.connect(_on_relic_selected)
-	enemy_intelligence = preload("res://scenes/enemies/components/enemy_intelligence.tscn").instantiate()
-	add_child(enemy_intelligence)
-	enemy_intelligence.setup(self)
 	timeline = get_node("LevelHUD/Header/WaveTimeline")
 	timeline.configure(level)
 	var shop: Node = get_node("CardPlacement/Shop")

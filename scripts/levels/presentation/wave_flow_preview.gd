@@ -86,7 +86,7 @@ func _sync_callouts() -> void:
 	if selected_origin >= panels.size(): selected_origin = -1
 
 func _show_intelligence(profile: Troop) -> void:
-	if session.enemy_intelligence != null: session.enemy_intelligence.show_profile(profile)
+	hud.open_progress(profile.troop_name)
 
 func _clear_filters() -> void:
 	for entry in _panels(): entry.clear_filter()

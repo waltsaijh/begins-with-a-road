@@ -1,5 +1,7 @@
 # Routing Sandbox — Phase 5 交接
 
+2026-11-07 進度頁：移除遊戲內敵軍情報按鈕／面板與「新 N」提示，主畫面與暫停選單新增「進度」，列出六塔與全部敵人的名稱、描述、數值及特性；開波提示的兵種圖示改為暫停並開到該敵人。新增 tests/menus/progress_page.gd（中英文無漏 key）。實際 main_menu、synergy/input、tutorial/intro、headless level_flow、road_flow_preview 通過；pause_menu 的 Restart fixture 失敗與 pause_navigation 的敵人準備錯誤在修改前提交版相同，未修。
+
 2026-11-07 開場改為全白品牌畫面：Web shell 只顯示左 Godot（深色無框）右 team_icon；Boot 同畫面加細長進度條與小字；主選單就緒後 logo 淡出、白底再淡出。Logo 開場淡入 0.8 秒（Web 用 CSS、桌面用 Boot）。選圖進關卡維持白底，雲海載入版本已依使用者要求撤回。Web 實測 shell、Boot、轉場 logo 位置一致，無 console error。發現隱藏 IntroLogos 在 Web 尺寸為 0（Windows 不會發生），以 refresh() 修正並在 startup_loading 加回歸。實際 menus/startup_loading、main_menu（--resolution 1600x900）、level_selection 與 headless tutorial/intro 通過。menus/scene_loading 有 2 項失敗，修改前提交版相同（第一關為教學時 start_allowed 為 false）。main_menu、scene_loading 含滑鼠輸入，需獨佔視窗焦點，與瀏覽器同跑會假失敗。tests/menus/web_loading_shell.cjs 已更新但未執行（本機無 Playwright）。
 
 2026-11-07 教學改用新版卡牌：starting_01～03、升級牌與新商品改引用基礎版配置（直線、L型、旁直線路、直路），全部走 imported_tower_visual；移除教學專用 bridge.tres（tile_presets/bridge.tres 仍供其他用途）。迫擊砲 2×2 在此地形只有 turns 0／2 合法，指定為 (5,0,1)、turns 2 坐進轉角，文案改為不寫死角度。Godot 4.7.2 headless 與實際 tutorial/intro、headless level_flow、level_catalog、cards、card_names、tower_integration 通過。放第三張牌的 0.5 秒停頓來自道路流量筆觸：教學在此之前隱藏，road_flow shader 首次繪製編譯 5 個 program；RoadFlow 改在載入時以相機下次像素常駐物件編譯。

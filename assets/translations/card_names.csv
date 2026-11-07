@@ -163,3 +163,38 @@ troop.winged_beast.name,Winged Beast,飛翼獸
 troop.scout.name,Scout,偵查兵
 troop.saboteur.name,Saboteur,爆破手
 troop.siege_behemoth.name,Siege Behemoth,攻城巨獸
+ui.pause.progress,Progress,進度
+ui.progress.towers,Our towers,我方防禦塔
+ui.progress.enemies,Enemies,敵軍
+ui.progress.stat.damage,Damage {value},傷害 {value}
+ui.progress.stat.interval,Attacks every {value}s,每 {value} 秒攻擊
+ui.progress.stat.range,Range {value} tiles,射程 {value} 格
+ui.progress.stat.range_shaped,Directional range,方向性射程
+ui.progress.stat.price,Cost {value},售價 {value}
+ui.progress.stat.health,Health {value},生命 {value}
+ui.progress.stat.shield,Shield {value},護盾 {value}
+ui.progress.stat.speed,Speed ×{value},速度 ×{value}
+ui.progress.stat.reduction,{value}% damage reduction,減傷 {value}%
+ui.progress.size.small,Small,小型
+ui.progress.size.standard,Standard,標準體型
+ui.progress.size.large,Large,大型
+ui.progress.tag.flying,Flying,飛行
+ui.progress.tag.armored,Armored,重甲
+ui.progress.tag.swarm,Swarm,群體
+ui.progress.tag.support,Support,支援
+ui.progress.tag.guardian,Taunts towers,吸引火力
+ui.progress.tag.scout,Scout,偵查
+ui.progress.tag.saboteur,Disables towers,癱瘓防禦塔
+ui.progress.tag.boss,Boss: a leak ends the run,首領：漏掉即敗北
+tower.sentry.description,A quick-firing watchtower that covers the road ahead of it.,射速快的基礎防線，守住前方的道路。
+tower.sentry.traits,Single target|Front arc only,單體攻擊|只打前方範圍
+tower.ballista.description,"A heavy bolt thrower with slow, powerful shots along a long line.",沿長直線射出重箭，射速慢但威力強。
+tower.ballista.traits,Single target|Long straight range,單體攻擊|長直線射程
+tower.broadside.description,An airship that fires from its side guns.,空艇從側舷開火，壓制船身一側的道路。
+tower.broadside.traits,Single target|Side range only,單體攻擊|只打側舷
+tower.crossfire.description,"Fires in every direction at once, striking all enemies in range.",同時朝四周開火，打擊範圍內的所有敵人。
+tower.crossfire.traits,Hits every enemy in range,命中範圍內全體
+tower.mortar.description,"Lobs shells that explode on landing. Shells do not track, so enemies can walk out of the blast.",拋射砲彈，落地時爆炸。砲彈不追蹤，敵人可能走出爆炸範圍。
+tower.mortar.traits,Area damage|Cannot hit flying enemies,範圍傷害|無法攻擊飛行敵人
+tower.barracks.description,Deploys two soldiers who hold enemies on the road and fight them in melee.,部署兩名友軍在道路上攔截敵人並近戰。
+tower.barracks.traits,Blocks enemies|Soldiers respawn after 5s|Cannot block flying enemies,攔截敵人|友軍陣亡 5 秒後重生|無法攔截飛行敵人

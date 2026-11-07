@@ -3,7 +3,9 @@ extends CanvasLayer
 signal home_requested
 const SettingsAdapter = preload("res://scripts/settings/game_settings.gd")
 const SettingsScene = preload("res://scenes/settings/settings_page.tscn")
+const ProgressScene = preload("res://scenes/progress/progress_page.tscn")
 var settings_page: Control
+var progress_page: Control
 var _settings_camera: Camera3D
 @export_range(0.0, 1.0, 0.01) var settings_veil_alpha := 0.82
 var _settings_veil_motion: Tween
@@ -44,9 +46,10 @@ var _callout_reveal := 0.0:
 @onready var pause_menu: Control = $PauseBlocker
 @onready var resume_button: Button = $PauseBlocker/Menu/Margin/Actions/Resume/Button
 @onready var restart_button: Button = $PauseBlocker/Menu/Margin/Actions/Restart/Button
+@onready var progress_button: Button = $PauseBlocker/Menu/Margin/Actions/Progress/Button
 @onready var settings_button: Button = $PauseBlocker/Menu/Margin/Actions/Settings/Button
 @onready var home_button: Button = $PauseBlocker/Menu/Margin/Actions/ReturnHome/Button
-@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, settings_button, home_button]
+@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, progress_button, settings_button, home_button]
 @onready var _cards: Node = get_node_or_null("../CardPlacement")
 
 func _ready() -> void:
@@ -62,8 +65,12 @@ func _ready() -> void:
 	settings_page = SettingsScene.instantiate()
 	add_child(settings_page)
 	settings_page.option_changed.connect(func(key: StringName, value: Variant): SettingsAdapter.apply(key, value, get_viewport()))
-	settings_page.visibility_changed.connect(_on_settings_visibility_changed)
+	settings_page.visibility_changed.connect(_on_page_visibility_changed.bind(settings_button))
 	settings_button.pressed.connect(open_settings)
+	progress_page = ProgressScene.instantiate()
+	add_child(progress_page)
+	progress_page.visibility_changed.connect(_on_page_visibility_changed.bind(progress_button))
+	progress_button.pressed.connect(open_progress)
 	pause_menu.hide()
 	pause_menu.modulate.a = 0.0
 	Engine.time_scale = SPEEDS[speed_index]
@@ -75,13 +82,25 @@ func open_settings() -> void:
 	settings_page.configure(SettingsAdapter.sections(), SettingsAdapter.read(get_viewport()))
 	settings_page.open()
 
-func _on_settings_visibility_changed() -> void:
-	var active := settings_page.is_visible_in_tree()
+## Pauses first when opened from a next-wave troop icon, then lands on that entry.
+func open_progress(entry_id := "") -> void:
+	if ScreenTransition.active: return
+	set_paused(true)
+	if not pause_requested: return
+	progress_page.configure(ProgressCatalog.sections(), {})
+	progress_page.open()
+	if not entry_id.is_empty(): progress_page.show_entry(entry_id)
+
+func _page_open() -> bool:
+	return (is_instance_valid(settings_page) and settings_page.visible) or (is_instance_valid(progress_page) and progress_page.visible)
+
+func _on_page_visibility_changed(button: Button) -> void:
+	var active := _page_open()
 	_set_settings_navigation_locked(active)
 	if not is_inside_tree(): return
 	$PauseBlocker/Menu.visible = not active
 	_fade_settings_veil(active)
-	if not active and pause_requested: settings_button.grab_focus()
+	if not active and pause_requested: button.grab_focus()
 
 func _set_settings_navigation_locked(value: bool) -> void:
 	if value: _settings_camera = get_viewport().get_camera_3d()
@@ -140,7 +159,7 @@ func _request_from_callout() -> void:
 
 func _position_callout() -> void:
 	if not is_inside_tree(): return
-	if is_instance_valid(settings_page) and settings_page.visible:
+	if _page_open():
 		for action in start_callouts: action.hide()
 		return
 	var viewport := get_viewport()
@@ -185,6 +204,7 @@ func _update_labels() -> void:
 	pause_button.tooltip_text = "Esc"
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
+	progress_button.text = tr("ui.pause.progress")
 	settings_button.text = tr("ui.pause.settings")
 	home_button.text = tr("ui.pause.home")
 
@@ -197,8 +217,9 @@ func cycle_speed() -> void:
 func set_paused(value: bool) -> void:
 	if _returning_home: return
 	if value == pause_requested: return
-	if not value and settings_page.visible:
+	if not value:
 		settings_page.hide()
+		progress_page.hide()
 	$PauseBlocker/Menu.show()
 	pause_requested = value
 	if value:
@@ -239,7 +260,7 @@ func _input(event: InputEvent) -> void:
 	if ScreenTransition.active:
 		get_viewport().set_input_as_handled()
 		return
-	if settings_page.is_visible_in_tree(): return
+	if _page_open(): return
 	if event is InputEventKey:
 		var shortcut: int = event.physical_keycode if event.physical_keycode else event.keycode
 		if shortcut == KEY_ESCAPE or (shortcut == KEY_TAB and not pause_requested):

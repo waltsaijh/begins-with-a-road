@@ -62,7 +62,7 @@ func verify() -> void:
 	for child in bridge.get_children():
 		if child.name.begins_with("Road"): roads += 1
 	check(roads == 58 and bridge.get_child(0).scene_file_path.begins_with("res://assets/models/tiles/"), "Scenic bridge is not made from explicit local scene instances")
-	check(menu.start_button.get_parent().get_child_count() == 3, "Start menu lacks its three explicit actions")
+	check(menu.start_button.get_parent().get_child_count() == 4, "Start menu lacks its four explicit actions")
 	var hover := InputEventMouseMotion.new()
 	hover.position = menu.start_button.get_global_transform_with_canvas()*(menu.start_button.size*0.5)
 	root.push_input(hover, true)

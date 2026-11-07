@@ -184,7 +184,7 @@ F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線�
 
 正式關卡的 `LevelHUD/WorldActions/EarlyStart/NextWaveIntel` 使用 `scenes/levels/components/next_wave_intel.tscn`，依 WaveSpawnSchedule 不洗牌排程中的 start_index 與 Troop Resource 加總各入口實際分配的數量；圖示取自資源，不列舉固定兵種。準備期常駐顯示上方置中的「開始下一波」與下方單列、由左至右的兵種圖示，不再使用菱形或整體 hover 展開面板。整個標題與圖示列包在淡色、青灰描邊、切角及下方置中尖角的共用對話框內。標題 16px、圖示框 34×34px、圖示 24×24px、框距 6px，整列置中；hover 單一框時以 0.15 秒拓寬並淡入 14px 的 ×數量，其餘框只顯示圖示，離開收回。超過 480px 時水平捲動。標題與空白選取該入口全兵種，圖示再篩選該兵種的既有流量預測；以實際 GUI 命中與 viewport 座標核對，不因子控制項或圖示展開改變而丟失入口。暫停、失焦或離窗清除 hover。
 
-每個入口都使用相同的開波命令，點擊上方標題會開始整波，不是只啟動該入口；圖示點擊改為開敵軍情報，不開波。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示標題及 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
+每個入口都使用相同的開波命令，點擊上方標題會開始整波，不是只啟動該入口；圖示點擊改為暫停並開啟進度頁的該敵人，不開波。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示標題及 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
 
 `wave_flow_preview.gd` 監聽 LevelSession.preparation_changed、EnemyWave.routes_changed、PortalMap.graph_changed／plan_changed 與 tile_parameters.costs_changed（包含非目前選取兵種）。失效先清除舊 mesh，待導航不在 computing 時合併重算一次。直接呼叫 `WaveSpawnSchedule.build(definition, controller, first_id, false, additional_starts)`；與開波共用跨群組、跨入口的完整配額流程，僅略過出發洗牌，不使用 global RNG，也不修改 pending／committed routes。預測是當前有限候選池的分配結果，不是所有可能道路的機率。
 
@@ -421,7 +421,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 開波提示位於 `scenes/levels/components/start_wave_callout.tscn`，上方置中的文字依語言顯示「開始下一波」／「Start next wave」，下方為橫排敵軍圖示；標題與橫排同置於先前設計的淡色對話框中，Shape/Background 與 Shape/Border 保留青灰邊框、切角和下方置中尖角；標題與圖示列均常駐，不加問號、倒數或獎勵。每個入口各有一份範本實例，隨相機平移／縮放更新投影位置，尺寸保持螢幕大小，hover 不縮放或上浮整組提示；部分超出視窗由視窗自然裁切，完全離開畫面才隱藏。開波時沿用 0.24 秒二次 ease-in 收回起點塔，下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的開波標題。
 
-Title 在整組提示頂部水平置中，下方 NextWaveIntel 依圖示框的實際寬度置中排列，hover 拓寬時同步調整整組寬度，保持出生點的投影錨點。對話框左右內距 12px、上下內距 8px、下方尖角高 8px，最小寬度 144px，隨內容自動延展；不使用原固定 216px 寬度或最多三列限制。單項範本 `troop_intel_item.tscn` 保存圖示、數量與邊框，平時不顯示兵種名稱，名稱以 tooltip 提供；點圖示開啟同一敵軍情報介面，不再另外配置 ? 按鈕。
+Title 在整組提示頂部水平置中，下方 NextWaveIntel 依圖示框的實際寬度置中排列，hover 拓寬時同步調整整組寬度，保持出生點的投影錨點。對話框左右內距 12px、上下內距 8px、下方尖角高 8px，最小寬度 144px，隨內容自動延展；不使用原固定 216px 寬度或最多三列限制。單項範本 `troop_intel_item.tscn` 保存圖示、數量與邊框，平時不顯示兵種名稱，名稱以 tooltip 提供；點圖示暫停並開啟進度頁的該敵人，不再另外配置 ? 按鈕。
 
 開波不發金幣，只有清完每波時發放 WaveDefinition.reward。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
 
@@ -623,4 +623,4 @@ PortalMap 保存已提交路網歷史，與預覽／普通候選快取分開。�
 
 EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結算治療、前搖與癱瘓。盾衛優先只套用到合法單體目標，全體範圍攻擊照常。來源死亡、離場、清波及重開清理所有癱瘓，重疊不累加；在途攻擊快照照常結算。
 
-下一波兵種圖示點擊打開敵軍情報，不觸發開波；首次登場以左側按鈕的新種類數提示。重開情報、暫停／遺物選擇期間的顯示及真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。
+下一波兵種圖示點擊會暫停並開啟進度頁的該敵人，不觸發開波。重開情報、暫停／遺物選擇期間的顯示及真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。

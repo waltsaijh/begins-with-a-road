@@ -4,7 +4,7 @@
 
 | 要調整的內容 | 場景 | 編輯位置 |
 | --- | --- | --- |
-| 五步教學提示 | `tutorial/tutorial_overlay.tscn` | 左側 Panel 位於敵軍情報按鈕下方；Title／Body／Progress 與完成後 Return，world hologram 沿用 CardPreview；暫停、設定或載入時隱藏 |
+| 五步教學提示 | `tutorial/tutorial_overlay.tscn` | 左側 Panel 位於頂部列下方；Title／Body／Progress 與完成後 Return，world hologram 沿用 CardPreview；暫停、設定或載入時隱藏 |
 | 頂部金幣、倍速、暫停與暫停選單 | `levels/level_hud.tscn` | `Header`、`PauseBlocker/Menu`；按下即暫停模擬；根節點 `pause_seconds` 僅控制 0.35 秒手牌與商店收合，`pause_menu_fade_seconds` 控制 0.35 秒淡入淡出；文字選單樣式位於 `assets/themes/pause_controls.tres` |
 | 暫停選單項目 | `levels/components/pause_menu_item.tscn` | 固定根 Control 與子 Button；Button 的 Hover Shift／Hover Seconds 控制左移距離與 ease-in-out 時長，hover 文字變黑但不縮放；各選項文字與動作由 LevelHUD 指派 |
 | 主畫面／選圖／遊戲切換 | `interface/screen_transition.tscn` | 根節點 Duration 預設 0.5 實際秒；`WhiteVeil` 全畫面變白後切換，再淡出；過渡期間攔截輸入 |
@@ -44,4 +44,4 @@ SettingsButton 的 hover 僅將文字變黑，維持 Light 字重、原尺寸與
 
 Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
 
-Phase 4 的 `enemies/components/enemy_intelligence.tscn` 提供左側固定入口與可重開的本局敵軍情報；下一波兵種圖示點擊開啟同一介面，不觸發開波。開波操作位於圖示列上方的置中文字，圖示 hover 才展開個體數。文字與數值取 Troop，行為及驗證入口見 `docs/phase4.md`。
+`progress/progress_page.tscn` 繼承 `settings/settings_page.tscn`，由主畫面與暫停選單開啟，列出防禦塔與敵軍介紹；條目範本為 `progress/components/progress_entry.tscn`。
