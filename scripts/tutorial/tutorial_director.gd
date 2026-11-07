@@ -39,9 +39,6 @@ func setup(host: Node3D, data: TutorialDefinition) -> void:
 	session.level_finished.connect(func(): _set_stage(Stage.DONE))
 	overlay = Overlay.instantiate()
 	add_child(overlay)
-	overlay.get_node("Panel/Margin/Rows/Return").pressed.connect(func():
-		LevelLaunch.clear()
-		ScreenTransition.change_scene("res://scenes/menus/main_menu.tscn"))
 	ghost = Ghost.instantiate()
 	ghost.valid_color = Color(1.0,0.8,0.3,0.32)
 	add_child(ghost)
@@ -141,4 +138,3 @@ func _update_text() -> void:
 	var progress: Label = overlay.get_node("Panel/Margin/Rows/Progress")
 	progress.visible = stage == Stage.CAMERA
 	progress.text = tr("tutorial.camera_progress").format({"pan":"✓" if camera_actions[0] else "○","zoom":"✓" if camera_actions[1] else "○","orbit":"✓" if camera_actions[2] else "○"})
-	overlay.get_node("Panel/Margin/Rows/Return").visible = stage == Stage.DONE

@@ -377,11 +377,11 @@ func _end_run(won: bool) -> void:
 	get_node("TowerMap").combat.barracks._process(0.0)
 	_update_start_callout()
 	set_process(false)
+	# Saved first: the result screen offers whatever this win just unlocked.
+	if won and not level.progress_id().is_empty(): LevelProgress.mark_completed(level.progress_id())
 	run_status.finish(won)
 	if BalanceTrace.enabled: BalanceTrace.event("victory" if won else "defeat","run",{"base_health":base_health,"kills":total_kills,"leaks":total_leaks,"completed_waves":current_wave})
-	if won:
-		if not level.progress_id().is_empty(): LevelProgress.mark_completed(level.progress_id())
-		level_finished.emit()
+	if won: level_finished.emit()
 	run_finished.emit(won)
 	if _owns_balance_trace:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"victory" if won else "defeat","base_health":base_health,"completed_waves":current_wave})

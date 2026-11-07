@@ -2,6 +2,8 @@ extends CanvasLayer
 ## Compact integrity/boss feedback and terminal result, authored in a shared scene.
 var session: Node3D
 var boss: WeakRef
+var next_map: MenuMapDefinition
+@onready var column: VBoxContainer = $Result/Center/Panel/Margin/Column
 func setup(value: Node3D) -> void:
 	session = value
 	$Result.hide()
@@ -11,7 +13,9 @@ func setup(value: Node3D) -> void:
 		if enemy.troop.has_tag(&"boss"):
 			boss = weakref(enemy)
 			$Boss.show())
-	$Result/Center/Panel/Margin/Column/Restart.pressed.connect(restart)
+	column.get_node("Restart").pressed.connect(restart)
+	column.get_node("NextLevel").pressed.connect(next_level)
+	column.get_node("Home").pressed.connect(return_home)
 	refresh()
 func refresh() -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
@@ -33,8 +37,30 @@ func finish(won: bool) -> void:
 	$Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if won else "Defense broken") if english else ("守住了這條路" if won else "防線失守")
 	$Result/Center/Panel/Margin/Column/Details.text = ("Waves %d / %d  ·  Leaks %d\nGold %d" if english else "完成 %d / %d 波　·　漏敵 %d\n剩餘金幣 %d") % [session.current_wave,session.level.wave_count(),session.total_leaks,session.get_node("CardPlacement/Shop").coins]
 	$Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
+	next_map = _following_map() if won else null
+	column.get_node("NextLevel").visible = next_map != null
 	$Result.show()
 func restart() -> void:
+	_resume()
+	session.restart_level()
+func next_level() -> void:
+	if next_map == null or ScreenTransition.active: return
+	_resume()
+	LevelLaunch.select(next_map.level)
+	if not ScreenTransition.change_scene(next_map.level_scene, &"prepare_for_play"): LevelLaunch.clear()
+func return_home() -> void:
+	if ScreenTransition.active: return
+	_resume()
+	ScreenTransition.change_scene("res://scenes/menus/main_menu.tscn")
+func _resume() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
-	session.restart_level()
+## First playable level after this one in the catalog's prerequisite order.
+func _following_map() -> MenuMapDefinition:
+	var catalog := LevelCatalog.new()
+	catalog.build(LevelCatalog.discover(), LevelProgress.snapshot())
+	var found := false
+	for entry in catalog.maps:
+		if found and entry.unlocked and entry.level != null: return entry
+		if entry.id == session.level.progress_id(): found = true
+	return null

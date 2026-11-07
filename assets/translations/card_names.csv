@@ -53,6 +53,7 @@ ui.settings.enabled,Enabled,啟用
 ui.settings.off,Off,關閉
 ui.pause.exit,Exit,離開
 ui.pause.home,Back to main menu,回到主畫面
+ui.result.next_level,Next level,下一關
 ui.wave.start_next,Start next wave,開始下一波
 ui.expansion.choose_direction,Choose a direction for the new entrance,選擇新入口的方向
 ui.expansion.choose_position,Choose a highlighted tile,選擇一個標示的候選位置
@@ -152,7 +153,6 @@ tutorial.practice_title,Put it into practice,自由實戰
 tutorial.practice,The guided steps are complete. Build and shop freely and defend all three waves to finish the level.,基本操作練習完成！接下來可以自由建造、購買與升級，守完全部三波並領取 ACT 獎勵才會通關。
 tutorial.complete_title,Level complete,教學關卡通關
 tutorial.done,All three waves cleared! The next level is now unlocked.,三波防守完成！後續關卡已解鎖，可以返回主畫面繼續挑戰。
-tutorial.return,Return to main menu,返回主畫面
 tutorial.match_ghost,Match the highlighted card and hologram position and direction.,請依提示選牌，並配合金色 hologram 的位置與方向。
 tutorial.follow_step,Complete the current tutorial step first.,請先完成目前的教學步驟。
 relic.empty,No relics yet,尚未取得遺物
