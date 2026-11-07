@@ -28,3 +28,7 @@ godot --headless --path . --script tools/assets/bake_solid_models.gd
 ```
 
 工具保留場景節點、變換、動畫、外觀幾何及 MeshLibrary 項目；每個道路項目的純色面合為一個 surface，柱底另保留一個 surface。一般 MeshInstance、GridMap 及 MultiMesh 仍可能觸發不同的引擎 program；單一材質不等於整個遊戲只有一次 draw call 或一次 shader 編譯。
+
+## 功能旗標限制
+
+3D 純色 StandardMaterial3D 只使用 `scripts/combat/rendering/solid_materials.gd` 的兩組旗標，新增材質時只改顏色與數值。`tools/assets/` 的產生器若重新輸出舊旗標（例如不含 emission_enabled），會多出一組 shader，需同步修正或重套旗標。

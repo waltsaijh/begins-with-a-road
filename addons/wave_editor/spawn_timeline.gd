@@ -59,7 +59,7 @@ func _draw() -> void:
 		var title := "%d · %s × %d" % [i+1, group.troop.troop_name if group.troop != null else "未設定", group.enemy_count]
 		var label_left := 5.0
 		if group.troop != null and group.troop.icon != null:
-			draw_texture_rect(group.troop.icon, Rect2(5, y+4, 18, 18), false)
+			draw_texture_rect(group.troop.icon, Rect2(5, y+4, 18, 18), false, group.troop.accent_color)
 			label_left = 27.0
 		draw_string(font, Vector2(label_left, y+20), title, HORIZONTAL_ALIGNMENT_LEFT, LABEL_WIDTH-label_left-5, font_size, text)
 		var start := _drag_tick if i == _drag_index else group.start_tick

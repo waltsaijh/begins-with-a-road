@@ -1,6 +1,8 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
 [resource]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 resource_name = "Stone foundation"
 albedo_color = Color(0.3764706, 0.4627451, 0.5450980, 1)
 roughness = 0.98

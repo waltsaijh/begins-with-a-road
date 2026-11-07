@@ -3,20 +3,20 @@ import argparse, json, pathlib
 # troop, individuals, first quarter-second tick, interval ticks, batch size
 WAVES = [
  [("soldier",5,0,8,1),("quickfeet",3,24,10,1)],
- [("soldier",6,0,6,1),("rat_swarm",10,12,10,1),("shield_guardian",1,0,1,1)],
- [("rat_swarm",15,12,10,1),("shield_guardian",2,0,24,1),("heavy",2,8,24,1)],
- [("soldier",10,0,6,1),("heavy",3,8,16,1),("blood_mage",2,12,24,1)],
- [("rat_swarm",25,8,8,1),("shield_guardian",3,0,20,1),("blood_mage",2,8,24,1)],
- [("heavy",5,0,14,1),("shield_guardian",3,4,20,1),("blood_mage",2,12,24,1),("saboteur",1,24,1,1)],
+ [("soldier",6,0,6,1),("rats",10,12,10,1),("rook",1,0,1,1)],
+ [("rats",15,12,10,1),("rook",2,0,24,1),("heavy",2,8,24,1)],
+ [("soldier",10,0,6,1),("heavy",3,8,16,1),("bloodmage",2,12,24,1)],
+ [("rats",25,8,8,1),("rook",3,0,20,1),("bloodmage",2,8,24,1)],
+ [("heavy",5,0,14,1),("rook",3,4,20,1),("bloodmage",2,12,24,1),("bomber",1,24,1,1)],
  [("scout",8,0,6,1),("soldier",12,4,5,1),("quickfeet",6,20,7,1)],
- [("winged_beast",10,12,7,1),("heavy",6,0,12,1)],
- [("scout",10,16,6,1),("winged_beast",8,24,7,1),("shield_guardian",4,0,16,1),("rat_swarm",25,8,8,1)],
- [("rat_swarm",35,4,7,1),("shield_guardian",5,0,14,1),("saboteur",3,12,20,1)],
- [("heavy",8,0,12,1),("blood_mage",4,8,20,1),("winged_beast",12,24,6,1)],
- [("shield_guardian",5,0,14,1),("blood_mage",3,8,20,1),("saboteur",3,16,20,1),("scout",12,24,5,1),("rat_swarm",30,8,7,1)],
- [("rat_swarm",40,4,7,1),("shield_guardian",6,0,14,1),("blood_mage",4,12,20,1),("heavy",8,8,12,1)],
- [("winged_beast",16,24,5,1),("scout",14,0,5,1),("saboteur",4,16,16,1),("quickfeet",12,12,5,1)],
- [("shield_guardian",4,0,16,1),("rat_swarm",25,8,8,1),("blood_mage",3,20,20,1),("siege_behemoth",1,56,1,1),("heavy",6,64,12,1),("scout",8,76,6,1),("winged_beast",8,88,6,1),("saboteur",2,76,20,1)],
+ [("winged",10,12,7,1),("heavy",6,0,12,1)],
+ [("scout",10,16,6,1),("winged",8,24,7,1),("rook",4,0,16,1),("rats",25,8,8,1)],
+ [("rats",35,4,7,1),("rook",5,0,14,1),("bomber",3,12,20,1)],
+ [("heavy",8,0,12,1),("bloodmage",4,8,20,1),("winged",12,24,6,1)],
+ [("rook",5,0,14,1),("bloodmage",3,8,20,1),("bomber",3,16,20,1),("scout",12,24,5,1),("rats",30,8,7,1)],
+ [("rats",40,4,7,1),("rook",6,0,14,1),("bloodmage",4,12,20,1),("heavy",8,8,12,1)],
+ [("winged",16,24,5,1),("scout",14,0,5,1),("bomber",4,16,16,1),("quickfeet",12,12,5,1)],
+ [("rook",4,0,16,1),("rats",25,8,8,1),("bloodmage",3,20,20,1),("ravager",1,56,1,1),("heavy",6,64,12,1),("scout",8,76,6,1),("winged",8,88,6,1),("bomber",2,76,20,1)],
 ]
 PURPOSES = ["single target / speed", "cohorts / first taunt", "armor and crowds", "healing introduction", "healer and swarm cooperation", "limited disable", "newest routes", "shortest routes / anti-air", "hard-route combination", "crowds and sabotage", "healing / air coverage", "cooperation stress", "mature ground build", "mobility and disabled coverage", "staged assault / telegraphed siege"]
 SPEEDS = [1.25]*3 + [1.35]*3 + [1.45]*3 + [1.5]*3 + [1.55]*3

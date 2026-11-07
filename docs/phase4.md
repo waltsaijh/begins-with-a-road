@@ -8,12 +8,12 @@
 
 | Troop 資源 ID | HP | 速度倍率 | 近戰傷害 | 體型／Tags | 選路與能力 |
 |---|---:|---:|---:|---|---|
-| rat_swarm | 16 | 1.15 | 3 | small／ground、swarm | Cost + Uniform；每群 5 隻、群內每 0.25 秒生成一隻 |
-| shield_guardian | 180 | 0.65 | 10 | large／ground、armored、guardian | Cost + Uniform；減傷 25%，嘲諷半徑 3.5 格、優先級 1 |
-| blood_mage | 65 | 0.85 | 3 | standard／ground、support | Cost + Uniform；每 3 秒治療 2.5 格內友軍 18 HP |
-| winged_beast | 45 | 1.65 | 0 | standard／flying | 實際最短路 + Uniform；道路上方 1.2 格飛行 |
+| rats | 16 | 1.15 | 3 | small／ground、swarm | Cost + Uniform；每群 5 隻、群內每 0.25 秒生成一隻 |
+| rook | 180 | 0.65 | 10 | large／ground、armored、guardian | Cost + Uniform；減傷 25%，嘲諷半徑 3.5 格、優先級 1 |
+| bloodmage | 65 | 0.85 | 3 | standard／ground、support | Cost + Uniform；每 3 秒治療 2.5 格內友軍 18 HP |
+| winged | 45 | 1.65 | 0 | standard／flying | 實際最短路 + Uniform；道路上方 1.2 格飛行 |
 | scout | 38 | 1.30 | 4 | small／ground、scout | 最新誕生批次 + Uniform；只在合格批次內接受設施倍率 |
-| saboteur | 75 | 0.90 | 5 | standard／ground、saboteur | Cost + Uniform；冷卻 6 秒、範圍 3 格、前搖 1 秒、癱瘓 2.5 秒 |
+| bomber | 75 | 0.90 | 5 | standard／ground、saboteur | Cost + Uniform；冷卻 6 秒、範圍 3 格、前搖 1 秒、癱瘓 2.5 秒 |
 
 四種 Cost 新兵種不使用威脅／傷害安全偏好。盾衛兵未加入可選的友軍流量偏好，血法師不追隨友軍。原 Soldier／Quickfeet／Heavy 資源未改動。所有數值、Tag、Route Rule、Uniform／Softmax、能力參數、模型及文字均可在 Troop Inspector 修改。
 
@@ -54,9 +54,9 @@
 
 ## 視覺與情報
 
-六種低面數模型與 SVG 圖示位於 `assets/models/enemies/`、`assets/sprites/enemies/`，模型共用步態／翼拍腳本；重建工具自足，不依賴另一專案。盾衛的大盾、血法師法杖、偵查兵望遠鏡、爆破手炸藥背包，以及鼠與飛翼獸的輪廓區分兵種。
+六種低面數模型與 PNG 圖示位於 `assets/models/enemies/`、`assets/sprites/enemies/`，模型共用步態／翼拍腳本；重建工具自足，不依賴另一專案。盾衛的大盾、血法師法杖、偵查兵望遠鏡、爆破手炸藥背包，以及鼠與飛翼獸的輪廓區分兵種。
 
-下一波列表維持名稱、個體數量與 hover 流量篩選；點每列 `?` 查看主要 Tag、特殊能力及巡路習性，不開波。左側「敵軍情報」保留本局見過的種類，首次出現以新種類數量提示，可在戰鬥中自行重開，不強制彈窗；與遺物收藏互斥，暫停時隱藏。固定入口放在遺物按鈕下方，避開開波菱形至情報欄的 hover 連接範圍。
+下一波提示常駐顯示上方置中的開波文字與下方橫排兵種圖示；hover 圖示拓寬邊框並顯示該入口的個體數，沿用兵種／入口流量篩選。點圖示暫停並開啟進度頁的該敵人，查看描述與特性，不開波；點上方文字才開始整波。左側「敵軍情報」保留本局見過的種類，首次出現以新種類數量提示，可在戰鬥中自行重開，不強制彈窗；暫停／遺物選擇期間隱藏；手牌旁的遺物圖示不再有收藏面板互斥狀態。
 
 ## 驗收與限制
 

@@ -23,7 +23,7 @@ var _presentation_prepared := false
 var choosing_relic := false
 var _settling_wave := false
 var relic_choice: CanvasLayer
-var enemy_intelligence: CanvasLayer
+var tutorial: Node
 var base_health := 0
 var total_leaks := 0
 var total_kills := 0
@@ -54,6 +54,7 @@ func _enter_tree() -> void:
 	if not error.is_empty():
 		push_error(error)
 		return
+	if level.tutorial != null: get_node("CardPlacement").cards = level.tutorial.starting_cards.duplicate()
 	var source_node := level.terrain.instantiate()
 	if not source_node is GridMap:
 		source_node.free()
@@ -113,9 +114,6 @@ func _ready() -> void:
 	add_child(relic_choice)
 	relic_choice.setup(get_node("TowerMap").relics)
 	relic_choice.selected.connect(_on_relic_selected)
-	enemy_intelligence = preload("res://scenes/enemies/components/enemy_intelligence.tscn").instantiate()
-	add_child(enemy_intelligence)
-	enemy_intelligence.setup(self)
 	timeline = get_node("LevelHUD/Header/WaveTimeline")
 	timeline.configure(level)
 	var shop: Node = get_node("CardPlacement/Shop")
@@ -132,6 +130,11 @@ func _ready() -> void:
 		_wave.controls.spawn_requested.disconnect(_wave.start_wave)
 		_wave.controls.spawn_requested.connect(_on_start_requested)
 	_prepare_wave()
+	if level.tutorial != null:
+		tutorial = preload("res://scripts/tutorial/tutorial_director.gd").new()
+		tutorial.name = "TutorialDirector"
+		add_child(tutorial)
+		tutorial.setup(self,level.tutorial)
 	if level.opening_shop: shop.prepare_opening_shop()
 
 func _on_balance_changed(coins: int) -> void:
@@ -204,6 +207,7 @@ func _prepare_wave() -> void:
 
 func _update_start_callout() -> void:
 	var available: bool = not _loading and not finished and not choosing_start and not choosing_relic and not _settling_wave and not _wave.active and not _wave_starting
+	if tutorial != null: available = available and tutorial.can_start_wave()
 	_hud.set_start_available(available)
 	preparation_changed.emit(available)
 
@@ -212,6 +216,7 @@ func _on_start_requested() -> void:
 	_begin_wave_start()
 
 func _begin_wave_start() -> void:
+	if tutorial != null and not tutorial.can_start_wave(): return
 	if _loading or finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
 	var construction: Node = get_node("CardPlacement").construction
 	if is_instance_valid(construction) and not construction.commit().ok: return
@@ -273,6 +278,10 @@ func _finish_wave_transition() -> void:
 	_settling_wave = false
 	set_process(false)
 	current_wave += 1
+	if tutorial != null and tutorial.after_wave():
+		get_node("CardPlacement").set_entry_selection(false)
+		_prepare_wave()
+		return
 	if _is_act_boundary(current_wave) and (current_wave < _waves.size() or level.reward_final_act):
 		choosing_relic = true
 		_wave.start_allowed = false

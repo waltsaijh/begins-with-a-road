@@ -26,11 +26,9 @@ static func part(parent: Node3D,kind: String,size: Vector3,at: Vector3,color: St
 			shape.radial_segments = 5
 			meshes[kind] = shape
 	if not materials.has(color):
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = COLORS[color]
+		var mat := SolidMaterials.opaque(COLORS[color])
 		mat.roughness = 0.98
 		if color in ["cyan","amber","hit"]:
-			mat.emission_enabled = true
 			mat.emission = COLORS[color]
 			mat.emission_energy_multiplier = 0.25
 		materials[color] = mat

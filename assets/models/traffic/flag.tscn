@@ -3,14 +3,20 @@
 [ext_resource type="PackedScene" path="res://assets/models/traffic/flag_ground.tscn" id="1_ground"]
 
 [sub_resource type="StandardMaterial3D" id="wood"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.39, 0.27, 0.16, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="cloth"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.72, 0.34, 0.25, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="stone"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.57, 0.57, 0.48, 1)
 roughness = 0.9
 

@@ -42,7 +42,7 @@
 
 Soldier 的 `grunt.tscn` 使用 MultiMesh 與 GPU 步態；Quickfeet／Heavy 的場景以實例顯示並保留自己的材質與 AnimationPlayer。不同模型可以出現在同一波。自訂場景各自產生繪製成本，適合保留完整的匯入模型／骨架動畫。
 
-Icon 是獨立 Texture2D，可選取 PNG 或 SVG，不受模型匯入方式影響。
+Icon 是 `assets/sprites/enemies/<id>.png` 的 64×64 白色 PNG，遊戲內只取 alpha 當遮罩，波次編輯器以 modulate 上色，不受模型匯入方式影響。Accent Color 是兵種專屬色，顯示時和塔一樣加深 45%（`Troop.icon_color()`）。
 
 ## 刪除
 
@@ -62,7 +62,7 @@ Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large�
 
 ## Phase 4 六兵種
 
-新增 rat_swarm、shield_guardian、blood_mage、winged_beast、scout、saboteur；完整數值／Tag／能力與限制見 [Phase 4](../../../docs/phase4.md)。
+新增 rats、rook、bloodmage、winged、scout、bomber；完整數值／Tag／能力與限制見 [Phase 4](../../../docs/phase4.md)。
 
 - **Route Rule**：COST 沿用原候選／評分；SHORTEST 直接使用合法路網的實際最短格距；NEWEST 依本局已提交道路歷史選最新有效批次。後兩者不使用普通 Search Budget／Score Threshold，再套 Uniform／Softmax 及適用設施倍率。
 - **Cohort Size／Cohort Interval Ticks**：大於 1 時以整群分配入口／路線，尾群可不足額；個體仍獨立。每 tick 為 0.25 秒；群模式使用群間 interval，取代 Batch Size 的並發規則。
@@ -76,4 +76,4 @@ Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large�
 
 ## Phase 5 最終巨獸
 
-`siege_behemoth.tres` 是最終波的一隻 boss，與九種普通兵種共用 Troop／Enemy 生命週期。`Sabotage Targets` 控制同次最多標記的塔數（普通爆破手1、巨獸2），`Base Damage` 控制漏敵扣血（普通1、巨獸20）；正式關卡額外將 boss 漏敵視為敗北。巨獸沿 Cost／Uniform 固定路線，boss Tag 排除狩獵處決，其餘狀態及兵營攔截依原規則。載入數值、模型來源與測試見 [Phase 5](../../../docs/phase5.md)。
+`ravager.tres` 是最終波的一隻 boss，與九種普通兵種共用 Troop／Enemy 生命週期。`Sabotage Targets` 控制同次最多標記的塔數（普通爆破手1、巨獸2），`Base Damage` 控制漏敵扣血（普通1、巨獸20）；正式關卡額外將 boss 漏敵視為敗北。巨獸沿 Cost／Uniform 固定路線，boss Tag 排除狩獵處決，其餘狀態及兵營攔截依原規則。載入數值、模型來源與測試見 [Phase 5](../../../docs/phase5.md)。

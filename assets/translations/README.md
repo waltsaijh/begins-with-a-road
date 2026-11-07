@@ -16,3 +16,5 @@ Troop 與 TowerDefinition 的 **Name Key** 與 TilePreset 的 **Prefix Key** 填
 `card.name_format` 的英文值為 `{prefix} {tower}`，中文值為 `{prefix}{tower}`；請保留格式中的兩個 placeholder。卡面本身使用獨立的前綴／塔名節點，套用對應字重與行數。
 
 編輯 CSV 後讓 Godot 重新匯入；產生的 `.translation` 已登錄在專案設定。切換語言使用 `TranslationServer.set_locale("en")` 或 `TranslationServer.set_locale("zh_TW")`。新增 key 時也應補齊兩種語言，避免畫面直接顯示識別碼。
+
+遺物的 `relic.<id>.description` 使用簡短、直覺且略帶個性的效果提示，中英文維持相同意思；不羅列完整倍率、疊加上限或行程／索敵等內部規則。詳細機制與數值以 RelicDefinition 參數及 `docs/phase3.md` 為準。

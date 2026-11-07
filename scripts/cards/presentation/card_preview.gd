@@ -10,7 +10,6 @@ var range_cells: Array[Vector2i] = []
 var ghost: Node3D
 var _definition: Resource
 var _ghost_stamp := ""
-var _ghost_material: StandardMaterial3D
 var _material: StandardMaterial3D
 var hint_anchor := Vector3.ZERO
 var upgrade_mode := false
@@ -58,13 +57,6 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 	global_transform = map.global_transform
 	_material.albedo_color = Color.WHITE
 	_material.vertex_color_use_as_albedo = true
-	if _ghost_material == null:
-		_ghost_material = _material.duplicate()
-		_ghost_material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
-		_ghost_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
-		_ghost_material.cull_mode = BaseMaterial3D.CULL_BACK
-	_ghost_material.vertex_color_use_as_albedo = false
-	_ghost_material.albedo_color = valid_color if valid else invalid_color
 	var mesh := ImmediateMesh.new()
 	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	var footprint := card.tower_cells(Vector2i(cell.x,cell.z),turns)
@@ -171,7 +163,6 @@ func _tint(node: Node) -> void:
 		node.set_preview()
 		return
 	if node is MeshInstance3D:
-		node.material_override = _ghost_material
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for child in node.get_children():
 		_tint(child)

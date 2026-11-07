@@ -4,10 +4,15 @@
 
 | 要調整的內容 | 場景 | 編輯位置 |
 | --- | --- | --- |
+| 五步教學提示 | `tutorial/tutorial_overlay.tscn` | 左側 Panel 位於頂部列下方；Title／Body／Progress 與完成後 Return，world hologram 沿用 CardPreview；暫停、設定或載入時隱藏 |
 | 頂部金幣、倍速、暫停與暫停選單 | `levels/level_hud.tscn` | `Header`、`PauseBlocker/Menu`；按下即暫停模擬；根節點 `pause_seconds` 僅控制 0.35 秒手牌與商店收合，`pause_menu_fade_seconds` 控制 0.35 秒淡入淡出；文字選單樣式位於 `assets/themes/pause_controls.tres` |
 | 暫停選單項目 | `levels/components/pause_menu_item.tscn` | 固定根 Control 與子 Button；Button 的 Hover Shift／Hover Seconds 控制左移距離與 ease-in-out 時長，hover 文字變黑但不縮放；各選項文字與動作由 LevelHUD 指派 |
 | 主畫面／選圖／遊戲切換 | `interface/screen_transition.tscn` | 根節點 Duration 預設 0.5 實際秒；`WhiteVeil` 全畫面變白後切換，再淡出；過渡期間攔截輸入 |
-| 開波對話框 | `levels/components/start_wave_callout.tscn` | `Shape/Background` 的多邊形、`Border`、`Title`；根節點可調 hover 顏色與邊框粗細倍率 |
+| 世界提示的共用對話框外觀 | `interface/components/speech_bubble_frame.tscn` | `Background` 的淡色底、`Border` 的青灰邊框；Frame Size／Tail Height 控制框體與置中尖角，開波與塔 hover 共用 |
+| 防禦塔 hover 與升級回饋 | `towers/components/tower_hover.tscn` | 根 CanvasLayer 7 高於開波提示的 Layer 6；`TowerHover/Margin/Content/TowerName` 靠左、`Level` 靠右；Text Theme 與開波標題統一為 16px 青灰色細字、無描邊，Content 的 Separation 為 12px，框寬依內容貼合 |
+| 開波提示 | `levels/components/start_wave_callout.tscn` | `Shape/Background`／`Shape/Border` 保存共用對話框底色與邊框，`Title` 的置中開波文字、`NextWaveIntel/Scroll/Items` 的橫排圖示；34px 單框、24px 圖示與 hover 數量樣式在 `troop_intel_item.tscn` |
+| 已持有遺物圖示 | `relics/relic_inventory.tscn` | 獨立掛在 RelicChoice CanvasLayer；Icons 為 HBox，間距 6px，Screen Margin 為左距 16px／底距 216px，不跟隨卡牌；單項保存 28px 圖示與 tooltip，取得時向右新增 |
+| ACT 遺物三選一 | `relics/relic_choice.tscn` | Modal/Backdrop 全畫面變暗，Blocker 獨立保留頂部 80px 點擊；Center/Layout 置中三張 184×272px、間距 20px 的卡牌，單卡使用 `relics/components/relic_card.tscn`；不再包含 InventoryButton／Collection |
 | ACT 結束後選擇新入口 | `levels/spawn_expansion.tscn` | `Interface/Root/Panel` 的標題、說明、三個方向按鈕與重選按鈕；`World` 的候選格、路徑與入口預覽；根節點可調搜尋距離與候選帶寬 |
 | 新入口模型 | `levels/components/expansion_start.tscn` | `Visual` 的起點模型；邏輯根節點固定，只有模型跟地塊浮起 |
 | 時間線整體 | `levels/wave_timeline.tscn` | 根節點的 Preview／Appearance；`Progress` 用 `clip_contents` 水平裁切填色 |
@@ -39,4 +44,4 @@ SettingsButton 的 hover 僅將文字變黑，維持 Light 字重、原尺寸與
 
 Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
 
-Phase 4 的 `enemies/components/enemy_intelligence.tscn` 提供左側固定入口與可重開的本局敵軍情報；下一波兵種列的 `?` 開啟同一介面，不觸發開波。入口位於遺物收藏按鈕下方，避免擋住菱形至下一波列表的連續 hover 路徑。文字與數值取 Troop，行為及驗證入口見 `docs/phase4.md`。
+`progress/progress_page.tscn` 繼承 `settings/settings_page.tscn`，由主畫面與暫停選單開啟，列出防禦塔、敵軍與遺物介紹；條目範本為 `progress/components/progress_entry.tscn`。

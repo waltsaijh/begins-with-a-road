@@ -83,4 +83,4 @@ text = "重新載入場景"
 layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.2, 0.36, 0.38, 1)
-text = "再次開波：清除敵人，保留地圖與已載入資源。Web 冷啟動請重新整理頁面。\n中鍵平移 · 滾輪縮放 · 左鍵拖曳旋轉 · F1 路線／節點 · F2 威脅"
+text = "再次開波：清除敵人，保留地圖與已載入資源。Web 冷啟動請重新整理頁面。\n左鍵平移 · 滾輪縮放 · 右鍵拖曳旋轉 · F1 路線／節點 · F2 威脅"

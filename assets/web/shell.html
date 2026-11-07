@@ -10,14 +10,13 @@ body { background: white; overflow: hidden; touch-action: none; }
 #canvas { display: block; }
 #canvas:focus { outline: none; }
 #status { position: fixed; inset: 0; z-index: 1; background: white; display: flex; align-items: center; justify-content: center; }
-#status-column { width: min(360px, calc(100vw - 48px)); text-align: center; font: 300 16px/1.5 "Noto Sans TC", "Microsoft JhengHei", sans-serif; color: #406166; }
-#status-title { font-size: 24px; color: #244a52; margin-bottom: 12px; }
-#status-stage { min-height: 24px; }
-#status-progress { display: none; width: 100%; height: 2px; border: 0; border-radius: 0; appearance: none; background: #dfe7e8; margin: 12px 0 0; }
-#status-progress::-webkit-progress-bar { background: #dfe7e8; }
-#status-progress::-webkit-progress-value { background: #52767b; }
-#status-progress::-moz-progress-bar { background: #52767b; }
-#status-notice { display: none; margin-top: 12px; overflow-wrap: anywhere; color: #70454a; white-space: normal; }
+/* Same geometry as intro_logos.tscn under the engine's canvas_items scaling. */
+#status { --unit: min(calc(100vw / 1152), calc(100vh / 648)); }
+#status-logos { position: fixed; left: 50%; top: calc(50% - 140 * var(--unit)); transform: translateX(-50%); display: flex; gap: calc(120 * var(--unit)); }
+@keyframes status-logos-in { from { opacity: 0; } }
+#status-logos { animation: status-logos-in 0.8s ease-out; }
+#status-logos img { display: block; opacity: 0.75; width: calc(200 * var(--unit)); height: calc(200 * var(--unit)); }
+#status-notice { display: none; position: fixed; left: 24px; right: 24px; bottom: 24px; text-align: center; overflow-wrap: anywhere; white-space: normal; font: 300 14px/1.5 "Noto Sans TC", "Microsoft JhengHei", sans-serif; color: #70454a; }
 </style>
 		$GODOT_HEAD_INCLUDE
 
@@ -32,12 +31,11 @@ body { background: white; overflow: hidden; touch-action: none; }
 		</noscript>
 
 		<div id="status">
-            <div id="status-column" role="status" aria-live="polite">
-                <div id="status-title">載入中</div>
-                <div id="status-stage">載入遊戲資源…</div>
-                <progress id="status-progress"></progress>
-                <div id="status-notice"></div>
+            <div id="status-logos">
+                <img alt="Godot Engine" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMTA1IDY3M3YzM3E0MDcgMzU0IDgxNCAwdi0zM3oiLz48cGF0aCBmaWxsPSIjMTExIiBkPSJtMTA1IDY3MyAxNTIgMTRxMTIgMSAxNSAxNGw0IDY3IDEzMiAxMCA4LTYxcTItMTEgMTUtMTVoMTYycTEzIDQgMTUgMTVsOCA2MSAxMzItMTAgNC02N3EzLTEzIDE1LTE0bDE1Mi0xNFY0MjdxMzAtMzkgNTYtODEtMzUtNTktODMtMTA4LTQzIDIwLTgyIDQ3LTQwLTM3LTg4LTY0IDctNTEgOC0xMDItNTktMjgtMTIzLTQyLTI2IDQzLTQ2IDg5LTQ5LTctOTggMC0yMC00Ni00Ni04OS02NCAxNC0xMjMgNDIgMSA1MSA4IDEwMi00OCAyNy04OCA2NC0zOS0yNy04Mi00Ny00OCA0OS04MyAxMDggMjYgNDIgNTYgODF6bTAgMzN2MzljMCAyNzYgODEzIDI3NiA4MTQgMHYtMzlsLTEzNCAxMi01IDY5cS0yIDEwLTE0IDEzbC0xNjIgMTFxLTEyIDAtMTYtMTFsLTEwLTY1SDQ0NmwtMTAgNjVxLTQgMTEtMTYgMTFsLTE2Mi0xMXEtMTItMy0xNC0xM2wtNS02OXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDgzIDYwMGMwIDM0IDU4IDM0IDU4IDB2LTg2YzAtMzQtNTgtMzQtNTggMHoiLz48Y2lyY2xlIGN4PSI3MjUiIGN5PSI1MjYiIHI9IjkwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMjk5IiBjeT0iNTI2IiByPSI5MCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjMwNyIgY3k9IjUzMiIgcj0iNjAiIGZpbGw9IiMxMTEiLz48Y2lyY2xlIGN4PSI3MTciIGN5PSI1MzIiIHI9IjYwIiBmaWxsPSIjMTExIi8+PC9zdmc+Cg==">
+                <img alt="ntu game #17" src="data:image/png;base64,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">
             </div>
+            <div id="status-notice" role="alert"></div>
         </div>
 
 		<script src="$GODOT_URL"></script>
@@ -48,16 +46,11 @@ const engine = new Engine(GODOT_CONFIG);
 
 (function () {
 	const statusOverlay = document.getElementById('status');
-	const statusProgress = document.getElementById('status-progress');
 	const statusNotice = document.getElementById('status-notice');
 
-    const statusStage = document.getElementById('status-stage');
     const english = navigator.language.toLowerCase().startsWith('en');
-    const messages = english ? { title: 'Loading', download: 'Loading game resources…', starting: 'Starting game…', failure: 'Unable to start game' }
-        : { title: '載入中', download: '載入遊戲資源…', starting: '啟動遊戲…', failure: '無法啟動遊戲' };
+    const failureTitle = english ? 'Unable to start game' : '無法啟動遊戲';
     document.documentElement.lang = english ? 'en' : 'zh-Hant';
-    document.getElementById('status-title').textContent = messages.title;
-    statusStage.textContent = messages.download;
     let engineStarted = false;
     let canvasPresented = false;
     // Never reveal an empty canvas between the engine promise and its first draw.
@@ -83,7 +76,6 @@ const engine = new Engine(GODOT_CONFIG);
 			return;
 		}
 		statusOverlay.style.visibility = 'visible';
-		statusProgress.style.display = 'none';
 		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
 		statusMode = mode;
 	}
@@ -101,13 +93,12 @@ const engine = new Engine(GODOT_CONFIG);
 
 	function displayFailureNotice(err) {
 		console.error(err);
-        statusStage.textContent = messages.failure;
 		if (err instanceof Error) {
-			setStatusNotice(err.message);
+			setStatusNotice(failureTitle + '\n' + err.message);
 		} else if (typeof err === 'string') {
-			setStatusNotice(err);
+			setStatusNotice(failureTitle + '\n' + err);
 		} else {
-			setStatusNotice('An unknown error occurred.');
+			setStatusNotice(failureTitle + '\nAn unknown error occurred.');
 		}
 		setStatusMode('notice');
 		initializing = false;
@@ -150,23 +141,8 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
-		engine.startGame({
-			'onProgress': function (current, total) {
-                const downloaded = current > 0 && total > 0 && current >= total;
-                statusStage.textContent = downloaded ? messages.starting : messages.download;
-                statusProgress.style.display = !downloaded && current > 0 && total > 0 ? 'block' : 'none';
-				if (current > 0 && total > 0) {
-					statusProgress.value = current;
-					statusProgress.max = total;
-				} else {
-					statusProgress.removeAttribute('value');
-					statusProgress.removeAttribute('max');
-				}
-			},
-		}).then(() => {
+		engine.startGame({}).then(() => {
             engineStarted = true;
-            statusStage.textContent = messages.starting;
-            statusProgress.style.display = 'none';
             dismissWhenPresented();
 		}, displayFailureNotice);
 	}

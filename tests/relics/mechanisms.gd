@@ -151,6 +151,10 @@ func verify_mortar() -> void:
 	var impacts_before: int = combat.visuals.restored_bursts.bursts.size()
 	combat._process(combat.projectiles[0].duration+0.01)
 	check(combat.visuals.restored_bursts.bursts.size() == impacts_before+1 and combat.visuals.impacts.is_empty(), "Mortar produces one impact effect")
+	var impact_ring: MeshInstance3D = combat.visuals.restored_bursts.bursts[-1].ring
+	var shared: StandardMaterial3D = SolidMaterials.transparent()
+	var ring_material: StandardMaterial3D = impact_ring.material_override
+	check(ring_material.transparency == shared.transparency and ring_material.shading_mode == shared.shading_mode and ring_material.cull_mode == shared.cull_mode and ring_material.vertex_color_use_as_albedo, "Mortar impact shares the transparent shader set")
 	check(not towers.occupied.has(Vector2i(5,5)) and e.health == 976, "Special shell destroys friendly tower and damages enemy once")
 	check(map.get_used_cells() == roads and e.route == route and e.waypoints == waypoints, "Friendly destruction preserves roads and fixed route")
 	var last := enemy(Vector2i(5,4))

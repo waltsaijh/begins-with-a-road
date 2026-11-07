@@ -129,10 +129,11 @@ func verify() -> void:
 	var point := point_for(cell)
 	var count: int = cards.cards.size()
 	var angle: float = camera.azimuth
+	var focus: Vector3 = camera.focus
 	drag_to(point)
 	await frames(3)
 	check(cards.hand.is_dragging() and cards.selected == 0 and cards.preview.visible, "Dragging did not select the card and show the world hologram")
-	check(cards.cards.size() == count and is_equal_approx(camera.azimuth, angle) and camera._orbit_press == null, "A held card drag placed early or started camera rotation")
+	check(cards.cards.size() == count and is_equal_approx(camera.azimuth, angle) and camera.focus.is_equal_approx(focus) and camera._orbit_press == null and camera._pan_press == null, "A held card drag placed early or moved the camera")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		viewport.get_texture().get_image().save_png(Artifacts.path("cards/card_drag_preview.png"))
@@ -184,14 +185,19 @@ func verify() -> void:
 	motion(back_point, MOUSE_BUTTON_MASK_LEFT)
 	left(back_point, false)
 	check(cards.selected == -1 and cards.cards.size() == count and shop.coins == wallet and shop.deals == deals and not shop.view.opened, "Dropping onto a shop back did not cancel focus or triggered a transaction")
-	# Esc cancels the captured drag, and its release must not place anything.
+	# Esc pauses gameplay and cancels capture; the release cannot place anything.
 	drag_to(point)
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
 	viewport.push_input(escape, true)
 	left(point, false)
-	check(cards.selected == -1 and cards.cards.size() == count and not cards.hand.is_dragging(), "Esc did not cancel dragging safely")
+	check(hud.pause_requested and cards.cards.size() == count and not cards.hand.is_dragging(), "Esc did not pause and cancel dragging safely")
+	escape.pressed = false
+	viewport.push_input(escape,true)
+	escape.pressed = true
+	viewport.push_input(escape,true)
+	check(not hud.pause_requested,"Esc did not resume after cancelling drag capture")
 	# Pausing cancels dragging; resuming still allows an ordinary card click.
 	drag_to(point)
 	hud.set_paused(true)

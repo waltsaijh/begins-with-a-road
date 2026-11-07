@@ -1,5 +1,11 @@
 extends Node
 signal balance_changed(coins: int)
+signal purchased(card: BuildCard)
+signal rerolled
+## Optional scenario policies; ordinary levels leave these empty.
+var deal_filter: Callable
+var purchase_rule: Callable
+var reroll_rule: Callable
 ## Wave-bound shop state and transactions. The view owns only layout/animation.
 @export var catalog: Array[TowerDefinition] = []
 @export var traffic_catalog: Array[TrafficStructureDefinition] = []
@@ -142,6 +148,7 @@ func _deal() -> bool:
 	return true
 
 func _accept_deal(next: Array[BuildCard]) -> void:
+	if deal_filter.is_valid(): next = deal_filter.call(next)
 	offers.assign(next)
 	prices.clear()
 	sold.clear()
@@ -169,6 +176,7 @@ func close_shop() -> void:
 func buy(index: int) -> bool:
 	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or index < 0 or index >= offers.size() or sold[index] != 0 or offers[index] == null:
 		return false
+	if purchase_rule.is_valid() and not purchase_rule.call(offers[index]): return false
 	if coins < prices[index]:
 		return false
 	coins -= prices[index]
@@ -182,11 +190,13 @@ func buy(index: int) -> bool:
 		return false
 	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-prices[index],"balance":coins,"reason":"purchase","card":offers[index].visual_definition().resource_path},"shop")
 	_refresh()
+	purchased.emit(offers[index])
 	return true
 
 func reroll() -> bool:
 	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or view.rerolling:
 		return false
+	if reroll_rule.is_valid() and not reroll_rule.call(): return false
 	if coins < maxi(0, reroll_price):
 		return false
 	var next := roll_offers()
@@ -196,6 +206,7 @@ func reroll() -> bool:
 	_accept_deal(next)
 	_refresh(true)
 	view.animate_reroll()
+	rerolled.emit()
 	return true
 
 func _refresh(insert_offers := false) -> void:

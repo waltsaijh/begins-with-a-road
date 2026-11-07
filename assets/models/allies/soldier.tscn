@@ -2,6 +2,7 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eydi3"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.34509805, 0.45882353, 0.56078434, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -14,6 +15,7 @@ rings = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t1c04"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.34901962, 0.29803923, 0.2627451, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -32,12 +34,14 @@ rings = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3xnu1"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.78431374, 0.70980394, 0.5882353, 1)
 metallic_specular = 0.12
 roughness = 0.98
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f73jg"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.8784314, 0.8352941, 0.7254902, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -70,6 +74,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u3hgs"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.6313726, 0.5176471, 0.38431373, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -101,6 +106,7 @@ rings = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gfp52"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.27450982, 0.3254902, 0.38039216, 1)
 metallic = 0.18
 metallic_specular = 0.25
@@ -114,6 +120,7 @@ rings = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjk8j"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.22352941, 0.28235295, 0.32156864, 1)
 metallic_specular = 0.12
 roughness = 0.98
@@ -133,6 +140,7 @@ _surfaces = [{
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m3iyh"]
 vertex_color_use_as_albedo = true
+emission_enabled = true
 albedo_color = Color(0.42745098, 0.5294118, 0.6117647, 1)
 metallic_specular = 0.12
 roughness = 0.98

@@ -100,6 +100,13 @@ func verify():
 	var saved:LevelDefinition=load("res://assets/data/levels/frontier.tres")
 	check(saved.progress_id()=="frontier" and LevelCatalog.discover().has(saved),"Formal catalog does not discover Frontier")
 	catalog.build(LevelCatalog.discover())
+	check(ids(catalog)[0] == "tutorial" and catalog.by_id.tutorial.unlocked and not catalog.by_id.frontier.unlocked and not catalog.by_id.bridge.unlocked,"Tutorial is the first and only unlocked root level")
+	catalog.refresh({"frontier":true,"bridge":true})
+	check(not catalog.by_id.frontier.unlocked and not catalog.by_id.bridge.unlocked,"Legacy completions bypassed the tutorial prerequisite")
+	catalog.refresh({"tutorial":true})
+	check(catalog.by_id.frontier.unlocked and not catalog.by_id.bridge.unlocked,"Tutorial completion unlocks the next level while keeping later prerequisites")
+	catalog.refresh({"tutorial":true,"frontier":true})
+	check(catalog.by_id.bridge.unlocked,"Later level did not unlock after all prerequisites")
 	if catalog.by_id.has("bridge") and catalog.by_id.bridge.requirements.has("frontier"):
 		check(ids(catalog).find("frontier")<ids(catalog).find("bridge"),"Formal Bridge appeared before its Frontier prerequisite")
 	LevelLaunch.select(c)

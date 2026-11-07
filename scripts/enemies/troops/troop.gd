@@ -3,6 +3,7 @@ class_name Troop
 extends Resource
 ## Editable troop definition. Instances keep health, routes and visual state separately.
 const TileRecord = preload("res://scripts/map/tile/tile_parameters.gd")
+const ICON_DARKENING := 0.45
 enum RouteSelection { UNIFORM, SOFTMAX }
 enum RouteRule { COST, SHORTEST, NEWEST }
 ## Hard eligibility precedes Uniform/Softmax and traffic weights.
@@ -48,6 +49,8 @@ func has_tag(tag: StringName) -> bool:
 @export var name_key := ""
 @export var sort_order := 100
 @export var icon: Texture2D
+## Icons are alpha masks; this is the enemy's own color, as towers have.
+@export var accent_color := Color(0.66, 0.72, 0.78)
 ## Contact combat only. Zero means no authored melee damage for a new profile.
 @export var melee_damage := 0.0
 @export var melee_interval := 1.0
@@ -147,6 +150,9 @@ func has_tag(tag: StringName) -> bool:
 @export_range(0.01, 10.0, 0.01, "or_greater") var animation_speed := 1.0
 ## 0 measures the model automatically. Positive values override its head height.
 @export_range(0.0, 20.0, 0.01, "or_greater") var head_height := 0.0
+
+func icon_color() -> Color:
+	return accent_color.darkened(ICON_DARKENING)
 
 func localized_name() -> String:
 	if name_key.is_empty(): return troop_name

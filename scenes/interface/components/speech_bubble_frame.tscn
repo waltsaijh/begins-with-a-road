@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/speech_bubble_frame.gd" id="1"]
+
+[node name="Shape" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Background" type="Polygon2D" parent="."]
+color = Color(0.953, 0.969, 0.953, 0.96)
+antialiased = true
+polygon = PackedVector2Array(4, 0, 140, 0, 144, 4, 144, 76, 140, 80, 77, 80, 72, 88, 67, 80, 4, 80, 0, 76, 0, 4, 4, 0)
+
+[node name="Border" type="Line2D" parent="."]
+points = PackedVector2Array(4, 0, 140, 0, 144, 4, 144, 76, 140, 80, 77, 80, 72, 88, 67, 80, 4, 80, 0, 76, 0, 4, 4, 0)
+width = 1.7
+default_color = Color(0.392, 0.545, 0.553, 1)
+antialiased = true

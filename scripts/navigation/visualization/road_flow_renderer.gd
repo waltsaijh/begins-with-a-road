@@ -26,6 +26,19 @@ func _ready() -> void:
 	material_override.set_shader_parameter("highlight_length", highlight_length)
 	material_override.set_shader_parameter("flow_speed", flow_speed)
 	material_override.set_shader_parameter("line_width", line_width)
+	_warm_shader.call_deferred()
+
+## The preview can stay hidden until mid-level, as in the tutorial, and its first
+## draw would then stall WebGL; a sub-pixel resident compiles it while loading.
+func _warm_shader() -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null: return
+	var resident := MeshInstance3D.new()
+	resident.mesh = BoxMesh.new()
+	resident.material_override = material_override
+	camera.add_child(resident)
+	resident.position = Vector3.FORWARD*(camera.near+1.0)
+	resident.scale = Vector3.ONE*0.00001
 
 func _point(cell: Vector2i) -> Vector2:
 	return Vector2(cell)

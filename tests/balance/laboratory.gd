@@ -22,7 +22,7 @@ func run() -> void:
 		if arg == "--stats=baseline": original_stats = true
 	for key in KEYS:
 		for geometry in ["parallel","approach","away"]:
-			for troop in ["soldier","rat_swarm","heavy","winged_beast"]:
+			for troop in ["soldier","rats","heavy","winged"]:
 				await arena(key,geometry,troop)
 	if results.size() != 72: failures.append("Incomplete matrix: %d/72" % results.size())
 	DirAccess.make_dir_recursive_absolute(output)
@@ -80,7 +80,7 @@ func arena(key: String, geometry: String, troop_key: String) -> void:
 		recipe.move_speed = 2.5
 		var group := WaveSpawnGroup.new()
 		group.troop = TroopCatalog.find(troop_key)
-		group.enemy_count = 20 if troop_key == "rat_swarm" else 8
+		group.enemy_count = 20 if troop_key == "rats" else 8
 		group.interval_ticks = 6
 		recipe.groups = [group]
 		wave.apply_definition(recipe)

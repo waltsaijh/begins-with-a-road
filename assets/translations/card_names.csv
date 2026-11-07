@@ -90,54 +90,114 @@ traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
 traffic.no_change,No forecast change: candidate routes or whole-unit quotas limit this effect,分流未變：候選路線或整數配額限制
 traffic.unavailable,No positive-weight route for the next wave,下一波沒有正權重路線
 relic.frost_ray.name,Frost Ray,冰霜射線
-relic.frost_ray.description,"Hits add 2s frost with diminishing returns, up to 60% slow.",每次命中附加 2 秒冰霜。每層減速遞減，最高減速 60%。
+relic.frost_ray.description,Making enemies slower and slower.,讓敵人行動愈加緩慢。
 relic.fuel_supply.name,Fuel Supply,燃料供能
-relic.fuel_supply.description,Other towers within 5 tiles gain +15% damage per Crossfire.,周圍 5 格的其他塔傷害 +15%；各來源加法疊加。
+relic.fuel_supply.description,Towers around it can deal more damage.,強化周圍的防禦塔的攻擊。
 relic.small_fry.name,Small Fry,專打雜魚
-relic.small_fry.description,Deal 75% more damage to small enemies.,對 small 體型敵人傷害 +75%。
+relic.small_fry.description,More damage to small enemies.,對小體型敵人造成更高傷害。
 relic.air_strike.name,Air Strike,空中打擊
-relic.air_strike.description,Target flying enemies; blasts check actual altitude.,可瞄準與炸傷 flying 敵人，爆炸檢查實際高度。
+relic.air_strike.description,Target and hit enemies in the sky.,能瞄準並擊中空中的敵人。
 relic.explosive_shell.name,Explosive Shell!,爆裂彈！
-relic.explosive_shell.description,Every third shell has 1.8x blast radius and damages friendly towers.,每第 3 發爆炸半徑 ×1.8，也會傷害我方塔。
+relic.explosive_shell.description,Who doesn't like explosion? it could hit your allies by the way.,誰不喜歡大爆炸呢? 但小心別炸到友軍。
 relic.assembled_cannon.name,Cannon Assembled,大砲已組裝
-relic.assembled_cannon.description,"3x damage, 1.5x attack interval, half shell speed.",傷害 ×3、攻擊間隔 ×1.5、砲彈速度 ×0.5。
-relic.departure.name,Departure,出發
-relic.departure.description,Patrol along the original broadside reach without turning.,沿原左右舷射程往返巡航，朝向不變。
+relic.assembled_cannon.description,Heavier but slower shot.,更重也更慢的砲彈。
+relic.departure.name,Departure,航行
+relic.departure.description,Patrol back and forth.,前後往返巡航。
 relic.rapid_fire.name,Rapid Fire,快速開火
-relic.rapid_fire.description,"Every 6s fire three shots per valid side, 0.12s apart.",每 6 秒朝有效左右舷各連射 3 發，間隔 0.12 秒。
+relic.rapid_fire.description,Bullet rain with a cooldown.,有冷卻時間的狂轟亂炸。
 relic.crew_concentration.name,Crew Concentration,人員集中
-relic.crew_concentration.description,2.5x damage; fire only to the local right.,傷害 ×2.5，只向本體右舷開火。
+relic.crew_concentration.description,"Double damage, but fire only to the right.",雙倍傷害，但只朝右舷開火。
 relic.hunting.name,Hunting,狩獵
-relic.hunting.description,"Every 8s execute a non-boss, preferring large enemies.",每 8 秒可處決一名普通敵人，優先 large；不影響 Boss。
+relic.hunting.description,Kill one enemy every 8 seconds.,每 8 秒可處決一名普通敵人。
 relic.protagonist.name,Become the Protagonist,成為主角
-relic.protagonist.description,Remove the Sentry level cap; keep its original card growth.,解除哨塔 Lv.3 上限，沿用同種卡牌與原成長。
+relic.protagonist.description,No limit to how high this tower can grow.,主角的成長沒有上限。
 relic.support_attack.name,Supporting Fire,支援攻擊
-relic.support_attack.description,"Triple effective reach, preserving shape and orientation.",有效射程 ×3，保持範圍形狀與朝向。
+relic.support_attack.description,Reach farther to lend a hand.,把火力送到更遠的地方。
 relic.powerful_shot.name,Powerful Shot,強力射擊
-relic.powerful_shot.description,"Bolts pierce along their trajectory, once per enemy.",弩箭沿直線貫穿多敵，每敵每發僅命中一次。
+relic.powerful_shot.description,"One bolt, several enemies.",一箭貫穿整排敵人。
 relic.secret_mission.name,Secret Mission,隱密任務
-relic.secret_mission.description,"2x damage if no other tower is within 3 tiles, including Barracks.",周圍 3 格沒有其他塔時傷害 ×2，兵營也算塔。
+relic.secret_mission.description,Hits harder when no other towers are nearby.,遠離其他防禦塔，才能使出全力。
 relic.heavy_bolts.name,Heavy Bolts,超重型箭矢
-relic.heavy_bolts.description,Push enemies back 0.3 tiles along their fixed route.,命中沿敵人固定行程推回 0.3 格，不重新選路。
+relic.heavy_bolts.description,A heavy hit sends enemies backward.,沉重的箭矢，讓敵人步步後退。
 relic.reinforcements.name,Reinforcements,來點增援
-relic.reinforcements.description,Each Barracks deploys a third fully functional soldier.,每座兵營增加第三名完整友軍。
+relic.reinforcements.description,There's always room for one more soldier.,多一名士兵，多一份戰力。
 relic.sharpshooter.name,Sharpshooter,神射手
-relic.sharpshooter.description,"Unengaged soldiers shoot enemies within 3 tiles, retaining melee.",未接戰的友軍可射擊 3 格內敵人，保留近戰。
+relic.sharpshooter.description,No need to wait for enemies to get close.,不必等敵人靠近，也能出手。
 relic.global_haste.name,Battle Rhythm,戰鬥節奏
-relic.global_haste.description,All towers and soldiers gain +8% attack speed. Up to 3 copies.,全體塔與友軍攻速 +8%，最多 3 次。
+relic.global_haste.description,All towers and soldiers attack a little faster.,讓防禦塔與友軍出手更快。
 relic.global_damage.name,Refined Arms,精製武裝
-relic.global_damage.description,All towers and soldiers gain +10% damage. Up to 3 copies.,全體塔與友軍傷害 +10%，最多 3 次。
+relic.global_damage.description,"Better weapons, harder hits.",讓防禦塔與友軍打得更痛。
 relic.gold.name,Supply Cache,補給箱
-relic.gold.description,Immediately gain 20 gold. Up to 5 copies.,立即獲得 20 金幣，最多 5 次。
+relic.gold.description,A little gold for the road ahead.,補點金幣，繼續上路。
 relic.reroll_discount.name,Regular Discount,熟客優惠
-relic.reroll_discount.description,"Rerolls cost 1 less, down to zero. Up to 2 copies.",刷新費用減 1，最低 0，最多 2 次。
+relic.reroll_discount.description,A familiar face gets cheaper rerolls.,熟客優惠，刷新少算一點。
 relic.collection,Relics,本局遺物
 relic.choose,Choose a relic,選擇一件遺物
+relic.debug_reroll,Reroll relics (Debug),重新隨機抽選（Debug）
+ui.maps.title.tutorial,First Steps,第一條防線
+ui.maps.description.tutorial,Learn camera controls and reshape roads with cards before upgrading your first tower.,練習鏡頭操作、用卡牌改變道路，再升級你的第一座塔。
+tutorial.step,Tutorial · {step} / 5,教學・{step} / 5
+tutorial.camera,Try left-drag outside cards to pan and the wheel to zoom. Right-drag around the screen center to rotate.,在卡牌以外按住左鍵拖曳平移、滾輪縮放；按住右鍵繞畫面中心拖曳旋轉。請各試一次。
+tutorial.camera_progress,{pan} Pan   {zoom} Zoom   {orbit} Rotate,{pan} 平移　{zoom} 縮放　{orbit} 旋轉
+tutorial.first,Select the {first_tower} card and place it on the golden hologram without rotating. Watch the road bend around the tower.,選擇{first_tower}卡，依金色 hologram 原方向放置。注意：塔占住原路，卡牌附帶的道路讓敵人繞行。
+tutorial.rotated,Select the {second_tower} card. Use R or a right click to rotate it until it matches the golden hologram.,選擇{second_tower}卡，按 R 或單擊右鍵旋轉到與金色 hologram 相同方向後放置，讓道路繞過第二座塔。
+tutorial.free,Place the {third_tower} card anywhere legal. Try a position and direction that keep the entrance connected to the goal.,最後一張{third_tower}自由放置。選擇你喜歡的位置與方向，記得保持入口到終點連通。
+tutorial.start,Ready? Click Start next wave above the entrance.,準備好了嗎？點入口上方的「開始下一波」。
+tutorial.combat,Watch your towers defend the road. The shop opens after the wave.,觀察防禦塔如何守住道路。這一波結束後，再到商店補強。
+tutorial.buy_sentry,Buy the {upgrade_tower} offered in the shop. You already have one on the map.,購買商店中的{upgrade_tower}卡。地圖上已經有一座同種塔，可以用這張卡升級。
+tutorial.upgrade,Place the purchased {upgrade_tower} card on your existing {upgrade_tower} to upgrade it. No extra roads or coins are needed.,把剛買的{upgrade_tower}卡放到原本的{upgrade_tower}上，升到 Lv.2。升級不增加道路，也不額外扣錢。
+tutorial.reroll,Use the reroll card at the lower right of the shop to refresh its offers.,點商店右下角的刷新牌，換一批商品。刷新會花費金幣。
+tutorial.buy_new,Buy {new_tower} from the refreshed shop. This tower was not in your starting hand.,購買刷新後出現的{new_tower}，試著擴充初始手牌以外的塔種。
+tutorial.practice_title,Put it into practice,自由實戰
+tutorial.practice,The guided steps are complete. Build and shop freely and defend all three waves to finish the level.,基本操作練習完成！接下來可以自由建造、購買與升級，守完全部三波並領取 ACT 獎勵才會通關。
+tutorial.complete_title,Level complete,教學關卡通關
+tutorial.done,All three waves cleared! The next level is now unlocked.,三波防守完成！後續關卡已解鎖，可以返回主畫面繼續挑戰。
+tutorial.return,Return to main menu,返回主畫面
+tutorial.match_ghost,Match the highlighted card and hologram position and direction.,請依提示選牌，並配合金色 hologram 的位置與方向。
+tutorial.follow_step,Complete the current tutorial step first.,請先完成目前的教學步驟。
 relic.empty,No relics yet,尚未取得遺物
-troop.rat_swarm.name,Rat Swarm,鼠群
-troop.shield_guardian.name,Shield Guardian,盾衛兵
-troop.blood_mage.name,Blood Mage,血法師
-troop.winged_beast.name,Winged Beast,飛翼獸
+troop.rats.name,Rat Swarm,鼠群
+troop.rook.name,Shield Guardian,盾衛兵
+troop.bloodmage.name,Blood Mage,血法師
+troop.winged.name,Winged Beast,飛翼獸
 troop.scout.name,Scout,偵查兵
-troop.saboteur.name,Saboteur,爆破手
-troop.siege_behemoth.name,Siege Behemoth,攻城巨獸
+troop.bomber.name,Saboteur,爆破手
+troop.ravager.name,Siege Behemoth,攻城巨獸
+ui.pause.progress,Progress,進度
+ui.progress.towers,Our towers,我方防禦塔
+ui.progress.enemies,Enemies,敵軍
+ui.progress.relics,Relics,遺物
+ui.relic.usage.generic,General,通用
+ui.progress.stat.stacks,Hold up to {value},最多持有 {value} 份
+ui.progress.stat.damage,Damage {value},傷害 {value}
+ui.progress.stat.interval,Attacks every {value}s,每 {value} 秒攻擊
+ui.progress.stat.range,Range {value} tiles,射程 {value} 格
+ui.progress.stat.range_shaped,Directional range,方向性射程
+ui.progress.stat.price,Cost {value},售價 {value}
+ui.progress.stat.health,Health {value},生命 {value}
+ui.progress.stat.shield,Shield {value},護盾 {value}
+ui.progress.stat.speed,Speed ×{value},速度 ×{value}
+ui.progress.stat.reduction,{value}% damage reduction,減傷 {value}%
+ui.progress.size.small,Small,小型
+ui.progress.size.standard,Standard,標準體型
+ui.progress.size.large,Large,大型
+ui.progress.tag.flying,Flying,飛行
+ui.progress.tag.armored,Armored,重甲
+ui.progress.tag.swarm,Swarm,群體
+ui.progress.tag.support,Support,支援
+ui.progress.tag.guardian,Taunts towers,吸引火力
+ui.progress.tag.scout,Scout,偵查
+ui.progress.tag.saboteur,Disables towers,癱瘓防禦塔
+ui.progress.tag.boss,Boss: a leak ends the run,首領：漏掉即敗北
+tower.sentry.description,A quick-firing watchtower that covers the road ahead of it.,射速快的基礎防線，守住前方的道路。
+tower.sentry.traits,Single target|Front arc only,單體攻擊|只打前方範圍
+tower.ballista.description,"A heavy bolt thrower with slow, powerful shots along a long line.",沿長直線射出重箭，射速慢但威力強。
+tower.ballista.traits,Single target|Long straight range,單體攻擊|長直線射程
+tower.broadside.description,An airship that fires from its side guns.,空艇從側舷開火，壓制船身一側的道路。
+tower.broadside.traits,Single target|Side range only,單體攻擊|只打側舷
+tower.crossfire.description,"Fires in every direction at once, striking all enemies in range.",同時朝四周開火，打擊範圍內的所有敵人。
+tower.crossfire.traits,Hits every enemy in range,命中範圍內全體
+tower.mortar.description,"Lobs shells that explode on landing. Shells do not track, so enemies can walk out of the blast.",拋射砲彈，落地時爆炸。砲彈不追蹤，敵人可能走出爆炸範圍。
+tower.mortar.traits,Area damage|Cannot hit flying enemies,範圍傷害|無法攻擊飛行敵人
+tower.barracks.description,Deploys two soldiers who hold enemies on the road and fight them in melee.,部署兩名友軍在道路上攔截敵人並近戰。
+tower.barracks.traits,Blocks enemies|Soldiers respawn after 5s|Cannot block flying enemies,攔截敵人|友軍陣亡 5 秒後重生|無法攔截飛行敵人

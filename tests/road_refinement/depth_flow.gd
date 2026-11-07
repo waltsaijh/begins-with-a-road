@@ -256,7 +256,7 @@ func verify_scheduled(index: int) -> void:
 	await frames(4)
 	var controller: Node = fixture.get_node("PortalMap")
 	var definition := WaveDefinition.new()
-	for id in ["soldier","scout","winged_beast"]:
+	for id in ["soldier","scout","winged"]:
 		var group := WaveSpawnGroup.new(); group.troop = TroopCatalog.find(id); group.enemy_count = 8; group.interval_ticks = 1; definition.groups.append(group)
 	var rng_state: int = fixture.get_node("EnemyWave").spawn_rng.state
 	var revision: int = controller.revision

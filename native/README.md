@@ -13,6 +13,8 @@ godot-cpp 固定 commit e83fd0904c13356ed1d4c3d09f8bb9132bdc6b77，4.5 API；Pyt
 ./tools/build/build_native.ps1 -Platform web -Target template_release
 ```
 
+godot-cpp 的 `gen/` 依目標位元數產生，Windows（float_64）與 Web（float_32）共用同一份，且切換平台時不一定重新產生。先建 Web 再建 Windows 會讓 x64 的 `StringName` 等 opaque 大小變成 32 位元版，DLL 可建置成功，但載入時於註冊階段崩潰（signal 11）。切換平台前刪除 `native/godot-cpp/gen/`，並確認 log 的 Built-in type config 符合目標。
+
 可提供 -Python、-MsvcTools、-WindowsSdk、-Emsdk。輸出 `bin/road_graph.candidates.*`，road_graph.gdextension 指向各平台版本；reloadable=false，需重啟 Godot 載入。舊已載入 DLL 保留，避免破壞正在開啟的編輯器。
 
 ## 資料與 API

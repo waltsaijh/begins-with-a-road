@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="RelicDefinition" format=3]
-[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/relics/global_haste.svg" id="icon"]
+[gd_resource type="Resource" script_class="RelicDefinition" format=3 uid="uid://46nxv0u87xdn"]
+
+[ext_resource type="Texture2D" uid="uid://bltrvg6bx7h1h" path="res://assets/sprites/relics/global_haste.png" id="1_2305l"]
+[ext_resource type="Script" uid="uid://dwvi372cqeuds" path="res://scripts/relics/relic_definition.gd" id="script"]
+
 [resource]
 script = ExtResource("script")
 id = &"global_haste"
 name_key = "relic.global_haste.name"
 description_key = "relic.global_haste.description"
-icon = ExtResource("icon")
+icon = ExtResource("1_2305l")
+parameters = {
+"bonus": 0.08
+}
 repeatable = true
 max_stacks = 3
-parameters = {"bonus": 0.08}

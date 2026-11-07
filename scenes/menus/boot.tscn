@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/interface/components/loading_display.tscn" id="3"]
 [ext_resource type="Environment" path="res://assets/data/rendering/level_environment.tres" id="4"]
 [ext_resource type="ArrayMesh" path="res://assets/models/towers/sentry_base_mesh.res" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/interface/components/intro_logos.tscn" id="6"]
 
 [node name="Boot" type="Node3D" unique_id=460860012]
 script = ExtResource("1")
@@ -41,6 +42,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Logos" parent="Interface" instance=ExtResource("6")]
 
 [node name="Loading" parent="Interface" unique_id=210641484 instance=ExtResource("3")]
 layout_mode = 3

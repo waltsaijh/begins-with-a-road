@@ -35,14 +35,14 @@
         "batch": 1
       },
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 10,
         "start_tick": 12,
         "interval_ticks": 10,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 1,
         "start_tick": 0,
         "interval_ticks": 1,
@@ -57,14 +57,14 @@
     "reward": 9,
     "groups": [
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 15,
         "start_tick": 12,
         "interval_ticks": 10,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 2,
         "start_tick": 0,
         "interval_ticks": 24,
@@ -100,7 +100,7 @@
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 2,
         "start_tick": 12,
         "interval_ticks": 24,
@@ -115,21 +115,21 @@
     "reward": 11,
     "groups": [
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 25,
         "start_tick": 8,
         "interval_ticks": 8,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 3,
         "start_tick": 0,
         "interval_ticks": 20,
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 2,
         "start_tick": 8,
         "interval_ticks": 24,
@@ -151,21 +151,21 @@
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 3,
         "start_tick": 4,
         "interval_ticks": 20,
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 2,
         "start_tick": 12,
         "interval_ticks": 24,
         "batch": 1
       },
       {
-        "troop": "saboteur",
+        "troop": "bomber",
         "count": 1,
         "start_tick": 24,
         "interval_ticks": 1,
@@ -209,7 +209,7 @@
     "reward": 12,
     "groups": [
       {
-        "troop": "winged_beast",
+        "troop": "winged",
         "count": 10,
         "start_tick": 12,
         "interval_ticks": 7,
@@ -238,21 +238,21 @@
         "batch": 1
       },
       {
-        "troop": "winged_beast",
+        "troop": "winged",
         "count": 8,
         "start_tick": 24,
         "interval_ticks": 7,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 4,
         "start_tick": 0,
         "interval_ticks": 16,
         "batch": 1
       },
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 25,
         "start_tick": 8,
         "interval_ticks": 8,
@@ -267,21 +267,21 @@
     "reward": 14,
     "groups": [
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 35,
         "start_tick": 4,
         "interval_ticks": 4,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 5,
         "start_tick": 0,
         "interval_ticks": 7,
         "batch": 1
       },
       {
-        "troop": "saboteur",
+        "troop": "bomber",
         "count": 3,
         "start_tick": 12,
         "interval_ticks": 10,
@@ -303,14 +303,14 @@
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 4,
         "start_tick": 8,
         "interval_ticks": 10,
         "batch": 1
       },
       {
-        "troop": "winged_beast",
+        "troop": "winged",
         "count": 12,
         "start_tick": 24,
         "interval_ticks": 3,
@@ -325,21 +325,21 @@
     "reward": 14,
     "groups": [
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 5,
         "start_tick": 0,
         "interval_ticks": 7,
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 3,
         "start_tick": 8,
         "interval_ticks": 10,
         "batch": 1
       },
       {
-        "troop": "saboteur",
+        "troop": "bomber",
         "count": 3,
         "start_tick": 16,
         "interval_ticks": 10,
@@ -353,7 +353,7 @@
         "batch": 1
       },
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 30,
         "start_tick": 8,
         "interval_ticks": 4,
@@ -368,21 +368,21 @@
     "reward": 15,
     "groups": [
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 40,
         "start_tick": 4,
         "interval_ticks": 4,
         "batch": 1
       },
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 6,
         "start_tick": 0,
         "interval_ticks": 7,
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 4,
         "start_tick": 12,
         "interval_ticks": 10,
@@ -404,7 +404,7 @@
     "reward": 15,
     "groups": [
       {
-        "troop": "winged_beast",
+        "troop": "winged",
         "count": 16,
         "start_tick": 24,
         "interval_ticks": 3,
@@ -418,7 +418,7 @@
         "batch": 1
       },
       {
-        "troop": "saboteur",
+        "troop": "bomber",
         "count": 4,
         "start_tick": 16,
         "interval_ticks": 8,
@@ -440,28 +440,28 @@
     "reward": 0,
     "groups": [
       {
-        "troop": "shield_guardian",
+        "troop": "rook",
         "count": 4,
         "start_tick": 0,
         "interval_ticks": 8,
         "batch": 1
       },
       {
-        "troop": "rat_swarm",
+        "troop": "rats",
         "count": 25,
         "start_tick": 8,
         "interval_ticks": 4,
         "batch": 1
       },
       {
-        "troop": "blood_mage",
+        "troop": "bloodmage",
         "count": 3,
         "start_tick": 20,
         "interval_ticks": 10,
         "batch": 1
       },
       {
-        "troop": "siege_behemoth",
+        "troop": "ravager",
         "count": 1,
         "start_tick": 56,
         "interval_ticks": 1,
@@ -482,14 +482,14 @@
         "batch": 1
       },
       {
-        "troop": "winged_beast",
+        "troop": "winged",
         "count": 8,
         "start_tick": 88,
         "interval_ticks": 3,
         "batch": 1
       },
       {
-        "troop": "saboteur",
+        "troop": "bomber",
         "count": 2,
         "start_tick": 76,
         "interval_ticks": 10,

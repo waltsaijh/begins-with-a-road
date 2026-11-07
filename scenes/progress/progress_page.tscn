@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/settings/settings_page.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/progress/progress_page.gd" id="2"]
+
+[node name="ProgressPage" instance=ExtResource("1")]
+script = ExtResource("2")
+
+[node name="Title" parent="Panel/Margin/Layout/Header" index="0"]
+text = "ui.pause.progress"
