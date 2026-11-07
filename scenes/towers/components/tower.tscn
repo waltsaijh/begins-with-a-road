@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cdatjv5icxnel"]
 
-[ext_resource type="Script" path="res://scripts/towers/tower.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dxa88jumonftp" path="res://scripts/towers/tower.gd" id="1_script"]
 
-[node name="Tower" type="Node3D"]
+[node name="Tower" type="Node3D" unique_id=1106430070]
 script = ExtResource("1_script")

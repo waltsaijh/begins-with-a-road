@@ -27,8 +27,7 @@ func mortar_impact(at: Vector3, radius := 1.0) -> void:
 	var root := K.group(self,"MortarImpact",at+Vector3.UP*0.11)
 	root.scale = Vector3.ONE*maxf(0.01,radius)
 	var ring := K.part(root,"ring",Vector3.ONE,Vector3.ZERO,"amber")
-	ring.material_override = ring.material_override.duplicate()
-	ring.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ring.material_override = SolidMaterials.transparent(K.COLORS.amber)
 	var core := K.part(root,"rock",Vector3.ONE*0.48,Vector3(0,0.35,0),"amber")
 	var particles: Array[Node3D] = []
 	for i in 6: particles.append(K.part(root,"rock",Vector3.ONE*0.08,Vector3.ZERO,"dust"))

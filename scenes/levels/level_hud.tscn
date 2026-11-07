@@ -153,6 +153,8 @@ mouse_filter = 2
 
 [node name="Restart" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1162389367 instance=ExtResource("10_menu_item")]
 
+[node name="Progress" parent="PauseBlocker/Menu/Margin/Actions" instance=ExtResource("10_menu_item")]
+
 [node name="Settings" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1202626757 instance=ExtResource("10_menu_item")]
 
 [node name="Codex" parent="PauseBlocker/Menu/Margin/Actions" instance=ExtResource("10_menu_item")]

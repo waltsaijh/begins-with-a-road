@@ -117,7 +117,7 @@ func verify() -> void:
 	hud.set_paused(true)
 	check(get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation")
 	await frames(2)
-	check(hud._menu_buttons.size() == 5, "Pause menu includes enemy codex alongside four existing actions")
+	check(hud._menu_buttons.size() == 6, "Pause menu includes enemy codex alongside progress and four existing actions")
 	var locale := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_TW")
 	check(hud.restart_button.text == "重新開始" and hud.settings_button.text == "設定", "New menu items lack Chinese translations")
@@ -249,12 +249,12 @@ func verify() -> void:
 		tab.pressed = false
 		get_viewport().push_input(tab, true)
 		check(page.is_ancestor_of(get_viewport().gui_get_focus_owner()), "Keyboard focus escaped behind the modal page")
-	for mouse_button in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_MIDDLE]:
+	for mouse_button in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
 		var press := InputEventMouseButton.new()
 		press.position = Vector2(10, 10)
 		press.button_index = mouse_button
 		press.pressed = true
-		press.button_mask = MOUSE_BUTTON_MASK_LEFT if mouse_button == MOUSE_BUTTON_LEFT else MOUSE_BUTTON_MASK_MIDDLE
+		press.button_mask = MOUSE_BUTTON_MASK_LEFT if mouse_button == MOUSE_BUTTON_LEFT else MOUSE_BUTTON_MASK_RIGHT
 		get_viewport().push_input(press, true)
 		var drag := InputEventMouseMotion.new()
 		drag.position = Vector2(130, 120)
@@ -268,7 +268,7 @@ func verify() -> void:
 	wheel.position = Vector2(10, 10)
 	get_viewport().push_input(wheel, true)
 	await frames(3)
-	check(camera.global_transform.is_equal_approx(camera_pose) and camera.focus.is_equal_approx(camera_focus) and camera.size == camera_size and camera._orbit_press == null, "Settings leaked orbit, pan, zoom or a pending click to the background")
+	check(camera.global_transform.is_equal_approx(camera_pose) and camera.focus.is_equal_approx(camera_focus) and camera.size == camera_size and camera._orbit_press == null and camera._pan_press == null, "Settings leaked orbit, pan, zoom or a pending click to the background")
 	check(not pressed_background[0] and shop.coins == coins and scene.timeline.progress == progress, "Settings leaked clicks or changed paused gameplay")
 	background.queue_free()
 	var escape := InputEventKey.new()

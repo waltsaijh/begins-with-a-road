@@ -16,6 +16,9 @@ var occupied := {}
 var _settings := {}
 var last_error := ""
 var input_enabled := true
+var manual_input_allowed := true
+## Optional scenario constraint, applied to preview and authoritative commit.
+var placement_rule: Callable
 ## Optional session-specific allowlist. Formal levels leave this empty.
 var card_filter: Callable
 var combat: Node
@@ -34,9 +37,9 @@ func _ready() -> void:
 	relics.name = "Relics"
 	relics.tower_map = self
 	add_child(relics)
-	var hover := preload("res://scripts/towers/tower_hover.gd").new()
-	hover.tower_map = self
-	add_child(hover)
+	var hover_layer := preload("res://scenes/towers/components/tower_hover.tscn").instantiate()
+	hover_layer.get_node("TowerHover").tower_map = self
+	add_child(hover_layer)
 	traffic = TrafficStructures.new()
 	traffic.name = "TrafficStructures"
 	traffic.tower_map = self
@@ -48,7 +51,7 @@ func _ready() -> void:
 	add_child(combat)
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not input_enabled:
+	if not input_enabled or not manual_input_allowed:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		if event.button_mask & MOUSE_BUTTON_MASK_MIDDLE:
@@ -105,6 +108,9 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 	var error := card.configuration_error()
 	if not error.is_empty():
 		return error
+	if placement_rule.is_valid():
+		var rule_error: String = placement_rule.call(card,cell,turns)
+		if not rule_error.is_empty(): return rule_error
 	if cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767:
 		return "超出可建造範圍"
 	var at := Vector2i(cell.x, cell.z)

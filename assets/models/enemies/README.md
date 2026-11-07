@@ -24,6 +24,6 @@ godot --headless --path . --script tools/assets/bake_enemy_gpu.gd
 
 ## Phase 4 自足模型
 
-`rat_swarm`、`shield_guardian`、`blood_mage`、`winged_beast`、`scout`、`saboteur` 為本專案新製的低面數微縮場景，不引用原型。各模型以可編輯 MeshInstance3D 組成，分別使用長尾鼠輪廓、大盾、法杖、雙翼、望遠鏡與炸藥背包區分。共用 `scripts/enemies/rendering/miniature_enemy.gd` 處理步態／擺臂／翼拍，由 EnemyModel.advance 依模擬時間更新。
+`rats`、`rook`、`bloodmage`、`winged`、`scout`、`bomber` 為本專案新製的低面數微縮場景，不引用原型。各模型以可編輯 MeshInstance3D 組成，分別使用長尾鼠輪廓、大盾、法杖、雙翼、望遠鏡與炸藥背包區分。共用 `scripts/enemies/rendering/miniature_enemy.gd` 處理步態／擺臂／翼拍，由 EnemyModel.advance 依模擬時間更新。
 
-重建入口 `python tools/assets/build_synergy_models.py`，同時產生本目錄六個場景及 `assets/sprites/enemies/` 六個 SVG 圖示。這會覆寫對應產物，重建前先確認手動修改；不需要另一專案或額外 Python 套件。
+重建入口 `python tools/assets/build_synergy_models.py`，產生本目錄六個場景；圖示是 `assets/sprites/enemies/` 的手繪 PNG，不由工具產生。這會覆寫對應產物，重建前先確認手動修改；不需要另一專案或額外 Python 套件。

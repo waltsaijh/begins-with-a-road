@@ -3,7 +3,9 @@ extends CanvasLayer
 signal home_requested
 const SettingsAdapter = preload("res://scripts/settings/game_settings.gd")
 const SettingsScene = preload("res://scenes/settings/settings_page.tscn")
+const ProgressScene = preload("res://scenes/progress/progress_page.tscn")
 var settings_page: Control
+var progress_page: Control
 var _settings_camera: Camera3D
 @export_range(0.0, 1.0, 0.01) var settings_veil_alpha := 0.82
 var _settings_veil_motion: Tween
@@ -25,7 +27,7 @@ const PauseIcon = preload("res://assets/sprites/interface/pause.png")
 const SPEED_ICONS: Array[Texture2D] = [
 	preload("res://assets/sprites/interface/speed_1x.png"),
 	preload("res://assets/sprites/interface/speed_2x.png"),
-	preload("res://assets/sprites/interface/speed_4x.png"),
+	preload("res://assets/sprites/interface/speed_4x.png"), # Three-chevron third preset.
 ]
 var speed_index := 0
 var _start_was_disabled := false
@@ -52,9 +54,10 @@ var _callout_reveal := 0.0:
 @onready var pause_menu: Control = $PauseBlocker
 @onready var resume_button: Button = $PauseBlocker/Menu/Margin/Actions/Resume/Button
 @onready var restart_button: Button = $PauseBlocker/Menu/Margin/Actions/Restart/Button
+@onready var progress_button: Button = $PauseBlocker/Menu/Margin/Actions/Progress/Button
 @onready var settings_button: Button = $PauseBlocker/Menu/Margin/Actions/Settings/Button
 @onready var home_button: Button = $PauseBlocker/Menu/Margin/Actions/ReturnHome/Button
-@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, settings_button, home_button]
+@onready var _menu_buttons: Array[Button] = [resume_button, restart_button, progress_button, settings_button, home_button]
 @onready var _cards: Node = get_node_or_null("../CardPlacement")
 
 func _ready() -> void:
@@ -77,8 +80,12 @@ func _ready() -> void:
 	settings_page = SettingsScene.instantiate()
 	add_child(settings_page)
 	settings_page.option_changed.connect(func(key: StringName, value: Variant): SettingsAdapter.apply(key, value, get_viewport()))
-	settings_page.visibility_changed.connect(_on_settings_visibility_changed)
+	settings_page.visibility_changed.connect(_on_page_visibility_changed.bind(settings_button))
 	settings_button.pressed.connect(open_settings)
+	progress_page = ProgressScene.instantiate()
+	add_child(progress_page)
+	progress_page.visibility_changed.connect(_on_page_visibility_changed.bind(progress_button))
+	progress_button.pressed.connect(open_progress)
 	pause_menu.hide()
 	pause_menu.modulate.a = 0.0
 	Engine.time_scale = SPEEDS[speed_index]
@@ -89,17 +96,29 @@ func _ready() -> void:
 	_layout_status_row()
 
 func open_settings() -> void:
-	if not pause_requested or ScreenTransition.active: return
+	if not pause_requested or ScreenTransition.active or is_instance_valid(inspection_owner) or _page_open(): return
 	settings_page.configure(SettingsAdapter.sections(), SettingsAdapter.read(get_viewport()))
 	settings_page.open()
 
-func _on_settings_visibility_changed() -> void:
-	var active := settings_page.is_visible_in_tree()
+## Pauses first when opened from a next-wave troop icon, then lands on that entry.
+func open_progress(entry_id := "") -> void:
+	if ScreenTransition.active or is_instance_valid(inspection_owner) or _page_open(): return
+	set_paused(true)
+	if not pause_requested: return
+	progress_page.configure(ProgressCatalog.sections(), {})
+	progress_page.open()
+	if not entry_id.is_empty(): progress_page.show_entry(entry_id)
+
+func _page_open() -> bool:
+	return (is_instance_valid(settings_page) and settings_page.visible) or (is_instance_valid(progress_page) and progress_page.visible)
+
+func _on_page_visibility_changed(button: Button) -> void:
+	var active := _page_open()
 	_set_settings_navigation_locked(active)
 	if not is_inside_tree(): return
 	$PauseBlocker/Menu.visible = not active
 	_fade_settings_veil(active)
-	if not active and pause_requested: settings_button.grab_focus()
+	if not active and pause_requested: button.grab_focus()
 
 func _set_settings_navigation_locked(value: bool) -> void:
 	if value: _settings_camera = get_viewport().get_camera_3d()
@@ -213,7 +232,7 @@ func _request_from_callout() -> void:
 
 func _position_callout() -> void:
 	if not is_inside_tree(): return
-	if is_instance_valid(settings_page) and settings_page.visible:
+	if _page_open():
 		for action in start_callouts: action.hide()
 		return
 	var viewport := get_viewport()
@@ -239,11 +258,10 @@ func _position_one_callout(action: Button, marker: Node3D, camera: Camera3D, vie
 	var point := camera.unproject_position(anchor)
 	var rest := point-Vector2(action.size.x*0.5, action.size.y+start_anchor_gap)
 	var tower := camera.unproject_position(marker.global_position+Vector3.UP*start_collapse_height)
-	var hover: float = action.get("hover_amount")
-	var center := tower.lerp(rest+action.size*0.5, _callout_reveal)-Vector2(0, hover*2.0)
+	var center := tower.lerp(rest+action.size*0.5, _callout_reveal)
 	action.pivot_offset = action.size*0.5
 	action.position = center-action.size*0.5
-	action.scale = Vector2.ONE*maxf(0.001, _callout_reveal)*lerpf(1.0, 1.035, hover)
+	action.scale = Vector2.ONE*maxf(0.001, _callout_reveal)
 	action.modulate.a = minf(1.0, _callout_reveal*2.0)
 	# Each entrance independently follows/clips against the moving camera.
 	action.visible = viewport.get_visible_rect().intersects(action.get_global_rect())
@@ -256,11 +274,12 @@ func _update_labels() -> void:
 	speed_button.text = ""
 	speed_button.icon = SPEED_ICONS[speed_index]
 	pause_button.icon = PauseIcon
-	speed_button.tooltip_text = ("Game speed: %d×\nClick to cycle 1× / 2× / 4×." if english else "遊戲速度：%d 倍\n點擊切換 1／2／4 倍速。") % SPEEDS[speed_index]
-	pause_button.tooltip_text = "Pause game · open menu" if english else "暫停遊戲並開啟選單"
+	speed_button.tooltip_text = ("Game speed: %d×\nClick / Tab to cycle 1× / 2× / 4×." if english else "遊戲速度：%d 倍\n點擊／Tab 切換 1／2／4 倍速。") % SPEEDS[speed_index]
+	pause_button.tooltip_text = "Pause game · open menu · Esc" if english else "暫停遊戲並開啟選單 · Esc"
 	if _cards != null: _update_wallet_tooltip(_cards.get_node("Shop").coins)
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
+	progress_button.text = tr("ui.pause.progress")
 	settings_button.text = tr("ui.pause.settings")
 	home_button.text = tr("ui.pause.home")
 	$PauseBlocker/Menu/Margin/Actions/Codex/Button.text = "Enemy codex" if TranslationServer.get_locale().begins_with("en") else "敵軍圖鑑"
@@ -278,8 +297,9 @@ func set_paused(value: bool) -> void:
 	if _returning_home: return
 	if is_instance_valid(inspection_owner) and not value: return
 	if value == pause_requested: return
-	if not value and settings_page.visible:
+	if not value:
 		settings_page.hide()
+		progress_page.hide()
 	$PauseBlocker/Menu.show()
 	pause_requested = value
 	if value:
@@ -321,8 +341,16 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if is_instance_valid(inspection_owner): return
+	if _page_open(): return
+	if event is InputEventKey:
+		var shortcut: int = event.physical_keycode if event.physical_keycode else event.keycode
+		if shortcut == KEY_ESCAPE or (shortcut == KEY_TAB and not pause_requested):
+			if event.pressed and not event.echo:
+				if shortcut == KEY_ESCAPE: set_paused(not pause_requested)
+				else: cycle_speed()
+			get_viewport().set_input_as_handled()
+			return
 	if not pause_requested: return
-	if settings_page.is_visible_in_tree(): return
 	var camera := get_viewport().get_camera_3d()
 	if event is InputEventMouse:
 		# Menu input reaches the camera's click/drag arbitration before GUI.
@@ -334,9 +362,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey:
 		var key: int = event.physical_keycode if event.physical_keycode else event.keycode
-		if key == KEY_ESCAPE and event.pressed and not event.echo:
-			set_paused(false)
-		elif key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in _menu_buttons:
+		if key in [KEY_TAB, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE] and get_viewport().gui_get_focus_owner() in _menu_buttons:
 			return
 	elif event is InputEventMouse:
 		# Deliver release events so dragging out of a menu button clears its press.
@@ -374,7 +400,7 @@ func _exit_tree() -> void:
 ## both an already-open pause menu and an external tree pause on return.
 func begin_inspection(owner_panel: Node) -> bool:
 	if is_instance_valid(inspection_owner): return inspection_owner == owner_panel
-	if ScreenTransition.active or settings_page.visible or _returning_home: return false
+	if ScreenTransition.active or _page_open() or _returning_home: return false
 	if get_parent().get("choosing_relic") == true or get_parent().get("finished") == true: return false
 	_inspection_was_requested = pause_requested
 	_inspection_was_paused = get_tree().paused

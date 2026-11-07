@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="RelicDefinition" format=3]
-[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/relics/reroll_discount.svg" id="icon"]
+[gd_resource type="Resource" script_class="RelicDefinition" format=3 uid="uid://g3sqs1heutpo"]
+
+[ext_resource type="Texture2D" uid="uid://d2qrgrugsm7aa" path="res://assets/sprites/relics/reroll_discount.png" id="1_pjnod"]
+[ext_resource type="Script" uid="uid://dwvi372cqeuds" path="res://scripts/relics/relic_definition.gd" id="script"]
+
 [resource]
 script = ExtResource("script")
 id = &"reroll_discount"
 name_key = "relic.reroll_discount.name"
 description_key = "relic.reroll_discount.description"
-icon = ExtResource("icon")
+icon = ExtResource("1_pjnod")
+parameters = {
+"amount": 1
+}
 repeatable = true
 max_stacks = 2
-parameters = {"amount": 1}

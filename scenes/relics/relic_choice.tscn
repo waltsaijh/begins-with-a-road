@@ -33,15 +33,27 @@ vertical_scroll_mode = 0
 [node name="Items" type="HBoxContainer" parent="RelicBar"]
 layout_mode = 2
 theme_override_constants/separation = 6
-[node name="Modal" type="ColorRect" parent="."]
+[node name="Modal" type="Control" parent="."]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-offset_top = 80.0
+mouse_filter = 2
+[node name="Backdrop" type="ColorRect" parent="Modal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 color = Color(0.10,0.17,0.18,0.70)
+[node name="Blocker" type="Control" parent="Modal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 80.0
 [node name="Center" type="CenterContainer" parent="Modal"]
 layout_mode = 1
 anchors_preset = 15
@@ -51,15 +63,32 @@ mouse_filter = 2
 [node name="Layout" type="VBoxContainer" parent="Modal/Center"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 20
+[node name="DebugReroll" type="Button" parent="Modal"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = 184.0
+offset_right = 120.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 14
+text = "relic.debug_reroll"
+flat = true
 [node name="Title" type="Label" parent="Modal/Center/Layout"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 text = "relic.choose"
 [node name="Cards" type="HBoxContainer" parent="Modal/Center/Layout"]
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 20
 [node name="Collection" type="Control" parent="."]
 visible = false
 anchors_preset = 15

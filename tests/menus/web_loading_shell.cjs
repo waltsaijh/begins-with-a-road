@@ -36,14 +36,11 @@ async function fixture(context) {
       args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-features=CalculateNativeWinOcclusion'] });
     const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, locale: 'zh-TW' });
     let page = await fixture(context);
-    check(await page.locator('#status-stage').textContent() === '載入遊戲資源…', 'Missing initial resource message');
-    check(!await page.locator('#status-progress').isVisible(), 'Unknown work displayed a progress bar');
-    await page.evaluate(() => window.testOptions.onProgress(20, 100));
-    check(await page.locator('#status-progress').isVisible(), 'Known download progress was not shown');
+    check(await page.locator('#status-logos img').count() === 2, 'Missing startup logos');
+    check(await page.locator('progress').count() === 0, 'First screen must not show a progress bar');
     await page.evaluate(() => window.testResolve());
     await page.waitForTimeout(50);
     check(await page.locator('#status').isVisible(), 'Engine promise exposed canvas before its first draw');
-    check(await page.locator('#status-stage').textContent() === '啟動遊戲…', 'Missing engine startup message');
     await page.evaluate(() => window.roadStartupPresented());
     await page.waitForFunction(() => !document.getElementById('status'));
     await page.close();
@@ -59,7 +56,7 @@ async function fixture(context) {
     await page.waitForFunction(() => document.getElementById('status-notice').textContent.includes('Expected startup failure'));
     await page.evaluate(() => window.roadStartupPresented());
     check(await page.locator('#status').isVisible(), 'A failed engine lost its error notice');
-    check(await page.locator('#status-stage').textContent() === '無法啟動遊戲', 'Missing failure stage');
+    check((await page.locator('#status-notice').textContent()).includes('無法啟動遊戲'), 'Missing failure stage');
     await page.close();
     if (process.argv.includes('--live')) {
       page = await context.newPage();

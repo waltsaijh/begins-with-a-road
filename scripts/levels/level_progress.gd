@@ -5,6 +5,11 @@ signal codex_changed
 var save_path := "user://level_completion.cfg"
 var _completed := {}
 var _encountered := {}
+# Canonical IDs changed with the enemy artwork; preserve v1 codex unlocks.
+const ENEMY_ALIASES := {"rat_swarm": "rats", "shield_guardian": "rook", "blood_mage": "bloodmage", "winged_beast": "winged", "saboteur": "bomber", "siege_behemoth": "ravager"}
+
+func canonical_enemy_id(id: String) -> String:
+	return ENEMY_ALIASES.get(id,id)
 
 func _ready() -> void:
 	var error := load_progress(save_path)
@@ -28,7 +33,7 @@ func load_progress(path: String) -> int:
 	_completed = loaded
 	_encountered.clear()
 	for id: String in enemies:
-		if not id.is_empty(): _encountered[id] = true
+		if not id.is_empty(): _encountered[canonical_enemy_id(id)] = true
 	changed.emit()
 	codex_changed.emit()
 	return OK
@@ -43,12 +48,13 @@ func mark_completed(id: String) -> int:
 	return error
 
 func enemy_unlocked(id: String) -> bool:
-	return _encountered.has(id)
+	return _encountered.has(canonical_enemy_id(id))
 
 func encounter_enemy(id: String) -> int:
+	id = canonical_enemy_id(id)
 	if id.is_empty(): return ERR_INVALID_PARAMETER
 	if _encountered.has(id): return OK
-	_encountered[id] = true
+	_encountered[canonical_enemy_id(id)] = true
 	var error := _save()
 	if error != OK: push_warning("Could not save enemy codex: "+error_string(error))
 	codex_changed.emit()

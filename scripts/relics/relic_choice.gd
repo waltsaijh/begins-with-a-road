@@ -10,6 +10,11 @@ var _inspected: RelicDefinition
 var _inspection_hud: Node
 @onready var modal: Control = $Modal
 @onready var row: HBoxContainer = $Modal/Center/Layout/Cards
+@onready var debug_reroll_button: Button = $Modal/DebugReroll
+
+func _ready() -> void:
+	debug_reroll_button.visible = OS.is_debug_build()
+	debug_reroll_button.pressed.connect(debug_reroll)
 
 func _process(_delta: float) -> void:
 	# Keep the normal HUD pause control reachable; the pause menu owns its overlay.
@@ -26,21 +31,34 @@ func begin() -> bool:
 	if choosing: return true
 	offers = relics.options()
 	if offers.is_empty(): return false
-	for child in row.get_children(): child.free()
 	choosing = true
 	_committing = false
 	$Collection.hide()
 	$RelicBar.hide()
+	_rebuild_cards()
+	modal.show()
+	return true
+
+func debug_reroll() -> bool:
+	if not OS.is_debug_build() or not choosing or _committing or get_tree().paused: return false
+	var next_offers := relics.options()
+	if next_offers.is_empty(): return false
+	offers = next_offers
+	_rebuild_cards()
+	return true
+
+func _rebuild_cards() -> void:
+	for child in row.get_children(): child.free()
+	debug_reroll_button.disabled = false
 	for relic in offers:
 		var card: Button = Card.instantiate()
 		row.add_child(card)
 		card.get_node("Contents/Icon").texture = relic.icon
-		card.get_node("Contents/Title").text = tr(relic.name_key)
+		card.get_node("Contents/Heading/Title").text = tr(relic.name_key)
+		card.get_node("Contents/Heading/Usage").text = relic.usage_text()
 		card.get_node("Contents/Description").text = tr(relic.description_key)
 		_color_card(card,relic)
 		card.pressed.connect(choose.bind(relic))
-	modal.show()
-	return true
 
 func _color_card(card: Button, relic: RelicDefinition) -> void:
 	var accent := relic.presentation_color()
@@ -57,14 +75,15 @@ func _color_card(card: Button, relic: RelicDefinition) -> void:
 	var focus: StyleBoxFlat = card.get_theme_stylebox("normal").duplicate()
 	focus.bg_color = Color.TRANSPARENT
 	card.add_theme_stylebox_override("focus",focus)
-	card.get_node("Contents/Title").add_theme_color_override("font_color",accent.darkened(0.65))
+	card.get_node("Contents/Heading/Title").add_theme_color_override("font_color",accent.darkened(0.65))
+	card.get_node("Contents/Heading/Usage").add_theme_color_override("font_color",relic.icon_color())
 	var icon: TextureRect = card.get_node("Contents/Icon")
 	if relic.tower != null:
 		# Tower art is an alpha mask; use the same tint as hand/shop tower icons.
 		var material := ShaderMaterial.new()
 		material.shader = IconMask
 		icon.material = material
-		icon.self_modulate = accent.darkened(0.45)
+		icon.self_modulate = relic.icon_color()
 
 func choose(relic: RelicDefinition) -> bool:
 	if not choosing or _committing or get_tree().paused or not offers.has(relic): return false
@@ -72,6 +91,7 @@ func choose(relic: RelicDefinition) -> bool:
 	if not relics.acquire(relic):
 		_committing = false
 		return false
+	debug_reroll_button.disabled = true
 	for i in row.get_child_count():
 		var button: Button = row.get_child(i)
 		button.disabled = true
@@ -95,6 +115,7 @@ func _refresh_collection() -> void:
 		var relic := relics.catalog.find(id)
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(38,38)
+		button.set_meta("relic_id",id)
 		button.tooltip_text = "%s ×%d\n%s" % [tr(relic.name_key),relics.held[id],tr(relic.description_key)]
 		var normal := StyleBoxFlat.new()
 		normal.bg_color = Color(relic.presentation_color(),0.12)
@@ -116,7 +137,7 @@ func _refresh_collection() -> void:
 			var material := ShaderMaterial.new()
 			material.shader = IconMask
 			icon.material = material
-			icon.self_modulate = relic.presentation_color().darkened(0.45)
+			icon.self_modulate = relic.icon_color()
 		button.add_child(icon)
 		if relics.held[id] > 1:
 			var count := Label.new()
@@ -149,8 +170,8 @@ func _show_relic() -> void:
 		var material := ShaderMaterial.new()
 		material.shader = IconMask
 		icon.material = material
-		icon.self_modulate = _inspected.presentation_color().darkened(0.45)
-	$Collection/Paper/Details/Description.text = tr(_inspected.description_key)
+		icon.self_modulate = _inspected.icon_color()
+	$Collection/Paper/Details/Description.text = _inspected.usage_text()+"\n\n"+tr(_inspected.description_key)
 	$Collection/Paper/Details/Close.text = "Close" if TranslationServer.get_locale().begins_with("en") else "關閉"
 
 func close_collection() -> void:

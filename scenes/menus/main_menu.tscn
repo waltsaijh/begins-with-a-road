@@ -1,5 +1,6 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://scenes/progress/progress_page.tscn" id="progress_page"]
 [ext_resource type="Script" path="res://scripts/menus/main_menu.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/menus/components/menu_stage.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/menus/components/menu_crest.tscn" id="3"]
@@ -88,6 +89,13 @@ theme_override_font_sizes/font_size = 22
 text = "ui.menu.start"
 alignment = 0
 
+[node name="Progress" parent="Interface/Home/Column/Actions" instance=ExtResource("4")]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 20
+text = "ui.pause.progress"
+alignment = 0
+
 [node name="Settings" parent="Interface/Home/Column/Actions" instance=ExtResource("4")]
 layout_mode = 2
 size_flags_horizontal = 0
@@ -115,6 +123,8 @@ color = Color(1, 1, 1, 0)
 mouse_filter = 2
 
 [node name="SettingsPage" parent="Interface" instance=ExtResource("6")]
+
+[node name="ProgressPage" parent="Interface" instance=ExtResource("progress_page")]
 
 [node name="Entry" type="AnimationPlayer" parent="Interface"]
 libraries = {&"": SubResource("Animations")}

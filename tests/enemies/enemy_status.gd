@@ -250,8 +250,57 @@ func verify_batch_rendering(renderer: MultiMeshInstance3D) -> Dictionary:
 	overlay._process(0.0)
 	check(overlay.batch.count == previous_count-4 and overlay._atlas._icons.size() == 1, "Reusing the batch after clearing did not restore active effects")
 	reference_layer.queue_free()
+	await verify_camera_reentry(renderer)
 	await verify_baked_appearance(renderer)
-	return {"reference_pixels": compared, "mismatched_pixels": mismatched, "maximum_channel_error": worst, "overlap_order": true, "atlas_growth": true, "capacity_growth": true, "effect_removal": true, "baked_appearance": true}
+	return {"reference_pixels": compared, "mismatched_pixels": mismatched, "maximum_channel_error": worst, "overlap_order": true, "atlas_growth": true, "capacity_growth": true, "effect_removal": true, "baked_appearance": true, "camera_reentry_edges": 4}
+
+func verify_camera_reentry(renderer: MultiMeshInstance3D) -> void:
+	var overlay: Control = renderer.status_overlay
+	var camera := get_viewport().get_camera_3d()
+	var camera_position := camera.position
+	var camera_size := camera.size
+	var positions := PackedVector3Array()
+	for enemy in renderer.units: positions.append(enemy.global_position)
+	var viewport_size := get_viewport().get_visible_rect().size
+	var center := viewport_size*0.5
+	var edges := [Vector2(-40,center.y),Vector2(viewport_size.x+40,center.y),Vector2(center.x,-40),Vector2(center.x,viewport_size.y+40)]
+	for edge: Vector2 in edges:
+		camera.position = camera_position
+		camera.size = camera_size
+		var outside := camera.project_position(edge,10)
+		var inside := camera.project_position(center,10)
+		for enemy in renderer.units:
+			var slot: int = renderer._slots[enemy]
+			var head_offset: Vector3 = renderer.head_positions[slot]-enemy.global_position
+			enemy.global_position = outside-head_offset
+			renderer.update_enemy(enemy)
+		# The head is within the overlay's 64px margin, but the complete status
+		# is outside the viewport. Its first canvas bounds must not stay cached.
+		overlay.batch.clear()
+		overlay._process(0)
+		await frame_image()
+		check(overlay.batch.count > 0,"Reentry fixture failed to submit the offscreen status")
+		camera.position += outside-inside
+		camera.size *= 0.6
+		var picture := await frame_image()
+		var health := 0
+		var shield := 0
+		var skill := 0
+		var effect := 0
+		for y in picture.get_height():
+			for x in picture.get_width():
+				var color := picture.get_pixel(x,y)
+				if color.is_equal_approx(EnemyStatusConstants.HEALTH): health += 1
+				if color.is_equal_approx(EnemyStatusConstants.SHIELD): shield += 1
+				if color.is_equal_approx(EnemyStatusConstants.SKILL): skill += 1
+				if color.r > 0.65 and color.g > 0.8 and color.b > 0.9: effect += 1
+		check(health > 20 and shield > 5 and skill > 5 and effect > 5,"Status disappeared after camera pan/zoom from %s: health=%d shield=%d skill=%d effect=%d" % [edge,health,shield,skill,effect])
+		if not OS.has_feature("web"): picture.save_png(Artifacts.path("enemies/status_reentry_%d.png" % edges.find(edge)))
+	camera.position = camera_position
+	camera.size = camera_size
+	for i in renderer.units.size():
+		renderer.units[i].global_position = positions[i]
+		renderer.update_enemy(renderer.units[i])
 
 func verify_baked_appearance(renderer: MultiMeshInstance3D) -> void:
 	var layer := load("res://scenes/enemies/components/enemy_status_overlay.tscn").instantiate() as CanvasLayer

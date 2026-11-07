@@ -6,15 +6,14 @@ var counts := {}
 var selected: Troop
 var _configured := false
 
+func _ready() -> void:
+	$Scroll/Items.minimum_size_changed.connect(_update_layout)
+
 func display(value: Dictionary) -> void:
 	if _configured and counts == value: return
 	_configured = true
 	counts = value.duplicate()
 	clear_filter()
-	var height := maxi(1,mini(3, counts.size()))*38.0
-	$Scroll.custom_minimum_size.y = height
-	offset_bottom = offset_top+height
-	get_parent().set_intel_height(height)
 	for child in $Scroll/Items.get_children():
 		$Scroll/Items.remove_child(child)
 		child.queue_free()
@@ -22,7 +21,8 @@ func display(value: Dictionary) -> void:
 	if profiles.is_empty():
 		var empty := Label.new()
 		empty.text = "×0"
-		empty.custom_minimum_size.y = 36
+		empty.custom_minimum_size = Vector2(34,34)
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		empty.add_theme_color_override("font_color",Color(0.15,0.30,0.32))
@@ -35,12 +35,20 @@ func display(value: Dictionary) -> void:
 		item.filter_entered.connect(_enter_filter)
 		item.filter_exited.connect(_exit_filter)
 		item.info_requested.connect(func(profile: Troop): info_requested.emit(profile))
-		item.body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		item.body.pressed.connect(func():
-			var action := get_parent() as Button
-			if action.is_visible_in_tree() and not action.disabled:
-				action.pressed.emit())
+	_update_layout()
+
+func _update_layout() -> void:
+	var width: float = $Scroll/Items.get_combined_minimum_size().x
+	var height := maxf(34,$Scroll/Items.get_combined_minimum_size().y)
+	if width > 480: height += $Scroll.get_h_scroll_bar().get_combined_minimum_size().y
+	$Scroll.custom_minimum_size.y = height
+	get_parent().set_intel_size(Vector2(minf(width,480),height))
+
+func set_interactive(enabled: bool) -> void:
+	for item in $Scroll/Items.get_children():
+		if item.has_method("set_expanded"):
+			item.body.disabled = not enabled
+			if not enabled: item.set_expanded(false)
 
 func _enter_filter(profile: Troop) -> void:
 	selected = profile
@@ -51,4 +59,6 @@ func _exit_filter(profile: Troop) -> void:
 
 func clear_filter() -> void:
 	selected = null
+	for item in $Scroll/Items.get_children():
+		if item.has_method("set_expanded"): item.set_expanded(false)
 	filter_changed.emit(null)

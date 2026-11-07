@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://scripts/interface/screen_transition.gd" id="1"]
 
 [ext_resource type="PackedScene" path="res://scenes/interface/components/loading_display.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/interface/components/intro_logos.tscn" id="4"]
 
 [node name="ScreenTransition" type="CanvasLayer"]
 process_mode = 3
@@ -16,6 +17,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 1, 0)
+
+[node name="Logos" parent="WhiteVeil" instance=ExtResource("4")]
+visible = false
 
 [node name="Loading" parent="WhiteVeil" instance=ExtResource("2")]
 visible = false

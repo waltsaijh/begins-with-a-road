@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="TutorialDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/build_card.gd" id="1_2xkhq"]
+[ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_b46a4aa7ce037ee15ceb475612745a2a.tres" id="sentry_line"]
+[ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_889e85b850619a8eb20d0fc7e832bfe5.tres" id="crossfire_line"]
+[ext_resource type="Resource" path="res://assets/data/towers/crossfire.tres" id="3_l7e5n"]
+[ext_resource type="Script" path="res://scripts/tutorial/tutorial_definition.gd" id="4_ej8ds"]
+[ext_resource type="Resource" path="res://assets/data/towers/sentry.tres" id="5_yj2j1"]
+
+[ext_resource type="Resource" path="res://assets/data/tutorial/starting_01.tres" id="start_1"]
+[ext_resource type="Resource" path="res://assets/data/tutorial/starting_02.tres" id="start_2"]
+[ext_resource type="Resource" path="res://assets/data/tutorial/starting_03.tres" id="start_3"]
+
+[sub_resource type="Resource" id="Resource_8072v"]
+script = ExtResource("1_2xkhq")
+price = 13
+tile_preset = ExtResource("crossfire_line")
+tower = ExtResource("3_l7e5n")
+
+[sub_resource type="Resource" id="Resource_gctoo"]
+script = ExtResource("1_2xkhq")
+tile_preset = ExtResource("sentry_line")
+tower = ExtResource("5_yj2j1")
+
+[resource]
+script = ExtResource("4_ej8ds")
+starting_cards = Array[ExtResource("1_2xkhq")]([ExtResource("start_1"), ExtResource("start_2"), ExtResource("start_3")])
+guided_cells = Array[Vector3i]([Vector3i(3,0,0),Vector3i(5,0,1)])
+guided_turns = PackedInt32Array(0, 2)
+upgrade_card = SubResource("Resource_gctoo")
+new_card = SubResource("Resource_8072v")

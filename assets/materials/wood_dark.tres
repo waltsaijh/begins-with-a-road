@@ -1,6 +1,8 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
 [resource]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 resource_name = "Bridge beams"
 albedo_color = Color(0.2588235, 0.2313725, 0.2117647, 1)
 metallic_specular = 0.12

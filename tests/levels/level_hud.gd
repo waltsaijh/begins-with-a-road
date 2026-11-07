@@ -13,6 +13,15 @@ func check(ok: bool, message: String) -> void:
 func frames(count := 3) -> void:
 	for i in count: await get_tree().process_frame
 
+func shortcut(code: Key, echo := false) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = code
+	event.pressed = true
+	event.echo = echo
+	get_viewport().push_input(event,true)
+	event.pressed = false
+	get_viewport().push_input(event,true)
+
 func finish_pause(hud: CanvasLayer) -> void:
 	check(hud.pause_requested and hud.pause_menu.visible, "Pause request did not immediately open its menu")
 	check(get_tree().paused and is_zero_approx(Engine.time_scale), "Pause did not immediately freeze simulation")
@@ -101,7 +110,7 @@ func verify() -> void:
 		hover.position = hud.early_start.get_global_rect().get_center()
 		get_viewport().push_input(hover, true)
 		await frames(12)
-		check(hud.early_start.hover_amount > 0.8 and hud.early_start.scale.x > 1.0, "Hover did not tint/lift/enlarge the callout")
+		check(hud.early_start.hover_amount > 0.8 and is_equal_approx(hud.early_start.scale.x,1.0), "Hover did not tint the callout or changed its screen scale")
 		await screenshot(Artifacts.path("levels/wave_start_callout_hover.png"))
 		hover.position = Vector2(1, 1)
 		get_viewport().push_input(hover, true)
@@ -111,6 +120,19 @@ func verify() -> void:
 	for speed in [2, 4, 1]:
 		await click(hud.speed_button)
 		check(Engine.time_scale == speed and hud.speed_button.text.is_empty() and hud.speed_button.icon == hud.SPEED_ICONS[hud.speed_index], "Speed button did not cycle 1x/2x/4x icons")
+	for speed in [2,4,1]:
+		shortcut(KEY_TAB)
+		check(Engine.time_scale == speed,"Tab did not cycle 1x/2x/4x")
+	shortcut(KEY_TAB,true)
+	check(Engine.time_scale == 1,"Held Tab repeated the speed change")
+	shortcut(KEY_ESCAPE)
+	check(hud.pause_requested and get_tree().paused and Engine.time_scale == 0,"Esc did not pause gameplay")
+	shortcut(KEY_ESCAPE,true)
+	check(hud.pause_requested,"Held Esc immediately resumed gameplay")
+	shortcut(KEY_TAB)
+	check(hud.speed_index == 0 and Engine.time_scale == 0,"Paused Tab changed speed")
+	shortcut(KEY_ESCAPE)
+	check(not hud.pause_requested and not get_tree().paused and Engine.time_scale == 1,"Esc did not resume at the selected speed")
 	await click(hud.pause_button)
 	await finish_pause(hud)
 	check(get_tree().paused and hud.pause_menu.visible and hud.early_start.disabled, "Pause button did not freeze gameplay and open the menu")
@@ -153,7 +175,8 @@ func verify() -> void:
 	# Freeze and resume the existing early-start transition without resetting it.
 	var shop: Node = cards.get_node("Shop")
 	var coins_before: int = shop.coins
-	await click(hud.early_start)
+	if DisplayServer.get_name() == "headless": await click(hud.early_start)
+	else: await click_at(hud.early_start.get_node("Title").get_global_rect().get_center())
 	check(scene._wave_starting and hud.early_start.disabled and not hud._callout_available, "World start action did not start the transition/retract its callout")
 	check(shop.coins == coins_before, "Clicking the callout granted a removed start bonus")
 	var bonus_balance: int = shop.coins

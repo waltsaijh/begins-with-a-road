@@ -8,7 +8,7 @@ extends Camera3D
 @export_range(0.1, 1.0, 0.05) var minimum_zoom_scale := 0.6
 ## World-space square centered on the initial focus; each axis allows ±pan_range.
 @export_range(0.0, 80.0, 0.5) var pan_range := 16.0
-## Separate clicks from drags without changing the one-circle/one-turn ratio.
+## Separate clicks from orbit/pan drags without changing the one-circle/one-turn ratio.
 @export_range(1.0, 16.0, 0.5) var orbit_drag_threshold := 4.0
 ## Ignore angular changes too close to the projected focus.
 @export_range(1.0, 64.0, 1.0) var orbit_dead_zone := 16.0
@@ -21,6 +21,9 @@ var _initial_focus := Vector3.ZERO
 var _orbiting := false
 var _orbit_press: InputEventMouseButton
 var _orbit_previous := Vector2.ZERO
+var _pan_press: InputEventMouseButton
+var _pan_previous := Vector2.ZERO
+var _panning := false
 var _replaying_click := false
 var _orbit_input_angle := 0.0
 var _orbit_velocity := 0.0
@@ -46,7 +49,7 @@ func _ready() -> void:
 			bounds = bounds.expand(map.to_global(map.map_to_local(cell)))
 		focus = bounds.get_center()
 	_initial_focus = focus
-	get_viewport().mouse_exited.connect(_stop_orbit)
+	get_viewport().mouse_exited.connect(_stop_navigation)
 	update_pose()
 
 func _process(_delta: float) -> void:
@@ -75,12 +78,11 @@ func _advance_orbit(real_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	# Decide click versus drag before GUI/gameplay can act on the press. Cards
-	# retain their normal input; non-card clicks are delivered on release.
-	# Middle-button navigation must reach the camera before cards consume GUI
-	# motion, including when the pointer crosses a shop slot or its price.
-	var middle_drag: bool = event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_MIDDLE) != 0
-	var middle_button: bool = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE
-	if middle_drag or middle_button or _orbit_press != null or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT):
+	# retain left-button input; clicks are delivered only after a gesture ends.
+	# Capture navigation before GUI motion, including across cards and prices.
+	var navigation_drag: bool = event is InputEventMouseMotion and (event.button_mask & (MOUSE_BUTTON_MASK_LEFT | MOUSE_BUTTON_MASK_RIGHT)) != 0
+	var navigation_button: bool = event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_LEFT,MOUSE_BUTTON_RIGHT]
+	if navigation_drag or navigation_button or _pan_press != null or _orbit_press != null:
 		if handle_navigation_input(event): get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -89,7 +91,7 @@ func _unhandled_input(event: InputEvent) -> void:
 ## A host can lock navigation for modal UI without coupling the camera to it.
 func set_navigation_locked(value: bool) -> void:
 	_navigation_locked = value
-	if value: _stop_orbit()
+	if value: _stop_navigation()
 
 ## HUD forwards camera navigation while gameplay input is locked.
 func handle_navigation_input(event: InputEvent) -> bool:
@@ -97,34 +99,48 @@ func handle_navigation_input(event: InputEvent) -> bool:
 	if _replaying_click: return false
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.button_mask & MOUSE_BUTTON_MASK_RIGHT: return true
+			if event.pressed:
+				if _over_card(event.position): return false
+				_stop_navigation()
+				_pan_press = event.duplicate()
+				_pan_previous = event.position
+			else:
+				if _pan_press == null: return false
+				var click := _pan_press if not _panning else null
+				_stop_pan()
+				if click != null: _deliver_click.call_deferred(click, event.duplicate())
+			return true
+		if event.button_index == MOUSE_BUTTON_RIGHT:
 			if not event.pressed:
 				if _orbit_press == null: return false
 				var click := _orbit_press if not _orbiting else null
 				_stop_orbit(true)
 				if click != null: _deliver_click.call_deferred(click, event.duplicate())
 				return true
-			if not event.button_mask & MOUSE_BUTTON_MASK_MIDDLE and not _over_card(event.position):
-				# A new gesture takes control without the previous easing tail.
-				_stop_orbit()
-				_orbit_press = event.duplicate()
-				_orbit_previous = event.position
-				return true
+			# Right dragging may start over cards; their left-button input stays free.
+			_stop_navigation()
+			_orbit_press = event.duplicate()
+			_orbit_previous = event.position
+			return true
 		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			if event.pressed:
 				var direction := -1.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0
 				size = clampf(size*pow(1.12, direction*event.factor), minimum_size, _maximum_view_size())
 				update_pose()
 			return true
-		if event.button_index == MOUSE_BUTTON_MIDDLE:
-			_stop_orbit()
-			return true
 	elif event is InputEventMouseMotion:
-		if event.button_mask & MOUSE_BUTTON_MASK_MIDDLE:
-			_stop_orbit()
-			pan(event.position - event.relative, event.position)
+		if _pan_press != null:
+			if not event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+				_stop_pan()
+				return false
+			if not _panning and event.position.distance_to(_pan_press.position) < orbit_drag_threshold: return true
+			_panning = true
+			pan(_pan_previous, event.position)
+			_pan_previous = event.position
 			return true
 		if _orbit_press != null:
-			if not event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+			if not event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
 				_stop_orbit()
 				return false
 			if not _orbiting and event.position.distance_to(_orbit_press.position) < orbit_drag_threshold:
@@ -159,8 +175,16 @@ func _stop_orbit(smooth := false) -> void:
 	_orbit_press = null
 	_orbit_input_angle = 0.0
 
+func _stop_pan() -> void:
+	_pan_press = null
+	_panning = false
+
+func _stop_navigation() -> void:
+	_stop_orbit()
+	_stop_pan()
+
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT: _stop_orbit()
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT: _stop_navigation()
 
 func _over_card(point: Vector2) -> bool:
 	return CardButton.has_card_at(get_viewport(), point)

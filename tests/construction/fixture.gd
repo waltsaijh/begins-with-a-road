@@ -45,7 +45,7 @@ static func definition(mode := 2) -> LevelDefinition:
 		var wave := WaveDefinition.new()
 		wave.move_speed = 0.8
 		wave.reward = 18
-		for id in ["soldier", "scout", "winged_beast"]:
+		for id in ["soldier", "scout", "winged"]:
 			var group := WaveSpawnGroup.new()
 			group.troop = TroopCatalog.find(id)
 			group.enemy_count = 4+index

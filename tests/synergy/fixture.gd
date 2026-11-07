@@ -24,10 +24,10 @@ static func definition(scenario: int) -> LevelDefinition:
 	level.terrain.pack(terrain)
 	terrain.free()
 	var types: Array = [
-		[["shield_guardian",4,0],["rat_swarm",30,1]],
-		[["shield_guardian",4,0],["blood_mage",5,1],["heavy",6,0]],
-		[["saboteur",6,0],["rat_swarm",30,1]],
-		[["winged_beast",12,0],["scout",12,0]]][scenario]
+		[["rook",4,0],["rats",30,1]],
+		[["rook",4,0],["bloodmage",5,1],["heavy",6,0]],
+		[["bomber",6,0],["rats",30,1]],
+		[["winged",12,0],["scout",12,0]]][scenario]
 	var act := ActDefinition.new()
 	act.add_start_after_completion = false
 	act.title = TITLES[scenario]

@@ -182,7 +182,17 @@ func verify() -> void:
 	check(session.choosing_relic and cards.input_suspended and not session.get_node("EnemyWave").start_allowed, "ACT completion enters mandatory reward phase")
 	var choice: CanvasLayer = session.relic_choice
 	var hud: CanvasLayer = session.get_node("LevelHUD")
-	hud.set_paused(true)
+	var backdrop: ColorRect = choice.get_node("Modal/Backdrop")
+	check(backdrop.get_global_rect().is_equal_approx(Rect2(Vector2.ZERO,Vector2(render_viewport.size))), "Reward dimmer covers the entire viewport, including the header")
+	var before_roll: Dictionary = manager.held.duplicate()
+	var before_roll_coins: int = cards.get_node("Shop").coins
+	var old_card: WeakRef = weakref(choice.row.get_child(0))
+	check(choice.debug_reroll_button.is_visible_in_tree(), "Debug reward reroll button is visible")
+	await click_control(choice.debug_reroll_button)
+	check(old_card.get_ref() == null and choice.row.get_child_count() == 3, "Real debug button click rebuilds the three reward cards")
+	check(manager.held == before_roll and cards.get_node("Shop").coins == before_roll_coins and session.choosing_relic and cards.input_suspended, "Debug reroll preserves inventory, coins and reward phase locks")
+	await click_control(hud.pause_button)
+	check(get_tree().paused, "Full-screen reward dimmer keeps the header pause button reachable")
 	check(not choice.choose(choice.offers[0]), "Paused reward cannot acquire")
 	var paused_cards: int = cards.cards.size()
 	check(not refill() and cards.cards.size() == paused_cards, "Paused test tool cannot refill cards")
@@ -200,6 +210,27 @@ func verify() -> void:
 	left(option_point,false)
 	await get_tree().create_timer(0.4).timeout
 	check(session.get_node("TowerMap").relics.held.has(selected.id) and not session.choosing_relic and not cards.input_suspended, "Real reward card click acquires and resumes preparation")
+	var relic_bar: Control = choice.get_node("RelicBar")
+	var icons: HBoxContainer = relic_bar.get_node("Items")
+	await frames()
+	check(relic_bar.visible and icons.get_child_count() == manager.held.size(),"Each owned relic type has a count-aware icon")
+	for icon in icons.get_children():
+		var definition := manager.catalog.find(icon.get_meta("relic_id"))
+		check(icon.tooltip_text.contains(tr(definition.name_key)) and icon.tooltip_text.contains("×%d" % manager.held[definition.id]),"Relic tooltip retains its name and acquired count")
+	check(not cards.hand.is_ancestor_of(relic_bar),"Relic row remains independent of the hand")
+	var fixed_position := relic_bar.global_position
+	var hand_root: Control = cards.hand.get_node("Cards")
+	var original_hand_position := hand_root.position
+	hand_root.position.y += 80
+	await frames()
+	check(relic_bar.global_position.is_equal_approx(fixed_position),"Moving hand root moved the relic row")
+	hand_root.position = original_hand_position
+	cards.hand.set_stowed(true)
+	cards.hand.finish_animation()
+	await frames()
+	check(relic_bar.visible and relic_bar.global_position.is_equal_approx(fixed_position),"Stowing hand moved or hid the relic row")
+	cards.hand.set_stowed(false)
+	cards.hand.finish_animation()
 	choice.get_node("RelicBar/Items").get_child(0).pressed.emit()
 	check(choice.get_node("Collection").visible, "Acquired collection can be inspected")
 	await snapshot("collection")

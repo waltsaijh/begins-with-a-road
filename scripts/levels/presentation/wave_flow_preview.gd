@@ -86,7 +86,7 @@ func _sync_callouts() -> void:
 	if selected_origin >= panels.size(): selected_origin = -1
 
 func _show_intelligence(profile: Troop) -> void:
-	if session.enemy_intelligence != null: session.enemy_intelligence.show_profile(profile)
+	hud.open_progress(profile.troop_name)
 
 func _clear_filters() -> void:
 	for entry in _panels(): entry.clear_filter()
@@ -156,7 +156,7 @@ func _process(_delta: float) -> void:
 	_refresh_visibility()
 
 func _sync_pointer_filter() -> void:
-	# Resolve the actual hovered descendant: titles, row gaps and scrollbars still
+	# Resolve the actual hovered descendant: titles, icon gaps and scrollbars still
 	# belong to this entrance, rather than falling back to the whole wave.
 	var hovered := get_viewport().gui_get_hovered_control()
 	var origin := -1
@@ -165,12 +165,12 @@ func _sync_pointer_filter() -> void:
 	for i in hud.start_callouts.size():
 		var action: Button = hud.start_callouts[i]
 		if not action.is_visible_in_tree() or action.disabled: continue
-		# The unpainted bridge is still inside the expanded callout even when GUI
-		# hover temporarily has no Control owner while crossing into the panel.
+		# Gaps inside the callout retain the entrance scope when GUI ownership
+		# briefly clears while an icon frame changes width.
 		var owned := hovered != null and (hovered == action or action.is_ancestor_of(hovered))
 		if not owned and not (hovered == null and bool(action.get("_hovered"))): continue
 		origin = i
-		# An expanded bridge without a GUI owner selects only the entrance.
+		# An empty gap selects the entrance, never a troop icon.
 		if hovered == null: break
 		for item in panels[i].get_node("Scroll/Items").get_children():
 			var body := item.get_node_or_null("Body")

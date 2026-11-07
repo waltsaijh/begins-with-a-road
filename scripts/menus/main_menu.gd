@@ -9,9 +9,11 @@ var _selecting := false
 var _veil_motion: Tween
 @onready var home: Control = $Interface/Home
 @onready var start_button: Button = $Interface/Home/Column/Actions/Start
+@onready var progress_button: Button = $Interface/Home/Column/Actions/Progress
 @onready var settings_button: Button = $Interface/Home/Column/Actions/Settings
 @onready var exit_button: Button = $Interface/Home/Column/Actions/Exit
 @onready var settings_page: Control = $Interface/SettingsPage
+@onready var progress_page: Control = $Interface/ProgressPage
 @onready var veil: ColorRect = $Interface/SettingsVeil
 @onready var map_selection: Control = $Interface/MapSelection
 @onready var map_previews: Node3D = $MapPreviews
@@ -21,11 +23,13 @@ func _ready() -> void:
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	start_button.pressed.connect(start_game)
+	progress_button.pressed.connect(open_progress)
 	settings_button.pressed.connect(open_settings)
 	exit_button.pressed.connect(func(): get_tree().quit())
 	exit_button.visible = not OS.has_feature("web")
 	settings_page.option_changed.connect(func(key: StringName, value: Variant): SettingsAdapter.apply(key, value, get_viewport()))
-	settings_page.visibility_changed.connect(_on_settings_visibility_changed)
+	settings_page.visibility_changed.connect(_on_page_visibility_changed.bind(settings_button))
+	progress_page.visibility_changed.connect(_on_page_visibility_changed.bind(progress_button))
 	map_selection.back_requested.connect(return_home)
 	map_selection.map_changed.connect(_on_map_changed)
 	map_selection.launch_requested.connect(_launch_map)
@@ -37,7 +41,7 @@ func _ready() -> void:
 	start_button.grab_focus()
 
 func start_game() -> void:
-	if _starting or settings_page.visible or _selecting: return
+	if _starting or _page_open() or _selecting: return
 	ScreenTransition.run(_show_map_selection)
 
 func _show_map_selection() -> void:
@@ -84,7 +88,7 @@ func _refresh_unlocks() -> void:
 
 func _launch_map(definition: MenuMapDefinition, _run_options: Dictionary) -> void:
 	# Run options are UI prototypes until their gameplay rules are defined.
-	if _starting or settings_page.visible or not _selecting or ScreenTransition.active: return
+	if _starting or _page_open() or not _selecting or ScreenTransition.active: return
 	_refresh_unlocks()
 	if definition == null or not catalog.maps.has(definition) or not definition.unlocked: return
 	if definition.level == null or not ResourceLoader.exists(definition.level_scene):
@@ -106,9 +110,17 @@ func open_settings() -> void:
 	settings_page.configure(SettingsAdapter.sections(), SettingsAdapter.read(get_viewport()))
 	settings_page.open()
 
-func _on_settings_visibility_changed() -> void:
+func open_progress() -> void:
+	if _starting or ScreenTransition.active: return
+	progress_page.configure(ProgressCatalog.sections(), {})
+	progress_page.open()
+
+func _page_open() -> bool:
+	return settings_page.visible or progress_page.visible
+
+func _on_page_visibility_changed(button: Button) -> void:
 	if not is_inside_tree(): return
-	var active := settings_page.is_visible_in_tree()
+	var active := _page_open()
 	home.visible = not active and not _selecting
 	map_selection.visible = not active and _selecting
 	if _veil_motion != null: _veil_motion.kill()
@@ -117,7 +129,7 @@ func _on_settings_visibility_changed() -> void:
 	_veil_motion.tween_property(veil, "color:a", settings_veil_alpha if active else 0.0, 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	if not active:
 		if _selecting: map_selection.start_button.grab_focus()
-		else: settings_button.grab_focus()
+		else: button.grab_focus()
 		_veil_motion.tween_callback(veil.hide)
 
 func _exit_tree() -> void:

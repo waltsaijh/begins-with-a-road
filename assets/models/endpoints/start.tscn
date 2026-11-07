@@ -115,11 +115,12 @@ _surfaces = [{
 }]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g1chd"]
+vertex_color_use_as_albedo = true
+emission_enabled = true
 resource_name = "amber"
 albedo_color = Color(0.92941177, 0.75686276, 0.5176471, 1)
 metallic_specular = 0.12
 roughness = 0.98
-emission_enabled = true
 emission = Color(0.92941177, 0.75686276, 0.5176471, 1)
 emission_energy_multiplier = 0.25
 

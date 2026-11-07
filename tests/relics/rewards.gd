@@ -85,8 +85,22 @@ func run() -> void:
 	var ui: CanvasLayer = load("res://scenes/relics/relic_choice.tscn").instantiate()
 	add_child(ui)
 	ui.setup(relics)
+	check(not ui.debug_reroll(), "Cannot debug-reroll before a reward choice")
 	check(ui.begin() and ui.offers.size() == 3, "Reward UI has three cards")
+	var held_before := relics.held.duplicate()
+	var coins_before: int = shop.coins
+	check(ui.debug_reroll() and ui.offers.size() == 3 and ui.offers[0].tower == null, "Debug reroll retains the normal three-slot reward rules")
+	for offer in ui.offers: check(relics.can_acquire(offer) and ui.offers.count(offer) == 1, "Rerolled offers are eligible and unique")
+	check(relics.held == held_before and shop.coins == coins_before, "Reroll does not grant relics or change coins")
+	get_tree().paused = true
+	check(not ui.debug_reroll(), "Paused reward cannot reroll")
+	get_tree().paused = false
+	var offers_before: Array = ui.offers.duplicate()
+	for relic in relics.catalog.entries: relics.held[relic.id] = relic.max_stacks
+	check(not ui.debug_reroll() and ui.offers == offers_before, "An exhausted pool preserves the displayed offers")
+	relics.held = held_before
 	check(ui.choose(ui.offers[0]) and not ui.choose(ui.offers[1]), "No double acquisition")
+	check(ui.debug_reroll_button.disabled and not ui.debug_reroll(), "Selection feedback cannot reroll")
 	await get_tree().create_timer(0.3).timeout
 	check(not ui.choosing and not ui.modal.visible, "Selection completes")
 	ui.queue_free()

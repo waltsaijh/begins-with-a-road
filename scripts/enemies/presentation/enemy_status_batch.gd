@@ -50,6 +50,9 @@ func submit() -> void:
 	if count > 0: multimesh.buffer = _buffer
 	multimesh.visible_instance_count = count
 	visible = count > 0
+	# Buffer uploads move the quads without invalidating the canvas draw command's
+	# cached bounds. Refresh it so offscreen bars can return after camera motion.
+	if count > 0: queue_redraw()
 
 func clear() -> void:
 	count = 0

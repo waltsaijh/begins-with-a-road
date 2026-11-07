@@ -8,15 +8,30 @@ var _pool: Array[Node3D] = []
 
 func _ready() -> void:
 	set_process(false)
+	_warm_shaders.call_deferred()
+
+## Shaders compile on first draw: a sub-pixel pooled burst pays that under the
+## loading veil, because the first kill otherwise stalls WebGL for seconds.
+func _warm_shaders() -> void:
+	var camera := get_viewport().get_camera_3d()
+	if effect_scene == null or camera == null: return
+	var burst := _create_burst()
+	_pool.append(burst)
+	burst.global_transform = camera.global_transform*Transform3D(Basis().scaled(Vector3.ONE*0.00001),Vector3.FORWARD*(camera.near+1.0))
+	burst.show()
+
+func _create_burst() -> Node3D:
+	var burst := effect_scene.instantiate() as Node3D
+	burst.set_meta("authored_basis", burst.basis)
+	add_child(burst)
+	burst.finished.connect(_release)
+	return burst
 
 func emit_at(at: Vector3, reference_basis := Basis.IDENTITY, splash_radius := -1.0) -> Node3D:
 	if effect_scene == null or active.size() >= max_active: return null
 	var burst: Node3D
 	if _pool.is_empty():
-		burst = effect_scene.instantiate() as Node3D
-		burst.set_meta("authored_basis", burst.basis)
-		add_child(burst)
-		burst.finished.connect(_release)
+		burst = _create_burst()
 	else:
 		burst = _pool.pop_back()
 	burst.global_transform = Transform3D(reference_basis*burst.get_meta("authored_basis"), at)

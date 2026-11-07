@@ -4,8 +4,12 @@ signal started
 signal covered
 signal finished(error: int)
 @export_range(0.1, 2.0, 0.05) var duration := 0.5
+## Intro only: logos leave first, then the white opens onto the first screen.
+@export_range(0.1, 3.0, 0.05) var intro_logo_fade := 0.6
+@export_range(0.1, 3.0, 0.05) var intro_reveal := 0.8
 var active := false
 @onready var veil: ColorRect = $WhiteVeil
+@onready var logos: Control = $WhiteVeil/Logos
 @onready var loading: Control = $WhiteVeil/Loading
 @onready var loading_stage: Label = $WhiteVeil/Loading/Column/Stage
 @onready var loading_bar: ProgressBar = $WhiteVeil/Loading/Column/Progress
@@ -22,17 +26,23 @@ func run(action: Callable) -> bool:
 
 ## Optional scene method: async prepare(report: Callable) -> Error.
 ## The target owns its preparation; the transition only displays reported work.
-func change_scene(path: String, preparation_method: StringName = &"", loading_message: StringName = &"") -> bool:
+## Intro continues the opaque startup screen instead of fading a cover in.
+func change_scene(path: String, preparation_method: StringName = &"", loading_message: StringName = &"", intro := false) -> bool:
 	if not ResourceLoader.exists(path):
 		push_error("Transition target does not exist: "+path)
 		return false
-	return _begin(func() -> int: return get_tree().change_scene_to_file(path), true, preparation_method, loading_message)
+	return _begin(func() -> int: return get_tree().change_scene_to_file(path), true, preparation_method, loading_message, intro)
 
-func _begin(action: Callable, scene_change: bool, preparation_method: StringName = &"", loading_message: StringName = &"") -> bool:
+func _begin(action: Callable, scene_change: bool, preparation_method: StringName = &"", loading_message: StringName = &"", intro := false) -> bool:
 	if active or not action.is_valid(): return false
 	active = true
 	_front()
-	veil.color.a = 0.0
+	veil.color.a = 1.0 if intro else 0.0
+	logos.visible = intro
+	if intro: logos.refresh()
+	logos.modulate.a = 1.0
+	loading.modulate.a = 1.0
+	loading.compact = intro
 	veil.show()
 	if loading_message.is_empty():
 		loading.hide()
@@ -40,7 +50,7 @@ func _begin(action: Callable, scene_change: bool, preparation_method: StringName
 		report_progress(0, 0, loading_message)
 		loading.show()
 	started.emit()
-	_run(action, scene_change, preparation_method, loading_message)
+	_run(action, scene_change, preparation_method, loading_message, intro)
 	return true
 
 func _front() -> void:
@@ -48,10 +58,10 @@ func _front() -> void:
 	# including camera handlers that intentionally run before normal GUI input.
 	get_tree().root.move_child(self, get_tree().root.get_child_count()-1)
 
-func _run(action: Callable, scene_change: bool, preparation_method: StringName, loading_message: StringName) -> void:
+func _run(action: Callable, scene_change: bool, preparation_method: StringName, loading_message: StringName, intro: bool) -> void:
 	var previous_path := get_tree().current_scene.scene_file_path if get_tree().current_scene != null else ""
 	var half := duration*0.5
-	await _fade(1.0, half)
+	if not intro: await _fade(1.0, half)
 	# Present a fully white frame before replacing a camera, layout or scene.
 	if DisplayServer.get_name() == "headless": await get_tree().process_frame
 	else: await RenderingServer.frame_post_draw
@@ -88,8 +98,13 @@ func _run(action: Callable, scene_change: bool, preparation_method: StringName, 
 				_front()
 			loading.hide()
 	await get_tree().process_frame
-	await _fade(0.0, half)
+	if intro:
+		await _fade_logos()
+		await _fade(0.0, intro_reveal)
+	else:
+		await _fade(0.0, half)
 	veil.hide()
+	logos.hide()
 	loading.hide()
 	active = false
 	finished.emit(error)
@@ -106,6 +121,12 @@ func report_progress(completed: int, total: int, stage: StringName) -> void:
 func _present() -> void:
 	if DisplayServer.get_name() == "headless": await get_tree().process_frame
 	else: await RenderingServer.frame_post_draw
+
+func _fade_logos() -> void:
+	var motion := create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS).set_parallel()
+	motion.tween_property(logos, "modulate:a", 0.0, intro_logo_fade)
+	motion.tween_property(loading, "modulate:a", 0.0, intro_logo_fade)
+	await motion.finished
 
 func _fade(alpha: float, seconds: float) -> void:
 	var motion := create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)

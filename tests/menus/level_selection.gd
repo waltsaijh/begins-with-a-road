@@ -125,6 +125,10 @@ func verify():
 	wave._process(0.01)
 	for enemy in wave.living_enemies(): enemy.take_damage(1000000)
 	await frames(5)
+	if completed_level.choosing_relic:
+		check(not progress.snapshot().has("selection_first"),"Completion was saved before choosing the final ACT relic")
+		completed_level.relic_choice.choose(completed_level.relic_choice.offers[0])
+		await get_tree().create_timer(0.3).timeout
 	check(completed_level.finished and progress.snapshot().has("selection_first"),"Finishing the final wave did not record completion")
 	completed_level.queue_free()
 	await frames()

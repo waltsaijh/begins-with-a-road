@@ -1,5 +1,32 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-07 本次 main → routing-sandbox 整合
+
+以 Sandbox `d85f60b` 為基礎完成既有 `origin/main`／`MERGE_HEAD=6141d51` 合併。授權包含 Merge Commit，不 push。以下為本次紀錄；後續兩個分支的歷史紀錄不代表現況或本次重測結果。
+
+合併前以 `git merge-tree` 重建同一對父提交，再逐檔比對 index 與工作目錄：兩者完全一致，沒有額外本地未提交差異。使用者確認可能沒有建立新 stash；清單只有 11 月 3 日 `60a9224`（此前已恢復）及 10 月 24 日 `d884400`。本次不重新 apply 舊 stash，兩份均保留，沒有把 stash 內容加入 Merge Commit。
+
+衝突處理（實際 14 檔）：
+
+- `AGENTS.md`、`README.md`、`docs/HANDOFF.md`、`docs/phase4.md`、`docs/systems.md`：整合兩邊有效設計與分支歷史，修正目前入口、圖鑑／進度頁、遺物列、倍速及測試敘述。
+- `scenes/enemies/components/enemy_intelligence.tscn`、`scripts/enemies/presentation/enemy_intelligence.gd`：保留 Sandbox 較完整的通知、持久解鎖、閱讀佇列及靜態模型預覽；恢復原 `.gd.uid` 與 LevelSession 初始化，採 main 的新版圖示色。
+- `scenes/relics/relic_choice.tscn`、`scripts/relics/relic_choice.gd`：頂列聚合份數與詳情保留，納入 main 的新版卡片、圖示／使用情境、全畫面 Backdrop、20px 間距及 Debug 重抽。左下獨立 inventory 元件保留給工具，正式關卡不顯示重複兩列。
+- `scripts/levels/presentation/level_hud.gd`：保留集中頂列、緊湊時間線及檢視暫停擁有權；增加進度頁與 Tab／Esc，維持 Sandbox 1／2／4 倍。進度、設定及圖鑑／遺物詳情互斥，暫停選單共六項。
+- `tests/levels/level_flow.gd`、`tests/levels/pause_menu.gd`、`tests/relics/input.gd`、`tests/synergy/input.gd`：依整合後介面保留兩邊階段鎖定、實際輸入、tooltip、遺物數量與手牌獨立性斷言。
+
+跨檔案補強：六種敵人新 ID 加上 v1 codex 舊 ID 映射，圖鑑文字改用新 ID；進度頁敵人與原圖鑑共用遭遇解鎖規則。教學三波／前置關卡、五 ACT Frontier、四塔商店、交通 API、戰鬥、道路及 main 的新版素材／左右鍵鏡頭／載入預熱修改保留。資源引用掃描未發現執行期遺失檔案；列出的其他路徑是測試生成檔及離線工具輸出。
+
+本次 Godot 4.7.2、Windows Compatibility 驗證（隔離 APPDATA／LOCALAPPDATA，不改玩家存檔）：
+
+- Headless editor import：無錯誤，CSV 翻譯重匯入後二進位內容與合併來源一致。
+- Headless：UI Slice A 104 項（當時版本）、tutorial/intro、progress_page、level_flow、relics/rewards、level_catalog、card_names、troop_resources、relics/mechanisms 114 項、traffic/integration 100 項、synergy/routing 357 項，全部通過。
+- 實際渲染：最終 UI Slice A 108 項、level_hud、pause_menu（含重新開始）、pause_navigation（含血條像素）、camera_orbit、relics/input、synergy/input 67 項、tutorial/intro、main_menu，全部通過。頂列、圖鑑／遺物代表截圖已檢視。
+- 初輪 UI 時間線測試在 deferred hover 啟動 tween 前取樣，補 GUI frame 同步後通過；pause_navigation 原有立即出生假設造成空陣列，改成獨立 Resource 的 start_tick=0 fixture 後通過。沒有修改正式波次或刪除功能來通過測試。
+
+日誌與比對證據在 `.godot/merge-2026-11-07/`，截圖在 `.godot/test-results/`。未執行完整十五波平衡、Web 匯出／瀏覽器、release、效能或真人驗收，不以此次 Windows 回歸推論這些結果。
+
+## Sandbox 歷史紀錄（合併前）
+
 ## 最新 Git 更新授權：2026-11-06
 
 使用者要求「git更新並push到雲端」，授權提交本輪 UI Slice A、頂列／時間線與集中置中成果、資源、相關測試及文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD 3f692fe，fetch 後本分支與遠端同步；origin/main 的新增提交未合併。本次沿用剛完成的 headless96／rendered99 及相關流程／時間線回歸，不另重跑遊戲測試；提交前核對 staged diff --check。測試log／截圖仍留在忽略的 .godot/。下方未commit／push為本次授權前的階段快照。不改main worktree、不做merge／rebase／reset／clean或強制推送。
@@ -19,6 +46,54 @@
 本輪 PASS：新整合 headless 78／rendered 81；商店 headless／rendered、cards、拖牌、traffic100、relic stacking／rewards／mechanisms113／rendered input、rendered level_flow／HUD／pause_menu／timeline templates、wave_spawn_groups、troop_resources、level_catalog、synergy rendered input67，failures皆0。初輪舊測試固定6張商品、3兵種、立即出生與舊空艇節點路徑已更新為目前契約；初輪解析／取樣問題已修正重跑。實際 Frontier UI 及800×600／1600×900截圖已檢視。日誌 .godot/ui-slice-*.log，截圖 .godot/test-results/ui_slice_a/。git diff --check 另於交付前核對。
 
 預設user://／shader cache受環境寫入權限限制，部分既有整合測試留下保存警告；新增跨局／舊檔保存回歸使用隔離的可寫路徑且通過。未跑Web（仍缺路網WASM）、完整15波、效能或真人驗收。完整責任／入口／限制見 [UI Slice A](ui_slice_a.md)。下方為歷史階段紀錄。
+
+## main 歷史紀錄（合併前；移除圖鑑及遺物詳情的決策由本次整合取代）
+
+2026-11-07 進度頁：移除遊戲內敵軍情報按鈕／面板與「新 N」提示，主畫面與暫停選單新增「進度」，列出六塔、全部敵人與 21 件遺物的名稱、描述及數值／特性；遺物名稱下方以對應塔色小字標示使用情境，三選一卡片相同；開波提示的兵種圖示改為暫停並開到該敵人。新增 tests/menus/progress_page.gd（中英文無漏 key）。實際 main_menu、synergy/input、tutorial/intro、headless level_flow、road_flow_preview 通過；pause_menu 的 Restart fixture 失敗與 pause_navigation 的敵人準備錯誤在修改前提交版相同，未修。
+
+2026-11-07 開場改為全白品牌畫面：Web shell 只顯示左 Godot（深色無框）右 team_icon；Boot 同畫面加細長進度條與小字；主選單就緒後 logo 淡出、白底再淡出。Logo 開場淡入 0.8 秒（Web 用 CSS、桌面用 Boot）。選圖進關卡維持白底，雲海載入版本已依使用者要求撤回。Web 實測 shell、Boot、轉場 logo 位置一致，無 console error。發現隱藏 IntroLogos 在 Web 尺寸為 0（Windows 不會發生），以 refresh() 修正並在 startup_loading 加回歸。實際 menus/startup_loading、main_menu（--resolution 1600x900）、level_selection 與 headless tutorial/intro 通過。menus/scene_loading 有 2 項失敗，修改前提交版相同（第一關為教學時 start_allowed 為 false）。main_menu、scene_loading 含滑鼠輸入，需獨佔視窗焦點，與瀏覽器同跑會假失敗。tests/menus/web_loading_shell.cjs 已更新但未執行（本機無 Playwright）。
+
+2026-11-07 教學改用新版卡牌：starting_01～03、升級牌與新商品改引用基礎版配置（直線、L型、旁直線路、直路），全部走 imported_tower_visual；移除教學專用 bridge.tres（tile_presets/bridge.tres 仍供其他用途）。迫擊砲 2×2 在此地形只有 turns 0／2 合法，指定為 (5,0,1)、turns 2 坐進轉角，文案改為不寫死角度。Godot 4.7.2 headless 與實際 tutorial/intro、headless level_flow、level_catalog、cards、card_names、tower_integration 通過。放第三張牌的 0.5 秒停頓來自道路流量筆觸：教學在此之前隱藏，road_flow shader 首次繪製編譯 5 個 program；RoadFlow 改在載入時以相機下次像素常駐物件編譯。
+
+2026-11-06 Shader 收斂：依使用者要求將 3D 純色材質收斂為 SolidMaterials 的不透明／半透明兩組旗標（28 個場景／資源檔、151 個材質），移除 hologram 深度預通道及之前加的常駐圓環。Web tutorial 進關卡前 program 121→77（scene StandardMaterial3D 約 60→16），主選單前 84→61。放第一座塔原本是下一步舊 model hologram 首次繪製深度預通道材質，凍結 4.4–5.2 秒，現為約 0.4–0.6 秒的首次編譯；波次中 0 link、最長單幀 35ms。視覺差異：舊 model hologram 改為原色不透明，爆散碎片與落地圓環改無光照。headless mechanisms（114）、tower_restoration、tower_integration、combat_bursts、card_drag_placement、cards、tutorial/intro、level_flow、balance/rules 及實際 combat_bursts、tutorial/intro、tower_restoration 通過。cards/card_preview 在修改前的提交版 headless 即逾時，未查原因。未驗 Frontier 全程及其他 GPU／瀏覽器；瀏覽器 shader 快取對冷啟動的影響未隔離。
+
+2026-11-06 迫擊砲落地卡頓：Web 每發落地約凍結 1 秒。攔截 WebGL 呼叫確認每次落地重新連結 5 個 program，burst 結束又全部刪除；原因是 mortar_impact 複製出全專案唯一的發光＋半透明材質，釋放後 shader 隨之刪除。RestoredBursts 改由掛在相機下的次像素常駐圓環持有該變體，於載入遮罩下編譯。同次另發現第一次擊殺編譯 death_burst 的 10 個 program，造成約 4 秒凍結；BurstEmitter 改在載入時預放一個次像素特效。Web release（Frontier 同佈局前兩波、窗格顯示中）修正後 63 秒內 linkProgram／deleteProgram 皆 0，載入期 link 26→41，最長單幀 62ms；headless mechanisms（114）、tower_restoration、combat_bursts、level_flow 及實際 combat_bursts 通過。窗格隱藏時 rAF 會節流，當時約 1 秒的尖峰不可當效能數據。未驗證其他 GPU／瀏覽器或完整 15 波。
+
+2026-11-06 合併 origin/main：依使用者「merge with main」指令，將 origin/main `f72420b` 合併至 feat/ui_suggestions（原 HEAD `af3e9e5`）。保留教學、鏡頭左右鍵、1x／2x／3x、遺物圖示列與開波對話框，並納入 Phase 5 五 ACT／生命／勝敗、Tower Tile Editor、道路凹槽與 Art Slice D–F。Frontier 要求 tutorial 前置；tutorial.tres 設定 reward_final_act，維持第 3 波遺物選完才記通關。本節以下的舊 HEAD 與「未提交」敘述均為當時快照。
+
+本次合併驗證：重建 `road_graph.candidates.*` 的 Windows／Web debug 與 release，重新匯入翻譯。Godot 4.7.2 headless level_catalog、level_flow、tutorial/intro、balance/rules（67）、road_refinement/rules（744）、camera_orbit 及 Compatibility 實際 tutorial/intro、camera_orbit、menus/level_selection 通過；輸出在 `.godot/merge-main-2026-11-06/`。未跑完整回歸、Frontier 全 15 波、真人遊玩或合併後的 Web 匯出／瀏覽器。
+
+2026-11-05 鏡頭左右鍵對調（HEAD `6a58b02` 後）：左鍵由卡牌以外起拖平移，右鍵可由地面、卡牌或其他 UI 起拖繞中心旋轉；保留 4px 點擊／拖曳分流、左鍵卡牌拖放、單擊右鍵旋轉卡牌及原旋轉速度／平滑、暫停與設定 navigation lock。平移捕捉後可跨卡牌，左鍵直接按在卡牌（含停用牌／商品／牌背）則保留原操作。教學中英文、README、驗收提示及操作共識同步更新，取代下方歷史記錄的右鍵平移／左鍵旋轉。
+
+本次 headless camera_orbit、pause_navigation、tutorial/intro 通過；Godot 4.7.2 Compatibility 實際 camera_orbit、pause_navigation、pause_menu、card_drag_placement、tutorial/intro 全通過，涵蓋角速度／完整畫圓、左右鍵點擊分流、跨商店平移、卡牌上右鍵旋轉、卡牌拖放不動鏡頭、暫停血條投影／設定阻擋及完整三波教學。翻譯匯入與 `git diff --check` 通過。證據在 `.godot/left-pan-right-orbit-2026-11-05/`；未跑完整回歸、Web 瀏覽器或長局平衡。
+
+2026-11-05 教學改為首關與三波：此版取代下方五步教學初版的「買牌即通關／獨立可選」設計。tutorial 為 1 ACT、3 波（4／6／8 名步兵，獎勵 20／10／10）；Frontier 直接要求 tutorial，Bridge 直接要求 tutorial 與 frontier，依既有 DAG 排為 tutorial → frontier → bridge，舊的後續關卡完成紀錄也不能略過教學。首波後維持五步商店／升級引導，買到新塔只解除教學規則並轉為自由實戰，繼續第 2、3 波；第 3 波與普通最後 ACT 遺物獎勵完成才保存通關及解鎖。
+
+初始牌改為 intro.tres 的 Starting Cards 引用三個獨立 starting_01～03.tres，可改 Tower／Tile Preset 及順序；文案讀實際塔名、升級 hologram 搜尋同種塔，升級牌不再限定第一個卡位。修改入口與資料限制見 assets/data/tutorial/README.md。Godot 4.7.2 headless tutorial/intro、level_catalog 及 Compatibility 實際 intro、main_menu 全通過，涵蓋三波、購買後仍未通關、自由放新塔、ACT 獎勵、第一關預選／後續解鎖及舊紀錄守衛、修改初始牌順序與升級目標、重玩重置；`git diff --check` 通過。證據在 `.godot/tutorial-three-waves-2026-11-05/`；教學測試仍以工具清敵，未驗長局平衡、完整回歸或 Web 瀏覽器。
+
+2026-11-05 五步教學：在 `feat/ui_suggestions`、HEAD `7c1dfcf` 上新增可由選圖頁選擇的「第一條防線」（tutorial.tres），共用 level.tscn，地形與起終點保存在獨立 GridMap 場景。固定哨塔／迫擊砲／弩砲跨橋牌，前兩張依 hologram 在橫／縱道路以 0／90° 放置形成繞道，第三張自由合法放置。開波後四名步兵；清波與砲彈結束接保證哨塔購買／原塔升級，之後才允許付費刷新並保證交叉火力。最後購買才保存 tutorial ID，不走該教學的 ACT 遺物／擴張；Frontier 不新增前置條件。可選 TutorialDefinition／Director 與放置、商店 policy 預設不作用於一般關卡，原始 Frontier、兵種與塔平衡 Resource 未修改。
+
+本次 Godot 4.7.2 Compatibility 實際 tutorial/intro 以相機、卡牌、R 旋轉、地圖／開波／購買／刷新點擊完成五步，含拒絕錯誤操作、金幣、暫停隱藏、重新進入重置與中英文 1280×800／800×600 代表畫面，通過；headless intro、card_shop、level_flow、level_catalog 及實際 menus/level_selection、main_menu 通過，`git diff --check` 通過。兩個既有測試的舊假設同步修正：level_flow 允許已明訂的快捷鍵／兵種名／遺物 tooltip，level_selection 完成最後 ACT 後先選遺物才檢查通關解鎖。證據在 `.godot/tutorial-2026-11-05/`；教學測試以工具清敵，不代表長局戰鬥／平衡、完整測試集合或 Web 瀏覽器已驗收。
+
+2026-11-05 鏡頭平移改為右鍵拖曳：相機在 GUI 前捕捉右鍵，移動達共用 4px 門檻才平移；未達門檻於放開後遞送原點擊，保留單擊右鍵旋轉卡牌及試驗場工具。中鍵不再平移，右鍵可由卡牌起拖、跨商店持續、放開停止，離窗／失焦／設定鎖定清除捕捉。更新手牌與放置的右鍵組合保護。Godot 4.7.2 headless camera_orbit、camera_limits、pause_navigation 通過；Compatibility 實際 camera_orbit、pause_navigation、pause_menu、card_drag_placement 通過，包含右鍵點擊／拖曳分流、中鍵不平移、商店不誤觸、取消手勢、暫停投影及設定阻擋。camera_orbit 原本只搜尋正式單行地圖上的可放塔格而失敗，改用既有獨立 road_flow_fixture 並排除被 UI 遮住的測試落點，未修改正式地圖。`git diff --check` 通過，證據在 `.godot/right-pan-2026-11-05/`；未跑 Web 或完整回歸。
+
+2026-11-05 遺物 Debug 重抽：三選一卡列下方新增中英文「重新隨機抽選（Debug）」按鈕，只在 debug 版本顯示；release 守衛同時保護方法。重抽沿用原 options 規則與遺物 RNG，不改持有、金幣或階段；未進選擇、暫停、提交後均拒絕，空候選保留原畫面。Godot 4.7.2 headless rewards 驗證候選合法／唯一、通用槽、持有與金幣不變、暫停／選定／耗盡守衛通過；Compatibility 實際 relics/input 點擊重抽、暫停及選取均通過，`git diff --check` 通過。證據在 `.godot/relic-reroll-2026-11-05/`，未跑 release 匯出、Web 或完整回歸。
+
+2026-11-05 遺物文案：沿用使用者已改寫前十件的簡短效果提示，從 protagonist 至 reroll_discount 重寫其餘 11 件中英文說明，修正 protagonist 英文未完成文字；保留前十件文案及所有名稱、ID、效果參數。重新匯入 CSV 與兩語 `.translation`，Godot headless 驗證 CSV 欄位／key 唯一及全部 21 件中英文說明與匯入結果一致，`git diff --check` 通過；證據在 `.godot/relic-copy-2026-11-05/`。本次僅文字更新，未重跑畫面／戰鬥回歸。
+
+2026-11-05 遺物選擇版面：將原 260×330px 選項縮為 184×272px 卡牌、間距 20px，圖示區 64px、名稱 18px、說明 14px，整組含 24px 標題對完整畫面置中。原本 Modal 的 80px 頂部留白改為獨立 Blocker 的點擊留白；Backdrop 覆蓋全畫面並忽略滑鼠，頂部暫停仍可操作。Godot 4.7.2 Compatibility 實際渲染檢查全部 21 件遺物、中英文、800×600／1280×800，卡牌尺寸、文字邊界、遮罩上下像素一致全部通過；relics/input 實際點擊頂部暫停及選取遺物通過，`git diff --check` 通過。記錄及截圖在 `.godot/relic-choice-2026-11-05/`；未跑 Web 或完整回歸。
+
+2026-11-05 遺物圖示對應：在 `feat/ui_suggestions`、HEAD `7c1dfcf` 上，將 17 件專屬遺物 Resource 的 icon 改為 `assets/sprites/relics/<id>.png`，4 件通用維持 SVG；保留專屬的 alpha mask／塔色與既有機制參數。Godot 4.7.2 headless 匯入完成，逐項實際載入確認 21 件圖示路徑及非空圖片（17 PNG／4 SVG）通過，`git diff --check` 通過；記錄在 `.godot/relic-mapping-2026-11-05/`。本次未重跑畫面或戰鬥回歸。
+
+2026-11-03 快捷鍵更新：遊戲速度改為 1x／2x／3x，Tab 與頂部倍速按鈕循環切換；Esc 優先於卡牌／商店取消操作，切換暫停／繼續。按住不重複觸發；暫停中的 Tab 保留選單導覽，設定頁維持 Tab 焦點／Esc 返回。headless level_hud、pause_navigation 與實際渲染的 level_hud、pause_menu、card_drag_placement 全部通過，涵蓋快捷鍵循環、重複按鍵、暫停鎖定、設定頁與拖牌時 Esc。記錄在 `.godot/shortcuts-2026-11-03/`；未跑 Web 瀏覽器或完整測試集合。
+
+2026-11-03 持有遺物介面：移除左側本局遺物按鈕／收藏面板，改為獨立於手牌的固定螢幕橫列，28px 圖示由左至右依取得順序新增，hover 提供名稱及說明；Screen Margin 預設左距 16px、底距 216px，不跟隨卡牌移動／收合／動畫，暫停與三選一時隱藏。原先跟隨手牌向上堆疊的版本已依使用者修正取代。最終版本的實際 relics/input 驗證取得份數、左右順序、固定留白、移動手牌根節點及收牌後位置不變，通過；前一版另通過 rewards 與 synergy/input（67 項）。Godot 4.7.2 Compatibility、RTX 3050 Laptop；最終版證據在 `.godot/relic-row-2026-11-03/`，前一版在 `.godot/relic-icons-2026-11-03/`，未跑 Web 瀏覽器或完整測試集合。
+
+2026-10-30 狀態顯示修正：相機平移／縮放後，MultiMesh buffer 的新位置沒有刷新 canvas 繪製命令快取的裁切範圍，狀態最初落在畫面外預留區時會持續漏畫。enemy_status_batch 的非空提交改為同步 queue_redraw，保持共用批次。新增四個畫面邊緣移回中央的實際像素回歸，修正前四案皆缺少全部狀態、修正後全數通過；既有 2,048,000 像素對照、圖集／容量／重用／樣式烘焙與 pause_navigation 暫停鏡頭回歸通過。Godot 4.7.2 Compatibility、RTX 3050 Laptop；本次證據位於 `.godot/status-2026-10-30/`，未執行 Web 瀏覽器或完整測試集合。
+
+2026-10-29 UI 更新：每個入口在準備期常駐顯示置中開波文字與橫排兵種圖示，hover 單個圖示拓寬邊框並顯示該入口數量；標題開整波、圖示開敵軍情報，沿用流量篩選、配額與階段鎖定。塔名／等級提示改為 24px 白字黑框的螢幕 Label，不隨鏡頭縮放。Godot 4.7.2 Compatibility 實際渲染的 road_flow_preview、level_hud 與 synergy/input（67 項）通過；另通過 headless 流量回歸及中英文各 0／1／9 兵種版面檢查。12 兵種橫向捲動、入口分配、hover 不重建排程、開波／ACT／重開與暫停恢復均由流量回歸覆蓋。本次記錄在 `.godot/wave-icons-2026-10-29/`，未執行 Web 瀏覽器驗收或完整測試集合。
+
+核對日期：2026-10-23（Asia/Taipei）。本文件是新工作階段的起點；玩法共識看 [AGENTS](../AGENTS.md)，細節看 [systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。測試結果只對下述版本及環境成立。
 
 ## 最新 Git 更新授權：2026-11-05
 
@@ -166,6 +241,9 @@ Godot Editor 的 SAC `~road_graph…dll` 封鎖未修改也未宣稱解除；這
 
 本次整合驗證（2026-10-26）：Godot 4.7.2、Compatibility、RTX 3050 Laptop；29 項 runtime 回歸＋1 項真實波次編輯器檢查通過，涵蓋路線／批次配額／去環、九兵種、交通、六塔、遺物、ACT／卸載、選單／設定及實際載入預熱。Windows 與單執行緒 Web 的 debug／release 擴充建置成功；未跑現版 Web 瀏覽器、完整長局與效能對照。scene_loading 以故意失敗的目標驗證恢復流程，預期產生 Invalid data／Unavailable 診斷，無非預期引擎或腳本錯誤。詳細結果見上述目錄的 summary.json 及各項 log。
 
+2026-10-26 UI 分支整合：依使用者指令，將 main `d36a866` 合併至 feat/ui_suggestions（原 HEAD `8155007`）。保留該分支的塔圖示、時間線場景、28px／零列間距與面板標題定位；情報清單的 anchors／offsets 集中在宿主場景，避免繼承重複。被刪除但仍受既有測試場景引用的 road_flow_preview 腳本及原 UID 採 main 版本，保留空 hover 回歸。先前 reset 留下的 129 份未追蹤檔案均與 main 完全相同，已備份至忽略的 `.godot/merge-ui-2026-10-26/untracked-backup/`。
+
+UI 分支本次驗證：8 種中英文版面、批次路線、關卡流程、實際道路預測、67 項敵軍情報輸入、HUD 與主選單檢查通過。ui_scene_templates 有兩個時間線圓點像素斷言失敗；在獨立 main `d36a866` 副本重現相同兩項失敗，確認為既有問題，本次不改動時間線邏輯。原始 log 與 main 對照保存在 `.godot/merge-ui-2026-10-26/`。前述 29＋1 全通過記錄屬 main 合併時選定的測試集合，不代表本次這個額外像素測試通過。
 
 Phase 5 原有 42 個 tracked 修改與 77 個 untracked 檔案已還原並保留未提交；安全 stash `d884400fc38ba15e429a5f1f9f2b260eb04948aa` 與 `.godot/merge-main-2026-10-24/original-files/` 仍保留。WIP 已在工作區，不要再次直接套用 stash。合併後 32 個代表性功能場景最終通過，另有正式入口 smoke、完整十五波渲染局／四次遺物／Boss／重開、獨立帳本及待提交樹的獨立驗證。Native runtime 已執行，Native build／Web／release／效能／真人未執行；初輪失敗與限制見整合報告。
 
@@ -201,7 +279,7 @@ F5 → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，五 ACT／�
 
 | 責任 | 位置 |
 |---|---|
-| 波次與正式數值 | `assets/data/levels/frontier.tres`、`assets/data/towers/`、`assets/data/troops/siege_behemoth.tres` |
+| 波次與正式數值 | `assets/data/levels/frontier.tres`、`assets/data/towers/`、`assets/data/troops/ravager.tres` |
 | 生命／勝敗／四次獎勵 | `scripts/levels/level_session.gd`、`scripts/levels/definitions/level_definition.gd` |
 | 結果、生命及 Boss UI | `scenes/levels/run_status.tscn`、`scripts/levels/presentation/run_status.gd` |
 | Boss 能力快照／多目標 | `scripts/enemies/troops/troop.gd`、`scripts/combat/enemy_abilities.gd` |
@@ -211,7 +289,7 @@ F5 → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，五 ACT／�
 | 實際戰鬥實驗 | `tests/balance/{laboratory,full_run,counterfactual,rules,defeat_input}.tscn` |
 | 策略／預留地圖 | `tests/balance/{policy,holdout}.gd`；保留七策略與原先凍結的地圖 |
 | 獨立分析／重現 | `tools/balance/{analyze,report,replay_audit,verification}.py`、JSON manifests、PowerShell runners |
-| 模型離線生成 | `tools/assets/build_siege_behemoth.gd`，已烘焙模型不需重新生成即可執行 |
+| 模型離線生成 | `tools/assets/build_ravager.gd`，已烘焙模型不需重新生成即可執行 |
 
 原 Phase 1–4 架構仍見 [architectures](architectures.md)、[systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。未更改有限 Cost 候選、硬性 SHORTEST／NEWEST 資格、整群配額、預覽不消耗 RNG 或固定行程規則。
 

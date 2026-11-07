@@ -18,6 +18,7 @@ shadow_size = 12
 transparency = 1
 shading_mode = 0
 cull_mode = 2
+vertex_color_use_as_albedo = true
 albedo_color = Color(0.25, 0.65, 0.68, 0.28)
 
 [sub_resource type="BoxMesh" id="CandidateMesh"]
@@ -32,6 +33,8 @@ mesh = SubResource("CandidateMesh")
 [sub_resource type="StandardMaterial3D" id="PathMaterial"]
 transparency = 1
 shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
 albedo_color = Color(0.08, 0.48, 0.46, 0.8)
 
 [sub_resource type="BoxMesh" id="PathMesh"]
@@ -46,6 +49,8 @@ mesh = SubResource("PathMesh")
 [sub_resource type="StandardMaterial3D" id="HoverMaterial"]
 transparency = 1
 shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
 albedo_color = Color(0.15, 0.65, 0.64, 0.85)
 
 [sub_resource type="BoxMesh" id="HoverMesh"]

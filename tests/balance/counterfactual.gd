@@ -25,14 +25,14 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 	var recipe := WaveDefinition.new()
 	recipe.move_speed = 1.4
 	recipe.reward = 0
-	var types := [["shield_guardian",4],["rat_swarm",30]]
+	var types := [["rook",4],["rats",30]]
 	match mechanic:
-		"healing": types = [["shield_guardian",3],["blood_mage",3],["heavy",4]]
-		"disable": types = [["saboteur",4],["rat_swarm",30]]
-		"swarm": types = [["rat_swarm",40]]
+		"healing": types = [["rook",3],["bloodmage",3],["heavy",4]]
+		"disable": types = [["bomber",4],["rats",30]]
+		"swarm": types = [["rats",40]]
 		"scout": types = [["scout",20],["soldier",6]]
-		"flying": types = [["winged_beast",20],["heavy",3]]
-		"boss": types = [["siege_behemoth",1],["shield_guardian",2],["rat_swarm",15]]
+		"flying": types = [["winged",20],["heavy",3]]
+		"boss": types = [["ravager",1],["rook",2],["rats",15]]
 	for entry: Array in types:
 		var profile: Troop = TroopCatalog.find(entry[0]).duplicate(true)
 		if not enabled:
@@ -45,8 +45,8 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 		var group := WaveSpawnGroup.new()
 		group.troop = profile
 		group.enemy_count = entry[1]
-		group.interval_ticks = 6 if entry[0] == "rat_swarm" else 12
-		if entry[0] == "blood_mage": group.start_tick = 2
+		group.interval_ticks = 6 if entry[0] == "rats" else 12
+		if entry[0] == "bloodmage": group.start_tick = 2
 		recipe.groups.append(group)
 	level.acts[0].waves.assign([recipe])
 	level.base_health = 0

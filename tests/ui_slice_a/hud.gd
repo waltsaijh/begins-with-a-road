@@ -51,6 +51,12 @@ func run() -> void:
 	legacy.set_value("future","keep","yes")
 	legacy.save(path)
 	check(LevelProgress.load_progress(path) == OK and LevelProgress.snapshot().has("older_level") and not LevelProgress.enemy_unlocked("quickfeet"),"v1 save loads with empty codex")
+	legacy.set_value("codex","encountered",PackedStringArray(LevelProgress.ENEMY_ALIASES.keys()))
+	legacy.save(path)
+	check(LevelProgress.load_progress(path) == OK,"legacy enemy IDs load")
+	for old_id: String in LevelProgress.ENEMY_ALIASES:
+		check(LevelProgress.enemy_unlocked(old_id) and LevelProgress.enemy_unlocked(LevelProgress.ENEMY_ALIASES[old_id]),"renamed enemy retains its persistent unlock: "+old_id)
+	check(LevelProgress._save() == OK and LevelProgress.load_progress(path) == OK and LevelProgress.snapshot().has("older_level"),"migrated codex roundtrips without losing completion")
 	scene = load("res://scenes/level.tscn").instantiate()
 	add_child(scene)
 	await frames(12)
@@ -116,7 +122,10 @@ func run() -> void:
 		var hover := InputEventMouseMotion.new()
 		hover.position = center
 		get_viewport().push_input(hover,true)
+		# Flush deferred GUI hover before measuring its real-time tween.
+		await frames(2)
 	await wait_real(0.24)
+	await frames(2)
 	check(timeline.expanded and timeline.expansion > 0.99 and timeline.size.x > 300,"hover smoothly expands all ACTs")
 	check(integrity.position.x < left_before and hud.get_node("Header/Actions").position.x > right_before,"both icon groups move outward with timeline expansion")
 	check(is_equal_approx(hud.status_row_rect.get_center().x,get_viewport().get_visible_rect().size.x*0.5),"expanded status group remains centered")
@@ -129,11 +138,13 @@ func run() -> void:
 	else: timeline._pinned = true
 	timeline.mouse_exited.emit()
 	await wait_real(0.24)
+	await frames(2)
 	check(timeline.expanded,"click latch survives pointer exit")
 	await hover_capture(timeline,Vector2(timeline.size.x*timeline.reward_fraction(2),43),"relic_node_tooltip")
 	timeline._pinned = false
 	timeline.mouse_exited.emit()
 	await wait_real(0.24)
+	await frames(2)
 	check(not timeline.expanded and timeline.size.x == 300 and center.is_equal_approx(timeline.get_global_rect().get_center()),"compact timeline retains center")
 	var anchor: Vector2 = timeline.position
 	timeline.set_state(6,0.5,true)
@@ -154,6 +165,9 @@ func run() -> void:
 	await capture("relic_detail")
 	guide.open_codex()
 	check(not guide.panel.visible,"another detail panel cannot steal the pause lease")
+	hud.open_progress()
+	hud.open_settings()
+	check(not hud.progress_page.visible and not hud.settings_page.visible and hud.inspection_owner == choice,"catalog/settings cannot steal an inspection pause")
 	choice.close_collection()
 	check(not get_tree().paused and not hud.pause_requested and Engine.time_scale == 2.0,"detail restores gameplay and speed")
 	hud.set_paused(true)

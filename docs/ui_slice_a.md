@@ -8,7 +8,7 @@
 - 時間線預設顯示目前 ACT／整局波次、目前與接下來兩個節點，；不再額外畫底部進度條。hover 展開所有 ACT，點擊固定展開／再點收合，鍵盤 Enter／Space 亦可切換。寬度與透明度以 0.18 實際秒過渡，中心固定；進度繼續由 LevelSession 更新。
 - 左上遺物列只畫實際持有圖示，堆疊合併顯示數量；hover 提示名稱／效果，點擊詳情，關閉或 Esc 返回。專屬圖示沿用原 icon mask 與塔色，通用保留原色；不新增圖示套件。
 - 敵軍首次實際出生時留下側邊 `! 數量` 通知，遊戲繼續且焦點不變。通知不設期限；同一 Troop ID 每局只排一次。點擊後才暫停，依遭遇順序在同一面板閱讀；關閉／Esc 讀完目前頁後前進，最後返回原狀態。新發現頁只列通知佇列，圖鑑頁列完整目錄。
-- 暫停選單的「敵軍圖鑑」重開同一版面。解鎖敵人顯示 Resource 名稱、HP、在地化體型／移動類型、行進偏好、介紹與能力摘要；外觀是原模型的獨立靜態 3D 預覽。未解鎖者保持問號，不提前顯示模型／HP；下一波 `?` 亦沿用此規則。
+- 暫停選單的「敵軍圖鑑」重開同一版面。解鎖敵人顯示 Resource 名稱、HP、在地化體型／移動類型、行進偏好、介紹與能力摘要；外觀是原模型的獨立靜態 3D 預覽。未解鎖者保持問號，不提前顯示模型／HP；下一波圖示改開 main 的進度頁，亦沿用遭遇解鎖規則。
 
 ## 責任與保存
 
@@ -18,7 +18,7 @@
 
 `enemy_intelligence.gd` 接 `EnemyWave.enemy_spawned`，`seen`／`read`／`pending` 為每局呈現紀錄。`enemy_codex_text.gd` 整理文字、`enemy_model_preview.gd` 只建立停用 processing 的模型副本，不建立 Enemy、不生成行程。Troop 的新增／修改方法僅回傳玩家用文字，不更動 evaluation 或能力快照。
 
-詳情頁向 `LevelHUD.begin_inspection/end_inspection` 借用暫停：保存原 HUD 暫停、原 SceneTree 暫停、倍速及焦點，沿用收牌／遮罩，隱藏暫停選單並鎖鏡頭。詳情頁互斥，設定／遺物選擇／轉場不接受新詳情。`inspection_panel.gd` 只隔離背景輸入、限制焦點及處理 Esc；不自行改 tree pause。結束時還原原狀態，已有外部暫停也不會被解除。
+詳情頁向 `LevelHUD.begin_inspection/end_inspection` 借用暫停：保存原 HUD 暫停、原 SceneTree 暫停、倍速及焦點，沿用收牌／遮罩，隱藏暫停選單並鎖鏡頭。詳情頁互斥，設定／進度頁／遺物選擇／轉場不接受新詳情。`inspection_panel.gd` 只隔離背景輸入、限制焦點及處理 Esc；不自行改 tree pause。結束時還原原狀態，已有外部暫停也不會被解除。
 
 LevelProgress 繼續使用 `user://level_completion.cfg` 的 v1 `progress` 格式，新增 `codex.encountered` PackedStringArray。舊檔缺少該 section 時視為空；每次保存先載入原檔再更新兩種 ID，保留其他 section。跨局保存解鎖，不保存當局通知／已閱讀狀態、血量或行程。每個新局仍可收到本局第一次遭遇通知。
 
@@ -65,3 +65,7 @@ WaveTimeline 的 milestone_tooltip／_get_tooltip 依實際波次提供 ACT、�
 LevelHUD._layout_status_row 統一計算跨 CanvasLayer 資訊的水平位置，依可見項目寬度保持整組置中；WaveTimeline 只提供目前動畫寬度與可用寬度上限，不再自行指定螢幕分區。resized／visibility_changed 與視窗尺寸更新布局，資料未變則不重設位置；不搬動既有節點，保留引用、點擊／hover與詳情頁介面。
 
 本輪 headless96／Compatibility rendered99，failures0；rendered level_flow、ui_scene_templates亦0。新增檢查緊湊／展開整組置中、兩側圖標相向移動、維持16px間距與原有通知／暫停／存檔。日誌 .godot/ui-centered-*.log；既有compact_shop_relics／expanded_timeline／discovery_notice截圖已更新並檢視。未重跑其他初版套件、Web或長局。
+
+## 2026-11-07 main 整合
+
+保留本頁頂列、通知及靜態模型圖鑑，加入三類進度頁與新版開波圖示操作。遺物使用集中頂列的聚合數量及詳情，同時採用新版 PNG、使用情境、20px 三選一卡距與 Debug 重抽。正式介面不重複顯示 main 的左下圖示列；獨立 relic_inventory 場景及 API 保留。六種更名敵人的舊存檔 ID 於 LevelProgress 載入／查詢時轉成新 ID；兩種情報介面共用持久遭遇紀錄。Tab 切換 1／2／4 倍，Esc 維持各頁返回與檢視暫停擁有權。當次驗證見 HANDOFF，不沿用本頁歷史測試數。

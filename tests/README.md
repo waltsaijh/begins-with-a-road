@@ -1,5 +1,7 @@
 # 測試
 
+五步教學入口與人工操作見 [tutorial/README.md](tutorial/README.md)，`tutorial/intro.tscn` 驗證固定手牌、hologram 位置／90° 旋轉、自由放置、開波、保證哨塔升級、付費刷新與新塔購買，包含實際滑鼠／鍵盤及重玩重置。
+
 ## 道路視覺與建造裁切
 
 最新凹槽／橋頭／寬路流線入口為 `tests/road_refinement/depth_flow.tscn`：1–9／0切十例、R旋轉實際地塊／接口、Space動畫。加 `-- --verify` 同時驗證覆蓋、GPU像素、真正WaveSpawnSchedule配額並產生26張截圖，輸出 `.godot/test-results/road_depth_flow/`。Headless可驗證幾何／資料，畫面與像素另跑真渲染；本輪結果見 [道路修正](../docs/road_visual_and_placement_refinement.md)。
@@ -71,7 +73,7 @@ godot --editor --path . -- --test-card-resource-refresh
 
 滑鼠 hover、像素取樣與動畫截圖測試需要實際渲染；`--headless` 適合資料與排程驗證。JSON 與截圖由 `fixtures/test_artifacts.gd` 建立目錄，寫入 `.godot/test-results/<功能>/`；log 及其他暫存也放 `.godot/`。這些產物不進版本控制或遊戲匯出。Web 驗證見 [工具說明](../tools/README.md)。
 
-`pause_navigation`、`level_hud` 與 `pause_menu` 驗證立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
+`pause_navigation`、`level_hud` 與 `pause_menu` 驗證 Tab 倍速循環、Esc 暫停／繼續、按住不重複觸發、立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
 
 `road_flow_preview` 驗證跨群組加總、兵種 Hover／移開、按鈕標題保留入口篩選、雙入口同兵種的實際 GPU 線段／流量資料隔離、篩選動畫相位獨立、分岔／合流／環路／雙向區段、多入口的獨立按鈕／實際配額、零配額入口、任一按鈕實際點擊開波、無有效路線、非選取兵種成本與幾何失效、RNG／正式配額一致性、列表溢出，以及開波、清波、ACT 選入口、暫停、重開和卸載。渲染模式額外送入實際滑鼠事件並比較明暗漸變相位及無中心線畫面，並驗證動畫不改變 mesh、直段／圓角、雙向中央位置與複製重合線形的像素一致性（允許一階 8-bit 輸出量化差異），輸出 `levels/road_flow_*.png`；headless 不宣稱像素通過。人工驗收可在 editor 開啟 `tests/levels/road_flow_playground.tscn` 按 F6：開始下一波按鈕內有三兵種，下方為兩入口環路，hover 篩選、移開恢復，按開始下一波確認中心線收起；F1／F2 暫時讓出玩家中心線。測試地形及波次為獨立實例，不修改 Frontier。
 
@@ -89,7 +91,7 @@ godot --editor --path . -- --test-card-resource-refresh
 
 `godot --path . --script tests/enemies/solid_material.gd` 核對道路／木橋的 surface 合併、塔／三兵種的材質身分、烘焙步態參數、特殊材質排除，以及原 StandardMaterial3D 與共用材質的實際像素差異；結果放 `.godot/test-results/rendering/shared_material/`。Headless 只驗證資料，不能替代像素檢查。工具由測試引用，正式匯出仍排除 tests／tools。
 
-`camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、中鍵跨過商店卡牌及卡牌上起拖／放開、中心死區、跨 UI 捕捉／放開、卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
+`camera_orbit` 使用實際輸入與獨立 viewport 驗證旋轉速度上限、目前角速度平滑過渡到目標角速度、加速／反向／減速一致、快速多圈不累積及放開後停止、正反向完整畫圓、變動半徑、地面／非卡牌 UI 起拖、左鍵平移跨過商店卡牌／放開、右鍵由卡牌起拖旋轉、中心死區、跨 UI 捕捉／放開、左鍵卡牌排除、點擊與拖曳分流、暫停選單及地形不變。`camera_limits` 保留方形平移範圍與 0.6x 縮小限制驗證。
 
 `cards/card_drag_placement` 使用獨立 viewport 與實際滑鼠輸入驗證較小的 hover 上提、選中上提與平滑切換、卡面搖動及穩定命中範圍，另驗證手牌拖放、點選後點地圖、有效／無效落點、拖到手牌或商店牌背時取消選取、UI 排除、保留旋轉、鏡頭不被起動，以及 Esc／暫停／開波／離開視窗取消。拖曳預覽截圖與結果寫入 `.godot/test-results/cards/`。
 
@@ -100,7 +102,7 @@ godot --editor --path . -- --test-card-resource-refresh
 設定頁面回歸併入 pause_menu：文字單選與文字開關、透明背景與遮罩還原、底線動畫、分類、雙語、實際滑鼠、長清單與滾輪輸入隔離、返回及重新開啟；截圖位於 .godot/test-results/settings/。
 設定 hover 回歸亦驗證 Light／黑色、移入移開均維持原尺寸且布局寬度不變、文字開關在仍有焦點時收回底線，以及切換語言保留控制項與動畫進度。
 設定主畫布回歸另外核對共用 viewport／canvas 與主 HUD Label 的文字像素一致性，驗證空白邊緣及內容區的背景點擊／旋轉／平移／縮放隔離、Tab 焦點限制、鍵盤啟用及返回後鏡頭恢復；level_teardown 也涵蓋設定開啟時移除 HUD 的鎖定清理。
-開始選單的實際渲染回歸：`godot --path . --script res://tests/menus/main_menu.gd`。檢查 F5 入口、固定模型實例、三種視窗尺寸、相機取景、設定頁與 Home 隔離、語言／抗鋸齒沿用至關卡、選圖／返回／Esc、唯讀地形取景、實際 Level 規模與真正場景切換及第一波手動準備。本局設定另檢查同場景與 viewport、下一步不直接開局、切換前後固定介面位置／尺寸與相機不變、兩欄、兩排內容完整位於原描述區、暫定單選互斥與開關、雙語、三種尺寸、逐步返回並保留值、滑鼠返回保持焦點與底線持續展開、Esc 回退後焦點不留在隱藏選項、最後發出一次包含地圖及暫定值的啟動意圖，以及新主畫面恢復預設值。亦取樣各次切換的完整白畫面，驗證過渡期間阻擋 Esc／重複操作、4x 戰鬥暫停後回主畫面、離場按鈕背景的白底像素檢查、舊關卡釋放、再次開始恢復全新進度且保留設定；`level_hud` 另檢查返回主畫面的雙語文字。結果與截圖在 `.godot/test-results/menus/`。
+開始選單的實際渲染回歸：`godot --path . --script res://tests/menus/main_menu.gd`。檢查 F5 入口、固定模型實例、三種視窗尺寸、相機取景、設定頁與 Home 隔離、語言／抗鋸齒沿用至關卡、選圖／返回／Esc、唯讀地形取景、實際 Level 規模與真正場景切換及第一波手動準備。本局設定另檢查同場景與 viewport、下一步不直接開局、切換前後固定介面位置／尺寸與相機不變、兩欄、兩排內容完整位於原描述區、暫定單選互斥與開關、雙語、三種尺寸、逐步返回並保留值、滑鼠返回保持焦點與底線持續展開、Esc 回退後焦點不留在隱藏選項、最後發出一次包含地圖及暫定值的啟動意圖，以及新主畫面恢復預設值。亦取樣各次切換的完整白畫面，驗證過渡期間阻擋 Esc／重複操作、3x 戰鬥暫停後回主畫面、離場按鈕背景的白底像素檢查、舊關卡釋放、再次開始恢復全新進度且保留設定；`level_hud` 另檢查返回主畫面的雙語文字。結果與截圖在 `.godot/test-results/menus/`。
 
 `navigation/debug_overlay.tscn` 驗證 F1 當波各兵種行程與目前圖的全部 vertex 編號／位置、預設隱藏、關閉隱藏、不逐幀重建，以及戰鬥行程固定時節點仍隨路網更新。實際渲染截圖保存於 `.godot/test-results/navigation/f1_vertices.png`。
 

@@ -83,8 +83,8 @@ func _refresh_entries() -> void:
 		var unlocked := _unlocked(profile)
 		var unread := pending.has(profile)
 		entries.add_item((profile.localized_name()+(" · !" if unread else "")) if unlocked else "???",profile.icon if unlocked else null)
-		if unlocked and profile.icon != null and profile.icon.resource_path.begins_with("res://assets/sprites/troops/"):
-			entries.set_item_icon_modulate(entries.item_count-1,Color("527b7d"))
+		if unlocked and profile.icon != null:
+			entries.set_item_icon_modulate(entries.item_count-1,profile.icon_color())
 
 func _display(profile: Troop) -> void:
 	selected = profile
