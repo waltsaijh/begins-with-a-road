@@ -67,6 +67,8 @@ func verify() -> void:
 				captured = true
 		if transition.active:
 			check(transition.loading.is_visible_in_tree() and transition.loading_stage.text == "ui.loading.menu", "Startup transition lost its stage label")
+			var row: Control = transition.logos.get_node("Row")
+			check(transition.logos.size.is_equal_approx(transition.veil.size) and absf(row.get_global_rect().get_center().x-transition.veil.size.x*0.5) < 1.0, "Intro logos moved during the transition handoff")
 			menu_loading_frames += 1
 		await process_frame
 	if current_scene == null: await scene_changed
