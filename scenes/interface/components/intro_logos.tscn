@@ -32,8 +32,13 @@ mouse_filter = 2
 theme_override_constants/separation = 120
 alignment = 1
 
-[node name="Engine" type="TextureRect" parent="Row" unique_id=504344224]
+[node name="EngineSlot" type="CenterContainer" parent="Row" unique_id=504344225]
 custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Engine" type="TextureRect" parent="Row/EngineSlot" unique_id=504344224]
+custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("1")

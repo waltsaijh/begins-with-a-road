@@ -16,6 +16,7 @@ body { background: white; overflow: hidden; touch-action: none; }
 @keyframes status-logos-in { from { opacity: 0; } }
 #status-logos { animation: status-logos-in 0.8s ease-out; }
 #status-logos img { display: block; opacity: 0.75; width: calc(200 * var(--unit)); height: calc(200 * var(--unit)); }
+#status-logos img:first-child { transform: scale(0.75); }
 #status-notice { display: none; position: fixed; left: 24px; right: 24px; bottom: 24px; text-align: center; overflow-wrap: anywhere; white-space: normal; font: 300 14px/1.5 "Noto Sans TC", "Microsoft JhengHei", sans-serif; color: #70454a; }
 </style>
 		$GODOT_HEAD_INCLUDE
