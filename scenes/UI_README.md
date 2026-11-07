@@ -44,4 +44,4 @@ SettingsButton 的 hover 僅將文字變黑，維持 Light 字重、原尺寸與
 
 Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
 
-`progress/progress_page.tscn` 繼承 `settings/settings_page.tscn`，由主畫面與暫停選單開啟，列出防禦塔與敵軍介紹；條目範本為 `progress/components/progress_entry.tscn`。
+`progress/progress_page.tscn` 繼承 `settings/settings_page.tscn`，由主畫面與暫停選單開啟，列出防禦塔、敵軍與遺物介紹；條目範本為 `progress/components/progress_entry.tscn`。

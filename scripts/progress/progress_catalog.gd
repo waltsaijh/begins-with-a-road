@@ -1,6 +1,6 @@
 class_name ProgressCatalog
 extends RefCounted
-## Reads tower and enemy entries from their Resources for the progress page.
+## Reads tower, enemy and relic entries from their Resources for the progress page.
 ## Same towers and order as card_shop.tscn; tests/menus/progress_page.gd keeps them in step.
 const TOWERS: Array[TowerDefinition] = [
 	preload("res://assets/data/towers/sentry.tres"),
@@ -10,15 +10,15 @@ const TOWERS: Array[TowerDefinition] = [
 	preload("res://assets/data/towers/crossfire.tres"),
 	preload("res://assets/data/towers/barracks.tres"),
 ]
-## Enemy art keeps its own colors, some of them white, so it needs a dark tile.
-const ENEMY_TILE := Color(0.2, 0.36, 0.38)
 ## Tower art is an alpha mask, tinted like the hand and shop icons.
 const TOWER_ICON_DARKENING := 0.45
+const RELICS: RelicCatalog = preload("res://assets/data/relics/catalog.tres")
 
 static func sections() -> Array[Dictionary]:
 	return [
 		{"label": "ui.progress.towers", "entries": towers()},
 		{"label": "ui.progress.enemies", "entries": enemies()},
+		{"label": "ui.progress.relics", "entries": relics()},
 	]
 
 static func towers() -> Array[Dictionary]:
@@ -32,6 +32,11 @@ static func enemies() -> Array[Dictionary]:
 		return a.troop_name < b.troop_name if a.sort_order == b.sort_order else a.sort_order < b.sort_order)
 	var result: Array[Dictionary] = []
 	for profile in profiles: result.append(_enemy_entry(profile))
+	return result
+
+static func relics() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for relic in RELICS.entries: result.append(_relic_entry(relic))
 	return result
 
 static func _tower_entry(definition: TowerDefinition) -> Dictionary:
@@ -58,8 +63,18 @@ static func _enemy_entry(profile: Troop) -> Dictionary:
 	if profile.damage_reduction > 0.0: traits.append(_stat("reduction", profile.damage_reduction*100.0))
 	if profile.route_rule != Troop.RouteRule.COST: traits.append(profile.route_description())
 	var english := TranslationServer.get_locale().begins_with("en")
-	return {"id": profile.troop_name, "name": profile.localized_name(), "icon": profile.icon, "tile": ENEMY_TILE,
+	return {"id": profile.troop_name, "name": profile.localized_name(), "icon": profile.icon, "tile": Color.TRANSPARENT, "tint": profile.icon_color(),
 		"description": profile.ability_text_en if english else profile.ability_text, "stats": stats, "traits": traits}
+
+## Generic relics keep their icon's own colors, as they do in a run.
+static func _relic_entry(relic: RelicDefinition) -> Dictionary:
+	var stats := PackedStringArray()
+	if relic.repeatable: stats.append(_stat("stacks", relic.max_stacks))
+	var entry := {"id": String(relic.id), "name": TranslationServer.translate(relic.name_key), "icon": relic.icon, "tile": Color.TRANSPARENT,
+		"usage": relic.usage_text(), "usage_color": relic.icon_color(),
+		"description": TranslationServer.translate(relic.description_key), "stats": stats, "traits": PackedStringArray()}
+	if relic.tower != null: entry.tint = relic.icon_color()
+	return entry
 
 static func _stat(key: String, value: float) -> String:
 	return TranslationServer.translate("ui.progress.stat.%s" % key).format({"value": str(int(value)) if is_equal_approx(value, roundf(value)) else str(snappedf(value, 0.01))})

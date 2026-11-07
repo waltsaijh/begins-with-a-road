@@ -1,6 +1,6 @@
 # Routing Sandbox — Phase 5 交接
 
-2026-11-07 進度頁：移除遊戲內敵軍情報按鈕／面板與「新 N」提示，主畫面與暫停選單新增「進度」，列出六塔與全部敵人的名稱、描述、數值及特性；開波提示的兵種圖示改為暫停並開到該敵人。新增 tests/menus/progress_page.gd（中英文無漏 key）。實際 main_menu、synergy/input、tutorial/intro、headless level_flow、road_flow_preview 通過；pause_menu 的 Restart fixture 失敗與 pause_navigation 的敵人準備錯誤在修改前提交版相同，未修。
+2026-11-07 進度頁：移除遊戲內敵軍情報按鈕／面板與「新 N」提示，主畫面與暫停選單新增「進度」，列出六塔、全部敵人與 21 件遺物的名稱、描述及數值／特性；遺物名稱下方以對應塔色小字標示使用情境，三選一卡片相同；開波提示的兵種圖示改為暫停並開到該敵人。新增 tests/menus/progress_page.gd（中英文無漏 key）。實際 main_menu、synergy/input、tutorial/intro、headless level_flow、road_flow_preview 通過；pause_menu 的 Restart fixture 失敗與 pause_navigation 的敵人準備錯誤在修改前提交版相同，未修。
 
 2026-11-07 開場改為全白品牌畫面：Web shell 只顯示左 Godot（深色無框）右 team_icon；Boot 同畫面加細長進度條與小字；主選單就緒後 logo 淡出、白底再淡出。Logo 開場淡入 0.8 秒（Web 用 CSS、桌面用 Boot）。選圖進關卡維持白底，雲海載入版本已依使用者要求撤回。Web 實測 shell、Boot、轉場 logo 位置一致，無 console error。發現隱藏 IntroLogos 在 Web 尺寸為 0（Windows 不會發生），以 refresh() 修正並在 startup_loading 加回歸。實際 menus/startup_loading、main_menu（--resolution 1600x900）、level_selection 與 headless tutorial/intro 通過。menus/scene_loading 有 2 項失敗，修改前提交版相同（第一關為教學時 start_allowed 為 false）。main_menu、scene_loading 含滑鼠輸入，需獨佔視窗焦點，與瀏覽器同跑會假失敗。tests/menus/web_loading_shell.cjs 已更新但未執行（本機無 Playwright）。
 
@@ -230,7 +230,7 @@ F5 → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，五 ACT／�
 
 | 責任 | 位置 |
 |---|---|
-| 波次與正式數值 | `assets/data/levels/frontier.tres`、`assets/data/towers/`、`assets/data/troops/siege_behemoth.tres` |
+| 波次與正式數值 | `assets/data/levels/frontier.tres`、`assets/data/towers/`、`assets/data/troops/ravager.tres` |
 | 生命／勝敗／四次獎勵 | `scripts/levels/level_session.gd`、`scripts/levels/definitions/level_definition.gd` |
 | 結果、生命及 Boss UI | `scenes/levels/run_status.tscn`、`scripts/levels/presentation/run_status.gd` |
 | Boss 能力快照／多目標 | `scripts/enemies/troops/troop.gd`、`scripts/combat/enemy_abilities.gd` |
@@ -240,7 +240,7 @@ F5 → `scenes/level.tscn` → `assets/data/levels/frontier.tres`，五 ACT／�
 | 實際戰鬥實驗 | `tests/balance/{laboratory,full_run,counterfactual,rules,defeat_input}.tscn` |
 | 策略／預留地圖 | `tests/balance/{policy,holdout}.gd`；保留七策略與原先凍結的地圖 |
 | 獨立分析／重現 | `tools/balance/{analyze,report,replay_audit,verification}.py`、JSON manifests、PowerShell runners |
-| 模型離線生成 | `tools/assets/build_siege_behemoth.gd`，已烘焙模型不需重新生成即可執行 |
+| 模型離線生成 | `tools/assets/build_ravager.gd`，已烘焙模型不需重新生成即可執行 |
 
 原 Phase 1–4 架構仍見 [architectures](architectures.md)、[systems](systems.md)、[Phase 3](phase3.md)、[Phase 4](phase4.md)。未更改有限 Cost 候選、硬性 SHORTEST／NEWEST 資格、整群配額、預覽不消耗 RNG 或固定行程規則。
 

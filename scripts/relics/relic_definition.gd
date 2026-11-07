@@ -16,6 +16,14 @@ extends Resource
 func presentation_color() -> Color:
 	return tower.accent_color if tower != null else accent_color
 
+## Darkened like the tower icons, so it stays readable on pale cards.
+func icon_color() -> Color:
+	return presentation_color().darkened(0.45)
+
+## Where the relic applies: a tower, or any build.
+func usage_text() -> String:
+	return TranslationServer.translate(tower.name_key if tower != null else "ui.relic.usage.generic")
+
 func configuration_error() -> String:
 	if id.is_empty() or name_key.is_empty() or description_key.is_empty() or icon == null: return "遺物資料不完整"
 	if max_stacks < 1 or (not repeatable and max_stacks != 1): return "遺物持有上限無效"

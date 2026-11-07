@@ -1,12 +1,16 @@
-[gd_resource type="Resource" script_class="RelicDefinition" format=3]
-[ext_resource type="Script" path="res://scripts/relics/relic_definition.gd" id="script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/relics/gold.svg" id="icon"]
+[gd_resource type="Resource" script_class="RelicDefinition" format=3 uid="uid://jluf6mqbe2cm"]
+
+[ext_resource type="Texture2D" uid="uid://ca7dvcu3pvjir" path="res://assets/sprites/relics/gold.png" id="1_g6fae"]
+[ext_resource type="Script" uid="uid://dwvi372cqeuds" path="res://scripts/relics/relic_definition.gd" id="script"]
+
 [resource]
 script = ExtResource("script")
 id = &"gold"
 name_key = "relic.gold.name"
 description_key = "relic.gold.description"
-icon = ExtResource("icon")
+icon = ExtResource("1_g6fae")
+parameters = {
+"amount": 20
+}
 repeatable = true
 max_stacks = 5
-parameters = {"amount": 20}

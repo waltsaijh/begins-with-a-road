@@ -51,7 +51,8 @@ func _rebuild_cards() -> void:
 		var card: Button = Card.instantiate()
 		row.add_child(card)
 		card.get_node("Contents/Icon").texture = relic.icon
-		card.get_node("Contents/Title").text = tr(relic.name_key)
+		card.get_node("Contents/Heading/Title").text = tr(relic.name_key)
+		card.get_node("Contents/Heading/Usage").text = relic.usage_text()
 		card.get_node("Contents/Description").text = tr(relic.description_key)
 		_color_card(card,relic)
 		card.pressed.connect(choose.bind(relic))
@@ -71,14 +72,15 @@ func _color_card(card: Button, relic: RelicDefinition) -> void:
 	var focus: StyleBoxFlat = card.get_theme_stylebox("normal").duplicate()
 	focus.bg_color = Color.TRANSPARENT
 	card.add_theme_stylebox_override("focus",focus)
-	card.get_node("Contents/Title").add_theme_color_override("font_color",accent.darkened(0.65))
+	card.get_node("Contents/Heading/Title").add_theme_color_override("font_color",accent.darkened(0.65))
+	card.get_node("Contents/Heading/Usage").add_theme_color_override("font_color",relic.icon_color())
 	var icon: TextureRect = card.get_node("Contents/Icon")
 	if relic.tower != null:
 		# Tower art is an alpha mask; use the same tint as hand/shop tower icons.
 		var material := ShaderMaterial.new()
 		material.shader = IconMask
 		icon.material = material
-		icon.self_modulate = accent.darkened(0.45)
+		icon.self_modulate = relic.icon_color()
 
 func choose(relic: RelicDefinition) -> bool:
 	if not choosing or _committing or get_tree().paused or not offers.has(relic): return false

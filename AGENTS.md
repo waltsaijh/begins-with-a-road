@@ -60,7 +60,7 @@
 
 ## 進度頁
 
-- 「進度」取代遊戲內左側敵軍情報按鈕與面板，主畫面與暫停選單都可開啟，繼承 settings_page 的外殼、捲動、Esc 與焦點，左側分「我方防禦塔／敵軍」。塔清單在 ProgressCatalog.TOWERS 明確定義，須與 card_shop.tscn 的 catalog 同內容同順序（回歸檢查）；敵人沿用 TroopCatalog 自動發現與 sort_order。ProgressCatalog 從 TowerDefinition／Troop 讀名稱、圖示與數值：塔描述與特性在翻譯 key tower.<id>.description／tower.<id>.traits（特性以 | 分隔），敵人描述沿用 ability_text／ability_text_en，特性由 tags、減傷與硬性選路產生。全部條目直接顯示，沒有解鎖或遇敵紀錄。塔圖示無底板，以 ui_icon_mask 套 accent_color 加深 45%，與手牌／商店一致；敵人圖示保留原色，用深色底板。
+- 「進度」取代遊戲內左側敵軍情報按鈕與面板，主畫面與暫停選單都可開啟，繼承 settings_page 的外殼、捲動、Esc 與焦點，左側分「我方防禦塔／敵軍／遺物」。塔清單在 ProgressCatalog.TOWERS 明確定義，須與 card_shop.tscn 的 catalog 同內容同順序（回歸檢查）；敵人沿用 TroopCatalog 自動發現與 sort_order。ProgressCatalog 從 TowerDefinition／Troop 讀名稱、圖示與數值：塔描述與特性在翻譯 key tower.<id>.description／tower.<id>.traits（特性以 | 分隔），敵人描述沿用 ability_text／ability_text_en，特性由 tags、減傷與硬性選路產生。遺物直接讀 assets/data/relics/catalog.tres 的順序，名稱下方以 RelicDefinition.usage_text()／icon_color() 用對應色小字標示塔名或「通用」，三選一卡片共用同一標示（12px，塔色加深 45%）；可重複者列持有上限；專屬圖示套塔色，通用保留原色。全部條目直接顯示，沒有解鎖或遇敵紀錄。塔與敵人圖示都無底板，以 ui_icon_mask 套 accent_color 加深 45%，與手牌／商店一致。敵人圖示一律是 assets/sprites/enemies/<troop_name>.png 的 64×64 白色遮罩，顏色由 Troop.accent_color 分配且各不相同，開波提示共用 Troop.icon_color()，波次編輯器直接以 accent_color 調色；不再使用 SVG 或 sprites/troops/。
 
 ## 卡牌、商店與放置
 
