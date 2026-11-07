@@ -63,6 +63,9 @@ func screenshot(path: String) -> void:
 
 func verify() -> void:
 	var scene: Node3D = load("res://scenes/level.tscn").instantiate()
+	# Pause checks need an immediate first spawn, independent of Frontier edits.
+	scene.level = scene.level.duplicate(true)
+	scene.level.acts[0].waves[0].groups[0].start_tick = 0
 	add_child(scene)
 	for i in 120:
 		if not scene.get_node("PortalMap").computing: break
@@ -114,12 +117,12 @@ func verify() -> void:
 		await frames(12)
 	for i in buttons.size()-1:
 		check(buttons[i].get_global_rect().end.x < buttons[i+1].get_global_rect().position.x and is_equal_approx(buttons[i].get_global_rect().get_center().y, buttons[i+1].get_global_rect().get_center().y), "Header actions do not form one horizontal row")
-	for speed in [2, 3, 1]:
+	for speed in [2, 4, 1]:
 		await click(hud.speed_button)
-		check(Engine.time_scale == speed and hud.speed_button.text.is_empty() and hud.speed_button.icon == hud.SPEED_ICONS[hud.speed_index], "Speed button did not cycle 1x/2x/3x icons")
-	for speed in [2,3,1]:
+		check(Engine.time_scale == speed and hud.speed_button.text.is_empty() and hud.speed_button.icon == hud.SPEED_ICONS[hud.speed_index], "Speed button did not cycle 1x/2x/4x icons")
+	for speed in [2,4,1]:
 		shortcut(KEY_TAB)
-		check(Engine.time_scale == speed,"Tab did not cycle 1x/2x/3x")
+		check(Engine.time_scale == speed,"Tab did not cycle 1x/2x/4x")
 	shortcut(KEY_TAB,true)
 	check(Engine.time_scale == 1,"Held Tab repeated the speed change")
 	shortcut(KEY_ESCAPE)

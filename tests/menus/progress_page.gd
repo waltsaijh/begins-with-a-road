@@ -12,6 +12,12 @@ func _initialize() -> void:
 	verify.call_deferred()
 
 func verify() -> void:
+	var progress := root.get_node("LevelProgress")
+	var previous: Dictionary = progress._encountered.duplicate()
+	progress._encountered.clear()
+	for entry: Dictionary in ProgressCatalog.enemies():
+		check(entry.name == "???" and entry.icon == null and entry.stats.is_empty() and entry.traits.is_empty(), "Progress leaked an undiscovered enemy")
+	for profile in TroopCatalog.all(): progress._encountered[profile.troop_name] = true
 	var shop: Node = load("res://scenes/cards/card_shop.tscn").instantiate()
 	check(ProgressCatalog.TOWERS == shop.catalog, "Progress towers must match the shop catalog and its order")
 	shop.free()
@@ -48,5 +54,6 @@ func verify() -> void:
 	page.close()
 	check(not page.visible, "Back did not close the page")
 	page.free()
+	progress._encountered = previous
 	print("PROGRESS_PAGE_CHECK:", JSON.stringify({"failures": failures}))
 	quit(1 if not failures.is_empty() else 0)

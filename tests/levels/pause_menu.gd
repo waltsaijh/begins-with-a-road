@@ -117,7 +117,7 @@ func verify() -> void:
 	hud.set_paused(true)
 	check(get_tree().paused and Engine.time_scale == 0.0, "Pause did not immediately freeze simulation")
 	await frames(2)
-	check(hud._menu_buttons.size() == 5, "Pause menu does not have five actions")
+	check(hud._menu_buttons.size() == 6, "Pause menu includes enemy codex alongside progress and four existing actions")
 	var locale := TranslationServer.get_locale()
 	TranslationServer.set_locale("zh_TW")
 	check(hud.restart_button.text == "重新開始" and hud.settings_button.text == "設定", "New menu items lack Chinese translations")
@@ -294,11 +294,12 @@ func verify() -> void:
 	await frames(2)
 	check(camera.size != old_size, "Camera navigation did not resume in the pause menu")
 	TranslationServer.set_locale(locale)
-	# Restart a live wave at 3x with altered instance state, rather than an empty level.
+	# Restart a live wave at 4x with altered instance state, rather than an empty level.
 	hud.set_paused(false)
 	scene._on_start_requested()
 	scene._process(1.5)
-	wave._process(0.0)
+	# Frontier's first group begins at tick 24; advance the test to that spawn.
+	wave._process(6.1)
 	shop.coins = 750
 	var relics: RunRelics = scene.get_node("TowerMap").relics
 	check(relics.acquire(relics.catalog.find(&"protagonist")), "Restart fixture did not acquire a relic")
@@ -306,7 +307,7 @@ func verify() -> void:
 	hud.cycle_speed()
 	check(wave.active and not wave.living_enemies().is_empty(), "Restart fixture did not start a live wave")
 	hud.set_paused(true)
-	check(get_tree().paused and Engine.time_scale == 0.0, "Live 3x wave did not pause immediately")
+	check(get_tree().paused and Engine.time_scale == 0.0, "Live 4x wave did not pause immediately")
 	get_tree().set_meta(RESTART_STATE, {"failures": failures, "scene_id": scene.get_instance_id()})
 	await click(hud.restart_button)
 	if not is_inside_tree(): return

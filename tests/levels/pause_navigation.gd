@@ -67,6 +67,8 @@ func verify() -> void:
 	add_child(_viewport)
 	var scene := load("res://scenes/level.tscn").instantiate() as Node3D
 	scene.level = scene.level.duplicate(true)
+	# Projection needs an enemy immediately, independent of editable wave delays.
+	scene.level.acts[0].waves[0].groups[0].start_tick = 0
 	_viewport.add_child(scene)
 	await frames(15)
 	while scene.get_node("PortalMap").computing: await frames(1)
@@ -78,7 +80,7 @@ func verify() -> void:
 	cards.select_card(0)
 	var selected: int = cards.selected
 	var original_hand_color: Color = cards.hand.get_node("Cards").modulate
-	for speed: float in [1.0, 2.0, 3.0]:
+	for speed: float in [1.0, 2.0, 4.0]:
 		while hud.SPEEDS[hud.speed_index] != speed: hud.cycle_speed()
 		var remaining: float = scene.timeline.progress
 		hud.set_paused(true)
@@ -212,5 +214,5 @@ func verify() -> void:
 		image.save_png(Artifacts.path("levels/paused_enemy_navigation.png"))
 	check(unit.global_position == frozen_position and get_tree().paused and Engine.time_scale == 0, "Reprojecting health bars advanced gameplay")
 	hud.set_paused(false)
-	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "immediate_pause_at_1x_2x_3x": true, "immediate_input_lock": true, "paused_zoom_and_pan": true, "paused_health_projection": true, "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
+	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "immediate_pause_at_1x_2x_4x": true, "immediate_input_lock": true, "paused_zoom_and_pan": true, "paused_health_projection": true, "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
 	get_tree().quit(1 if failures else 0)

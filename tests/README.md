@@ -73,7 +73,7 @@ godot --editor --path . -- --test-card-resource-refresh
 
 滑鼠 hover、像素取樣與動畫截圖測試需要實際渲染；`--headless` 適合資料與排程驗證。JSON 與截圖由 `fixtures/test_artifacts.gd` 建立目錄，寫入 `.godot/test-results/<功能>/`；log 及其他暫存也放 `.godot/`。這些產物不進版本控制或遊戲匯出。Web 驗證見 [工具說明](../tools/README.md)。
 
-`pause_navigation`、`level_hud` 與 `pause_menu` 驗證 Tab 倍速循環、Esc 暫停／繼續、按住不重複觸發、立即暫停、1x／2x／3x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
+`pause_navigation`、`level_hud` 與 `pause_menu` 驗證 Tab 倍速循環、Esc 暫停／繼續、按住不重複觸發、立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
 
 `road_flow_preview` 驗證跨群組加總、兵種 Hover／移開、按鈕標題保留入口篩選、雙入口同兵種的實際 GPU 線段／流量資料隔離、篩選動畫相位獨立、分岔／合流／環路／雙向區段、多入口的獨立按鈕／實際配額、零配額入口、任一按鈕實際點擊開波、無有效路線、非選取兵種成本與幾何失效、RNG／正式配額一致性、列表溢出，以及開波、清波、ACT 選入口、暫停、重開和卸載。渲染模式額外送入實際滑鼠事件並比較明暗漸變相位及無中心線畫面，並驗證動畫不改變 mesh、直段／圓角、雙向中央位置與複製重合線形的像素一致性（允許一階 8-bit 輸出量化差異），輸出 `levels/road_flow_*.png`；headless 不宣稱像素通過。人工驗收可在 editor 開啟 `tests/levels/road_flow_playground.tscn` 按 F6：開始下一波按鈕內有三兵種，下方為兩入口環路，hover 篩選、移開恢復，按開始下一波確認中心線收起；F1／F2 暫時讓出玩家中心線。測試地形及波次為獨立實例，不修改 Frontier。
 
@@ -168,3 +168,7 @@ godot --path . res://scenes/level.tscn --quit-after 180
 - [tower_visuals/gallery.tscn](tower_visuals/gallery.tscn)：人工1–6／R／A；加 -- --capture 會存六塔等級與射程對照圖。
 
 規格與限制見 [塔體與預覽](../docs/tower_visuals_and_preview.md)。
+
+## UI Slice A
+
+F6 或命令列執行 res://tests/ui_slice_a/hud.tscn；headless檢查保存、四塔卡池、通知／暫停與RNG，實際渲染另檢查真實滑鼠／鍵盤、十種模型、三種尺寸並輸出截圖。測試使用隔離保存，不寫玩家通關檔。現行商店四商品＋重刷牌，情報需實際遭遇後解鎖；取代本文件較早的雙排及準備期直接情報假設。結果、依賴與限制見 [UI Slice A](../docs/ui_slice_a.md)。

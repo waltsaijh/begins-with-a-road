@@ -1,12 +1,15 @@
-[gd_resource type="Theme" load_steps=3 format=3]
+[gd_resource type="Theme" format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
+[ext_resource type="StyleBox" path="res://assets/themes/hud_tooltip.tres" id="tooltip"]
 
 [sub_resource type="StyleBoxEmpty" id="Transparent"]
 
 [resource]
 default_font = ExtResource("1")
 default_font_size = 16
+TooltipPanel/styles/panel = ExtResource("tooltip")
+TooltipLabel/colors/font_color = Color(0.14, 0.298, 0.32, 1)
 Button/colors/icon_normal_color = Color(0.22, 0.38, 0.4, 0.72)
 Button/colors/icon_hover_color = Color(0.16, 0.32, 0.35, 1)
 Button/colors/icon_pressed_color = Color(0.16, 0.32, 0.35, 0.48)

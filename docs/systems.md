@@ -102,7 +102,7 @@ tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高�
 - 波次結束後點右下商店牌組：展開上排四張塔牌、下排兩張輔助牌與右下重刷牌；點商品購買加入手牌，點外側或 Esc 收回。
 - 地塊由建造卡加入，未選卡時點擊空格不會放置道路，也不顯示單格預覽。
 - 未選卡時右鍵：在道路放置／移除防禦塔。
-- 右鍵拖曳（可從卡牌與其他 UI 起拖）：以滑鼠相對目前 focus 投影（畫面中心）的前後向量計算有號角差，跨越 ±π 仍累積最短角差；未超過轉速上限時，順時針／逆時針一圈對應地圖同向一整圈，不受圓半徑、解析度或縮放影響。只改 azimuth，不改仰角、距離、縮放及地形。地面、柱側、天空、卡牌及其他 UI 都可起拖，不再掃描 GridMap 模型判斷天空。Camera3D 的 `orbit_drag_threshold` 預設 4px，超過才啟動旋轉；`orbit_dead_zone` 預設 16px，前後任一向量落入中心範圍時不計角差。相機在 GUI 前暫存右鍵按下，拖曳時攔截，若放開前未超過門檻則在 deferred 階段依原位置／修飾鍵遞送按下與放開，保留單擊右鍵旋轉卡牌或試驗場單塔工具；拖曳不觸發這些點擊。實際旋轉在 Camera3D 的 `_process` 以單調時鐘的真實秒數推進，每幀轉角限制為 `maximum_orbit_speed × real_delta`，目前預設 360°/s，不受 1x／2x／3x 或零 time_scale 影響。同幀滑鼠角差累加後除以真實 delta，得到目標角速度並夾在 ±`maximum_orbit_speed`，每幀取用後清零；沒有未完成角度或多圈佇列。只對目前角速度做 `lerp(current, target, 1-exp(-response × real_delta))`，`response = log(100) / orbit_smoothing_seconds`；預設 0.15 秒消除 99% 速度差。加速、減速、反向與放開皆用同一條響應：滑鼠停止移動或放開後目標角速度為 0，速度低於 0.01°/s 時歸零，不再使用獨立緩停動畫。角度位移採此速度響應的精確積分 `target × delta + (previous-target) × follow / response`，使持續相同輸入時的過渡不依賴幀率；釋放時沒有新的旋轉目標，尾段轉角約為當前角速度 / response，與先前畫幾圈無關。未超過轉速上限的圈數在速度收斂後維持角度比例，超過上限的輸入不補轉。新的鏡頭手勢、離開視窗、失焦或 navigation lock 立即重設輸入與速度。旋轉開始後跨過卡牌或 UI 仍持續。暫停時相機保持運作，但原點擊仍經 HUD 的遊戲輸入鎖定，不推進時間。
+- 右鍵拖曳（可從卡牌與其他 UI 起拖）：以滑鼠相對目前 focus 投影（畫面中心）的前後向量計算有號角差，跨越 ±π 仍累積最短角差；未超過轉速上限時，順時針／逆時針一圈對應地圖同向一整圈，不受圓半徑、解析度或縮放影響。只改 azimuth，不改仰角、距離、縮放及地形。地面、柱側、天空、卡牌及其他 UI 都可起拖，不再掃描 GridMap 模型判斷天空。Camera3D 的 `orbit_drag_threshold` 預設 4px，超過才啟動旋轉；`orbit_dead_zone` 預設 16px，前後任一向量落入中心範圍時不計角差。相機在 GUI 前暫存右鍵按下，拖曳時攔截，若放開前未超過門檻則在 deferred 階段依原位置／修飾鍵遞送按下與放開，保留單擊右鍵旋轉卡牌或試驗場單塔工具；拖曳不觸發這些點擊。實際旋轉在 Camera3D 的 `_process` 以單調時鐘的真實秒數推進，每幀轉角限制為 `maximum_orbit_speed × real_delta`，目前預設 360°/s，不受 1x／2x／4x 或零 time_scale 影響。同幀滑鼠角差累加後除以真實 delta，得到目標角速度並夾在 ±`maximum_orbit_speed`，每幀取用後清零；沒有未完成角度或多圈佇列。只對目前角速度做 `lerp(current, target, 1-exp(-response × real_delta))`，`response = log(100) / orbit_smoothing_seconds`；預設 0.15 秒消除 99% 速度差。加速、減速、反向與放開皆用同一條響應：滑鼠停止移動或放開後目標角速度為 0，速度低於 0.01°/s 時歸零，不再使用獨立緩停動畫。角度位移採此速度響應的精確積分 `target × delta + (previous-target) × follow / response`，使持續相同輸入時的過渡不依賴幀率；釋放時沒有新的旋轉目標，尾段轉角約為當前角速度 / response，與先前畫幾圈無關。未超過轉速上限的圈數在速度收斂後維持角度比例，超過上限的輸入不補轉。新的鏡頭手勢、離開視窗、失焦或 navigation lock 立即重設輸入與速度。旋轉開始後跨過卡牌或 UI 仍持續。暫停時相機保持運作，但原點擊仍經 HUD 的遊戲輸入鎖定，不推進時間。
 - 滾輪縮放，左鍵由卡牌以外拖曳平移，中鍵不控制鏡頭。達共用 `orbit_drag_threshold`（預設 4px）才平移，未達門檻則放開後遞送原左鍵點擊，保留放塔／UI。CardButton 以 `camera_drag_blockers` 群組提供含縮放、旋轉及 hover 延伸的實際命中區，手牌、商品、牌背與重刷牌（包含停用牌）保留左鍵卡牌操作，不開始鏡頭平移；只在按下時檢查。捕捉後的移動與放開在相機 `_input` 處理，可跨過卡牌／價格及其他 GUI 持續平移，放開立即停止；離窗、失焦或 navigation lock 清除捕捉，須重新按下。最遠縮小為初始鏡頭的 0.6x（Camera3D 的 `minimum_zoom_scale`），放大仍沿用 `minimum_size`。拖曳直接將鏡頭 focus 的 X／Z 夾在初始中心 ±`pan_range` 內（預設 ±24，形成 48×48 的正方形）；不檢查畫面四角、雲層幾何或視窗比例，縮放不會推移中心或改變拖曳邊界。暫停時同樣適用。
 - F1：切換本波每個兵種的完整路徑與目前路網的 vertex 圓點／V 編號；soldier 青色、quickfeet 金色、heavy 紫色，共用路段並排顯示。
 - F2：切換 threat 熱圖；指向地塊查看參數，越紅代表威脅越高。
@@ -140,7 +140,7 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 ### 回合商店
 
-每波敵人全數抵達或被擊殺後，右下升起七張背面牌，最上方顯示商店圖示。點擊展開時，左下手牌疊起並暫停建造工具；商品標題列左側顯示塔名，右側靠右顯示金幣與價格，右下背面牌用於同時重刷兩排，其價格放在卡片內的上方並水平置中，數字固定白色。購買後商品與價格立即移除，其餘商品在各自排內向右靠攏，下排右端保留重刷牌，不留空洞；買入卡從畫面下方滑入疊起手牌的最上方。重刷保留重刷牌，圖示以二次 ease-in-out 在 0.5 秒內旋轉 360 度，六張新商品從畫面下方插入；旋轉期間不會重複扣款。金錢不足時，重刷牌與商品一樣淡灰且不可購買。點商店外的空白處或 Esc 收回，恢復手牌與建造。開始下一波時，商店自動收回並隱藏。每波只發一次獎勵，開關商店不會重抽商品。
+每波敵人全數抵達或被擊殺後，右下升起五張背面牌（四張塔商品＋原重刷牌），最上方顯示商店圖示。點擊展開時，左下手牌疊起並暫停建造工具；商品標題列左側顯示塔名，右側靠右顯示金幣與價格，右下背面牌用於重刷四張塔牌，其價格放在卡片內的上方並水平置中，數字固定白色。購買後商品與價格立即移除，其餘商品在單排內向右靠攏，右端保留重刷牌，不留空洞；買入卡從畫面下方滑入疊起手牌的最上方。重刷保留重刷牌，圖示以二次 ease-in-out 在 0.5 秒內旋轉 360 度，四張新商品從畫面下方插入；旋轉期間不會重複扣款。金錢不足時，重刷牌與商品一樣淡灰且不可購買。點商店外的空白處或 Esc 收回，恢復手牌與建造。開始下一波時，商店自動收回並隱藏。每波只發一次獎勵，開關商店不會重抽商品。
 
 手牌新增只建立一個卡面，消耗只移除對應卡面，既有卡面保持同一實例；快捷鍵與點擊索引隨順序更新。插牌預設 0.28 秒、商店靠攏 0.22 秒，位於 CardFanLayout。連續購買、快速收合或重新排版會從當前動畫位置接續，不把插入中的牌重新丟回畫面外；插入期間該手牌不接受點擊，商店靠攏／補牌時也短暫停用商品點擊。商店商品的固定索引與顯示序號分開，靠攏後仍購買正確商品。
 
@@ -148,7 +148,7 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 Hover 沿卡牌自身上方提起 6 原始 px（正常顯示約 5 px）；手牌選中上提 24 原始 px（約 20 px），選中優先於 hover，不相加。Hand 的 `selected_lift`／`selection_seconds` 控制選中高度與切換時間，預設 24px／0.22 實際秒；hover 使用 CardFanLayout 的 6px／0.14 秒。切換、移開或取消選中都從當前位置接續 Tween，上提與命中區的 `hover_lift` 同步過渡。選中卡面在可編輯的 Visuals 子節點以 ±0.6°、3.6 秒週期輕晃，選取振幅在 0.22 秒內淡入／淡出；CardView 的 Selection Motion 可調整幅度、週期與混合時長。只有正在選中或淡出中的卡面逐幀更新搖動，速度獨立於 1x／2x／4x；暫停依場景樹凍結。外層 Button 不跟著晃動，所以命中與拖曳穩定，且不與扇形布局的旋轉 Tween 競爭。所有卡牌維持原尺寸與順序，不放大或置頂。正面與牌背共用 CardButton，提起時保留原位置下緣的命中範圍；CardFanLayout.pick 也使用當前命中延伸，讓選中牌移開 hover 後仍可從原下緣操作。命中依旋轉／縮放後座標，只在實際滑鼠移動時重新挑選；動畫不會反覆觸發布局，折疊時清除上提與焦點。
 
-預設初始金幣 0、每波獲得 10、每張卡 3、重刷 1。`ShopConstants` 管理共用預設；card_shop.tscn 可在 Inspector 覆寫金幣、波次獎勵、重刷價格與 seed，塔資源的 Card Price 決定每次抽出卡片的價格；已抽出的 BuildCard 保存當時價格。購買扣款並加入手牌，同一商品不能重複購買；重刷重新產生上排四張塔牌與下排兩張輔助牌。塔種使用洗牌袋補足四個位置，地塊預設則為每張卡依所屬塔的候選權重獨立抽取，因此可能重複同種組合。商店有自己的 RNG，不影響敵人選路。
+預設初始金幣 0、每波獲得 10、每張卡 3、重刷 1。`ShopConstants` 管理共用預設；card_shop.tscn 可在 Inspector 覆寫金幣、波次獎勵、重刷價格與 seed，塔資源的 Card Price 決定每次抽出卡片的價格；已抽出的 BuildCard 保存當時價格。購買扣款並加入手牌，同一商品不能重複購買；重刷只重新產生四張塔牌；輔助資源與 roll_traffic_cards API 保留，一般商店不使用。塔種使用洗牌袋補足四個位置，地塊預設則為每張卡依所屬塔的候選權重獨立抽取，因此可能重複同種組合。商店有自己的 RNG，不影響敵人選路。
 
 可編輯 UI 為 `scenes/cards/card_shop_view.tscn`（商店整體）與 `scenes/cards/components/` 下的 `shop_slot.tscn`（卡位）、`card_back.tscn`（背面與圖示）、`card_price.tscn`（共用金幣與價格列）。商品正面沿用同資料夾的 `card_view.tscn`，Presentation 選 HAND／SHOP 會切換標題列配置。價格跟著正面一起翻轉與移動，點擊價格也能購買。動畫使用 Tween，沒有逐幀重建卡面。`tests/cards/card_shop.tscn` 驗證插牌、靠攏後購買、卡面實例保留、金幣、重刷、輸入隔離、消耗、波次切換、弧形重疊與快速收合；Web 可用 `tools/web/verify_enemy_web.cjs --shop` 比對當次原生輸出。
 
@@ -413,11 +413,11 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 頂部時間線寬度為畫面的 50%，水平置中；每波佔一個等長區間，圓點代表一般波次，ACT 的最後一波由分隔直線表示，起點另有直線；目前 ACT 使用 Noto Sans TC Medium。金幣在時間線左側，右側只有倍速與暫停，商店不另外顯示重複餘額。沒有獨立位置游標。準備期時間線停在已完成節點，不隨等待時間前進。按「開始下一波」後，時間線以二次 ease-in-out 於前 1 秒走完下一段，到達下一節點後停留 0.5 秒才進攻。等待期間停用開波按鈕並鎖住建造與商店。戰鬥期間固定在該波節點；本波完成後進入不限時的下一波準備。
 
-頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示或按 Tab 依序切換 1x → 2x → 3x → 1x，以一、二、三個箭頭區分，影響遊戲時間、開場等待、出生、移動與動畫。Esc 或頂部暫停按鈕立即暫停 SceneTree 並將 Engine.time_scale 設為 0，同時鎖住選牌、旋轉、放置、商店與手動開波；遊戲中 Esc 優先於取消選牌／關閉商店，暫停保留原選取與商店狀態。快捷鍵按住不重複觸發，暫停時 Tab 只保留選單導覽，設定頁仍使用 Tab 移動焦點、Esc 返回暫停選單；1x／2x／3x 都不經過減速過渡。暫停時仍可滾輪縮放、左鍵平移與右鍵拖曳旋轉鏡頭，其他遊戲輸入由 HUD 攔截。暫停請求接受後立即停用頂部倍速與暫停按鈕，同時忽略其 hover／點擊；暫停期間也不接受程式發起的倍速切換。恢復後才重新啟用。右下選單使用右對齊的細字與透明底，不使用 hover／focus 底線，暫停／繼續時皆以實際 0.35 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；手牌與商店的呈現根節點在實際 0.35 秒內一起滑至畫面下方，時長由 LevelHUD 的 `pause_seconds` 調整，僅控制介面收合，保留選牌、商品及展開狀態；恢復時反向滑回。背景使用 `PauseBlocker/WhiteVeil` 的白色 ColorRect（透明度以場景中的 color.a 為準），隨右下選單一起淡入／淡出，圖示與選單保留原色。繼續遊戲或 Esc 會還原卡牌位置／選取及選定速度，未完成的開波過渡也會接續；介面收合途中恢復會立即繼續模擬，並從當前位置與透明度反向還原。「回到主畫面」會結束目前關卡，白色過渡遮住畫面前保持暫停，返回後可重新開始全新進度。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／3x 下的立即暫停、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換與繼續；返回主畫面的完整往返由 menus/main_menu 回歸驗證。
+頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示或按 Tab 依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、開場等待、出生、移動與動畫。Esc 或頂部暫停按鈕立即暫停 SceneTree 並將 Engine.time_scale 設為 0，同時鎖住選牌、旋轉、放置、商店與手動開波；遊戲中 Esc 優先於取消選牌／關閉商店，暫停保留原選取與商店狀態。快捷鍵按住不重複觸發，暫停時 Tab 只保留選單導覽，設定頁仍使用 Tab 移動焦點、Esc 返回暫停選單；1x／2x／4x 都不經過減速過渡。暫停時仍可滾輪縮放、左鍵平移與右鍵拖曳旋轉鏡頭，其他遊戲輸入由 HUD 攔截。暫停請求接受後立即停用頂部倍速與暫停按鈕，同時忽略其 hover／點擊；暫停期間也不接受程式發起的倍速切換。恢復後才重新啟用。右下選單使用右對齊的細字與透明底，不使用 hover／focus 底線，暫停／繼續時皆以實際 0.35 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；手牌與商店的呈現根節點在實際 0.35 秒內一起滑至畫面下方，時長由 LevelHUD 的 `pause_seconds` 調整，僅控制介面收合，保留選牌、商品及展開狀態；恢復時反向滑回。背景使用 `PauseBlocker/WhiteVeil` 的白色 ColorRect（透明度以場景中的 color.a 為準），隨右下選單一起淡入／淡出，圖示與選單保留原色。繼續遊戲或 Esc 會還原卡牌位置／選取及選定速度，未完成的開波過渡也會接續；介面收合途中恢復會立即繼續模擬，並從當前位置與透明度反向還原。「回到主畫面」會結束目前關卡，白色過渡遮住畫面前保持暫停，返回後可重新開始全新進度。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的立即暫停、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換與繼續；返回主畫面的完整往返由 menus/main_menu 回歸驗證。
 
-暫停選單依序為「繼續遊戲／重新開始／設定／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px，文字變黑但不縮放；移開後反向還原。Button 的 Hover Shift／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／3x 影響。鍵盤仍可切換四個選項，以文字顏色表示焦點。
+暫停選單依序為「繼續遊戲／重新開始／進度／設定／敵軍圖鑑／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px，文字變黑但不縮放；移開後反向還原。Button 的 Hover Shift／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／4x 影響。鍵盤可切換六個選項，以文字顏色表示焦點。
 
-重新開始先解除暫停並還原 1x，再以 SceneTree.reload_current_scene() 重載目前場景，回到第一波準備，重置敵人、商店金幣及初始手牌；關閉舊場景沿用清理保護。設定會開啟 `scenes/settings/settings_page.tscn`，隱藏暫停選單文字但保留背景遮罩與暫停狀態。返回或 Esc 只關閉設定並將焦點還給設定按鈕。`tests/levels/pause_menu.tscn` 使用實際滑鼠及渲染檢查 hover 進出、原邊緣命中、無橫線、雙語與設定，再由 3x 戰鬥中暫停並點擊重新開始，檢查重載後狀態。
+重新開始先解除暫停並還原 1x，再以 SceneTree.reload_current_scene() 重載目前場景，回到第一波準備，重置敵人、商店金幣及初始手牌；關閉舊場景沿用清理保護。設定會開啟 `scenes/settings/settings_page.tscn`，隱藏暫停選單文字但保留背景遮罩與暫停狀態。返回或 Esc 只關閉設定並將焦點還給設定按鈕。`tests/levels/pause_menu.tscn` 使用實際滑鼠及渲染檢查 hover 進出、原邊緣命中、無橫線、雙語與設定，再由 4x 戰鬥中暫停並點擊重新開始，檢查重載後狀態。
 
 開波提示位於 `scenes/levels/components/start_wave_callout.tscn`，上方置中的文字依語言顯示「開始下一波」／「Start next wave」，下方為橫排敵軍圖示；標題與橫排同置於先前設計的淡色對話框中，Shape/Background 與 Shape/Border 保留青灰邊框、切角和下方置中尖角；標題與圖示列均常駐，不加問號、倒數或獎勵。每個入口各有一份範本實例，隨相機平移／縮放更新投影位置，尺寸保持螢幕大小，hover 不縮放或上浮整組提示；部分超出視窗由視窗自然裁切，完全離開畫面才隱藏。開波時沿用 0.24 秒二次 ease-in 收回起點塔，下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的開波標題。
 
@@ -476,7 +476,7 @@ python tools/web/serve_web.py
 
 開啟 http://127.0.0.1:8765/index.html。伺服器提供 COOP／COEP 標頭，正式部署也需對應的跨來源隔離設定。
 
-Web 匯出引用 `assets/web/shell.html`，先以不依賴 WebGL 字型的頁面文字呈現「載入遊戲資源／啟動遊戲」。下載只有在位元組總量已知時顯示實際進度；未知時只顯示狀態。引擎啟動 promise 與 ScreenTransition 首個 `frame_post_draw` 通知都完成後，才在下一個 rAF 移除 HTML 遮罩；不在 canvas 尚未畫好時提早撤掉，也不因提早收到 draw 通知而隱藏啟動失敗資訊。頁面自帶英／繁中初始文字，沒有額外字型下載依賴。
+Web 匯出引用 `assets/web/shell.html`，白底只顯示內嵌 Godot／團隊 logo，失敗才顯示訊息。引擎啟動 promise 與 ScreenTransition 首個 frame_post_draw 通知都完成後才移除 HTML 遮罩。版面、透明度及比例與 IntroLogos 一致，Web 先播放 0.8 秒 CSS 淡入，Boot 不重播。
 
 
 ## 設定頁面
@@ -551,7 +551,7 @@ LevelSession 依序準備入口圖、第一波獨立兵種／入口的候選池�
 
 載入外觀明確保存在 `scenes/interface/components/loading_display.tscn`，由啟動及轉場共用，為置中標題、階段文字、2px 細線 ProgressBar 與完成數，支援英／繁中。`tests/menus/startup_loading.gd` 驗證啟動代表去重、透明材質不誤合併、資源保留、關卡重用及 MSAA 改變補漏；`tests/menus/scene_loading.gd` 驗證直接開選單的補漏路徑、未知／已知進度、代表繪製、RNG／波次隔離、正常開波、清理及失敗／取消恢復；失敗案例會產生預期轉場錯誤訊息。
 
-Boot 的初始階段文字直接保存在場景，依序呈現整理資源及準備角色／狀態。預熱完成後呼叫 `ScreenTransition.change_scene(path, &"", &"ui.loading.menu")`，通用轉場在開始時即接手顯示「準備主選單」，先實際畫出文字才換場景，並保留至首次主選單繪製及淡入結束；來源介面在成功交接後才隱藏。第三個參數僅是可選翻譯 key，不讓轉場層依賴主選單規則。未知工作量清掉進度條及計數，避免顯示舊的完成值。一般未指定訊息的短過渡不變。
+Boot 使用相同全白 IntroLogos，加上 LoadingDisplay.compact 的細進度條與小字；桌面播放 0.8 秒 logo 淡入。預熱完成後以 ScreenTransition intro 模式交接，主選單首次繪製後先淡出 logo 再淡出白底。未知工作量不顯示進度條；一般選圖／關卡轉場仍沿用白底載入訊息，不顯示開場 logo。
 
 主畫面與地圖選擇雙向切換、確認本局設定並進入遊戲，以及暫停選單「回到主畫面」，共用 `scenes/interface/screen_transition.tscn`。它是持續跨場景存在的 ScreenTransition Autoload，明確保存頂層 CanvasLayer 與全畫面白色 ColorRect；根節點 Duration 預設 0.5 秒。`scripts/interface/screen_transition.gd` 的 `run(action)` 在白畫面下執行呈現切換，`change_scene(path)` 切換真正場景，透過 started／covered／finished(error) signal 提供生命週期；呼叫者決定目的地及遊戲狀態，過渡層不引用選單、關卡或鏡頭。
 
@@ -559,7 +559,7 @@ Boot 的初始階段文字直接保存在場景，依序呈現整理資源及準
 
 從暫停返回時，LevelHUD 立即標記離場狀態並透過通用 navigation lock 清掉已有鏡頭手勢；舊關卡保持暫停及零模擬速度，直到白畫面下移除。主畫面就緒時恢復未暫停與 1x；再次開始建立新關卡、初始金幣、手牌及第一波手動準備，語言、MSAA 與靜音沿用本次執行設定。切換失敗也會淡出遮罩，由宿主恢復可操作選單。
 
-`tests/menus/main_menu.gd` 驗證完整往返、每次 covered 的白色像素、過渡期間 Esc／重複操作隔離、3x 戰鬥暫停返回、舊關卡釋放與再次開始的全新進度。白畫面截圖與結果寫入 `.godot/test-results/menus/`。
+`tests/menus/main_menu.gd` 驗證完整往返、每次 covered 的白色像素、過渡期間 Esc／重複操作隔離、4x 戰鬥暫停返回、舊關卡釋放與再次開始的全新進度。白畫面截圖與結果寫入 `.godot/test-results/menus/`。
 
 
 ### 寬路流線的顯示投影
@@ -599,7 +599,7 @@ P99 判因採固定 simulation delta／相同暖機與取樣步數，核對完�
 
 ## 五步教學
 
-選圖頁第一關「第一條防線」為 1 ACT、3 波，使用一般 LevelDefinition 搭配可選 `tutorial` 引用；Frontier 直接要求 tutorial，Bridge 要求 tutorial 與 frontier，透過 DAG 固定排在教學後，舊的後續關卡通關紀錄亦不能繞過。terrain 為明確保存的 GridMap，起點 (0,0)、終點 (12,6)，先橫向再縱向再橫向連通。`assets/data/tutorial/intro.tres` 的 Starting Cards 引用 starting_01～03.tres，預設為哨塔／迫擊砲／弩砲，可改塔、地塊及順序；文案動態讀取塔名。該資料亦保存指定格 (3,0,0)／(6,0,3)、方向 0／1，以及哨塔升級商品與交叉火力新商品。教學專用 bridge 不依賴可編輯的普通地塊候選；第一、第二座塔各堵住原道路，但所附三格在北側／東側接成繞道，第三張允許任意一般驗證通過的落點及方向。
+選圖頁第一關「第一條防線」為 1 ACT、3 波，使用一般 LevelDefinition 搭配可選 `tutorial` 引用；Frontier 直接要求 tutorial，Bridge 要求 tutorial 與 frontier，透過 DAG 固定排在教學後，舊的後續關卡通關紀錄亦不能繞過。terrain 為明確保存的 GridMap，起點 (0,0)、終點 (12,6)，先橫向再縱向再橫向連通。`assets/data/tutorial/intro.tres` 的 Starting Cards 引用 starting_01～03.tres，預設為哨塔／迫擊砲／弩砲，可改塔、地塊及順序；文案動態讀取塔名。該資料亦保存指定格 (3,0,0)／(5,0,1)、方向 0／2，以及哨塔升級商品與交叉火力新商品。三張初始牌引用目前基礎版塔地塊配置，指定前兩張在合法位置形成繞道；第三張允許任意一般驗證通過的落點及方向。
 
 TutorialDirector 保存本局五步進度。鏡頭步驟觀察實際 focus、size、azimuth，相對進入時改變超過 0.1 格／0.2 尺寸／5° 即分別完成平移、縮放、旋轉；暫停、設定或載入時隱藏提示與目標 hologram，停止判斷。指定建造同時限制卡片、格子與 90° 步數，透過 TowerMap 的可選 placement_rule 同時作用於預覽及提交，拒絕不消耗卡牌；CardPlacement 在成功消耗後發出 card_placed，才前進。完成三次放置才開放開波，沿用原 1.5 秒等待及戰鬥鎖定。
 
@@ -623,4 +623,10 @@ PortalMap 保存已提交路網歷史，與預覽／普通候選快取分開。�
 
 EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結算治療、前搖與癱瘓。盾衛優先只套用到合法單體目標，全體範圍攻擊照常。來源死亡、離場、清波及重開清理所有癱瘓，重疊不累加；在途攻擊快照照常結算。
 
-下一波兵種圖示點擊會暫停並開啟進度頁的該敵人，不觸發開波。重開情報、暫停／遺物選擇期間的顯示及真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。
+情報列的兵種圖示打開進度頁的該敵人，不觸發開波，未解鎖者保持問號；首次實際出生才排入側邊未讀通知。通知／圖鑑與遺物詳情共用 HUD 暫停擁有權，真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。
+
+## UI Slice A
+
+緊湊時間線、遺物圖示列、實際出生通知、共用敵軍圖鑑及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
+
+頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。緊湊未來波次空心圈，兩模式增加ACT遺物雙菱形，移除緊湊底部細進度條；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。

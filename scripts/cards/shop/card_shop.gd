@@ -132,14 +132,8 @@ func roll_traffic_cards(count: int) -> Array[BuildCard]:
 	return result
 
 func roll_offers() -> Array[BuildCard]:
-	var result := roll_cards(ShopConstants.OFFER_COUNT)
-	var support := roll_traffic_cards(2)
-	if result.is_empty() and support.is_empty(): return []
-	# Stable indices preserve row identity even if an entire pool is invalid.
-	result.resize(ShopConstants.OFFER_COUNT)
-	support.resize(2)
-	result.append_array(support)
-	return result
+	# Support resources/tools remain available, but never enter the normal shop.
+	return roll_cards(ShopConstants.OFFER_COUNT)
 
 func _deal() -> bool:
 	var next := roll_offers()

@@ -21,7 +21,7 @@
 
 ## 資料與流程
 
-已持有圖示使用 `scenes/relics/relic_inventory.tscn`，獨立掛在 RelicChoice CanvasLayer，單項為 `components/relic_inventory_item.tscn`；不與 Hand/Cards 建立節點或定位依賴。28×28px 圖示由左至右依取得順序排列，間距 6px，每份遺物各一個，最新取得的在最右方，通用重複份數不合併。Screen Margin 預設左距 16px、列底距畫面底部 216px，只隨 viewport 尺寸維持固定留白；卡牌 hover、選取、數量、收合、上下動畫與空手皆不影響圖示位置。管理器 changed 事件更新純顯示的取得順序與 tooltip，不修改持有量、效果或 RNG；手動移除後同步縮短，暫停與三選一時隱藏。專屬圖示使用塔卡相同的 alpha mask／加深色，通用保留原 SVG 顏色。名稱與說明由 hover tooltip 提供，移除舊收藏面板及其與敵軍情報的互斥依賴。
+已持有圖示使用 `scenes/relics/relic_choice.tscn` 的 RelicBar/Items，由 HUD 集中置中；每種類型一個 38px 按鈕，重複份數顯示數字，與 Hand/Cards 沒有節點或定位依賴。管理器 changed 事件刷新圖示與 tooltip，不修改持有量、效果或 RNG；移除、重開同步清理。專屬圖示使用 alpha mask 與塔色，通用保留原 SVG 顏色。點擊 Collection 顯示名稱、份數、使用情境與說明，向 LevelHUD 借用暫停，與圖鑑／設定／進度頁互斥，關閉恢復原狀態。main 的獨立 relic_inventory 場景及取得順序呈現 API 保留供工具使用，正式關卡不重複顯示。
 
 `assets/data/relics/` 包含 17 專屬、4 通用及 catalog；RelicDefinition 保存 ID、雙語名稱／描述 key、圖示、TowerDefinition 適用身分、參數與重複限制。17 件專屬的 icon 各自引用 `assets/sprites/relics/<id>.png`，4 件通用保留同目錄的 SVG。所有專屬 `repeatable=false / max_stacks=1`。
 
@@ -31,7 +31,7 @@ TowerMap 持有 `RunRelics`，其持有數及 RNG 只屬當局。建造／移除
 
 CombatSystem 沿用共用索引及飛行紀錄，`relic_combat.gd` 只處理巡航、齊射、處決等需要時間狀態的機制。AttackPayload 快照本次傷害、目標體型倍率、冰霜與擊退；命中時仍能獨立於來源塔執行。兵營沿用 FriendlySoldier／BarracksSystem，沒有 17 套塔腳本。
 
-ACT 完成後先等既有砲彈結束並鎖住建造／商店／開波。Phase 5 已把正式 Frontier 改為五 ACT，僅第 3／6／9／12 波後三選一，最後 ACT 直接結算；自訂關卡與教學可設定 reward_final_act。選擇立即取得效果並短暫標示選中卡，之後才進入準備期或自訂 ACT 擴張。暫停保留選擇狀態，頂部暫停仍可操作；已取得遺物以獨立橫向圖示列固定於左下手牌附近，最新取得的一份加在最右方；不再提供左側「本局遺物」按鈕及收藏面板。
+ACT 完成後先等既有砲彈結束並鎖住建造／商店／開波。Phase 5 已把正式 Frontier 改為五 ACT，僅第 3／6／9／12 波後三選一，最後 ACT 直接結算；自訂關卡與教學可設定 reward_final_act。選擇立即取得效果並短暫標示選中卡，之後才進入準備期或自訂 ACT 擴張。暫停保留選擇狀態，頂部暫停仍可操作；已取得遺物使用集中頂列，重複份數合併顯示、hover 查看效果並可點擊開啟詳情；借用 HUD 暫停與圖鑑互斥，關閉恢復原狀態。
 
 ## 獎勵池
 

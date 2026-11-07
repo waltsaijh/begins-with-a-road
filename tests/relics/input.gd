@@ -142,7 +142,7 @@ func verify() -> void:
 	await frames()
 	# Inspect the actual baked airship at close range, including its firing markers.
 	var ship: DefenseTower = session.get_node("TowerMap").upgrade_target(ANCHORS[3])
-	var base: Node3D = ship._visual.get_node("FixedBase")
+	var base: Node3D = ship._visual.find_children("*__FixedBase","Node3D",true,false)[0] if ship._visual.has_method("_part") else ship._visual.get_node("FixedBase")
 	var base_transform := base.global_transform
 	var flight: Node3D = ship.patrol_visual()
 	var docked := flight.position
@@ -210,35 +210,30 @@ func verify() -> void:
 	left(option_point,false)
 	await get_tree().create_timer(0.4).timeout
 	check(session.get_node("TowerMap").relics.held.has(selected.id) and not session.choosing_relic and not cards.input_suspended, "Real reward card click acquires and resumes preparation")
-	var inventory: Control = choice.inventory
+	var relic_bar: Control = choice.get_node("RelicBar")
+	var icons: HBoxContainer = relic_bar.get_node("Items")
 	await frames()
-	check(choice.get_node_or_null("InventoryButton") == null and choice.get_node_or_null("Collection") == null,"Old collection interface was not removed")
-	var icons: HBoxContainer = inventory.get_node("Icons")
-	var owned := 0
-	for amount in manager.held.values(): owned += int(amount)
-	check(inventory.visible and icons.get_child_count() == owned,"Each acquired relic copy should have an icon")
-	check(icons.get_child(owned-1).get_meta("relic_id") == selected.id,"Newest acquired relic was not appended to the right")
-	check(icons.get_child(owned-1).tooltip_text.contains(tr(selected.name_key)),"Relic icon lost its name/description tooltip")
-	check(not cards.hand.is_ancestor_of(inventory),"Relic row is still parented to the hand")
-	check(absf(inventory.position.x-inventory.screen_margin.x)<1 and absf(inventory.get_rect().end.y+inventory.screen_margin.y-render_viewport.get_visible_rect().size.y)<1,"Relics did not keep their independent screen margin")
-	for i in icons.get_child_count()-1:
-		check(icons.get_child(i).get_global_rect().end.x < icons.get_child(i+1).get_global_rect().position.x and is_equal_approx(icons.get_child(i).position.y,icons.get_child(i+1).position.y),"Relic icons are not arranged left to right")
-	await snapshot("hand_relic_icons")
-	var fixed_position := inventory.global_position
+	check(relic_bar.visible and icons.get_child_count() == manager.held.size(),"Each owned relic type has a count-aware icon")
+	for icon in icons.get_children():
+		var definition := manager.catalog.find(icon.get_meta("relic_id"))
+		check(icon.tooltip_text.contains(tr(definition.name_key)) and icon.tooltip_text.contains("×%d" % manager.held[definition.id]),"Relic tooltip retains its name and acquired count")
+	check(not cards.hand.is_ancestor_of(relic_bar),"Relic row remains independent of the hand")
+	var fixed_position := relic_bar.global_position
 	var hand_root: Control = cards.hand.get_node("Cards")
 	var original_hand_position := hand_root.position
 	hand_root.position.y += 80
 	await frames()
-	check(inventory.global_position.is_equal_approx(fixed_position),"Moving the hand root moved the independent relic row")
+	check(relic_bar.global_position.is_equal_approx(fixed_position),"Moving hand root moved the relic row")
 	hand_root.position = original_hand_position
 	cards.hand.set_stowed(true)
 	cards.hand.finish_animation()
 	await frames()
-	check(inventory.visible and inventory.get_global_rect().end.y < render_viewport.size.y,"Combat stowing hid relics or moved them below the screen")
-	check(inventory.global_position.is_equal_approx(fixed_position),"Stowing the hand moved the relic row")
+	check(relic_bar.visible and relic_bar.global_position.is_equal_approx(fixed_position),"Stowing hand moved or hid the relic row")
 	cards.hand.set_stowed(false)
 	cards.hand.finish_animation()
-	await frames()
+	choice.get_node("RelicBar/Items").get_child(0).pressed.emit()
+	check(choice.get_node("Collection").visible, "Acquired collection can be inspected")
+	await snapshot("collection")
 	var weak: WeakRef = weakref(session.get_node("TowerMap").relics)
 	session.queue_free()
 	await frames()

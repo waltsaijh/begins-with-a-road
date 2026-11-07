@@ -1,5 +1,54 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-07 本次 main → routing-sandbox 整合
+
+以 Sandbox `d85f60b` 為基礎完成既有 `origin/main`／`MERGE_HEAD=6141d51` 合併。授權包含 Merge Commit，不 push。以下為本次紀錄；後續兩個分支的歷史紀錄不代表現況或本次重測結果。
+
+合併前以 `git merge-tree` 重建同一對父提交，再逐檔比對 index 與工作目錄：兩者完全一致，沒有額外本地未提交差異。使用者確認可能沒有建立新 stash；清單只有 11 月 3 日 `60a9224`（此前已恢復）及 10 月 24 日 `d884400`。本次不重新 apply 舊 stash，兩份均保留，沒有把 stash 內容加入 Merge Commit。
+
+衝突處理（實際 14 檔）：
+
+- `AGENTS.md`、`README.md`、`docs/HANDOFF.md`、`docs/phase4.md`、`docs/systems.md`：整合兩邊有效設計與分支歷史，修正目前入口、圖鑑／進度頁、遺物列、倍速及測試敘述。
+- `scenes/enemies/components/enemy_intelligence.tscn`、`scripts/enemies/presentation/enemy_intelligence.gd`：保留 Sandbox 較完整的通知、持久解鎖、閱讀佇列及靜態模型預覽；恢復原 `.gd.uid` 與 LevelSession 初始化，採 main 的新版圖示色。
+- `scenes/relics/relic_choice.tscn`、`scripts/relics/relic_choice.gd`：頂列聚合份數與詳情保留，納入 main 的新版卡片、圖示／使用情境、全畫面 Backdrop、20px 間距及 Debug 重抽。左下獨立 inventory 元件保留給工具，正式關卡不顯示重複兩列。
+- `scripts/levels/presentation/level_hud.gd`：保留集中頂列、緊湊時間線及檢視暫停擁有權；增加進度頁與 Tab／Esc，維持 Sandbox 1／2／4 倍。進度、設定及圖鑑／遺物詳情互斥，暫停選單共六項。
+- `tests/levels/level_flow.gd`、`tests/levels/pause_menu.gd`、`tests/relics/input.gd`、`tests/synergy/input.gd`：依整合後介面保留兩邊階段鎖定、實際輸入、tooltip、遺物數量與手牌獨立性斷言。
+
+跨檔案補強：六種敵人新 ID 加上 v1 codex 舊 ID 映射，圖鑑文字改用新 ID；進度頁敵人與原圖鑑共用遭遇解鎖規則。教學三波／前置關卡、五 ACT Frontier、四塔商店、交通 API、戰鬥、道路及 main 的新版素材／左右鍵鏡頭／載入預熱修改保留。資源引用掃描未發現執行期遺失檔案；列出的其他路徑是測試生成檔及離線工具輸出。
+
+本次 Godot 4.7.2、Windows Compatibility 驗證（隔離 APPDATA／LOCALAPPDATA，不改玩家存檔）：
+
+- Headless editor import：無錯誤，CSV 翻譯重匯入後二進位內容與合併來源一致。
+- Headless：UI Slice A 104 項（當時版本）、tutorial/intro、progress_page、level_flow、relics/rewards、level_catalog、card_names、troop_resources、relics/mechanisms 114 項、traffic/integration 100 項、synergy/routing 357 項，全部通過。
+- 實際渲染：最終 UI Slice A 108 項、level_hud、pause_menu（含重新開始）、pause_navigation（含血條像素）、camera_orbit、relics/input、synergy/input 67 項、tutorial/intro、main_menu，全部通過。頂列、圖鑑／遺物代表截圖已檢視。
+- 初輪 UI 時間線測試在 deferred hover 啟動 tween 前取樣，補 GUI frame 同步後通過；pause_navigation 原有立即出生假設造成空陣列，改成獨立 Resource 的 start_tick=0 fixture 後通過。沒有修改正式波次或刪除功能來通過測試。
+
+日誌與比對證據在 `.godot/merge-2026-11-07/`，截圖在 `.godot/test-results/`。未執行完整十五波平衡、Web 匯出／瀏覽器、release、效能或真人驗收，不以此次 Windows 回歸推論這些結果。
+
+## Sandbox 歷史紀錄（合併前）
+
+## 最新 Git 更新授權：2026-11-06
+
+使用者要求「git更新並push到雲端」，授權提交本輪 UI Slice A、頂列／時間線與集中置中成果、資源、相關測試及文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD 3f692fe，fetch 後本分支與遠端同步；origin/main 的新增提交未合併。本次沿用剛完成的 headless96／rendered99 及相關流程／時間線回歸，不另重跑遊戲測試；提交前核對 staged diff --check。測試log／截圖仍留在忽略的 .godot/。下方未commit／push為本次授權前的階段快照。不改main worktree、不做merge／rebase／reset／clean或強制推送。
+
+## 最新 UI 布局：集中置中與同步位移，2026-11-06
+
+沿用未提交成果，整組資訊依可見項目置中，固定16px間距；時間線展開／收合的0.18秒動畫同步帶動兩側圖標移動，不再貼齊畫面兩端，空遺物／無通知不保留固定槽。保留所有節點引用、tooltip、通知與暫停行為。headless整合96／rendered99、rendered level_flow／ui_scene_templates均failures0；日誌 .godot/ui-centered-*.log，截圖原目錄已更新並檢視。未commit／push，Web／長局未測。
+## 最新 UI 追修：頂列與時間線，2026-11-06
+
+沿用下節全部未提交成果。防線改盾牌圖示＋數值，與金幣／遺物／時間線／敵軍未讀通知／加速及暫停放在同一頂列；補上各項 hover 資訊。緊湊未來波次改空心圈、移除其底部細進度條；兩模式依 ACT 加雙菱形遺物節點（Frontier四次，自訂最終獎勵旗標保留）。未改戰鬥、導航或十五波流程。
+
+本輪 headless整合92／Compatibility rendered95，failures0；rendered level_flow／ui_scene_templates／pause_menu亦各0。實際頂列、空心圈、兩模式遺物及hover截圖已檢視，日誌 .godot/ui-topbar-*.log，截圖仍在 .godot/test-results/ui_slice_a/（覆蓋為最新版本，新增health_tooltip／relic_node_tooltip／relic_milestone_active）。Web／完整15波／真人未測，user://環境限制同下節。未commit／push。細節見 [UI Slice A](ui_slice_a.md)。
+## 最新 UI：Slice A，2026-11-06
+
+起始 branch experiment/routing-sandbox／HEAD 3f692fe，工作區乾淨；本輪未 commit／push。完成四塔商品的單排商店（輔助設施保留但暫不販售）、hover／點擊展開的緊湊時間線、持有遺物圖示列，以及實際出生後的未讀通知／共用敵軍圖鑑。詳情向 LevelHUD 借用暫停並還原原狀態；通關 v1 保存加入 codex section，舊檔相容。沒有修改原生／導航、戰鬥／波次 Resource 或模型。
+
+本輪 PASS：新整合 headless 78／rendered 81；商店 headless／rendered、cards、拖牌、traffic100、relic stacking／rewards／mechanisms113／rendered input、rendered level_flow／HUD／pause_menu／timeline templates、wave_spawn_groups、troop_resources、level_catalog、synergy rendered input67，failures皆0。初輪舊測試固定6張商品、3兵種、立即出生與舊空艇節點路徑已更新為目前契約；初輪解析／取樣問題已修正重跑。實際 Frontier UI 及800×600／1600×900截圖已檢視。日誌 .godot/ui-slice-*.log，截圖 .godot/test-results/ui_slice_a/。git diff --check 另於交付前核對。
+
+預設user://／shader cache受環境寫入權限限制，部分既有整合測試留下保存警告；新增跨局／舊檔保存回歸使用隔離的可寫路徑且通過。未跑Web（仍缺路網WASM）、完整15波、效能或真人驗收。完整責任／入口／限制見 [UI Slice A](ui_slice_a.md)。下方為歷史階段紀錄。
+
+## main 歷史紀錄（合併前；移除圖鑑及遺物詳情的決策由本次整合取代）
+
 2026-11-07 進度頁：移除遊戲內敵軍情報按鈕／面板與「新 N」提示，主畫面與暫停選單新增「進度」，列出六塔、全部敵人與 21 件遺物的名稱、描述及數值／特性；遺物名稱下方以對應塔色小字標示使用情境，三選一卡片相同；開波提示的兵種圖示改為暫停並開到該敵人。新增 tests/menus/progress_page.gd（中英文無漏 key）。實際 main_menu、synergy/input、tutorial/intro、headless level_flow、road_flow_preview 通過；pause_menu 的 Restart fixture 失敗與 pause_navigation 的敵人準備錯誤在修改前提交版相同，未修。
 
 2026-11-07 開場改為全白品牌畫面：Web shell 只顯示左 Godot（深色無框）右 team_icon；Boot 同畫面加細長進度條與小字；主選單就緒後 logo 淡出、白底再淡出。Logo 開場淡入 0.8 秒（Web 用 CSS、桌面用 Boot）。選圖進關卡維持白底，雲海載入版本已依使用者要求撤回。Web 實測 shell、Boot、轉場 logo 位置一致，無 console error。發現隱藏 IntroLogos 在 Web 尺寸為 0（Windows 不會發生），以 refresh() 修正並在 startup_loading 加回歸。實際 menus/startup_loading、main_menu（--resolution 1600x900）、level_selection 與 headless tutorial/intro 通過。menus/scene_loading 有 2 項失敗，修改前提交版相同（第一關為教學時 start_allowed 為 false）。main_menu、scene_loading 含滑鼠輸入，需獨佔視窗焦點，與瀏覽器同跑會假失敗。tests/menus/web_loading_shell.cjs 已更新但未執行（本機無 Playwright）。

@@ -23,6 +23,10 @@ func verify() -> void:
 	scene.set_process(false)
 	await frames(12)
 	var timeline: WaveTimeline = scene.timeline
+	timeline._pinned = true
+	timeline.set_expanded(true)
+	timeline._motion.custom_step(0.2)
+	await frames()
 	var markers := timeline.get_node("Track/Markers")
 	var filled := timeline.get_node("Progress/Fill/Markers")
 	check(markers.get_child_count() == scene.level.wave_count() and filled.get_child_count() == markers.get_child_count(), "Timeline did not instantiate matching marker templates")
@@ -34,22 +38,24 @@ func verify() -> void:
 	check(timeline.find_children("*", "", true, false).size() == nodes_before, "Progress updates grew the UI tree")
 	check(timeline.get_node("Progress").clip_contents, "Timeline no longer clips its fill")
 	var center_x := timeline.size.x*timeline.node_fraction(0)
-	var fraction := (center_x-1.5)/timeline._marker_right_edge(0)
+	# Sample safely inside each half at the actual canvas scale, away from AA.
+	var fraction := center_x/timeline._marker_right_edge(0)
 	timeline.set_state(0, fraction, false)
 	await frames()
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		var image := get_viewport().get_texture().get_image()
 		var center := timeline.global_position+Vector2(center_x, timeline.get_node("Track/Line").points[0].y)
-		var left := pixel_at(image, center-Vector2(2, 0))
-		var right := pixel_at(image, center+Vector2(2, 0))
+		var image_scale := Vector2(image.get_size())/get_viewport().get_visible_rect().size
+		var left := pixel_at(image, (center-Vector2(2, 0))*image_scale)
+		var right := pixel_at(image, (center+Vector2(2, 0))*image_scale)
 		check(left.r < 0.4 and left.g > 0.4 and right.r > 0.75, "Circle was not filled continuously from left to right")
 		image.save_png(Artifacts.path("levels/timeline_partial_fill.png"))
 		timeline.set_state(0, 1.0, true)
 		await frames()
 		await RenderingServer.frame_post_draw
 		image = get_viewport().get_texture().get_image()
-		var complete := pixel_at(image, center+Vector2(2, 0))
+		var complete := pixel_at(image, (center+Vector2(2, 0))*image_scale)
 		check(complete.r < 0.4 and complete.g > 0.4, "Circle was not completely filled on wave start")
 	var appearance := scene.get_node("EnemyWave").visuals.status_overlay.get_node("Appearance") as Control
 	check(appearance.scene_file_path == "res://scenes/enemies/components/enemy_status_appearance.tscn", "Batched status overlay no longer reads its scene template")

@@ -257,14 +257,14 @@ func verify() -> void:
 	check(hud.settings_page.visible and level.get_node("Camera3D")._navigation_locked, "In-game settings no longer work after entering from the menu")
 	hud.settings_page.close()
 	hud.set_paused(false)
-	# Return from a real paused 3x battle, keeping simulation frozen until covered.
+	# Return from a real paused 4x battle, keeping simulation frozen until covered.
 	level._on_start_requested()
 	level._process(1.5)
 	var wave: Node = level.get_node("EnemyWave")
 	wave._process(0.0)
 	hud.cycle_speed()
 	hud.cycle_speed()
-	check(wave.active and hud.speed_index == 2, "Return-home fixture is not an active 3x battle")
+	check(wave.active and hud.speed_index == 2, "Return-home fixture is not an active 4x battle")
 	hud.set_paused(true)
 	check(hud.home_button.text == "Back to main menu", "Pause action was not renamed")
 	await create_timer(0.4, true, false, true).timeout

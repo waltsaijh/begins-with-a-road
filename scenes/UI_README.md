@@ -11,8 +11,8 @@
 | 世界提示的共用對話框外觀 | `interface/components/speech_bubble_frame.tscn` | `Background` 的淡色底、`Border` 的青灰邊框；Frame Size／Tail Height 控制框體與置中尖角，開波與塔 hover 共用 |
 | 防禦塔 hover 與升級回饋 | `towers/components/tower_hover.tscn` | 根 CanvasLayer 7 高於開波提示的 Layer 6；`TowerHover/Margin/Content/TowerName` 靠左、`Level` 靠右；Text Theme 與開波標題統一為 16px 青灰色細字、無描邊，Content 的 Separation 為 12px，框寬依內容貼合 |
 | 開波提示 | `levels/components/start_wave_callout.tscn` | `Shape/Background`／`Shape/Border` 保存共用對話框底色與邊框，`Title` 的置中開波文字、`NextWaveIntel/Scroll/Items` 的橫排圖示；34px 單框、24px 圖示與 hover 數量樣式在 `troop_intel_item.tscn` |
-| 已持有遺物圖示 | `relics/relic_inventory.tscn` | 獨立掛在 RelicChoice CanvasLayer；Icons 為 HBox，間距 6px，Screen Margin 為左距 16px／底距 216px，不跟隨卡牌；單項保存 28px 圖示與 tooltip，取得時向右新增 |
-| ACT 遺物三選一 | `relics/relic_choice.tscn` | Modal/Backdrop 全畫面變暗，Blocker 獨立保留頂部 80px 點擊；Center/Layout 置中三張 184×272px、間距 20px 的卡牌，單卡使用 `relics/components/relic_card.tscn`；不再包含 InventoryButton／Collection |
+| 已持有遺物圖示 | `relics/relic_choice.tscn` | RelicBar/Items 依持有種類建立按鈕與疊加數字，HUD 集中置中；點擊 Collection 詳情。獨立 `relic_inventory.tscn` 保留供工具使用 |
+| ACT 遺物三選一 | `relics/relic_choice.tscn` | Modal/Backdrop 全畫面變暗，Blocker 獨立保留頂部 80px 點擊；Center/Layout 置中三張 184×272px、間距 20px 的卡牌，單卡使用 `relics/components/relic_card.tscn`；保留 Collection 詳情，與圖鑑共用 HUD 暫停擁有權 |
 | ACT 結束後選擇新入口 | `levels/spawn_expansion.tscn` | `Interface/Root/Panel` 的標題、說明、三個方向按鈕與重選按鈕；`World` 的候選格、路徑與入口預覽；根節點可調搜尋距離與候選帶寬 |
 | 新入口模型 | `levels/components/expansion_start.tscn` | `Visual` 的起點模型；邏輯根節點固定，只有模型跟地塊浮起 |
 | 時間線整體 | `levels/wave_timeline.tscn` | 根節點的 Preview／Appearance；`Progress` 用 `clip_contents` 水平裁切填色 |
@@ -42,6 +42,6 @@ SettingsButton 的 hover 僅將文字變黑，維持 Light 字重、原尺寸與
 開始選單：`scenes/menus/main_menu.tscn`。Interface/Home/Column 保存徽記、標題、說明及三個明確按鈕；Interface/Entry 調整淡入動畫，SettingsVeil／SettingsPage 與主畫布的設定頁共用宿主流程。`menus/components/menu_stage.tscn` 保存固定道路、柱子、端點、燈光、透視相機及雲材質，Entry 控制橋面浮起。`menus/components/menu_crest.tscn` 使用明確的 Line2D／Polygon2D 節點，沒有程式繪製或執行時生成。以上場景可直接在編輯器修改。
 選圖頁：`scenes/menus/map_selection.tscn` 的 Heading 與 Footer/Column 保存固定介面，Footer 可調名稱、索引、描述、關卡規模及按鈕排版，Entry 控制淡入。按下一步只在 Footer/Column/Details 的固定 104px 高區域內，把 Info 換成 RunOptions 的兩欄、兩排選項區（左上難度、右上起始手牌、左下額外事件、右下提示），RunOptions 的 Separation 調整欄間留白（64px），各欄 Group 的 Separation 調整排間留白（24px），Details/Divider 為中央 1px 淡青垂直線，僅在選項步驟顯示，最後按開始作戰；Heading/Step、地圖名稱／箭頭與相機保持原樣，Actions 的按鈕由場景保存固定位置及尺寸，不隨文案長度移動。LeftColumn／RightColumn 以 CenterContainer 置中整欄 Group，Group 內各列與 Hint 均左對齊，同欄 Key 依語言共用寬度；OptionLabelPadding 保留左側透明內距；CompactOption 調整選項字級／留白，Underline Inset 控制底線與底緣距離。選項為流程原型，尚不影響戰局。`scenes/menus/components/map_preview.tscn` 保存共用預覽宿主與 Camera3D，選中地圖時由 Level.terrain 延遲載入地形，換圖釋放舊副本；預覽根節點的 Top Clearance／Bottom Clearance／Horizontal Fraction 調整標題與下方操作的取景留白，Zoom 控制視覺倍率（目前 1.0，Bottom Clearance 為 280px）；Camera3D 保留 45° 俯角，Z 較長地圖轉向 -90°。解鎖狀態使用原 Info 區顯示未解鎖／未完成前置，不另建對話框。自動發現、前置 ID 與通關保存見 `assets/data/levels/README.md`。
 
-Phase 2 商店 Root/Slots 保留原 Reroll 牌背與動畫，上排 Offer0–3，下排 Support0–1 加右下 Reroll。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
+一般商店 Root/Slots 為單排 Offer0–3 加右端 Reroll，保留牌背與動畫；輔助池 API 與資源供工具使用，不在一般商店販售。岔路 ↑／↓ 外觀範本位於 `traffic/components/traffic_delta_overlay.tscn`，只比較候選與基準實際配額，不代表行進方向。
 
 `progress/progress_page.tscn` 繼承 `settings/settings_page.tscn`，由主畫面與暫停選單開啟，列出防禦塔、敵軍與遺物介紹；條目範本為 `progress/components/progress_entry.tscn`。

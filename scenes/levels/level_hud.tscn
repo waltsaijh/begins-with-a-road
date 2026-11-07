@@ -31,6 +31,7 @@ visible = false
 layout_mode = 0
 
 [node name="Header" type="Control" parent="." unique_id=1027691164]
+theme = ExtResource("7")
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -45,13 +46,13 @@ layout_mode = 1
 [node name="Balance" type="HBoxContainer" parent="Header" unique_id=1541689674]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.25
-anchor_right = 0.25
-offset_left = -116.0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 96.0
 offset_top = 34.0
-offset_right = -22.0
+offset_right = 160.0
 offset_bottom = 72.0
-mouse_filter = 2
+mouse_filter = 0
 theme_override_constants/separation = 0
 alignment = 2
 
@@ -75,11 +76,11 @@ vertical_alignment = 1
 [node name="Actions" type="HBoxContainer" parent="Header" unique_id=1092782050]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.75
-anchor_right = 0.75
-offset_left = 16.0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
 offset_top = 37.0
-offset_right = 88.0
+offset_right = -16.0
 offset_bottom = 69.0
 mouse_filter = 2
 theme = ExtResource("7")
@@ -127,7 +128,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -212.0
-offset_top = -198.0
+offset_top = -240.0
 offset_right = -24.0
 offset_bottom = -24.0
 grow_horizontal = 0
@@ -155,5 +156,7 @@ mouse_filter = 2
 [node name="Progress" parent="PauseBlocker/Menu/Margin/Actions" instance=ExtResource("10_menu_item")]
 
 [node name="Settings" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1202626757 instance=ExtResource("10_menu_item")]
+
+[node name="Codex" parent="PauseBlocker/Menu/Margin/Actions" instance=ExtResource("10_menu_item")]
 
 [node name="ReturnHome" parent="PauseBlocker/Menu/Margin/Actions" unique_id=778682886 instance=ExtResource("10_menu_item")]

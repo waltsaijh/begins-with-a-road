@@ -53,6 +53,11 @@ static func _tower_entry(definition: TowerDefinition) -> Dictionary:
 		"traits": TranslationServer.translate("tower.%s.traits" % id).split("|", false)}
 
 static func _enemy_entry(profile: Troop) -> Dictionary:
+	var progress := (Engine.get_main_loop() as SceneTree).root.get_node("LevelProgress")
+	if not progress.enemy_unlocked(profile.troop_name):
+		return {"id": profile.troop_name, "name": "???", "icon": null, "tile": Color.TRANSPARENT,
+			"description": "Encounter this enemy to unlock its record." if TranslationServer.get_locale().begins_with("en") else "在戰場遭遇後解鎖此敵軍情報。",
+			"stats": PackedStringArray(), "traits": PackedStringArray()}
 	var stats := PackedStringArray([_stat("health", profile.max_health)])
 	if profile.max_shield > 0.0: stats.append(_stat("shield", profile.max_shield))
 	stats.append(_stat("speed", profile.speed_multiplier))
