@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="TutorialDefinition" format=3]
+[gd_resource type="Resource" script_class="TutorialDefinition" format=3 uid="uid://kjj24npyu6vr"]
 
-[ext_resource type="Script" path="res://scripts/cards/definitions/build_card.gd" id="1_2xkhq"]
-[ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_b46a4aa7ce037ee15ceb475612745a2a.tres" id="sentry_line"]
+[ext_resource type="Script" uid="uid://uc2xwo88w3ys" path="res://scripts/cards/definitions/build_card.gd" id="1_2xkhq"]
+[ext_resource type="Resource" uid="uid://bbbau5u7i34ve" path="res://assets/data/towers/crossfire.tres" id="3_l7e5n"]
+[ext_resource type="Script" uid="uid://ckih7x7ol30ue" path="res://scripts/tutorial/tutorial_definition.gd" id="4_ej8ds"]
+[ext_resource type="Resource" uid="uid://ctxkqyv56ojbu" path="res://assets/data/towers/sentry.tres" id="5_yj2j1"]
 [ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_889e85b850619a8eb20d0fc7e832bfe5.tres" id="crossfire_line"]
-[ext_resource type="Resource" path="res://assets/data/towers/crossfire.tres" id="3_l7e5n"]
-[ext_resource type="Script" path="res://scripts/tutorial/tutorial_definition.gd" id="4_ej8ds"]
-[ext_resource type="Resource" path="res://assets/data/towers/sentry.tres" id="5_yj2j1"]
-
+[ext_resource type="Resource" path="res://assets/data/tower_tiles/user/user_b46a4aa7ce037ee15ceb475612745a2a.tres" id="sentry_line"]
 [ext_resource type="Resource" path="res://assets/data/tutorial/starting_01.tres" id="start_1"]
 [ext_resource type="Resource" path="res://assets/data/tutorial/starting_02.tres" id="start_2"]
 [ext_resource type="Resource" path="res://assets/data/tutorial/starting_03.tres" id="start_3"]
@@ -25,7 +24,7 @@ tower = ExtResource("5_yj2j1")
 [resource]
 script = ExtResource("4_ej8ds")
 starting_cards = Array[ExtResource("1_2xkhq")]([ExtResource("start_1"), ExtResource("start_2"), ExtResource("start_3")])
-guided_cells = Array[Vector3i]([Vector3i(3,0,0),Vector3i(5,0,1)])
+guided_cells = Array[Vector3i]([Vector3i(3, 0, 0), Vector3i(5, 0, 1)])
 guided_turns = PackedInt32Array(0, 2)
 upgrade_card = SubResource("Resource_gctoo")
 new_card = SubResource("Resource_8072v")
