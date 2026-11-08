@@ -47,6 +47,26 @@ func set_cards(cards: Array[BuildCard]) -> void:
 	show_selection(-1, 0)
 	_layout(false)
 
+func deal_cards(cards: Array[BuildCard]) -> void:
+	set_cards(cards)
+	_motion = create_tween().set_ignore_time_scale(true).set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var source := Vector2(get_viewport().get_visible_rect().size.x*0.5,get_viewport().get_visible_rect().size.y+40)
+	for i in views.size():
+		var view := views[i]
+		var target := view.position
+		var angle := view.rotation
+		view.position = source
+		view.rotation = 0
+		view.modulate.a = 0
+		view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_entering[view] = true
+		_motion.tween_property(view,"position",target,0.55).set_delay(i*0.12)
+		_motion.tween_property(view,"rotation",angle,0.55).set_delay(i*0.12)
+		_motion.tween_property(view,"modulate:a",1.0,0.3).set_delay(i*0.12)
+	_motion.finished.connect(func():
+		_entering.clear()
+		for view in views: view.mouse_filter = Control.MOUSE_FILTER_STOP)
+
 func _append_view(card: BuildCard) -> Button:
 	var view: Button = View.instantiate()
 	view.card = card
@@ -154,6 +174,7 @@ func finish_animation() -> void:
 	if _motion != null: _motion.kill()
 	_fresh.clear()
 	_entering.clear()
+	for view in views: view.modulate.a = 1.0
 	_layout(false)
 
 func _layout(animate: bool, selection_changed := false) -> void:
@@ -203,11 +224,13 @@ func _layout(animate: bool, selection_changed := false) -> void:
 			_motion.tween_property(views[i], "rotation", angle, duration)
 			_motion.tween_property(views[i], "scale", Vector2.ONE*scale_factor, duration)
 			_motion.tween_property(views[i], "hover_lift", lift, duration)
+			_motion.tween_property(views[i], "modulate:a", 1.0, duration)
 		else:
 			views[i].position = target
 			views[i].rotation = angle
 			views[i].scale = Vector2.ONE*scale_factor
 			views[i].hover_lift = lift
+			views[i].modulate.a = 1.0
 	if animate:
 		_motion.finished.connect(func():
 			_entering.clear()

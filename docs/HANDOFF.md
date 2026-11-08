@@ -1,5 +1,21 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-08 教學體驗優化
+
+Git 交付：使用者以「git更新 並 push到遠端」授權將本節教學流程、精確焦點框、輕量結算、勝利音效與向外彩帶，以及所有相關素材／測試／文件提交並正常推送 origin/experiment/routing-sandbox。開始 HEAD 4a61359，fetch 後與追蹤分支同步；本節下方未 commit／push 為各實作當時快照。提交整理沿用已完成的實測並核對 staged diff，不宣稱重新執行整套測試；.godot/ 臨時音訊探測器、日誌與截圖不提交。
+
+最新彩帶方向：使用者要求向左右外側噴發，保持碎片尺寸，將水平速度改為 100–210 px/s、阻尼 0.9，增加距離與散度；仍各 12 片、1.4 秒內清除，中央文字與按鈕保持排除區。音訊無聲已由使用者確認是 Discord 語音影響、目前正常，因此未改動音訊邏輯或音量；排查時另外用實際混音 PCM 測過正式 boot → 選單 → 關卡準備 → 號角 → 勝利 → BGM，所有段落都有非零訊號，臨時探測器與原始記錄留在 .godot/。本輪未 commit／push。
+
+最新比例／勝利慶祝：教學標註整體縮小 10%。RunStatus 勝利時只觸發一次 VictoryConfetti（UI 畫布繪製，左右各 12 片低彩度紙片，0.08／0.13 秒延遲、1.4 實際秒內清空，避開中央文字／按鈕），不生成砲具或 3D 道具；失敗不觸發。使用 Downloads 指定 victory.mp3 原檔副本，BGM bus／基礎增益 0.5；出現結算先淡掉原 BGM，約 3.918 秒音效自然結束後才接回平時 BGM，重玩／離場取消 pending 接歌。同次 finish 重入不重播。Native game_audio、實際 completion_flow（等待原音檔自然完成後恢復 BGM）與 defeat_input 通過；intro 新增 24 片、排除文字區、重入不重播與自動清理斷言亦通過。已檢視縮小教學與勝利碎片峰值截圖 05_victory_burst.png；發牌測試原以三個 GUI frame 後的到達狀態斷言，並行 GPU 載入可能已跑完動畫，改在既有 cards_changed 訊號當下驗證三牌淡入初態，保持原動畫要求。未 commit／push，Web 未測。
+
+最新美術方向覆蓋下方矩形框版本：教學改單側細線、低透明度向右淡出的資訊標註，加 01 / 05 小標、操作標題與快捷鍵層級；原說明／步驟／限制保留。結算移除米色圓角窗與實心按鈕，採中央主選單徽記＋勝敗主標＋三欄統計與文字操作，教學完成內容／兩個操作仍是同一中央內容群組。白色徑向柔罩保留背景與雲海，勝敗以文字與金／暖灰紅線色區別，實際時間快速淡入。Godot Compatibility 的 intro、completion_flow 與實際行走至漏敵敗北／重新開始的 defeat_input 均通過；已檢視中文教學、勝利、800×600 英文與一般失敗截圖。defeat_input 舊回歸點擊整個開波容器中心、且仍假設重玩會丟棄所選 Level override，修正為實際 Title 命中與既有保留選中 Resource 的契約後通過，沒有改遊戲規則。未 commit／push，Web 未測。
+
+最新追修：重玩／繼續改放在勝利結算 Panel 內的 TutorialActions，移除畫面底部獨立按鈕與 Footer 漸層。焦點框改追蹤卡面 Visuals 實際四角，包含扇形轉角與搖動，以來源／目標 CanvasLayer 變換轉為焦點層局部座標；暗罩使用同一四邊形半平面裁切，避免軸向包圍框造成的偏移，繪製時重取最終布局／動畫變換。收斂後留白約 3–5 px。中英文教學與完成文案改以 CSV 引號多行按語意預先換行；實際各步提示行數沒有額外半句自動折行。新增 focus_geometry 跨 CanvasLayer／縮放／旋轉四角對齊與暗罩不重覆覆蓋回歸通過；intro 與 completion_flow 實際渲染再次通過，800×600 英文與中文結算、兩按鈕在框內截圖均已檢視。本輪仍未 commit／push。
+
+開始 branch experiment/routing-sandbox／HEAD 4a61359，工作區乾淨。本輪未 commit／push。完成無牌鏡頭練習、第二步三牌依序飛入左下角、教學目標的半透明脈動材質、獨立挖孔暗罩與收斂／脈動／淡出焦點框，以及讓玩家自行開店。第三波不選遺物、直接完成並保存通關；原完成提示移至共用勝利結算，下方按鈕可重玩本關或白色轉場至第二關選擇戰場頁（單次選圖 ID handoff，未直接開戰）。現有相機／放置／商店交易權威不代操作。
+
+已完成 Godot 4.7.2 Compatibility 真實渲染：tutorial/intro（全三波、發牌、半透明 pulse、焦點收縮、手動開店、完整操作與無遺物通關）、tutorial/completion_flow（實際點擊重玩與繼續第二關）、menus/main_menu（含9次白色過渡與設定／進關／返回），全部通過；headless balance/rules 67 項通過，確認普通十五波與四次遺物流程。代表截圖在 .godot/test-results/tutorial/，已檢視發牌、焦點暗罩、放置指示、結算與第二關選圖。Headless balance 快速結束有既有音訊 Resource 清理警告。Web／真人長局未測；完成流程測試以直接觸發勝利隔離兩個按鈕，全三波流程另由 intro 驗證。初次 completion_flow 腳本的型別／autoload 參照編譯錯誤已修正後通過。
+
 ## 2026-11-08 完整塔體中心旋轉
 
 Git 交付：使用者以「git更新並push到遠端」授權將本節旋轉／異種重疊成果提交並正常推送 origin/experiment/routing-sandbox，連同先前本機音訊提交 6163ba8 一起交付。開始 HEAD 6163ba8；fetch 後領先追蹤分支 1 筆、無落後，未合併 origin/main 新更新。本節下方未 commit／push 為各實作當時快照；提交整理沿用已完成的測試並核對 staged diff，不宣稱整套重測。

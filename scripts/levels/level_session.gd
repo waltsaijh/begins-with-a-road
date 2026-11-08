@@ -55,7 +55,9 @@ func _enter_tree() -> void:
 	if not error.is_empty():
 		push_error(error)
 		return
-	if level.tutorial != null: get_node("CardPlacement").cards = level.tutorial.starting_cards.duplicate()
+	if level.tutorial != null:
+		get_node("CardPlacement").cards.clear()
+		get_node("CardPlacement").initial_card_count = 0
 	var source_node := level.terrain.instantiate()
 	if not source_node is GridMap:
 		source_node.free()
@@ -282,7 +284,7 @@ func _on_wave_finished() -> void:
 	_finish_wave_transition()
 
 func _finish_wave_transition() -> void:
-	GameAudio.play_default()
+	if current_wave+1 < _waves.size() or level.reward_final_act: GameAudio.play_default()
 	_settling_wave = false
 	set_process(false)
 	current_wave += 1
@@ -367,7 +369,7 @@ func _on_enemy_leaked(enemy: Node3D) -> void:
 
 func _end_run(won: bool) -> void:
 	if finished: return
-	GameAudio.play_default()
+	if not won: GameAudio.play_default()
 	finished = true
 	victory = won
 	_wave_starting = false
@@ -382,10 +384,10 @@ func _end_run(won: bool) -> void:
 	get_node("TowerMap").combat.barracks._process(0.0)
 	_update_start_callout()
 	set_process(false)
+	if won and not level.progress_id().is_empty(): LevelProgress.mark_completed(level.progress_id())
 	run_status.finish(won)
 	if BalanceTrace.enabled: BalanceTrace.event("victory" if won else "defeat","run",{"base_health":base_health,"kills":total_kills,"leaks":total_leaks,"completed_waves":current_wave})
 	if won:
-		if not level.progress_id().is_empty(): LevelProgress.mark_completed(level.progress_id())
 		level_finished.emit()
 	run_finished.emit(won)
 	if _owns_balance_trace:

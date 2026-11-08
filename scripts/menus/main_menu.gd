@@ -39,13 +39,16 @@ func _ready() -> void:
 	$Interface/Entry.play("enter")
 	$Stage/Entry.play("enter")
 	start_button.grab_focus()
+	var requested_map := LevelLaunch.take_menu_map()
+	if not requested_map.is_empty(): _show_map_selection(requested_map)
 
 func start_game() -> void:
 	if _starting or _page_open() or _selecting: return
 	ScreenTransition.run(_show_map_selection)
 
-func _show_map_selection() -> void:
+func _show_map_selection(preferred_id := "") -> void:
 	_reload_catalog()
+	if not preferred_id.is_empty(): map_selection.select_level(preferred_id)
 	_selecting = true
 	home.hide()
 	$Stage/Bridge.hide()

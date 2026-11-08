@@ -53,4 +53,4 @@ required_to_complete_levels = PackedStringArray()
 terrain = ExtResource("5_d3556")
 acts = Array[ExtResource("1_hpbpm")]([SubResource("Resource_cto5j")])
 tutorial = ExtResource("6_5bysg")
-reward_final_act = true
+reward_final_act = false

@@ -3,6 +3,7 @@ extends Node
 const DEFAULT = preload("res://assets/audio/music/bgm_default.ogg")
 const BATTLE = preload("res://assets/audio/music/bgm_battle.ogg")
 const BUGLE = preload("res://assets/audio/music/sfx_bugle_cue.wav")
+const VICTORY = preload("res://assets/audio/music/victory.mp3")
 const CLICK = preload("res://assets/audio/ui/click.wav")
 const HOVER = preload("res://assets/audio/ui/hover.mp3")
 const CARD_HOVER = preload("res://assets/audio/ui/card_hover.mp3")
@@ -14,6 +15,7 @@ const LOOP_SECONDS := 2.0
 const DEFAULT_BGM_VOLUME := 0.5
 const BGM_GAIN := 0.5
 const BUGLE_GAIN := 0.5
+const VICTORY_GAIN := 0.5
 var _voices: Array[AudioStreamPlayer] = []
 var _targets: Array[float] = [0.0, 0.0]
 var _active := -1
@@ -25,6 +27,9 @@ var _fade_from: Array[float] = [0.0, 0.0]
 var _fade_age := 0.0
 var _fade_seconds := FADE_SECONDS
 var _effects: Dictionary = {}
+var _victory: AudioStreamPlayer
+var _victory_pending := false
+var _victory_target := 0.0
 
 func play_effect(kind: StringName) -> void:
 	if _effects.has(kind): _effects[kind].play()
@@ -55,6 +60,8 @@ func _exit_tree() -> void:
 		player.stream = null
 	_bugle.stop()
 	_bugle.stream = null
+	_victory.stop()
+	_victory.stream = null
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -87,18 +94,45 @@ func _ready() -> void:
 	_bugle.bus = &"Combat"
 	add_child(_bugle)
 	_bugle.stream = BUGLE
+	_victory = AudioStreamPlayer.new()
+	_victory.bus = &"BGM"
+	_victory.stream = VICTORY
+	_victory.volume_linear = 0.0
+	add_child(_victory)
+	_victory.finished.connect(_on_victory_finished)
 	_last_usec = Time.get_ticks_usec()
 	play_default()
 
 func play_default() -> void:
+	_victory_pending = false
+	_victory_target = 0.0
 	_battle_at = 0.0
 	var returning := _desired == BATTLE
 	_desired = DEFAULT
 	# Cancel an interrupted opening cue gently, without playing an ending cue.
 	_switch(DEFAULT, RETURN_SECONDS if returning else FADE_SECONDS)
 
+func play_victory() -> void:
+	if _victory_pending: return
+	_battle_at = 0.0
+	_desired = DEFAULT
+	_victory_pending = true
+	_victory_target = VICTORY_GAIN
+	_victory.volume_linear = 0.0
+	_fade_to([0.0,0.0],0.3)
+	_active = -1
+	_victory.play()
+
+func _on_victory_finished() -> void:
+	if not _victory_pending: return
+	_victory_pending = false
+	_victory_target = 0.0
+	_switch(DEFAULT,FADE_SECONDS)
+
 func begin_wave() -> void:
 	if _desired == BATTLE: return
+	_victory_pending = false
+	_victory_target = 0.0
 	_desired = BATTLE
 	_fade_to([0.0, 0.0], FADE_SECONDS)
 	_active = -1
@@ -132,6 +166,8 @@ func _process(_delta: float) -> void:
 	var now := Time.get_ticks_usec()
 	var elapsed := maxf(0.0, (now-_last_usec)/1000000.0)
 	_last_usec = now
+	_victory.volume_linear = move_toward(_victory.volume_linear,_victory_target,elapsed*VICTORY_GAIN/(0.08 if _victory_pending else 0.2))
+	if not _victory_pending and _victory.volume_linear <= 0.0 and _victory.playing: _victory.stop()
 	if _battle_at > 0.0 and now/1000000.0 >= _battle_at:
 		_battle_at = 0.0
 		_switch(BATTLE)

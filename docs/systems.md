@@ -501,6 +501,8 @@ Web 匯出引用 `assets/web/shell.html`，白底只顯示內嵌 Godot／團隊 
 
 `GameAudio` Autoload 在啟動時建立 BGM／Combat bus 與雙 BGM player，跨選單／選圖／關卡連續播放平時音樂。LevelSession 在 1.5 秒開波等待開始時要求播放號角並淡出平時 BGM，號角結束前 0.5 實際秒淡入戰鬥 BGM；wave_started 補接直接開波入口且不重播號角。波次等在途攻擊收尾後、勝敗、離場或失敗開波時淡回平時 BGM，不播結束號角。重複要求同狀態不重頭播放；快速返回仍在淡出的曲目直接反向淡化，取消開波也取消延遲接歌並以 0.25 秒淡掉號角。全部 BGM 播放基礎增益為 50%（與音量滑桿獨立相乘，平時、戰鬥與循環均適用），BGM bus 滑桿預設恢復為 50%，號角基礎增益為 50%（仍受 Combat／Master 控制）。一般淡化 1.5 秒，戰鬥結束／離場回平時改用 4 秒；包絡以 smoothstep 平滑起落，從當前增益接續。曲尾提前 2 秒以另一 player 從頭播放並交叉淡化，音檔原生 loop 關閉。所有包絡以單調實際時鐘更新，Always processing，不受遊戲倍速與暫停影響。號角與現有六聲道射擊池走 Combat，BGM 專走 BGM。BGM 使用使用者提供的 bgm_default.ogg／bgm_battle.ogg，來源副本位於 assets/audio/music/，原 MP3 副本已移除。OGG 的原生 loop 關閉，沿用雙 player 交叉淡化；正式執行不讀取原型專案。新 UI 點擊副本位於 assets/audio/ui/click.wav；GameAudio 監看新增 BaseButton 的 pressed，包含主選單、設定、暫停與卡牌，停用按鈕不會發出 pressed。點擊走 Master；按鈕 hover.mp3 與卡片 card_hover.mp3 副本同放 assets/audio/ui/，兩者增益皆為 0.25（click 為 1.0）、max_polyphony=1 並走 Master。一般 BaseButton 的 mouse_entered 僅對可處理、可見且啟用者發聲；CardButton 不接一般 hover，改由手牌／展開商店的穩定 hover index 變更觸發，避免動畫改變命中造成重播，游標停留同卡不重播。遺物卡以 audio_card_hover group 選用卡片聲。放塔／非法放塔副本位於 assets/audio/placement/，由 CardPlacement 權威提交結果觸發並走 Combat。非法地圖提交保留卡片與導航 revision，紅色預覽 shader 以實際時鐘短亮 0.4 秒，只改紅色格面及邊框，其他格色與攻擊範圍不變；移到新格、旋轉或轉為合法預覽即清除閃亮，不為動畫每幀重建網格。
 
+勝利結算額外使用 assets/audio/music/victory.mp3（原檔副本約 3.918 秒、loop=false）。GameAudio 的獨立一次性播放器走 BGM bus、基礎增益 0.5；play_victory 取消號角接歌、把現有音樂在 0.3 秒內淡掉，勝利音效用 0.08 秒淡入，自然 finished 才以既有 1.5 秒包絡接回平時 BGM。play_default／begin_wave 會取消 pending，0.2 秒淡掉被中止的勝利聲；離場後不保留延遲接歌。RunStatus.finish 有同次結算守衛，避免重播聲音／彩帶。VictoryConfetti 為不攔截輸入的 2D Control，只繪左右各 12 個幾何碎片，局部 RNG 不消耗遊戲亂數；先向左右外側偏上噴發（尺寸不變、水平速度 100–210 px/s、阻尼 0.9），阻尼／重力／旋轉／淡出，最多 1.4 實際秒清空並停止 processing。四色為米金、柔金、藍灰、淡青；0.08／0.13 秒延遲，避開整個中央內容區及其 8px 邊距，失敗不啟動。不建立實體砲具、粒子煙霧或 3D 節點。
+
 音訊回歸：`godot --headless --path . --script res://tests/menus/game_audio.gd`；移除 headless 可驗證實際音訊裝置、鍵盤滑桿及畫面（`.godot/audio-settings.png`）。涵蓋解碼／原生 loop 關閉、開波單次號角、循環重疊、取消延遲接歌、暫停／4x 實際時間、bus 路由、0 音量及三滑桿立即套用。主觀音量平衡與 Web 使用者手勢解鎖仍需真人試聽。
 
 `tests/levels/pause_menu.tscn` 包含實際渲染／滑鼠操作，驗證分類、互斥、套用、翻譯更新、合成長清單、空白邊緣及清單上的點擊／拖曳／滾輪隔離、鍵盤啟用／焦點限制、返回／Esc 保持暫停，以及重新開啟與重開關卡。亦核對頁面與暫停選單的 viewport／canvas 相同，將設定文字與同位置、同字型／字級／顏色的主 HUD Label 逐像素比對。截圖放 `.godot/test-results/settings/`。
@@ -613,13 +615,25 @@ P99 判因採固定 simulation delta／相同暖機與取樣步數，核對完�
 
 ## 五步教學
 
+教學資訊標註 Panel 的整體 scale 為 0.9，原有內部字級／間距／語意換行保持，佔用畫面縮小約 10%；卡牌、世界 hologram、焦點框與操作命中不跟著縮放。
+
+教學呈現為沙盤資訊標註：`tutorial_overlay.tscn` 保留原節點與文案介面，採單側 1px 細線、背景從左側低透明白向右淡出，不畫圓角或完整包圍邊框；既有 Noto Sans TC Medium 12px 顯示 `教學 01 / 05`，Light 21px 操作標題、16px 原說明（行距 4px）、12px 快捷鍵與完成標記建立層級。每步只增加 0.2 實際秒淡入，不改真實動作條件／交易規則。Focus 保留精確四角與收斂／脈動邏輯，線色對齊主選單低彩度金色。
+
+共用結算 `run_status.tscn` 的 Panel 僅保留透明排版容器，無可見完整矩形。中央共用 menu_crest 菱形徽記、12px 狀態小標、36px Light 勝敗主標、短細線，三欄以 22px Medium 數字與 12px 標籤顯示完成波次／漏敵／金幣；教學原完成內容與重玩／繼續仍在同一組排版下方。一般關卡重玩也使用既有透明 settings_button，hover 字色與焦點底線保持一致。背景為中心較清楚、邊緣較透明的白色徑向罩，遊戲仍可見，沒有模糊／新 renderer 依賴。勝利主標統一「守住了這條路」，教學通關作小標；失敗用「防線失守」及克制暖灰紅裝飾。從徽記至按鈕用約 0.4 實際秒依序淡入，不 disable 操作、不更動勝敗或通關規則。
+
+鏡頭步驟（1/5）不建立初始手牌，也不執行隨機抽牌。完成平移／縮放／旋轉後才進 FIRST（2/5），把 Starting Cards 資料交給 CardHand.deal_cards：三張從畫面下方中央依序飛向左下，0.55 秒平滑移動／旋轉、0.3 秒淡入，每張間隔 0.12 秒，抵達前 mouse_filter=IGNORE；正常卡面插牌／布局與中途動畫切換保留。重新開始恢復無牌的鏡頭步驟。
+
+放置／升級 hologram 使用教學專用 unshaded 透明材質，不覆寫真塔或玩家選牌的原材質，青色 alpha 約 0.24–0.40、1.6 實際秒週期平滑閃爍；模型與地塊沿用 CardPreview 既有幾何，攻擊區不額外顯示。Focus 獨立 CanvasLayer 7，教學文字層 8：目標以卡面 Visuals 實際四角追蹤（含卡片旋轉／縮放與搖動），由來源 CanvasLayer 轉到焦點層局部座標，繪製時重取最終變換；由外擴約 45 px 在 0.5 秒 smoothstep 內收至約 3–5 px，之後 1.5 秒微幅脈動；框外為 alpha 0.42 暗罩，用與框線相同的旋轉四邊形挖孔，半平面裁切確保暗罩區域不重疊，mouse_filter=IGNORE。目標切換／完成時用 0.18 秒淡化舊框；一般教學提示、框線與世界 hologram 在暫停／設定／載入／結算隱藏。只在需要選牌、點開收合商店、購買、刷新或開波時顯示；選牌後轉為世界放置指示。
+
+首波後與刷新階段不呼叫 open_shop，由玩家自行點牌背開店，焦點隨開店移至指定商品／刷新牌。教學 resource 的 reward_final_act=false，第三波收尾直接完成並先保存通關 ID，再由 RunStatus 顯示原 tutorial.done 文案；DONE 隱藏教學 overlay。教學中央結算內容中有重新開始本關與繼續下一關，後者由共用 LevelCatalog 挑通關後的下一張可用關卡，以 LevelLaunch 一次性 menu map ID 交接給新 MainMenu，直接顯示 MAP 步驟並選中第二關 frontier；不直接開戰或跳到本局設定。普通關卡結算與 ACT 遺物維持原有行為，轉場失敗可重試。
+
 選圖頁第一關「第一條防線」為 1 ACT、3 波，使用一般 LevelDefinition 搭配可選 `tutorial` 引用；Frontier 直接要求 tutorial，Bridge 要求 tutorial 與 frontier，透過 DAG 固定排在教學後，舊的後續關卡通關紀錄亦不能繞過。terrain 為明確保存的 GridMap，起點 (0,0)、終點 (12,6)，先橫向再縱向再橫向連通。`assets/data/tutorial/intro.tres` 的 Starting Cards 引用 starting_01～03.tres，預設為哨塔／迫擊砲／弩砲，可改塔、地塊及順序；文案動態讀取塔名。該資料亦保存指定格 (3,0,0)／(5,0,1)、方向 0／2，以及哨塔升級商品與交叉火力新商品。三張初始牌引用目前基礎版塔地塊配置，指定前兩張在合法位置形成繞道；第三張允許任意一般驗證通過的落點及方向。
 
 TutorialDirector 保存本局五步進度。鏡頭步驟觀察實際 focus、size、azimuth，相對進入時改變超過 0.1 格／0.2 尺寸／5° 即分別完成平移、縮放、旋轉；暫停、設定或載入時隱藏提示與目標 hologram，停止判斷。指定建造同時限制卡片、格子與 90° 步數，透過 TowerMap 的可選 placement_rule 同時作用於預覽及提交，拒絕不消耗卡牌；CardPlacement 在成功消耗後發出 card_placed，才前進。完成三次放置才開放開波，沿用原 1.5 秒等待及戰鬥鎖定。
 
 教學三波預設四／六／八名步兵、20／10／10 金幣清波獎勵；首波等待砲彈後推進到第二波準備，先進行商店引導。Shop 的可選 deal_filter 在原洗牌袋抽取後保證升級牌（預設哨塔），若原商品已有同種則交換位置以保留塔種唯一；purchase_rule 只允許目前要學的商品。購買仍正常扣款／插牌；疊到實際同種塔才前進，升級 hologram 不依賴其初始卡序或第一個指定格。升級不改道路／revision，之後允許正常付費重刷並保證初始牌沒有的新塔（預設交叉火力）。
 
-買下新牌只轉為 PRACTICE，移除可選放置／交易／重刷規則，關閉商店，允許自由使用新牌、建造與手動開第 2、3 波，不直接標記通關。後兩波走一般流程；第三波進最後 ACT 遺物選擇，提示層暫時隱藏，選完後才由普通 LevelSession 完成事件轉為 DONE、保存 tutorial 通關並解鎖後續關卡。中途離場不保存，重玩全部重置。初始牌、目標、升級牌與新牌的編輯入口及限制見 assets/data/tutorial/README.md。
+買下新牌只轉為 PRACTICE，移除可選放置／交易／重刷規則，關閉商店，允許自由使用新牌、建造與手動開第 2、3 波，不直接標記通關。後兩波走一般流程；第三波與在途攻擊收尾後，由普通 LevelSession 完成事件轉為 DONE、保存 tutorial 通關並解鎖後續關卡，不進遺物選擇；教學提示隱藏，完成文字轉由勝利結算呈現。中途離場不保存，重玩全部重置。初始牌、目標、升級牌與新牌的編輯入口及限制見 assets/data/tutorial/README.md。
 
 普通 Level 的 tutorial 為 null，所有可選規則預設空白，原先隨機初始牌、商店與 ACT 順序維持。教學文案有中英文，外觀由 `scenes/tutorial/tutorial_overlay.tscn` 編輯，world 目標沿用 CardPreview，未為教學複製放置、升級、商店或戰鬥實作。執行及人工驗收入口見 [教學測試](../tests/tutorial/README.md)。
 

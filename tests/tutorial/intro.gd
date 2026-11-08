@@ -29,6 +29,9 @@ func motion(point: Vector2, delta: Vector2, mask: int) -> void:
 func snapshot(name: String) -> void:
 	if DisplayServer.get_name() == "headless": return
 	await RenderingServer.frame_post_draw
+	var body: Label = session.tutorial.overlay.get_node("Panel/Margin/Rows/Body")
+	if body.is_visible_in_tree():
+		check(body.get_line_count() == body.text.count("\n")+1,"Authored tutorial lines should fit without mid-phrase wrapping: "+name)
 	viewport.get_texture().get_image().save_png(Artifacts.path("tutorial/"+name+".png"))
 func click(control: Control) -> void:
 	var point := control.get_global_transform_with_canvas()*(control.size*0.5)
@@ -84,13 +87,17 @@ func verify() -> void:
 	var shop: Node = cards.get_node("Shop")
 	var camera: Camera3D = session.get_node("Camera3D")
 	var wave: Node = session.get_node("EnemyWave")
+	var deals: Array[bool] = []
+	cards.cards_changed.connect(func():
+		if director.stage == director.Stage.FIRST and cards.cards == data.starting_cards and deals.is_empty():
+			deals.append(cards.hand._entering.size() == 3 and cards.hand.views.all(func(view): return view.modulate.a == 0.0)))
 	check(session.level.acts.size() == 1 and session.level.wave_count() == 3,"Tutorial has one ACT and three waves")
-	check(director != null and cards.cards == data.starting_cards and data.starting_cards[0].tower == data.upgrade_card.tower,"Tutorial starts with the authored three cards including Sentry")
+	check(director != null and cards.cards.is_empty() and cards.hand.views.is_empty(),"Camera practice must begin without cards")
 	check(not wave.start_allowed and place(data.starting_cards[0],data.guided_cells[0],0) == null,"Camera step blocks premature building and waves")
 	cards.select_card(-1)
 	session.get_node("LevelHUD").set_paused(true)
 	await frames()
-	check(not director.overlay.visible and not director.ghost.visible and director.stage == director.Stage.CAMERA,"Pause hides tutorial presentation without advancing its step")
+	check(not director.overlay.visible and not director.ghost.visible and not director.focus_layer.visible and director.stage == director.Stage.CAMERA,"Pause hides tutorial presentation without advancing its step")
 	session.get_node("LevelHUD").set_paused(false)
 	await frames()
 	await snapshot("01_camera")
@@ -104,13 +111,29 @@ func verify() -> void:
 	mouse(Vector2(640,560),MOUSE_BUTTON_RIGHT,false)
 	await frames()
 	check(director.stage == director.Stage.FIRST and director.camera_actions == [true,true,true],"Real camera pan/zoom/orbit advances the first step")
+	check(cards.cards == data.starting_cards and not deals.is_empty() and deals[0],"Step two deals the authored hand with an arrival animation")
+	await snapshot("02_dealing")
+	await get_tree().create_timer(0.9,true,false,true).timeout
+	await frames()
+	check(cards.hand._entering.is_empty() and director.focus.target == cards.hand.views[0],"The first card becomes the spotlight target after dealing")
+	check(director._ghost_material.get_shader_parameter("tint").a < 0.5,"Guided tower must be translucent")
+	var ghost_alphas: Array[float] = []
+	for i in 8:
+		ghost_alphas.append(director._ghost_material.get_shader_parameter("tint").a)
+		await get_tree().create_timer(0.2,true,false,true).timeout
+	check(ghost_alphas.max()-ghost_alphas.min() > 0.12,"Guided tower transparency must pulse over a complete cycle")
 	await snapshot("02_first_target")
+	cards.select_card(0,false)
+	await get_tree().create_timer(0.25,true,false,true).timeout
+	check(director.focus.target == null and director.focus._alpha == 0.0 and director.focus._outgoing_alpha == 0.0,"Selecting the requested card must fade out its focus frame")
+	cards.select_card(-1)
 	session._begin_wave_start()
 	check(not session._wave_starting,"Cannot skip placement by starting a wave")
 	var count: int = cards.cards.size()
 	check(place(data.starting_cards[0],data.guided_cells[0],1) == null and cards.cards.size() == count,"Wrong first orientation is rejected without consuming a card")
 	var first := await place_input(data.starting_cards[0],data.guided_cells[0],0)
 	check(first != null and director.stage == director.Stage.ROTATED,"First exact hologram placement advances")
+	await get_tree().create_timer(0.6,true,false,true).timeout
 	await snapshot("02_rotated_target")
 	check(cards.placement.map.get_cell_item(Vector3i(3,0,-1)) > 0 and cards.towers.occupied.has(Vector2i(3,0)),"First tower adds a real bypass around its occupied road")
 	while session.get_node("PortalMap").computing: await frames(1)
@@ -133,6 +156,17 @@ func verify() -> void:
 		if director.stage == director.Stage.BUY_SENTRY: break
 	shop.view.finish_animation()
 	check(director.stage == director.Stage.BUY_SENTRY and shop.available and shop.offers[0].tower == data.upgrade_card.tower and not session.choosing_relic,"Wave reward guarantees Sentry before any end-of-ACT relic choice")
+	check(not shop.view.opened,"Step four must let the player open the shop")
+	await frames()
+	check(director.focus.target == shop.view.slots.back().get_node("Face/Back"),"The closed shop must receive the focus frame")
+	var expanded_width: float = director.focus._rect.size.x
+	await get_tree().create_timer(0.6,true,false,true).timeout
+	check(director.focus._rect.size.x < expanded_width and director.focus._alpha > 0.95 and director.focus.mouse_filter == Control.MOUSE_FILTER_IGNORE,"The focus frame must contract without intercepting clicks")
+	await snapshot("03_open_shop_focus")
+	await click(shop.view.slots.back().get_node("Face/Back"))
+	shop.view.finish_animation()
+	await frames()
+	check(shop.view.opened and director.focus.target == shop.view.slots[1].get_node("Face/Card"),"Opening the shop moves the focus frame to the required purchase")
 	check(not session.finished and not LevelProgress.snapshot().has("tutorial"),"Finishing the wave alone does not complete the tutorial")
 	var coins: int = shop.coins
 	check(not shop.reroll() and shop.coins == coins,"Cannot reroll away the required upgrade card")
@@ -148,6 +182,9 @@ func verify() -> void:
 	shop.view.finish_animation()
 	check(director.stage == director.Stage.REROLL and cards.placement.map.get_used_cells() == cells and session.get_node("PortalMap").revision == revision,"Upgrade keeps roads and navigation unchanged")
 	coins = shop.coins
+	check(not shop.view.opened,"The reroll lesson must also let the player open the shop")
+	await click(shop.view.slots.back().get_node("Face/Back"))
+	shop.view.finish_animation()
 	await click(shop.view.slots[0].get_node("Face/Back"))
 	check(shop.coins == coins-shop.reroll_price and director.stage == director.Stage.BUY_NEW,"Player reroll charges the normal fee and advances")
 	check(shop.offers[0].tower == data.new_card.tower,"Refresh guarantees the new tower")
@@ -172,18 +209,35 @@ func verify() -> void:
 			if session.current_wave == wave_index+1 and not session._settling_wave: break
 		if wave_index == 1:
 			check(not session.finished and not LevelProgress.snapshot().has("tutorial") and director.stage == director.Stage.PRACTICE,"Wave two does not complete or repeat the teaching sequence")
-	check(session.choosing_relic and not session.finished and not LevelProgress.snapshot().has("tutorial"),"The third wave reaches the normal final ACT reward before completion")
+	check(not session.choosing_relic and session.finished and LevelProgress.snapshot().has("tutorial"),"The third wave completes the tutorial immediately without a relic choice")
 	await frames()
-	check(not director.overlay.visible,"Tutorial hints do not cover the final reward")
-	await click(session.relic_choice.row.get_child(0))
-	await get_tree().create_timer(0.3).timeout
-	check(director.stage == director.Stage.DONE and session.finished and LevelProgress.snapshot().has("tutorial"),"All three waves and the ACT reward complete and save the tutorial")
+	check(not director.overlay.visible and not director.focus_layer.visible and not director.ghost.visible,"Completion must hide every tutorial hint and focus frame")
+	check(director.stage == director.Stage.DONE,"All three waves complete the teaching sequence")
+	check(session.run_status.get_node("Result/Center/Panel/Margin/Column/Completion").text == tr("tutorial.done") and session.run_status.get_node("Result/Center/Panel/Margin/Column/TutorialActions").visible,"Victory panel owns the completion text and actions")
+	check(session.run_status._next_map_id == "frontier","Continue must select the unlocked second battlefield")
+	var confetti: Control = session.run_status.get_node("Result/Confetti")
+	check(confetti._started and confetti._particles.size() == 24 and GameAudio._victory_pending,"Victory must trigger one small paired burst and a single victory cue")
+	var burst_age: float = confetti._elapsed
+	session.run_status.finish(true)
+	check(confetti._elapsed == burst_age and confetti._particles.size() == 24,"The same result must never restart or duplicate the celebration")
 	await frames()
+	await get_tree().create_timer(0.3,true,false,true).timeout
+	for particle in confetti._particles:
+		var pose: Dictionary = confetti.particle_pose(particle)
+		if not pose.is_empty():
+			check(not confetti.content_rect().grow(8).has_point(pose.position),"Victory paper must stay outside the title, statistics and action area")
+			var edge: float = confetti.content_rect().position.x-54.0 if particle.side < 0 else confetti.content_rect().end.x+54.0
+			check((pose.position.x-edge)*particle.side > 8.0,"Victory paper must spray outward away from both sides of the result")
+	await snapshot("05_victory_burst")
+	await get_tree().create_timer(1.2,true,false,true).timeout
+	check(confetti._particles.is_empty() and not confetti.is_processing(),"Celebration must clear itself after one short burst")
 	await snapshot("05_done")
 	viewport.size = Vector2i(800,600)
 	TranslationServer.set_locale("en")
 	await frames()
-	check(director.overlay.get_node("Panel").get_global_rect().end.y < 600,"Small English overlay stays within the viewport")
+	var result_panel: Control = session.run_status.get_node("Result/Center/Panel")
+	var result_actions: Control = session.run_status.get_node("Result/Center/Panel/Margin/Column/TutorialActions")
+	check(result_actions.get_global_rect().end.y < 600 and result_panel.get_global_rect().encloses(result_actions.get_global_rect()) and not director.overlay.visible,"Small English victory actions stay inside the result panel")
 	await snapshot("06_small_en")
 	var saved_cards := data.starting_cards.duplicate()
 	session.queue_free()
@@ -192,7 +246,7 @@ func verify() -> void:
 	session.level = load("res://assets/data/levels/tutorial.tres")
 	viewport.add_child(session)
 	await frames(12)
-	check(session.tutorial.stage == session.tutorial.Stage.CAMERA and session.get_node("CardPlacement").cards == saved_cards and session.get_node("CardPlacement/Shop").coins == 0 and session.get_node("TowerMap").towers.is_empty(),"Replaying tutorial resets cards, coins, towers and teaching progress")
+	check(session.tutorial.stage == session.tutorial.Stage.CAMERA and session.get_node("CardPlacement").cards.is_empty() and session.get_node("CardPlacement/Shop").coins == 0 and session.get_node("TowerMap").towers.is_empty(),"Replaying tutorial resets to camera practice without cards")
 	await snapshot("07_small_camera_en")
 	var edited := data.duplicate() as TutorialDefinition
 	edited.starting_cards = [data.starting_cards[1],data.starting_cards[0],data.starting_cards[2]]
