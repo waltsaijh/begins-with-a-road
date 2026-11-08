@@ -110,6 +110,7 @@ godot --editor --path . -- --test-card-resource-refresh
 `godot --headless --path . --script res://tests/navigation/loop_erasure.gd` 驗證建池去環、節點與連續分段重建、去重後的正負原始評分、嚴格門檻、256 名敵人的配額與 32×32 合成房間網路；地形位於 fixtures/route_loop_fixture.gd，不改正式地圖。效能原始樣本保存在 `.godot/test-results/navigation/loop_erasure_256/`，當次精簡結論見 [去環量測摘要](../reports/loop_erasure_2026-10-22.md)。
 
 `godot --headless --path . --script res://tests/navigation/route_batch.gd` 驗證輕量計畫摘要、按需除錯聯集、256 名批次配額與單筆一致、跨群組一次準備、共用唯讀路線／世界座標、快照與地圖 transform 隔離，以及獨立移動進度。效能對照產物位於 `.godot/test-results/navigation/route_batch_256/`，結論見[當次摘要](../reports/route_batch_2026-10-22.md)。
+`godot --headless --path . --script res://tests/navigation/road_traffic.gd` 驗證 road_traffic_weight 兵種在其他兵種分配後規劃，並以 Max 加負權重走人最多的道路。
 
 `godot --headless --path . --script res://tests/navigation/native_candidates.gd` 驗證 C++ 批次候選與 scalar 抽樣加腳本去環參考逐條一致，涵蓋節點／分段／來源順序、共用分段表、正成本轉換、signed 評分、嚴格門檻、Uniform／Softmax 與 256 名配額。`fixtures/candidate_walk_reference.gd` 僅供測試；正式運算位於原生核心。`tests/native/candidate_walk.cpp` 可用 C++17 獨立編譯，輸出放 `.godot/`。
 
@@ -145,8 +146,6 @@ Phase 4 `synergy/` 的 routing／combat 回歸與實際渲染 input 驗證六種
 ```powershell
 godot --headless --path . res://tests/navigation/route_distribution.tscn
 godot --headless --path . res://tests/navigation/multiple_starts.tscn
-godot --headless --path . --script res://tests/traffic/weights.gd
-godot --headless --path . res://tests/traffic/integration.tscn
 godot --headless --path . res://tests/combat/tower_restoration.tscn
 godot --headless --path . res://tests/relics/stacking.tscn
 godot --headless --path . res://tests/relics/rewards.tscn

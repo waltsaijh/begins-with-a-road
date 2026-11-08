@@ -2,9 +2,91 @@
 
 [ext_resource type="PackedScene" path="res://scenes/settings/settings_page.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/progress/progress_page.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/progress/components/model_preview.tscn" id="3"]
+
+[sub_resource type="StyleBoxFlat" id="Frame"]
+bg_color = Color(1, 1, 1, 0.25)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.392, 0.545, 0.553, 1)
 
 [node name="ProgressPage" instance=ExtResource("1")]
 script = ExtResource("2")
 
 [node name="Title" parent="Panel/Margin/Layout/Header" index="0"]
 text = "ui.pause.progress"
+
+[node name="Detail" type="ScrollContainer" parent="Panel/Margin/Layout/Body"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Column" type="VBoxContainer" parent="Panel/Margin/Layout/Body/Detail"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Hint" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "ui.progress.pick"
+autowrap_mode = 3
+
+[node name="Frame" type="PanelContainer" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Preview" parent="Panel/Margin/Layout/Body/Detail/Column/Frame" instance=ExtResource("3")]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="Panel/Margin/Layout/Body/Detail/Column/Frame"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Unknown" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column/Frame"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Name" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 3
+
+[node name="Usage" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="Stats" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+modulate = Color(1, 1, 1, 0.75)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="Traits" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.42, 0.14, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="Panel/Margin/Layout/Body/Detail/Column"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3

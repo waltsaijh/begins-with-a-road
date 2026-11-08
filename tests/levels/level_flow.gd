@@ -70,7 +70,7 @@ func verify() -> void:
 	check(not wave.active and wave.enemy_count == 3 and scene.current_wave == 0, "Level did not prepare the first wave without auto-starting")
 	check(scene.timeline.mouse_filter == Control.MOUSE_FILTER_STOP and scene.timeline.wave_index == 0, "Timeline accepts expansion input and starts at the first wave")
 	var viewport_width := get_viewport().get_visible_rect().size.x
-	check(scene.timeline.size.x <= 300 and is_equal_approx(scene.get_node("LevelHUD").status_row_rect.get_center().x,viewport_width*0.5), "Compact status row is centered as a group")
+	check(scene.timeline.size.x > 300 and is_equal_approx(scene.get_node("LevelHUD").status_row_rect.get_center().x,viewport_width*0.5), "Status row with the full timeline is centered as a group")
 	check(scene.find_children("*", "OptionButton", true, false).is_empty(), "Removed troop/distribution dropdowns remain")
 	check(wave.controls.spawn_button.get_parent() == scene.get_node("LevelHUD/WorldActions") and shop.view.get_node_or_null("Root/Balance") == null, "Start button did not move to its world anchor or wallet remained in shop")
 	check(is_equal_approx(scene.timeline.node_fraction(0), 1.0/3.0) and is_equal_approx(scene.timeline.node_fraction(2), 1.0), "Wave markers include an extra interval before the level end")

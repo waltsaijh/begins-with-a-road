@@ -167,6 +167,7 @@ ui.pause.progress,Progress,進度
 ui.progress.towers,Our towers,我方防禦塔
 ui.progress.enemies,Enemies,敵軍
 ui.progress.relics,Relics,遺物
+ui.progress.pick,Choose an entry to see its details.,選擇項目查看詳情。
 ui.relic.usage.generic,General,通用
 ui.progress.stat.stacks,Hold up to {value},最多持有 {value} 份
 ui.progress.stat.damage,Damage {value},傷害 {value}
@@ -193,9 +194,9 @@ tower.sentry.description,A quick-firing watchtower that covers the road ahead of
 tower.sentry.traits,Single target|Front arc only,單體攻擊|只打前方範圍
 tower.ballista.description,"A heavy bolt thrower with slow, powerful shots along a long line.",沿長直線射出重箭，射速慢但威力強。
 tower.ballista.traits,Single target|Long straight range,單體攻擊|長直線射程
-tower.broadside.description,An airship that fires from its side guns.,空艇從側舷開火，壓制船身一側的道路。
-tower.broadside.traits,Single target|Side range only,單體攻擊|只打側舷
-tower.crossfire.description,"Fires in every direction at once, striking all enemies in range.",同時朝四周開火，打擊範圍內的所有敵人。
+tower.broadside.description,"Six guns each hold their own straight line, firing on their own timers.",六門砲各自守住前方直線，獨立計時開火。
+tower.broadside.traits,Six independent guns|Side range only,六門獨立火砲|只打側舷
+tower.crossfire.description,Releases rapid shockwaves that strike all enemies in range.,快速釋放衝擊波，打擊範圍內的所有敵人；波次中持續旋轉。
 tower.crossfire.traits,Hits every enemy in range,命中範圍內全體
 tower.mortar.description,"Lobs shells that explode on landing. Shells do not track, so enemies can walk out of the blast.",拋射砲彈，落地時爆炸。砲彈不追蹤，敵人可能走出爆炸範圍。
 tower.mortar.traits,Area damage|Cannot hit flying enemies,範圍傷害|無法攻擊飛行敵人
