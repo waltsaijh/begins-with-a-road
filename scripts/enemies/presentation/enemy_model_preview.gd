@@ -48,5 +48,12 @@ func display_node(instance: Node3D) -> void:
 	camera.look_at(center)
 	$Viewport.render_target_update_mode = SubViewport.UPDATE_ONCE if is_zero_approx(spin_degrees_per_second) else SubViewport.UPDATE_WHEN_VISIBLE
 
-func _process(delta: float) -> void:
-	if _pivot != null: _pivot.rotate_y(deg_to_rad(spin_degrees_per_second)*delta)
+## Real seconds: in-game pause sets Engine.time_scale to 0 and 2x/4x speed the
+## simulation, but a catalog model should turn at the same pace regardless.
+var _last_ticks := -1
+
+func _process(_delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	var seconds := 0.0 if _last_ticks < 0 else minf(0.1, (now-_last_ticks)/1000000.0)
+	_last_ticks = now
+	if _pivot != null: _pivot.rotate_y(deg_to_rad(spin_degrees_per_second)*seconds)

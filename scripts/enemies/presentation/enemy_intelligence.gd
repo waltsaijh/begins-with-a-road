@@ -30,6 +30,8 @@ func _refresh_notice() -> void:
 	toggle.text = "!  %d" % pending.size()
 	toggle.icon = pending[0].icon if not pending.is_empty() else null
 	toggle.tooltip_text = ("New enemy discovered · %d unread" if en else "新敵軍發現 · %d 則未讀") % pending.size()
+	# _process stops while paused, so an emptied queue hides the notice here.
+	if pending.is_empty(): toggle.hide()
 
 ## Every new enemy is now listed there, so the whole notice counts as read.
 func open_notifications() -> void:

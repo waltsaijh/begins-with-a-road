@@ -43,7 +43,7 @@ func verify() -> void:
 	check(scene.get_node("CardPlacement/Shop").coins == 9,"Loss gives no completion Gold")
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(output+"/defeat.png")
-	await click(scene.run_status.get_node("Result/Center/Panel/Margin/Column/Restart"))
+	await click(scene.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/Restart"))
 	for frame in 8: await get_tree().process_frame
 	var restarted: Node = get_tree().current_scene
 	check(restarted != scene and restarted.current_wave == 0 and restarted.base_health == 20 and Engine.time_scale == 1.0,"Defeat restart reloads authored Frontier and resets speed")

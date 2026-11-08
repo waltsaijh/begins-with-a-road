@@ -158,7 +158,7 @@ func play(kind: String) -> void:
 	if rendered:
 		await snapshot("result")
 		if choice_clicks != 4 or not scene.victory: failures.append("Rendered run did not win with exactly four choices")
-		await click(scene.run_status.get_node("Result/Center/Panel/Margin/Column/Restart"))
+		await click(scene.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/Restart"))
 		for frame in 8: await get_tree().process_frame
 		var restarted: Node = get_tree().current_scene
 		restart_verified = restarted != scene and restarted.current_wave == 0 and not restarted.finished and restarted.base_health == restarted.level.base_health and Engine.time_scale == 1.0 and not get_tree().paused and restarted.get_node("CardPlacement/Shop").coins == restarted.level.starting_gold and restarted.get_node("CardPlacement").cards.size() == 3 and restarted.get_node("TowerMap").towers.is_empty() and restarted.get_node("TowerMap").relics.held.is_empty()
