@@ -357,7 +357,7 @@ func _on_enemy_leaked(enemy: Node3D) -> void:
 	if finished: return
 	total_leaks += 1
 	if level.base_health <= 0: return
-	base_health = maxi(0,base_health-int(enemy.abilities.get("base_damage",1)))
+	base_health = maxi(0,base_health-enemy.base_damage)
 	run_status.refresh()
 	if base_health == 0 or enemy.troop.has_tag(&"boss"): _end_run(false)
 
@@ -374,6 +374,7 @@ func _end_run(won: bool) -> void:
 		_wave.abort_wave()
 		get_node("TowerMap").combat.projectiles.clear()
 	get_node("TowerMap").combat.enemy_abilities.clear()
+	get_node("TowerMap").combat.set_wave_motion(false)
 	get_node("TowerMap").combat.barracks._process(0.0)
 	_update_start_callout()
 	set_process(false)

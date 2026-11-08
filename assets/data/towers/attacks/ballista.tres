@@ -6,4 +6,5 @@
 [resource]
 script = ExtResource("2_ol5u4")
 circular_range = false
+heavy_bolt = true
 color = Color(1, 0.9529412, 0.6901961, 1)

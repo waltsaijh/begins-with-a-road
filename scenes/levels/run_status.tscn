@@ -14,7 +14,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
 [node name="RunStatus" type="CanvasLayer"]
-layer = 8
+layer = 5
 script = ExtResource("1")
 [node name="Integrity" type="Button" parent="."]
 offset_left = 20.0
@@ -36,48 +36,50 @@ horizontal_alignment = 1
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.40, 0.20, 0.20, 1)
 theme_override_font_sizes/font_size = 20
-[node name="Result" type="Control" parent="."]
+[node name="ResultLayer" type="CanvasLayer" parent="."]
+layer = 8
+[node name="Result" type="Control" parent="ResultLayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-[node name="Center" type="CenterContainer" parent="Result"]
+[node name="Center" type="CenterContainer" parent="ResultLayer/Result"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-[node name="Panel" type="PanelContainer" parent="Result/Center"]
+[node name="Panel" type="PanelContainer" parent="ResultLayer/Result/Center"]
 custom_minimum_size = Vector2(340, 220)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
-[node name="Margin" type="MarginContainer" parent="Result/Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="ResultLayer/Result/Center/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 24
-[node name="Column" type="VBoxContainer" parent="Result/Center/Panel/Margin"]
+[node name="Column" type="VBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 18
-[node name="Title" type="Label" parent="Result/Center/Panel/Margin/Column"]
+[node name="Title" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.23, 0.29, 0.27, 1)
 theme_override_font_sizes/font_size = 26
-[node name="Details" type="Label" parent="Result/Center/Panel/Margin/Column"]
+[node name="Details" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 layout_mode = 2
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.23, 0.29, 0.27, 1)
-[node name="NextLevel" type="Button" parent="Result/Center/Panel/Margin/Column"]
+[node name="NextLevel" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(0, 42)
 text = "ui.result.next_level"
-[node name="Restart" type="Button" parent="Result/Center/Panel/Margin/Column"]
+[node name="Restart" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 42)
 text = "重新開始"
-[node name="Home" type="Button" parent="Result/Center/Panel/Margin/Column"]
+[node name="Home" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 42)
 text = "ui.pause.home"

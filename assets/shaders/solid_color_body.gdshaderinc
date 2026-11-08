@@ -1,4 +1,8 @@
 varying vec2 surface_response;
+// Darkening (0 = unchanged), e.g. a disabled tower using its own copy of the
+// shared material. A plain uniform: WebGL ignores instance uniforms here, and a
+// copy of the same shader adds no program, only another uniform value.
+uniform float dim = 0.0;
 
 // COLOR: palette. UV.y / UV2: rigid pivot. CUSTOM0: signed limb amplitude,
 // body bob, body sway, keyframe intervals + 1. Zero w means static geometry.
@@ -31,7 +35,7 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = COLOR.rgb;
+	ALBEDO = COLOR.rgb * (1.0 - dim);
 	ROUGHNESS = surface_response.x;
 	SPECULAR = surface_response.y;
 }

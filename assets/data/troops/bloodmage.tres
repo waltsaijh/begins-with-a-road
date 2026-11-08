@@ -1,24 +1,39 @@
-[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[gd_resource type="Resource" script_class="Troop" format=3 uid="uid://c4uadrgvskl4s"]
+
+[ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_evq6m"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/bloodmage.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/bloodmage.png" id="3"]
+[ext_resource type="Script" uid="uid://cqiial8p7uqi7" path="res://scripts/enemies/abilities/taunt_ability.gd" id="2_kla7u"]
+[ext_resource type="Texture2D" uid="uid://c0v5lfpyh11tr" path="res://assets/sprites/enemies/bloodmage.png" id="3"]
+[ext_resource type="Script" uid="uid://cmiri4sb3e634" path="res://scripts/enemies/abilities/heal_ability.gd" id="3_23arm"]
+
+[sub_resource type="Resource" id="Resource_caak3"]
+script = ExtResource("2_kla7u")
+radius = 1.0
+
+[sub_resource type="Resource" id="Resource_fa4u0"]
+script = ExtResource("3_23arm")
+amount = 5.0
+interval = 1.0
+radius = 2.0
+
 [resource]
 script = ExtResource("1")
+abilities = Array[ExtResource("1_evq6m")]([SubResource("Resource_caak3"), SubResource("Resource_fa4u0")])
+ability_text = "每 3 秒治療 2.5 格內友軍 18 生命，不超過上限；不主動追隨友軍。"
+ability_text_en = "Heals allies within 2.5 tiles for 18 every 3 seconds, capped at maximum health. Does not follow allies."
+tags = Array[StringName]([&"ground", &"support"])
 troop_name = "bloodmage"
 name_key = "troop.bloodmage.name"
 sort_order = 12
-body_size = "standard"
-tags = Array[StringName]([&"ground", &"support"])
-max_health = 65.0
-speed_multiplier = 0.85
-melee_damage = 3.0
-route_selection = 0
-model = ExtResource("2")
 icon = ExtResource("3")
 accent_color = Color(0.9, 0.36, 0.46, 1)
+melee_damage = 3.0
 debug_color = Color(0.61, 0.27, 0.38, 1)
-ability_text = "每 3 秒治療 2.5 格內友軍 18 生命，不超過上限；不主動追隨友軍。"
-ability_text_en = "Heals allies within 2.5 tiles for 18 every 3 seconds, capped at maximum health. Does not follow allies."
-heal_amount = 18.0
-heal_interval = 3.0
-heal_radius = 2.5
+speed_multiplier = 0.85
+route_selection = 0
+tile_cost_reduce = 1
+path_base_cost = 0.0
+damage_weight = -0.125
+road_traffic_weight = -1.0
+model = ExtResource("2")

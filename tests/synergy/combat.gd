@@ -39,6 +39,12 @@ func enemy(key: String, at: Vector2i) -> Node3D:
 	wave.alive += 1
 	combat._index.rebuild(wave.living_enemies(),map)
 	return e
+## Pins one ability's settings on this enemy's own copy, independent of tuning.
+func tune(e: Node3D, type: Script, values: Dictionary) -> EnemyAbility:
+	var ability: EnemyAbility = e.ability(type)
+	for key in values: ability.set(key,values[key])
+	ability.start()
+	return ability
 func clear() -> void:
 	combat.enemy_abilities.clear()
 	for e in wave.enemies:
@@ -75,12 +81,18 @@ func run() -> void:
 	clear()
 	verify_sabotage()
 	clear()
+	verify_trail()
+	clear()
 	scene.queue_free()
 	await get_tree().process_frame
 	var output := {"checks":checks,"failures":failures}
 	FileAccess.open(Artifacts.path("synergy/combat.json"),FileAccess.WRITE).store_string(JSON.stringify(output))
 	print("SYNERGY_COMBAT:",JSON.stringify(output))
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+func land_bolts() -> void:
+	for shot in combat.projectiles: combat._advance_arrow(shot,100.0)
+	combat.projectiles.clear()
 
 func verify_guardian() -> void:
 	var tower := build("ballista",Vector2i(4,5))
@@ -91,11 +103,13 @@ func verify_guardian() -> void:
 	var guard := enemy("rook",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"guardian overrides earlier/nearer rat for single target")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))
+	land_bolts()
 	check(rat.health == rat.max_health and guard.health < guard.max_health,"same-lane guardian absorbs a shot that would hit rat")
 	guard.global_position = world(Vector2i(5,4))
 	combat._index.rebuild(wave.living_enemies(),map)
 	check(tower.attack.select_target(combat,tower) == rat,"out-of-shape guardian never taunts")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))
+	land_bolts()
 	check(rat.health < rat.max_health,"separating guardian lets unchanged single-target damage reach rat")
 	guard.global_position = world(Vector2i(4,1))
 	combat._index.rebuild(wave.living_enemies(),map)
@@ -103,8 +117,10 @@ func verify_guardian() -> void:
 	guard.global_position = world(Vector2i(4,3))
 	var second := enemy("rook",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"equal guardians stable spawn order")
-	second.abilities.taunt_priority = 2
+	second.ability(TauntAbility).priority = 2
 	check(tower.attack.select_target(combat,tower) == second,"authored taunt priority wins")
+	guard.damage_reduction = 0.25
+	guard.shield = 0
 	var armor_before: float = guard.health
 	guard.take_damage(40)
 	check(is_equal_approx(guard.health,armor_before-30),"guardian data-driven defense")
@@ -116,7 +132,7 @@ func verify_guardian() -> void:
 	var barracks := build("barracks",Vector2i(19,6))
 	var first := enemy("rats",Vector2i(19,5))
 	var blocked := enemy("rook",Vector2i(19,5))
-	blocked.abilities.taunt_priority = 2
+	blocked.ability(TauntAbility).priority = 2
 	blocked.engaged_by = scene
 	var legal := enemy("rook",Vector2i(19,5))
 	combat.barracks._process(0)
@@ -131,8 +147,11 @@ func verify_guardian() -> void:
 
 func verify_heal() -> void:
 	var mage := enemy("bloodmage",Vector2i(11,4))
+	var heal := {"amount":18.0,"interval":3.0,"radius":2.5}
+	tune(mage,HealAbility,heal)
 	var ally := enemy("rook",Vector2i(12,4))
 	var far := enemy("heavy",Vector2i(17,4))
+	ally.max_health = 200
 	ally.health = 50
 	far.health = 50
 	combat.enemy_abilities.advance(2.9)
@@ -140,8 +159,9 @@ func verify_heal() -> void:
 	combat.enemy_abilities.advance(0.11)
 	check(ally.health == 68 and far.health == 50,"heal only within radius")
 	var other := enemy("bloodmage",Vector2i(11,5))
-	mage.heal_clock = 0.1
-	other.heal_clock = 0.1
+	tune(other,HealAbility,heal)
+	mage.ability(HealAbility).clock = 0.1
+	other.ability(HealAbility).clock = 0.1
 	combat.enemy_abilities.advance(0.2)
 	check(ally.health == 104,"multiple mages independently heal")
 	ally.health = ally.max_health-1
@@ -186,11 +206,13 @@ func verify_sabotage() -> void:
 	var tower := build("sentry",Vector2i(3,13))
 	tower.upgrade()
 	var sab := enemy("bomber",Vector2i(3,12))
+	var sabotage := {"radius":3.0,"interval":6.0,"windup":1.0,"duration":2.5,"targets":1}
+	var cast: SabotageAbility = tune(sab,SabotageAbility,sabotage)
 	var route: Dictionary = sab.route.duplicate(true)
 	var roads := map.get_used_cells()
 	var old_definition := tower.definition
 	combat.enemy_abilities.advance(6)
-	check(sab.cast_remaining == 1 and not tower.is_disabled(),"visible windup before disabling")
+	check(cast.remaining == 1 and not tower.is_disabled(),"visible windup before disabling")
 	check(sab.skill_progress == 0 and is_instance_valid(sab.ability_visual),"caster ring and skill progress initialized")
 	combat.enemy_abilities.advance(0.5)
 	check(not tower.is_disabled() and is_equal_approx(sab.skill_progress,0.5),"windup advances without early disable")
@@ -219,16 +241,61 @@ func verify_sabotage() -> void:
 	second.take_damage(1000)
 	check(not tower.is_disabled(),"source death immediately releases its disable")
 	var third := enemy("bomber",Vector2i(3,12))
+	var third_cast: SabotageAbility = tune(third,SabotageAbility,sabotage)
 	tower.apply_disable(third,2.5)
 	combat.enemy_abilities.clear()
-	check(not tower.is_disabled() and third.cast_target == null,"wave cleanup clears disable and cast")
-	third.sabotage_clock = 0
+	check(not tower.is_disabled() and third_cast.target() == null,"wave cleanup clears disable and cast")
+	third_cast.clock = 0
 	combat.enemy_abilities.advance(0)
 	third.global_position = world(Vector2i(23,18))
 	combat.enemy_abilities.advance(1)
-	check(third.cast_target == null and not tower.is_disabled(),"moving out of range cancels windup")
+	check(third_cast.target() == null and not tower.is_disabled(),"moving out of range cancels windup")
 	var b := towers.towers[Vector2i(16,12)] as DefenseTower
 	b.apply_disable(third,2.5)
 	combat.barracks._process(0.1)
 	for unit in combat.barracks.units:
 		if unit.tower == b: check(unit.target == null,"disabled barracks releases and stops friendly attacks")
+
+func verify_trail() -> void:
+	const RoadTrail = preload("res://scripts/enemies/abilities/road_trail.gd")
+	var scout := enemy("scout",Vector2i(2,16))
+	var trail: TrailAbility = tune(scout,TrailAbility,{"speed_bonus":0.25,"seconds":0.5})
+	combat.enemy_abilities.advance(0)
+	var service: Node = combat.enemy_abilities.service(RoadTrail)
+	check(service.buffs.has(Vector2i(2,16)),"scout marks the tile it stands on")
+	scout.global_position = world(Vector2i(3,16))
+	combat.enemy_abilities.advance(0)
+	scout.global_position = world(Vector2i(3,17))
+	combat.enemy_abilities.advance(0)
+	var links: Dictionary = service._layers.values()[0].links
+	check(links[Vector2i(2,16)] == 2 and links[Vector2i(3,16)] == (8|4) and links[Vector2i(3,17)] == 1,"consecutive tiles join into one strip, with a corner")
+	var layer_mesh: MeshInstance3D = service._layers.values()[0].mesh
+	check(is_instance_valid(layer_mesh) and layer_mesh.mesh != null and absf(trail.opacity-layer_mesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR][0].a) < 0.01,"strip drawn in the scout accent color at its opacity")
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(scout._speed_factor(0),1.0) and not scout.effect_icons.has(&"haste"),"the scout never speeds up on its own trail")
+	var follower := enemy("scout",Vector2i(3,16))
+	tune(follower,TrailAbility,{"speed_bonus":0.25,"seconds":0.5})
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(follower._speed_factor(0),1.25),"a second scout speeds up on the first scout's trail")
+	var rat := enemy("rats",Vector2i(3,16))
+	var off := enemy("rats",Vector2i(6,16))
+	var flyer := enemy("winged",Vector2i(3,16))
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(rat._speed_factor(0),1.25) and rat.effect_icons.has(&"haste"),"ground enemy on a marked tile moves 25% faster with the agile icon")
+	check(is_equal_approx(off._speed_factor(0),1.0) and is_equal_approx(flyer._speed_factor(0),1.0),"unmarked tile and flying enemies get no speed-up")
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(rat._speed_factor(0),1.25),"repeated marks never stack")
+	rat.global_position = world(Vector2i(6,16))
+	combat.enemy_abilities.advance(0.3)
+	check(is_equal_approx(rat._speed_factor(0.3),1.25),"speed-up lasts after stepping off")
+	rat._speed_factor(0.3)
+	check(is_equal_approx(rat._speed_factor(0),1.0) and not rat.effect_icons.has(&"haste"),"speed-up expires 0.5s after leaving the trail")
+	rat.apply_slow(0.5,1.0)
+	rat.global_position = world(Vector2i(3,16))
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(rat._speed_factor(0),0.625),"slow and speed-up multiply")
+	combat.enemy_abilities.clear()
+	check(service.buffs.is_empty() and service._layers.is_empty(),"wave end removes marks and buffs")
+	rat._speed_factor(1.0)
+	combat.enemy_abilities.advance(0)
+	check(is_equal_approx(rat._speed_factor(0),1.0),"no speed-up after the wave ends")

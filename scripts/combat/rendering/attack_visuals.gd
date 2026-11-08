@@ -7,6 +7,7 @@ var impacts: Array[Node3D]:
 @onready var _instance: MeshInstance3D = $Geometry
 var _visible_last_frame := false
 var restored_bursts: Node3D
+var streams: MultiMeshInstance3D
 var _shot_players: Array[AudioStreamPlayer] = []
 var _last_shot := {}
 
@@ -15,6 +16,8 @@ func _ready() -> void:
 	_instance.global_transform = Transform3D.IDENTITY
 	restored_bursts = preload("res://scripts/combat/rendering/restored_bursts.gd").new()
 	add_child(restored_bursts)
+	streams = preload("res://scripts/combat/rendering/crossfire_streams.gd").new()
+	add_child(streams)
 	# Prototype's shared six-voice / 25 ms-per-kind budget, real-time cosmetic only.
 	for i in 6:
 		var voice := AudioStreamPlayer.new()

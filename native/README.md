@@ -87,9 +87,8 @@ RoadEditGuard.prepare(cells, ports, terminals) 在完整快照後建立迭代 Ta
 
 ## Phase 4：專用道路候選
 
-`RoadSpecialRoutes.plan(cells, ports, start, goal, history, shortest, work_limit=200000)` 接收同一份雙向接口快照，回傳 `valid / paths / birth_wave / distance / work / history_monotone`。格座標排序保證重建順序不改結果，去重完整格序列。
+`RoadReducedRoutes.plan(cells, ports, start, goal, tile_scores, use_min)` 接收同一份雙向接口與逐格分數，回傳 `paths`。`use_min=true` 從最低分地塊開始，以頂點容量 flow 找經過它的簡單路線，整批走不通才換下一批；`false` 先求最低可達的最差地塊，再回傳該上限內每條最短路 DAG 邊的代表路線。
 
-shortest 模式以兩端 BFS 距離取得真正最短路 DAG，每條 DAG 有向邊建立一條完整最短代表，不讀成本或普通搜尋預算。時間 O(EV)、代表最多 E，不列舉指數個最短走法。
 
 newest 模式的 history 每項包含 cells、ports、starts、goal、wave。誕生是最早完整容納該行程及端點的歷史快照。將歷史投影到當前有效邊後若單調增長，每條邊以頂點容量 1 的兩單位最大流找一條簡單 s–t 通路，保證任何能形成新選擇的邊至少有一個代表，死路不算；保留最高誕生波次的代表。兩次增廣、每邊 O(V+E)，總 O(E(V+E))，加歷史包含檢查。它是有限代表池，不是所有簡單路線的等機率分布。
 

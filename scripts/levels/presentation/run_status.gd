@@ -1,12 +1,14 @@
 extends CanvasLayer
 ## Compact integrity/boss feedback and terminal result, authored in a shared scene.
+## Integrity/boss sit below the HUD pause veil (layer 5) so they fade with the
+## header; only the result panel keeps its own layer above everything.
 var session: Node3D
 var boss: WeakRef
 var next_map: MenuMapDefinition
-@onready var column: VBoxContainer = $Result/Center/Panel/Margin/Column
+@onready var column: VBoxContainer = $ResultLayer/Result/Center/Panel/Margin/Column
 func setup(value: Node3D) -> void:
 	session = value
-	$Result.hide()
+	$ResultLayer/Result.hide()
 	$Boss.hide()
 	$Integrity.visible = session.level.base_health > 0
 	session.get_node("EnemyWave").enemy_spawned.connect(func(enemy):
@@ -31,15 +33,15 @@ func _process(_delta: float) -> void:
 		$Boss.hide()
 		boss = null
 		return
-	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.cast_remaining > 0 else ""]
+	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.is_casting() else ""]
 func finish(won: bool) -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
-	$Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if won else "Defense broken") if english else ("守住了這條路" if won else "防線失守")
-	$Result/Center/Panel/Margin/Column/Details.text = ("Waves %d / %d  ·  Leaks %d\nGold %d" if english else "完成 %d / %d 波　·　漏敵 %d\n剩餘金幣 %d") % [session.current_wave,session.level.wave_count(),session.total_leaks,session.get_node("CardPlacement/Shop").coins]
-	$Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
+	$ResultLayer/Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if won else "Defense broken") if english else ("守住了這條路" if won else "防線失守")
+	$ResultLayer/Result/Center/Panel/Margin/Column/Details.text = ("Waves %d / %d  ·  Leaks %d\nGold %d" if english else "完成 %d / %d 波　·　漏敵 %d\n剩餘金幣 %d") % [session.current_wave,session.level.wave_count(),session.total_leaks,session.get_node("CardPlacement/Shop").coins]
+	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
 	next_map = _following_map() if won else null
 	column.get_node("NextLevel").visible = next_map != null
-	$Result.show()
+	$ResultLayer/Result.show()
 func restart() -> void:
 	_resume()
 	session.restart_level()

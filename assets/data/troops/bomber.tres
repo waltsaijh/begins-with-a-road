@@ -1,25 +1,32 @@
-[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[gd_resource type="Resource" script_class="Troop" format=3 uid="uid://c4o4q12r81eta"]
+
+[ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_svho4"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/bomber.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/bomber.png" id="3"]
+[ext_resource type="Script" uid="uid://by1vmxx24hncs" path="res://scripts/enemies/abilities/sabotage_ability.gd" id="2_n5h4r"]
+[ext_resource type="Texture2D" uid="uid://vi5xukyk8v7u" path="res://assets/sprites/enemies/bomber.png" id="3"]
+
+[sub_resource type="Resource" id="Resource_i4o0y"]
+script = ExtResource("2_n5h4r")
+interval = 3.0
+windup = 2.0
+duration = 5.0
+
 [resource]
 script = ExtResource("1")
+abilities = Array[ExtResource("1_svho4")]([SubResource("Resource_i4o0y")])
+ability_text = "每 6 秒選附近 3 格內一塔，前搖 1 秒後癱瘓 2.5 秒。重疊取剩餘時間最大值；來源死亡即解除。"
+ability_text_en = "Every 6 seconds targets a tower within 3 tiles, winds up for 1 second, then disables it for 2.5 seconds. Overlaps use the longest remaining time; source death removes its effect."
+tags = Array[StringName]([&"ground", &"saboteur"])
 troop_name = "bomber"
 name_key = "troop.bomber.name"
 sort_order = 15
-body_size = "standard"
-tags = Array[StringName]([&"ground", &"saboteur"])
-max_health = 75.0
-speed_multiplier = 0.9
-melee_damage = 5.0
-route_selection = 0
-model = ExtResource("2")
 icon = ExtResource("3")
 accent_color = Color(0.96, 0.56, 0.26, 1)
+melee_damage = 5.0
 debug_color = Color(0.74, 0.52, 0.23, 1)
-ability_text = "每 6 秒選附近 3 格內一塔，前搖 1 秒後癱瘓 2.5 秒。重疊取剩餘時間最大值；來源死亡即解除。"
-ability_text_en = "Every 6 seconds targets a tower within 3 tiles, winds up for 1 second, then disables it for 2.5 seconds. Overlaps use the longest remaining time; source death removes its effect."
-sabotage_radius = 3.0
-sabotage_interval = 6.0
-sabotage_windup = 1.0
-sabotage_duration = 2.5
+speed_multiplier = 0.7999999999999999
+score_threshold = 25.0
+path_base_cost = -0.25
+tower_count_weight = -0.5
+model = ExtResource("2")

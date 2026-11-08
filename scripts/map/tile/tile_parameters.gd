@@ -33,6 +33,15 @@ var threat := 0.0:
 		if threat != value:
 			threat = value
 			emit_changed()
+## Waves between this road joining a route and the newest road that did.
+var road_age := 0.0:
+	set(value):
+		if road_age != value:
+			road_age = value
+			emit_changed()
+## Share of this wave's other troops whose routes cross this tile. The spawn
+## schedule writes it between its two passes; it never emits changed itself.
+var road_traffic := 0.0
 var _parameters := {}
 
 func set_parameter(key: StringName, value: Variant) -> void:

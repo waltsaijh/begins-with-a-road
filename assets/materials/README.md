@@ -32,3 +32,5 @@ godot --headless --path . --script tools/assets/bake_solid_models.gd
 ## 功能旗標限制
 
 3D 純色 StandardMaterial3D 只使用 `scripts/combat/rendering/solid_materials.gd` 的兩組旗標，新增材質時只改顏色與數值。`tools/assets/` 的產生器若重新輸出舊旗標（例如不含 emission_enabled），會多出一組 shader，需同步修正或重套旗標。
+
+`solid_color` 另有一般 uniform `float dim`（預設 0），顏色乘上 `1 - dim`；共用材質維持 0。被癱瘓的防禦塔會讓自己的網格暫時改用一份同 shader 的 ShaderMaterial 副本並漸變 `dim`，恢復後還原。同一個 shader 不增加 program。不要改用 `instance uniform`：WebGL（Compatibility）不套用它，畫面不會變暗且會出現 WebGL 警告。

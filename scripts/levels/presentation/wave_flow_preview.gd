@@ -82,11 +82,7 @@ func _sync_callouts() -> void:
 		var callback := _filter.bind(i)
 		if not panels[i].filter_changed.is_connected(callback):
 			panels[i].filter_changed.connect(callback)
-		if not panels[i].info_requested.is_connected(_show_intelligence): panels[i].info_requested.connect(_show_intelligence)
 	if selected_origin >= panels.size(): selected_origin = -1
-
-func _show_intelligence(profile: Troop) -> void:
-	hud.open_progress(profile.troop_name)
 
 func _clear_filters() -> void:
 	for entry in _panels(): entry.clear_filter()
@@ -210,7 +206,7 @@ func _render_filter() -> void:
 	delta_overlay.hint = tr("traffic.no_change") if not candidate.is_empty() and baseline.all == forecast.all else ""
 	if not candidate.is_empty() and _candidate_unavailable: delta_overlay.hint = tr("traffic.unavailable")
 	if not _schedule_error.is_empty():
-		delta_overlay.hint = ("Unable to confirm the newest route. Simplify the roads and retry." if TranslationServer.get_locale().begins_with("en") else "無法確認最新路線，請簡化道路後重試。") if "Scout history" in _schedule_error else _schedule_error
+		delta_overlay.hint = tr("traffic.unavailable")
 		delta_overlay.hint_point = controller.get_node(controller.start_paths[0]).global_position+Vector3.UP*0.5
 	if not candidate.is_empty():
 		var placement: Node = get_node("../CardPlacement")

@@ -1,23 +1,24 @@
-[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[gd_resource type="Resource" script_class="Troop" format=3 uid="uid://nlewhl04qto1"]
+
+[ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/rats.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/rats.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://b54ajd6dt6trl" path="res://assets/sprites/enemies/rats.png" id="3"]
+
 [resource]
 script = ExtResource("1")
+cohort_size = 5
+ability_text = "低生命；每群 5 隻共用路線，個別承受傷害。"
+ability_text_en = "Low health. Cohorts of five share a route; each rat takes damage separately."
+body_size = "small"
+tags = Array[StringName]([&"ground", &"swarm"])
 troop_name = "rats"
 name_key = "troop.rats.name"
 sort_order = 10
-body_size = "small"
-tags = Array[StringName]([&"ground", &"swarm"])
-max_health = 16.0
-speed_multiplier = 1.15
-melee_damage = 3.0
-route_selection = 0
-model = ExtResource("2")
 icon = ExtResource("3")
 accent_color = Color(0.76, 0.62, 0.5, 1)
+melee_damage = 0.5
+melee_interval = 0.5
 debug_color = Color(0.58, 0.45, 0.36, 1)
-ability_text = "低生命；每群 5 隻共用路線，個別承受傷害。"
-ability_text_en = "Low health. Cohorts of five share a route; each rat takes damage separately."
-cohort_size = 5
-cohort_interval_ticks = 1
+max_health = 25.0
+route_selection = 0
+model = ExtResource("2")

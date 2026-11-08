@@ -157,6 +157,4 @@ mouse_filter = 2
 
 [node name="Settings" parent="PauseBlocker/Menu/Margin/Actions" unique_id=1202626757 instance=ExtResource("10_menu_item")]
 
-[node name="Codex" parent="PauseBlocker/Menu/Margin/Actions" instance=ExtResource("10_menu_item")]
-
 [node name="ReturnHome" parent="PauseBlocker/Menu/Margin/Actions" unique_id=778682886 instance=ExtResource("10_menu_item")]

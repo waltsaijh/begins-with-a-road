@@ -22,18 +22,37 @@ var _next := 1
 var _finished := false
 var _slow_multiplier := 1.0
 var _slow_remaining := 0.0
+var _haste_bonus := 0.0
+var _haste_remaining := 0.0
 var _frost: Array[Dictionary] = []
 ## A friendly can pause this immutable trip; it never replaces route/waypoints.
 var engaged_by: Node3D
 var melee_damage := 0.0
 var melee_interval := 1.0
-var abilities := {}
-var heal_clock := 0.0
-var sabotage_clock := 0.0
-var cast_remaining := 0.0
-var cast_target: WeakRef
-var cast_targets: Array[WeakRef] = []
+## Per-enemy copies from Troop.combat_snapshot(); each owns its own state.
+var abilities: Array[EnemyAbility] = []
+var damage_reduction := 0.0
+var base_damage := 1
 var ability_visual: Node3D
+var _snapshot_ready := false
+
+## Spawn hands over the wave-start snapshot; follow() falls back to the troop.
+func apply_snapshot(snapshot: Dictionary) -> void:
+	damage_reduction = float(snapshot.get("damage_reduction",0.0))
+	base_damage = int(snapshot.get("base_damage",1))
+	abilities.assign(snapshot.get("abilities",[]))
+	_snapshot_ready = true
+
+## This enemy's ability of one type, or null.
+func ability(type: Script) -> EnemyAbility:
+	for entry in abilities:
+		if entry.get_script() == type: return entry
+	return null
+
+func is_casting() -> bool:
+	for entry in abilities:
+		if entry.is_casting(): return true
+	return false
 
 func can_be_targeted() -> bool:
 	return not _finished and not is_queued_for_deletion() and health > 0
@@ -46,7 +65,7 @@ func add_shield(amount: float) -> void:
 func take_damage(amount: float, source := "unattributed") -> void:
 	if not can_be_targeted() or not is_finite(amount) or amount <= 0:
 		return
-	amount *= 1.0-float(abilities.get("damage_reduction",0.0))
+	amount *= 1.0-damage_reduction
 	var absorbed := minf(maxf(0.0, shield), amount)
 	shield = maxf(0.0, shield-absorbed)
 	var applied := minf(health, amount-absorbed)
@@ -85,8 +104,21 @@ func apply_slow(multiplier: float, duration: float, icon: Texture2D = null) -> v
 	_slow_remaining = maxf(_slow_remaining, duration)
 	if BalanceTrace.enabled: BalanceTrace.event("debuff",str(enemy_id),{"kind":"slow","multiplier":_slow_multiplier,"seconds":_slow_remaining})
 
+## Speed-up of (1+bonus) times own speed; like slow, the strongest bonus and the
+## longest remaining time merge independently and never stack.
+func apply_haste(bonus: float, duration: float, icon: Texture2D = null) -> void:
+	if not can_be_targeted() or not is_finite(bonus) or not is_finite(duration) or bonus <= 0 or duration <= 0:
+		return
+	if _haste_remaining <= 0 or bonus >= _haste_bonus: set_effect_icon(&"haste", icon)
+	_haste_bonus = maxf(_haste_bonus, bonus)
+	_haste_remaining = maxf(_haste_remaining, duration)
+
 func _speed_factor(delta: float) -> float:
-	var factor := _slow_multiplier
+	var factor := _slow_multiplier*(1.0+_haste_bonus)
+	_haste_remaining = maxf(0.0, _haste_remaining-delta)
+	if _haste_remaining <= 0 and _haste_bonus > 0:
+		_haste_bonus = 0.0
+		set_effect_icon(&"haste", null)
 	var intensity := 0.0
 	var cap := 0.0
 	for i in range(_frost.size()-1,-1,-1):
@@ -129,12 +161,7 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, sha
 	if is_instance_valid(engaged_by): engaged_by.release()
 	melee_damage = troop.melee_damage if troop != null else 0.0
 	melee_interval = troop.melee_interval if troop != null else 1.0
-	if abilities.is_empty() and troop != null: abilities = troop.ability_snapshot()
-	heal_clock = float(abilities.get("heal_interval",3.0))
-	sabotage_clock = float(abilities.get("sabotage_interval",6.0))
-	cast_remaining = 0.0
-	cast_target = null
-	cast_targets.clear()
+	if not _snapshot_ready and troop != null: apply_snapshot(troop.combat_snapshot())
 	enemy_id = id
 	route = selected_route
 	# Spawn scheduling owns immutable packed snapshots; external callers keep
@@ -145,9 +172,14 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, sha
 	travelled_distance = 0.0
 	_slow_multiplier = 1.0
 	_slow_remaining = 0.0
+	_haste_bonus = 0.0
+	_haste_remaining = 0.0
 	_frost.clear()
 	effect_icons.clear()
 	skill_progress = -1.0
+	for entry in abilities:
+		entry.enemy = self
+		entry.start()
 	if not waypoints.is_empty():
 		global_position = waypoints[0]
 	set_process(not waypoints.is_empty())

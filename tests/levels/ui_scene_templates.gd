@@ -23,9 +23,6 @@ func verify() -> void:
 	scene.set_process(false)
 	await frames(12)
 	var timeline: WaveTimeline = scene.timeline
-	timeline._pinned = true
-	timeline.set_expanded(true)
-	timeline._motion.custom_step(0.2)
 	await frames()
 	var markers := timeline.get_node("Track/Markers")
 	var filled := timeline.get_node("Progress/Fill/Markers")

@@ -1,10 +1,11 @@
 extends RefCounted
-## Run-local committed topology snapshots; never populated by candidate searches.
+## Run-local road ages, never populated by candidate searches. A tile keeps the
+## wave it first joined a complete route, the same membership that colors roads.
 var wave := 1
-var snapshots: Array[Dictionary] = []
+var tile_waves := {}
 var current := {}
 var revision := 0
-var _geometry_cache := {}
+var _active := {}
 
 func record(snapshot: Dictionary, terminals: Array[Vector2i]) -> void:
 	if terminals.size() < 2: return
@@ -22,17 +23,23 @@ func record(snapshot: Dictionary, terminals: Array[Vector2i]) -> void:
 		value.cells.append_array(PackedInt32Array([cell.x,cell.y]))
 		value.ports.append(sorted[cell])
 	if not current.is_empty() and current.cells == value.cells and current.ports == value.ports and current.starts == value.starts and current.goal == value.goal: return
-	value.wave = 0 if snapshots.is_empty() else wave
+	_mark_tiles(value,terminals,0 if current.is_empty() else wave)
 	current = value
-	snapshots.append(value)
 	revision += 1
-	_geometry_cache.clear()
 
-func candidates(origin: int, shortest: bool) -> Dictionary:
-	if current.is_empty() or origin < 0 or origin >= current.starts.size(): return {"valid":false,"error":"尚未建立道路歷史"}
-	var key := Vector2i(origin, int(shortest))
-	if not _geometry_cache.has(key):
-		if not ClassDB.class_exists("RoadSpecialRoutes"): return {"valid":false,"error":"請重新建置並重啟 Godot 以載入 Phase 4 尋路擴充"}
-		var search: RefCounted = ClassDB.instantiate("RoadSpecialRoutes")
-		_geometry_cache[key] = search.plan(current.cells,current.ports,Vector2i(current.starts[origin]),current.goal,snapshots,shortest,200000)
-	return _geometry_cache[key]
+func _mark_tiles(value: Dictionary, terminals: Array[Vector2i], age: int) -> void:
+	var guard: RefCounted = ClassDB.instantiate("RoadEditGuard")
+	var routed: PackedInt32Array = guard.prepare(value.cells,value.ports,PackedVector2Array(terminals)).get("route_cells",PackedInt32Array())
+	_active.clear()
+	for i in range(0,routed.size(),2):
+		var cell := Vector2i(routed[i],routed[i+1])
+		_active[cell] = true
+		if not tile_waves.has(cell): tile_waves[cell] = age
+
+## Waves since each routed tile connected, counted from the newest routed tile.
+func tile_ages() -> Dictionary:
+	var newest := 0
+	for cell: Vector2i in _active: newest = maxi(newest,tile_waves[cell])
+	var ages := {}
+	for cell: Vector2i in _active: ages[cell] = float(newest-tile_waves[cell])
+	return ages

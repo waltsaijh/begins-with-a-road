@@ -58,13 +58,15 @@ func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> vo
 	mat.albedo_color = Color("173039")
 	bar.material_override = mat
 	add_child(bar)
-	health_fill = bar.duplicate()
-	health_fill.mesh = bar.mesh.duplicate()
-	health_fill.position.z = -0.002
+	# Billboarding drops node scale and turns node offsets with the soldier, so
+	# the fill is sized and shifted inside its own mesh (camera-facing space).
+	health_fill = MeshInstance3D.new()
+	health_fill.mesh = QuadMesh.new()
 	health_fill.material_override = mat.duplicate()
 	health_fill.material_override.albedo_color = Color("64dfc2")
 	bar.add_child(health_fill)
-	health_fill.position.y = 0
+	_fill_ratio = -1.0
+	_refresh_bar()
 func release() -> void:
 	if is_instance_valid(target) and target.engaged_by == self: target.engaged_by = null
 	target = null
@@ -74,9 +76,11 @@ func release() -> void:
 func _refresh_stats() -> void:
 	health = health/_max_health*settings.health
 	_max_health = settings.health
+	_refresh_bar()
 func take_damage(amount: float) -> void:
 	if dead: return
 	health = maxf(0,health-amount)
+	_refresh_bar()
 	flash = 0.15
 	manager.effect(global_position,"hit")
 	if health <= 0:
@@ -99,6 +103,7 @@ func advance(delta: float) -> void:
 		if respawn_timer == 0 and manager.road(home):
 			dead = false
 			health = settings.health
+			_refresh_bar()
 			global_position = home_position
 			visible = true
 			scale = Vector3.ONE
@@ -170,6 +175,21 @@ func advance(delta: float) -> void:
 		limb.rotation.x = sin(phase)*0.48*float(limb.get_meta("gait_sign",limb.get_meta("arm_sign",0.0))) if motion.length_squared() > 0.000001 else 0.0
 		if limb.has_meta("arm_sign"): limb.rotation.x -= pulse*0.7
 	model.position = Vector3(0,absf(sin(phase))*0.012, -pulse*0.08)
-	health_fill.scale.x = maxf(0.001,health/settings.health)
-	health_fill.position.x = -(1-health/settings.health)*0.175
+	_refresh_bar()
+const BAR_WIDTH := 0.35
+const BAR_HEIGHT := 0.035
+var _fill_ratio := -1.0
+
+## Left-anchored fill; rebuilt only when the ratio changes.
+func _refresh_bar() -> void:
+	if not is_instance_valid(health_fill) or settings == null: return
+	var ratio := clampf(health/settings.health, 0.0, 1.0)
+	if is_equal_approx(ratio, _fill_ratio): return
+	_fill_ratio = ratio
+	var quad: QuadMesh = health_fill.mesh
+	health_fill.visible = ratio > 0.0
+	quad.size = Vector2(maxf(0.001, BAR_WIDTH*ratio), BAR_HEIGHT)
+	# Slightly toward the camera so the fill never z-fights its background.
+	quad.center_offset = Vector3(-(BAR_WIDTH-BAR_WIDTH*ratio)*0.5, 0.0, 0.004)
+
 func _exit_tree() -> void: release()

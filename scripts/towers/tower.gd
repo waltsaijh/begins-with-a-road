@@ -49,6 +49,7 @@ var patrol_distance := 0.0
 var rapid_remaining := 0
 var rapid_next := 0.0
 var mortar_shots := 0
+var _gun_ready := {}
 var _disables := {}
 var _disable_icon: Sprite3D
 
@@ -84,6 +85,49 @@ func _refresh_disable_visual() -> void:
 		_disable_icon.no_depth_test = true
 		add_child(_disable_icon)
 	if is_instance_valid(_disable_icon): _disable_icon.visible = disabled
+	if disabled != _dimmed: _fade_dim(disabled)
+
+const DISABLED_DIM := 0.45
+const DIM_SECONDS := 0.2
+const SolidShader = preload("res://assets/shaders/solid_color.gdshader")
+var _dimmed := false
+var _dim_motion: Tween
+## This tower's copy of the shared solid_color material, used only while dimmed.
+var _dim_material: ShaderMaterial
+## Mesh -> its own material_override before dimming, restored afterwards.
+var _dim_meshes := {}
+
+## Darkens the whole model while disabled. Meshes drawn with the shared
+## solid_color material switch to this tower's own copy of it (same shader, so
+## no new program) whose `dim` fades; they switch back once fully restored.
+func _fade_dim(disabled: bool) -> void:
+	_dimmed = disabled
+	if _dim_motion != null: _dim_motion.kill()
+	if disabled:
+		if _dim_material == null:
+			_dim_material = ShaderMaterial.new()
+			_dim_material.shader = SolidShader
+			_dim_material.set_shader_parameter(&"dim", 0.0)
+		for node in find_children("*", "MeshInstance3D", true, false):
+			var mesh := node as MeshInstance3D
+			if _dim_meshes.has(mesh) or mesh.mesh == null: continue
+			var solid := true
+			for surface in mesh.mesh.get_surface_count():
+				var material := mesh.get_active_material(surface) as ShaderMaterial
+				if material == null or material.shader != SolidShader: solid = false
+			if not solid: continue
+			_dim_meshes[mesh] = mesh.material_override
+			mesh.material_override = _dim_material
+	elif _dim_material == null: return
+	var from := float(_dim_material.get_shader_parameter(&"dim"))
+	_dim_motion = create_tween()
+	_dim_motion.tween_method(func(value: float): _dim_material.set_shader_parameter(&"dim", value), from, DISABLED_DIM if disabled else 0.0, DIM_SECONDS)
+	if not disabled: _dim_motion.tween_callback(_restore_materials)
+
+func _restore_materials() -> void:
+	for mesh: Variant in _dim_meshes:
+		if is_instance_valid(mesh) and mesh.material_override == _dim_material: mesh.material_override = _dim_meshes[mesh]
+	_dim_meshes.clear()
 
 func effect(id: StringName) -> Dictionary: return relic_effects.get(id,{})
 func has_relic(id: StringName) -> bool: return relic_effects.has(id)
@@ -252,11 +296,18 @@ func damage_against(_target: Node3D) -> float:
 ## Called every combat frame, including cooldown and the extra tile of lookahead.
 ## Returns true once the weapon is close enough to fire without snapping.
 func aim_at(target: Vector3, delta: float) -> bool:
+	if attack is VolleyAttack and attack.mortar_visual and _visual != null and _visual.has_method("aim_ballistic"):
+		return _visual.aim_ballistic(target,attack.shell_arc_height,delta)
 	if _aim_pivot == null:
 		return true
 	var direction := _aim_pivot.get_parent_node_3d().to_local(target)-_aim_pivot.position
 	if direction.length_squared() <= 0.000001:
 		return false
+	if _visual.has_method("aim_pitch_limits"):
+		# The weapon stops short of its mount; shots still fly from the muzzle to the target.
+		var limits: Vector2 = _visual.aim_pitch_limits()
+		var flat := Vector2(direction.x,direction.z).length()
+		direction.y = flat*tan(clampf(atan2(direction.y,flat),limits.x,limits.y))
 	var up := Vector3.UP
 	if absf(direction.normalized().dot(up)) > 0.999:
 		up = Vector3.RIGHT
@@ -268,8 +319,20 @@ func aim_at(target: Vector3, delta: float) -> bool:
 		# exactly, so a moving enemy cannot keep the tower perpetually unaligned.
 		var blend := minf(1.0, TowerConstants.AIM_TURN_SPEED*maxf(0.0, delta)/angle)
 		_aim_pivot.quaternion = current.slerp(desired, blend)
-	var forward := (-_aim_pivot.global_basis.z).normalized()
-	return forward.dot((target-_aim_pivot.global_position).normalized()) >= cos(TowerConstants.AIM_TOLERANCE)
+	return _aim_pivot.quaternion.angle_to(desired) <= TowerConstants.AIM_TOLERANCE
+
+func set_wave_motion(active: bool) -> void:
+	if _visual != null and _visual.has_method("set_wave_motion"): _visual.set_wave_motion(active)
+
+func has_gun_lines() -> bool:
+	return _visual != null and _visual.has_method("gun_count") and _visual.gun_count() > 0
+
+func gun_count() -> int: return _visual.gun_count()
+func gun_position(gun: int) -> Vector3: return _visual.gun_position(gun)
+func gun_direction(gun: int) -> Vector3: return _visual.gun_direction(gun)
+func gun_ready_time(gun: int) -> float: return float(_gun_ready.get(gun,0.0))
+func set_gun_ready_time(gun: int, time: float) -> void: _gun_ready[gun] = time
+func present_gun_shot(gun: int, effects: Node) -> void: _visual.fire_gun(gun,effects)
 
 func prepare_shot(target: Node3D) -> void:
 	if _visual != null and _visual.has_method("prepare_target"): _visual.prepare_target(target)

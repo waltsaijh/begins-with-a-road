@@ -40,8 +40,8 @@ func run() -> void:
 	var history := History.new()
 	var terminals: Array[Vector2i] = [Vector2i(8,0),Vector2i(0,0)]
 	history.record(snapshot(cells),terminals)
-	var initial: Dictionary = history.candidates(0,false)
-	check(initial.valid and initial.birth_wave == 0 and initial.paths.size() >= 2,"all initial paths baseline zero")
+	var scout := TroopCatalog.find("scout")
+	check(reduced_plan(history,cells,scout).size() >= 2,"all initial paths share the newest age")
 	var revision: int = history.revision
 	history.wave = 1
 	history.record(snapshot(cells),terminals)
@@ -49,7 +49,7 @@ func run() -> void:
 	cells.append(Vector2i(4,1))
 	cells.append(Vector2i(4,2))
 	history.record(snapshot(cells),terminals)
-	check(history.candidates(0,false).birth_wave == 0,"dead-end extension does not refresh old routes")
+	check(not history.tile_ages().has(Vector2i(4,2)),"dead-end extension does not join a route")
 	cells.erase(Vector2i(4,1))
 	cells.erase(Vector2i(4,2))
 	history.wave = 2
@@ -57,42 +57,25 @@ func run() -> void:
 	history.record(snapshot(cells),terminals)
 	add_lane(cells,6)
 	history.record(snapshot(cells),terminals)
-	var newest: Dictionary = history.candidates(0,false)
-	check(newest.valid and newest.birth_wave == 2,"new legal choices get committed wave")
 	var on_three := false
 	var on_six := false
-	for path: Dictionary in newest.paths:
-		on_three = on_three or Vector2(4,3) in path.cells
-		on_six = on_six or Vector2(4,6) in path.cells
-		check(path.birth_wave == 2 and (Vector2(4,3) in path.cells or Vector2(4,6) in path.cells),"old route never revived by weighting")
+	for route: Dictionary in reduced_plan(history,cells,scout):
+		on_three = on_three or Vector2(4,3) in route.cells
+		on_six = on_six or Vector2(4,6) in route.cells
+		check(route.score == 0.0 and (Vector2(4,3) in route.cells or Vector2(4,6) in route.cells),"old route never revived")
 	check(on_three and on_six,"two new same-wave routes both represented")
-	var special = preload("res://scripts/navigation/routes/special_routes.gd").new()
-	special.history = history
-	var scout := TroopCatalog.find("scout").duplicate() as Troop
-	scout.search_budget = 1
-	scout.score_threshold = 0
-	var old_flag := [{"tags":[&"ground"],"excluded_tags":[],"cells":{Vector2i(4,0):true},"multiplier":1000.0}]
-	var plan: Dictionary = special.plan_for(scout,0,old_flag)
-	check(plan.valid and plan.routes > 0,"newest eligibility independent of ordinary budget and zero score threshold")
-	for i in plan.routes:
-		var chosen: Dictionary = special.route_for(scout,0,old_flag,0,1,-1,i)
-		check(chosen.birth_wave == 2,"old-route flag cannot restore an ineligible route")
-	var shortest: Dictionary = history.candidates(0,true)
-	check(shortest.valid and shortest.distance == 8,"physical distance ignores costs")
-	for path: Dictionary in shortest.paths: check(path.cells.size() == 9,"only globally shortest grid paths")
 	var old_cells: Array[Vector2i] = []
 	add_lane(old_cells,0)
 	add_lane(old_cells,-2)
 	history.wave = 3
 	history.record(snapshot(old_cells),terminals)
-	check(history.candidates(0,false).birth_wave == 0,"invalid new route safely falls back to surviving batch")
+	check(not reduced_plan(history,old_cells,scout).is_empty() and history.tile_ages().values().max() == 0.0,"invalid new route safely falls back to surviving tiles")
 	history.wave = 4
 	add_lane(old_cells,3)
 	history.record(snapshot(old_cells),terminals)
-	check(history.candidates(0,false).birth_wave == 2,"restored old identity retains first birth")
-	var native_search: RefCounted = ClassDB.instantiate("RoadSpecialRoutes")
-	var limited: Dictionary = native_search.plan(history.current.cells,history.current.ports,Vector2i.ZERO,Vector2i(8,0),history.snapshots,false,1)
-	check(not limited.valid and limited.paths.is_empty(),"non-monotone work limit reports failure without silently selecting old paths")
+	check(history.tile_ages()[Vector2i(4,0)] == 2.0 and history.tile_ages()[Vector2i(4,3)] == 0.0,"restored old tiles retain first connection")
+	verify_entrances()
+	verify_worst_tile()
 	verify_oracle()
 	await verify_schedule(cells)
 	var output := {"checks":checks,"failures":failures}
@@ -110,6 +93,60 @@ func oracle_paths(cells: Array[Vector2i], at: Vector2i, goal: Vector2i, path: Ar
 			path.append(next)
 			oracle_paths(cells,next,goal,path,result)
 			path.pop_back()
+
+## Reduced routes need only these two members of a PortalMap.
+class MapStub:
+	extends Node
+	var route_history: RefCounted
+	var tile_parameters: RefCounted
+
+func reduced_plan(history: RefCounted, cells: Array[Vector2i], profile: Troop, origin := 0, prepare := Callable()) -> Array:
+	var stub := MapStub.new()
+	stub.route_history = history
+	stub.tile_parameters = preload("res://scripts/map/tile/tile_parameter_store.gd").new()
+	var packed := PackedVector2Array()
+	for cell in cells: packed.append(Vector2(cell))
+	stub.tile_parameters.sync(packed)
+	stub.tile_parameters.set_road_ages(history.tile_ages())
+	if prepare.is_valid(): prepare.call(stub.tile_parameters)
+	var search = preload("res://scripts/navigation/routes/reduced_routes.gd").new()
+	search.map = stub
+	var plan: Dictionary = search.plan_for(profile,origin,[])
+	var routes: Array = []
+	if plan.get("valid",false): for i in plan.routes: routes.append(search.route_for(profile,origin,[],0,1,-1,i))
+	stub.free()
+	return routes
+
+func verify_worst_tile() -> void:
+	# The short lane holds one dangerous tile; max must take the longer calm lane.
+	var cells: Array[Vector2i] = []
+	add_lane(cells,0)
+	add_lane(cells,2)
+	var history := History.new()
+	history.record(snapshot(cells),[Vector2i(8,0),Vector2i(0,0)])
+	var careful := Troop.new()
+	careful.tile_cost_reduce = Troop.TileCostReduce.MAX
+	careful.path_base_cost = 0.0
+	careful.threat_weight = 1.0
+	var routes := reduced_plan(history,cells,careful,0,func(store): store.get_tile(Vector2i(4,0)).threat = 5.0)
+	check(not routes.is_empty(),"max keeps a route")
+	for route: Dictionary in routes:
+		check(route.score == 0.0 and not Vector2(4,0) in route.cells,"max avoids the single worst tile")
+
+func verify_entrances() -> void:
+	# A tile only another entrance can use must not hide this entrance's route.
+	var cells: Array[Vector2i] = []
+	for x in 5: cells.append(Vector2i(x,0))
+	var history := History.new()
+	history.record(snapshot(cells),[Vector2i(4,0),Vector2i(0,0)])
+	history.wave = 2
+	cells.append(Vector2i(4,1))
+	cells.append(Vector2i(4,2))
+	history.record(snapshot(cells),[Vector2i(4,0),Vector2i(0,0),Vector2i(4,2)])
+	var scout := TroopCatalog.find("scout")
+	check(not reduced_plan(history,cells,scout,0).is_empty(),"entrance falls back to its own newest tiles")
+	var fresh := reduced_plan(history,cells,scout,1)
+	check(not fresh.is_empty() and fresh[0].score == 0.0,"new entrance sees its own new road")
 
 func verify_oracle() -> void:
 	# Exhaustive small grids compare hard eligibility to every simple path.
@@ -130,15 +167,15 @@ func verify_oracle() -> void:
 		history.record(snapshot(cells),[Vector2i(2,2),Vector2i.ZERO])
 		var all: Array = []
 		oracle_paths(cells,Vector2i.ZERO,Vector2i(2,2),[Vector2i.ZERO],all)
-		var latest := -1
-		var length := 999
+		var through := false
+		var around := false
 		for path: Array in all:
-			latest = maxi(latest,2 if Vector2i(1,1) in path else 0)
-			length = mini(length,path.size()-1)
-		var actual: Dictionary = history.candidates(0,false)
-		var fast: Dictionary = history.candidates(0,true)
-		check(actual.valid and (actual.paths.is_empty() if all.is_empty() else actual.birth_wave == latest),"oracle newest mask %d" % mask)
-		check(fast.valid and (fast.paths.is_empty() if all.is_empty() else fast.distance == length),"oracle shortest mask %d" % mask)
+			through = through or Vector2i(1,1) in path
+			around = around or not Vector2i(1,1) in path
+		var routes := reduced_plan(history,cells,TroopCatalog.find("scout"))
+		check(routes.is_empty() == all.is_empty(),"oracle reachability mask %d" % mask)
+		if through and around:
+			for route: Dictionary in routes: check(Vector2(1,1) in route.cells,"oracle newest mask %d" % mask)
 
 func verify_schedule(cells: Array[Vector2i]) -> void:
 	var scene := Fixture.scene_for(cells,Vector2i.ZERO,Vector2i(8,0))
@@ -190,9 +227,21 @@ func verify_schedule(cells: Array[Vector2i]) -> void:
 	check(rat_total == 20 and cohorts.size() == 5,"12+8 rats produce 5 cohorts not 20 route units")
 	var flying := TroopCatalog.find("winged")
 	var baseline: Dictionary = controller.plan_for(flying)
+	var shortest_length: int = Fixture.road_distance(controller.route_history.current,Vector2i.ZERO,Vector2i(8,0))
+	var flight: Dictionary = controller.prepare_route_batch(flying,8)
+	check(baseline.valid and baseline.reachable and flight.routes.size() == 8,"winged keeps a route through the cost pipeline")
+	var flight_paths := {}
+	for route: Dictionary in flight.routes:
+		check(route.cells.size()-1 == shortest_length,"winged only flies the true shortest distance")
+		flight_paths[str(route.cells)] = true
 	var effect := {"tags":[&"flying"],"excluded_tags":[],"cells":{Vector2i(1,0):true},"multiplier":0.001}
 	check(controller.plan_for(flying,0,[effect]).route_probabilities == baseline.route_probabilities,"flying ignores all ground traffic effects")
 	for member: Dictionary in actual.pending:
 		if member.profile == flying: check(member.points[0].y > scene.get_node("TileMap").global_position.y+1.0,"flight altitude frozen in actual waypoints")
+		if member.profile == flying:
+			var junctions := preload("res://scripts/enemies/spawning/route_waypoints.gd").junctions(controller.route_history.current)
+			var inner := 0
+			for cell: Vector2 in member.route.cells.slice(1,-1): if junctions.has(Vector2i(cell)): inner += 1
+			check(member.points.size() == 2+inner and member.points.size() < member.route.cells.size(),"flyers keep only junctions between their ends")
 	scene.queue_free()
 	await get_tree().process_frame

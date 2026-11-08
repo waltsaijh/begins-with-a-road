@@ -27,7 +27,7 @@ static func advance(combat: Node, tower: DefenseTower, delta: float) -> void:
 				tower.prepare_shot(victim)
 				combat.visuals.add_beam(tower.muzzle_position(),victim.global_position+Vector3.UP*0.3,Color("f7de80"),0.1,0.35)
 				combat.visuals.restored_bursts.emit(victim.global_position,"respawn")
-				victim.take_damage((victim.health+victim.shield)/maxf(0.000001,1.0-float(victim.abilities.get("damage_reduction",0.0))),BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "hunting")
+				victim.take_damage((victim.health+victim.shield)/maxf(0.000001,1.0-victim.damage_reduction),BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "hunting")
 				tower.relic_clocks[&"hunting"] = combat.elapsed+tower.relic_value(&"hunting", &"period")
 	if tower.has_relic(&"rapid_fire"):
 		var ready: float = tower.relic_clocks.get(&"rapid_fire",combat.elapsed+tower.relic_value(&"rapid_fire", &"period"))

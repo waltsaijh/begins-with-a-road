@@ -29,8 +29,17 @@ func _ready() -> void:
 	enemy_abilities.combat = self
 	add_child(enemy_abilities)
 	if is_instance_valid(wave) and wave.has_signal("wave_finished"):
+		wave.wave_started.connect(set_wave_motion.bind(true))
 		wave.wave_finished.connect(func():
+			set_wave_motion(false)
 			for tower: DefenseTower in tower_map.towers.values(): tower.rapid_remaining = 0)
+
+func set_wave_motion(active: bool) -> void:
+	var streaming: Array[DefenseTower] = []
+	for tower: DefenseTower in tower_map.towers.values():
+		tower.set_wave_motion(active)
+		if active and tower.attack is VolleyAttack and tower.attack.shockwave and not tower in streaming: streaming.append(tower)
+	visuals.streams.set_sources(streaming,map.cell_size.x*map.global_basis.x.length())
 
 func _process(delta: float) -> void:
 	var reuse_index := friendly_index_ready
@@ -67,6 +76,9 @@ func _process(delta: float) -> void:
 			if BalanceTrace.enabled and tower.is_disabled(): BalanceTrace.sample(tower,"disabled",step)
 			continue
 		if wave.active: RelicCombat.advance(self,tower,step)
+		if tower.attack is VolleyAttack and tower.attack.gun_lines and tower.has_gun_lines():
+			_fire_gun_lines(tower,step)
+			continue
 		var target: Node3D = tower.attack.select_target(self,tower)
 		if target == null:
 			if BalanceTrace.enabled: BalanceTrace.sample(tower,"no_target",step)
@@ -86,6 +98,30 @@ func _process(delta: float) -> void:
 		tower.next_attack_time = elapsed+tower.attack_interval
 		shots_fired += 1
 		if BalanceTrace.enabled: BalanceTrace.event("attack",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"damage":tower.damage})
+
+func _fire_gun_lines(tower: DefenseTower, step: float) -> void:
+	var attack: VolleyAttack = tower.attack
+	if not attack.configuration_error().is_empty() or not is_finite(tower.attack_interval) or tower.attack_interval <= 0: return
+	var tile := map.cell_size.x*map.global_basis.x.length()
+	var fired := false
+	for gun in tower.gun_count():
+		if elapsed < tower.gun_ready_time(gun): continue
+		var start := tower.gun_position(gun)
+		var end := start+tower.gun_direction(gun)*attack.gun_reach*tower.range_multiplier*tile
+		var candidates := _index.targets_along_segment(start,end,attack.gun_half_width).filter(func(enemy): return tower.can_attack_target(enemy))
+		if candidates.is_empty(): continue
+		var target: Node3D = enemy_abilities.preferred(tower,candidates)
+		if target == null: target = candidates[0]
+		visuals.add_beam(start,target.global_position+Vector3.UP*0.24,attack.color,0.035,0.16)
+		var payload := AttackPayload.new(tower,target,attack)
+		payload.knockback *= tile
+		payload.apply(target)
+		tower.present_gun_shot(gun,visuals)
+		tower.set_gun_ready_time(gun,elapsed+tower.attack_interval)
+		fired = true
+		shots_fired += 1
+		if BalanceTrace.enabled: BalanceTrace.event("attack",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"damage":tower.damage,"gun":gun})
+	if BalanceTrace.enabled: BalanceTrace.sample(tower,"has_target" if fired else "no_target",step)
 
 func default_target(tower: DefenseTower) -> Node3D:
 	var preferred: Node3D = enemy_abilities.preferred(tower,targets_for(tower))
@@ -147,6 +183,20 @@ func fire_piercing_bolt(tower: DefenseTower, target: Node3D, attack: TowerAttack
 	var payload := AttackPayload.new(tower,target,attack)
 	payload.knockback *= map.cell_size.x*map.global_basis.x.length()
 	projectiles.append({"arrow":true,"piercing":true,"start":start,"position":start,"end":start+direction*distance,"direction":direction,"travelled":0.0,"speed":tower.relic_value(&"powerful_shot", &"speed"),"length":0.65,"width":0.07,"trail_length":0.8,"trail_width":0.04,"color":attack.color,"payload":payload,"hit_ids":{},"hit_width":tower.relic_value(&"powerful_shot", &"width")})
+
+## Same arrival rule as arrows: it disappears on the hit, or at the last position.
+func fire_heavy_bolt(tower: DefenseTower, target: Node3D, attack: VolleyAttack) -> void:
+	var end := _arrow_target_position(target)
+	var start := tower.muzzle_position()
+	projectiles.append({"arrow":true,"start":start,"position":start,"end":end,"direction":(end-start).normalized(),"target":weakref(target),"travelled":0.0,"speed":attack.bolt_speed,"length":attack.bolt_length,"width":attack.bolt_width,"trail_length":0.8,"trail_width":0.04,"color":attack.color,"payload":AttackPayload.new(tower,target,attack)})
+
+func fire_shockwave(tower: DefenseTower, attack: VolleyAttack) -> void:
+	var tile := map.cell_size.x*map.global_basis.x.length()
+	visuals.restored_bursts.mortar_impact(tower.combat_origin(),tower.attack_radius*tower.range_multiplier*tile,false)
+	for victim in attack.targets(self,tower):
+		var payload := AttackPayload.new(tower,victim,attack)
+		payload.knockback *= tile
+		payload.apply(victim)
 
 func _advance_piercing_bolt(shot: Dictionary, delta: float) -> bool:
 	var before: Vector3 = shot.position

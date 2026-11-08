@@ -123,17 +123,67 @@ func events() -> void:
 			var target:=enemy(map.to_global(map.map_to_local(Vector3i(tower.grid_cell.x+offset.x,0,tower.grid_cell.y+offset.y))))
 			# Smooth aim is still authoritative; align by advancing its existing limit.
 			tower.aim_at(combat.aim_position(target,tower.attack),10)
+			if id=="sentry":
+				var limits:Vector2=visual.aim_pitch_limits()
+				check(visual.aim_pivot().rotation.x>=limits.x-.001 and visual.aim_pivot().rotation.x<=limits.y+.001,"sentry pitch left its limits")
+			if id=="mortar":
+				var flat:Vector3=tower.to_local(target.global_position)-visual._center;flat.y=0
+				var facing:Vector3=visual.to_local(visual._rotor.to_global(Vector3.FORWARD))-visual._rotor.position
+				check(facing.normalized().dot(flat.normalized())>.99,"mortar disc does not face its target")
+				check(visual._aim.rotation.x>0,"mortar barrel ignores the shell arc")
+				var stops:MeshInstance3D=visual.get_node("BedStops")
+				check(stops.get_parent()==visual and stops.mesh.get_aabb().size.x>1.5,"mortar bed stops must stay off the rotor")
 			var interval:=tower.attack_interval
 			var damage:=tower.damage
 			var shots:int=combat.shots_fired
 			combat.friendly_index_ready=false
 			combat._process(.01)
-			check(combat.shots_fired==shots+1 and visual.shot_count==1,id+" attack event not delivered")
-			check(not visual.last_clips.is_empty(),id+" missing animation")
-			report[id]["event_clips"]=visual.last_clips.duplicate()
-			check(tower.attack_interval==interval and tower.damage==damage and is_equal_approx(tower.next_attack_time,combat.elapsed+interval),id+" balance/cooldown changed")
+			var fired:int=combat.shots_fired-shots
+			check(fired>=1 and visual.shot_count==fired and (fired==1 or id=="broadside"),id+" attack event not delivered")
+			if id=="broadside":
+				check(tower.attack_interval==interval and tower.damage==damage and tower.next_attack_time==0.0,"broadside balance/cooldown changed")
+				# The opposite guns keep their own timers while this side reloads.
+				var opposite:=enemy(tower.combat_origin()*2.0-target.global_position)
+				var after:int=combat.shots_fired
+				combat.friendly_index_ready=false;combat._process(.01)
+				check(combat.shots_fired>after,"guns share one attack timer")
+				var waiting:int=combat.shots_fired
+				combat.friendly_index_ready=false;combat._process(.01)
+				check(combat.shots_fired==waiting,"a gun ignored its own interval")
+				wave._living.erase(opposite);enemies.erase(opposite);opposite.free();wave.alive=enemies.size()
+				visual._process(10)
+				check(visual._gun_kick.all(func(kick):return is_zero_approx(kick)),"gun recoil did not settle")
+			else:
+				check(not visual.last_clips.is_empty(),id+" missing animation")
+				report[id]["event_clips"]=visual.last_clips.duplicate()
+				check(tower.attack_interval==interval and tower.damage==damage and is_equal_approx(tower.next_attack_time,combat.elapsed+interval),id+" balance/cooldown changed")
+			if id=="ballista":
+				check(not visual._bolt.visible,"the clip's flying bolt is still visible")
+				check(combat.projectiles.size()==1 and target.health==target.max_health,"bolt must fly before it hits")
+				combat.friendly_index_ready=false;combat._process(1.0)
+				check(combat.projectiles.is_empty() and target.health<target.max_health,"bolt must end on its target")
+			if id=="crossfire":
+				check(visual.last_clips.size()==4,"shockwave must drive all four launchers")
+				var bursts:Array=combat.visuals.restored_bursts.bursts
+				check(bursts.any(func(burst):return burst.get("kind")=="mortar_impact"),"shockwave ring missing")
+				var rest:Basis=visual._rotor.basis
+				visual._process(.1);check(visual._rotor.basis.is_equal_approx(rest),"crossfire must rest between waves")
+				combat.set_wave_motion(true)
+				for step in 40:visual._process(.05)
+				check(not visual._rotor.basis.is_equal_approx(rest) and visual.is_processing(),"crossfire must spin during a wave")
+				var streams:Node=combat.visuals.streams
+				streams._process(.016)
+				var live:int=streams.multimesh.visible_instance_count
+				check(live>0,"barrels must stream tracers")
+				var hp_before:float=target.health
+				streams._process(.016)
+				check(target.health==hp_before,"tracers must stay cosmetic")
+				combat.set_wave_motion(false)
+				check(streams.multimesh.visible_instance_count==0,"tracers must stop with the wave")
+				for step in 40:visual._process(.05)
+				check(is_zero_approx(visual._spin_speed) and not visual.is_processing(),"crossfire must stop after a wave")
 			visual._process(10);check(visual._active.is_empty(),id+" animation did not finish")
-			if id in ["crossfire","broadside"]:directions(tower)
+			if id=="broadside":directions(tower)
 			# Repeated events at a faster instance interval cannot get stuck.
 			for i in 12:
 				tower.prepare_shot(target);tower.attack_interval=.16;tower.present_shot(target)
@@ -154,8 +204,8 @@ func events() -> void:
 func directions(tower:DefenseTower) -> void:
 	var v:Node3D=tower._visual
 	var center:Vector3=tower.combat_origin()
-	var names:Array=["fire_north","fire_east","fire_south","fire_west"] if v.tower_kind=="crossfire" else ["fire_port","fire_starboard"]
-	var vectors:=[Vector3.FORWARD,Vector3.RIGHT,Vector3.BACK,Vector3.LEFT] if v.tower_kind=="crossfire" else [Vector3.LEFT,Vector3.RIGHT]
+	var names:Array=["fire_port","fire_starboard"]
+	var vectors:=[Vector3.LEFT,Vector3.RIGHT]
 	for i in names.size():
 		var target:=enemy(center+tower.global_basis*vectors[i]*2)
 		tower.prepare_shot(target)
