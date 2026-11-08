@@ -68,7 +68,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 			var members: Array[Dictionary] = []
 			for i in range(first, mini(first+profile.cohort_size, group.enemy_count)):
 				members.append({"id": first_id+offset+i, "wave_index": offset+i, "route": route.duplicate(), "points": points,
-					"profile": profile, "health": profile.max_health, "shield": profile.max_shield, "abilities":profile.ability_snapshot(),
+					"profile": profile, "health": profile.max_health, "shield": profile.max_shield, "combat":profile.combat_snapshot(),
 					"speed": definition.move_speed*profile.speed_multiplier, "group_index": group_index, "cohort_id":offset+first,
 					"allocation_index": allocation_index, "allocation_total": int(quotas[key]), "start_index": origin})
 			cohorts.append(members)

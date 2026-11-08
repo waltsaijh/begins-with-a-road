@@ -16,7 +16,7 @@ One final encounter adapts the legacy armored ram model and two-tower suppressio
 
 The boss is a normal `Troop`/`Enemy` with large, ground, armored and boss tags: 1,200 HP; speed multiplier .4; melee 28 every 1 s; after an 8 s cooldown starts a 1.2 s windup, then disables at most two legal towers within three cells for three seconds. It uses the current fixed route allocation, current health/shield/status pipeline and source-specific disable cleanup. Slow, frost, knockback and Barracks interception retain their ordinary rules. Hunting explicitly excludes bosses. The charge ring, links, skill bar, disabled-tower lightning and top health label expose the encounter state. Death counts normally; remaining escorts/projectiles must resolve before victory.
 
-Only the generic ability snapshot gains `sabotage_targets` (ordinary Saboteurs default to one) and `base_damage` (ordinary troops default to one). No old manager, dynamic escort insertion, exposure-based boss routing or spell system was migrated. The adapted boss can affect Barracks as current sabotage does; the legacy exclusion was intentionally not imported.
+The boss reuses SabotageAbility with `targets = 2` (ordinary Saboteurs use one); `base_damage` (ordinary troops default to one) is frozen in the wave-start combat snapshot. No old manager, dynamic escort insertion, exposure-based boss routing or spell system was migrated. The adapted boss can affect Barracks as current sabotage does; the legacy exclusion was intentionally not imported.
 
 ## Balance laboratory
 

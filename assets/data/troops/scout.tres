@@ -1,14 +1,21 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://5h8kr8738eal"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_myded"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/scout.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://cdbj6gerftwyu" path="res://assets/sprites/effects/agile.png" id="2_ms2wd"]
 [ext_resource type="Texture2D" uid="uid://csvi48yff7k6j" path="res://assets/sprites/enemies/scout.png" id="3"]
+[ext_resource type="Script" uid="uid://djy6h7b8kepki" path="res://scripts/enemies/abilities/trail_ability.gd" id="3_tlir2"]
+
+[sub_resource type="Resource" id="Resource_m1ncx"]
+script = ExtResource("3_tlir2")
+speed_bonus = 0.2
+width = 0.25
+opacity = 0.25
 
 [resource]
 script = ExtResource("1")
-tile_cost_reduce = 2
-path_base_cost = 0.0
-road_age_weight = 1.0
+abilities = Array[ExtResource("1_myded")]([SubResource("Resource_m1ncx")])
 ability_text = "只走最新一批仍有效的完整道路；同一波新增的路線可共同分流。"
 ability_text_en = "Uses the newest surviving complete routes. Routes established in the same wave can share traffic."
 body_size = "small"
@@ -20,7 +27,9 @@ icon = ExtResource("3")
 accent_color = Color(0.62, 0.78, 0.36, 1)
 melee_damage = 4.0
 debug_color = Color(0.49, 0.6, 0.33, 1)
-max_health = 38.0
-speed_multiplier = 1.3
+max_health = 40.0
 route_selection = 0
+tile_cost_reduce = 2
+path_base_cost = 0.0
+road_age_weight = 1.0
 model = ExtResource("2")

@@ -11,17 +11,9 @@ enum TileCostReduce { ADD, MAX, MIN }
 @export_range(1, 64, 1) var cohort_size := 1
 @export_range(1, 16, 1) var cohort_interval_ticks := 1
 @export_group("Abilities")
+## Each entry is duplicated per spawned enemy; empty slots are ignored.
+@export var abilities: Array[EnemyAbility] = []
 @export_range(0.0, 0.9, 0.05) var damage_reduction := 0.0
-@export_range(0.0, 10.0, 0.1) var taunt_radius := 0.0
-@export_range(0, 10, 1) var taunt_priority := 1
-@export_range(0.0, 1000.0, 1.0) var heal_amount := 0.0
-@export_range(0.1, 20.0, 0.1) var heal_interval := 3.0
-@export_range(0.0, 10.0, 0.1) var heal_radius := 2.0
-@export_range(0.0, 10.0, 0.1) var sabotage_radius := 0.0
-@export_range(0.1, 30.0, 0.1) var sabotage_interval := 6.0
-@export_range(0.1, 5.0, 0.1) var sabotage_windup := 1.0
-@export_range(0.1, 10.0, 0.1) var sabotage_duration := 2.5
-@export_range(1, 4, 1) var sabotage_targets := 1
 @export_range(1, 100, 1) var base_damage := 1
 @export_range(0.0, 5.0, 0.1) var flight_height := 0.0
 @export_group("Intelligence")
@@ -174,14 +166,16 @@ func localized_name() -> String:
 	return troop_name if text == name_key else text
 
 func configuration_error() -> String:
-	if sabotage_targets < 1 or sabotage_targets > 4 or base_damage < 1: return "癱瘓目標數或基地傷害無效"
+	if base_damage < 1: return "基地傷害無效"
+	for ability in abilities:
+		if ability == null: continue
+		var problem := ability.configuration_error()
+		if not problem.is_empty(): return problem
 	if cohort_size < 1 or cohort_interval_ticks < 1: return "群體大小與群內間隔必須為正整數"
 	if tile_cost_reduce not in [TileCostReduce.ADD, TileCostReduce.MAX, TileCostReduce.MIN]: return "未知的路線分數合併方式"
-	for value in [damage_reduction, taunt_radius, heal_amount, heal_radius, sabotage_radius, flight_height]:
+	for value in [damage_reduction, flight_height]:
 		if not is_finite(value) or value < 0: return "敵軍能力數值必須非負且有限"
 	if damage_reduction >= 1: return "防禦減傷不可達到 100%"
-	for value in [heal_interval, sabotage_interval, sabotage_windup, sabotage_duration]:
-		if not is_finite(value) or value <= 0: return "敵軍能力時間必須為正有限數值"
 	if not is_finite(melee_damage) or melee_damage < 0 or not is_finite(melee_interval) or melee_interval <= 0: return "兵種近戰反擊設定無效"
 	if troop_name.strip_edges().is_empty(): return "兵種缺少 ID"
 	if not is_finite(max_health) or max_health <= 0 or not is_finite(speed_multiplier) or speed_multiplier <= 0: return "兵種血量與速度必須大於 0"
@@ -219,12 +213,19 @@ func evaluation(tile: TileRecord) -> float:
 	if road_traffic_weight != 0: score += tile.road_traffic*road_traffic_weight
 	return score
 
-func ability_snapshot() -> Dictionary:
-	return {"damage_reduction":damage_reduction, "taunt_radius":taunt_radius, "taunt_priority":taunt_priority,
-		"heal_amount":heal_amount, "heal_interval":heal_interval, "heal_radius":heal_radius,
-		"sabotage_radius":sabotage_radius, "sabotage_interval":sabotage_interval,
-		"sabotage_windup":sabotage_windup, "sabotage_duration":sabotage_duration,
-		"sabotage_targets":sabotage_targets,"base_damage":base_damage}
+## Frozen at wave start: later edits to this Resource never reach queued or
+## living enemies. Each call returns fresh ability copies with their own state.
+func combat_snapshot() -> Dictionary:
+	var copies: Array[EnemyAbility] = []
+	for ability in abilities:
+		if ability != null: copies.append(ability.duplicate())
+	return {"damage_reduction":damage_reduction, "base_damage":base_damage, "abilities":copies}
+
+## The authored ability of one type, or null.
+func find_ability(type: Script) -> EnemyAbility:
+	for ability in abilities:
+		if ability != null and ability.get_script() == type: return ability
+	return null
 
 ## A cutoff below one tile's cost keeps only routes tied for the best score.
 func only_shortest() -> bool:

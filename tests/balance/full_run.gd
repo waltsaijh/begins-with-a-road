@@ -82,10 +82,12 @@ func play(kind: String) -> void:
 			definition.growth.friendly_damage = 1.0+(definition.growth.friendly_damage-1.0)*growth_factor
 	var healths := {}
 	for troop: Troop in TroopCatalog.all():
-		healths[troop] = [troop.max_health,troop.heal_amount,troop.sabotage_duration]
+		var heal: HealAbility = troop.find_ability(HealAbility)
+		var sabotage: SabotageAbility = troop.find_ability(SabotageAbility)
+		healths[troop] = [troop.max_health,heal.amount if heal else 0.0,sabotage.duration if sabotage else 0.0]
 		troop.max_health *= hp_factor
-		troop.heal_amount *= healing_factor
-		troop.sabotage_duration *= disable_factor
+		if heal: heal.amount *= healing_factor
+		if sabotage: sabotage.duration *= disable_factor
 	shop.random_seed = seed_value+1000
 	scene.get_node("EnemyWave").spawn_seed = seed_value+2000
 	get_tree().root.add_child(scene)
@@ -173,8 +175,10 @@ func play(kind: String) -> void:
 		growth.friendly_damage = growths[growth][1]
 	for troop: Troop in healths:
 		troop.max_health = healths[troop][0]
-		troop.heal_amount = healths[troop][1]
-		troop.sabotage_duration = healths[troop][2]
+		var heal: HealAbility = troop.find_ability(HealAbility)
+		var sabotage: SabotageAbility = troop.find_ability(SabotageAbility)
+		if heal: heal.amount = healths[troop][1]
+		if sabotage: sabotage.duration = healths[troop][2]
 	print("POLICY_DONE ",id," ",result.outcome," wave=",result.completed_waves," leaks=",result.total_leaks)
 func click(control: Control) -> void:
 	var point := control.get_global_rect().get_center()

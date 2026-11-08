@@ -37,9 +37,9 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 		var profile: Troop = TroopCatalog.find(entry[0]).duplicate(true)
 		if not enabled:
 			match mechanic:
-				"guardian": profile.taunt_radius = 0
-				"healing": profile.heal_amount = 0
-				"disable", "boss": profile.sabotage_radius = 0
+				"guardian": profile.abilities = _without(profile.abilities,TauntAbility)
+				"healing": profile.abilities = _without(profile.abilities,HealAbility)
+				"disable", "boss": profile.abilities = _without(profile.abilities,SabotageAbility)
 				"swarm": profile.cohort_size = 1
 				"scout", "flying":
 					profile.tile_cost_reduce = Troop.TileCostReduce.ADD
@@ -99,3 +99,10 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 	BalanceTrace.end(result)
 	scene.queue_free()
 	await get_tree().process_frame
+
+## A fresh list without one ability type; the shared resources stay untouched.
+func _without(list: Array[EnemyAbility], type: Script) -> Array[EnemyAbility]:
+	var kept: Array[EnemyAbility] = []
+	for ability in list:
+		if ability != null and ability.get_script() != type: kept.append(ability)
+	return kept

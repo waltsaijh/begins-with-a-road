@@ -1,24 +1,24 @@
-[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[gd_resource type="Resource" script_class="Troop" format=3 uid="uid://ckr7p170cy3tn"]
+
+[ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/winged.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/winged.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://dbhjpym3xc7q2" path="res://assets/sprites/enemies/winged.png" id="3"]
+
 [resource]
 script = ExtResource("1")
+flight_height = 1.2
+ability_text = "沿道路上方飛行，無法被兵營攔截。普通迫擊砲無法攻擊；空中打擊可解鎖防空。"
+ability_text_en = "Flies above roads; cannot be intercepted. Mortars need Air Strike to target or damage it. Other shooting towers can attack it."
+tags = Array[StringName]([&"flying"])
 troop_name = "winged"
 name_key = "troop.winged.name"
 sort_order = 13
-body_size = "standard"
-tags = Array[StringName]([&"flying"])
-max_health = 45.0
-speed_multiplier = 1.65
-melee_damage = 0.0
-route_selection = 0
-model = ExtResource("2")
 icon = ExtResource("3")
 accent_color = Color(0.4, 0.82, 0.7, 1)
 debug_color = Color(0.44, 0.64, 0.55, 1)
-ability_text = "沿道路上方飛行，無法被兵營攔截。普通迫擊砲無法攻擊；空中打擊可解鎖防空。"
-ability_text_en = "Flies above roads; cannot be intercepted. Mortars need Air Strike to target or damage it. Other shooting towers can attack it."
+max_health = 60.0
+speed_multiplier = 1.5
 score_threshold = 0.5
+route_selection = 0
 search_budget = 4
-flight_height = 1.2
+model = ExtResource("2")

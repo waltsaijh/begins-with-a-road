@@ -166,5 +166,5 @@ func verify_modified_batches(controller: Node, profile: Troop) -> void:
 	if schedule.pending.size() == 7:
 		schedule.pending[0].route["test_marker"] = true
 		check(not schedule.pending[1].route.has("test_marker"), "Cohort members shared a mutable route dictionary")
-		schedule.pending[0].abilities["test_marker"] = true
-		check(not schedule.pending[1].abilities.has("test_marker"), "Cohort members shared mutable ability state")
+		schedule.pending[0].combat["test_marker"] = true
+		check(not schedule.pending[1].combat.has("test_marker"), "Cohort members shared mutable ability state")

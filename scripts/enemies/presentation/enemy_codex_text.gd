@@ -17,8 +17,8 @@ static func description(profile: Troop) -> String:
 	var abilities: Array[String] = []
 	if profile.max_shield > 0: abilities.append(("Shield %d" if en else "護盾 %d") % profile.max_shield)
 	if profile.damage_reduction > 0: abilities.append("Armor reduces incoming damage." if en else "裝甲可減少受到的傷害。")
-	if profile.taunt_radius > 0: abilities.append("Draws nearby single-target attacks." if en else "吸引附近可命中的單體攻擊。")
-	if profile.heal_amount > 0: abilities.append("Periodically heals nearby allies." if en else "定期治療附近的友軍。")
-	if profile.sabotage_radius > 0: abilities.append("Charges, then briefly disables nearby towers." if en else "蓄力後短暫癱瘓附近防禦塔。")
+	for ability in profile.abilities:
+		var line := ability.describe(en) if ability != null else ""
+		if not line.is_empty() and not abilities.has(line): abilities.append(line)
 	if profile.has_tag(&"flying"): abilities.append("Travels above the road; ground-only attacks cannot hit it." if en else "在道路上方飛行，僅限地面的攻擊無法命中。")
 	return story+("\n\n"+"\n".join(abilities) if not abilities.is_empty() else "")

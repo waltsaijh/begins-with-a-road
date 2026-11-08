@@ -31,7 +31,7 @@ func _process(_delta: float) -> void:
 		$Boss.hide()
 		boss = null
 		return
-	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.cast_remaining > 0 else ""]
+	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.is_casting() else ""]
 func finish(won: bool) -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
 	$Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if won else "Defense broken") if english else ("守住了這條路" if won else "防線失守")
