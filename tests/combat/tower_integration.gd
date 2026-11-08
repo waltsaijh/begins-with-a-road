@@ -110,6 +110,8 @@ func events() -> void:
 		var tower:DefenseTower=towers.place_card(card,Vector3i(7,0,7))
 		check(tower!=null,id+" event placement");if tower==null:continue
 		var visual:Node3D=tower._visual;visual.set_process(false)
+		if id=="sentry":
+			check(visual.shot_sound != null and visual.shot_sound.resource_path == "res://assets/audio/towers/sentry_shot.wav", "Sentry must retain its authored bow release sound after configuration")
 		# This regression checks visuals and combat, not Dummy audio-driver playback.
 		if DisplayServer.get_name()=="headless":visual.shot_sound=null
 		if id=="barracks":
@@ -182,6 +184,12 @@ func events() -> void:
 				check(streams.multimesh.visible_instance_count==0,"tracers must stop with the wave")
 				for step in 40:visual._process(.05)
 				check(is_zero_approx(visual._spin_speed) and not visual.is_processing(),"crossfire must stop after a wave")
+			if id=="sentry" and DisplayServer.get_name()!="headless":
+				var effects:Node = combat.visuals
+				var sounding := false
+				for voice:AudioStreamPlayer in effects._shot_players:
+					if voice.playing and voice.stream == visual.shot_sound and voice.bus == &"Combat": sounding = true
+				check(sounding,"Sentry firing must play its bow release through the combat bus")
 			visual._process(10);check(visual._active.is_empty(),id+" animation did not finish")
 			if id=="broadside":directions(tower)
 			# Repeated events at a faster instance interval cannot get stuck.

@@ -115,7 +115,8 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 		return "超出可建造範圍"
 	var at := Vector2i(cell.x, cell.z)
 	if card.traffic != null: return traffic.validate(card.traffic, at, turns)
-	if occupied.has(at): return upgrade_error(card, occupied[at])
+	var upgrade := upgrade_target(cell, card)
+	if upgrade != null: return upgrade_error(card, upgrade)
 	if not card.allows_rotation(turns): return "地塊不支援這個旋轉方向"
 	return construction_plan([{"card":card,"anchor":cell,"turns":turns}]).error
 
@@ -127,7 +128,7 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 	if card.traffic != null:
 		_feedback("")
 		return traffic.place(card.traffic, Vector2i(cell.x,cell.z), turns)
-	var existing := upgrade_target(cell)
+	var existing := upgrade_target(cell, card)
 	if existing != null:
 		if not existing.upgrade(): return null
 		_feedback("")
@@ -147,8 +148,10 @@ func card_ground(card: BuildCard, anchor: Vector2i, turns: int) -> Array[Vector2
 		result.append(pos)
 	return result
 
-func upgrade_target(cell: Vector3i) -> DefenseTower:
-	return occupied.get(Vector2i(cell.x, cell.z)) if cell.y == 0 else null
+func upgrade_target(cell: Vector3i, card: BuildCard = null) -> DefenseTower:
+	var target: DefenseTower = occupied.get(Vector2i(cell.x, cell.z)) if cell.y == 0 else null
+	if target != null and card != null and card.tower != target.definition: return null
+	return target
 
 func upgrade_error(card: BuildCard, tower: DefenseTower) -> String:
 	if card.tower != tower.definition: return "需要同種類防禦塔卡牌"
@@ -331,7 +334,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		elif card.traffic != null: failure.error = "輔助設施請在確認預擺後單獨放置"
 		elif cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767: failure.error = "超出可建造範圍"
 		if not failure.error.is_empty(): return failure
-		var existing := upgrade_target(cell)
+		var existing := upgrade_target(cell, card)
 		if existing != null:
 			failure.error = upgrade_error(card,existing)
 			if not failure.error.is_empty(): return failure

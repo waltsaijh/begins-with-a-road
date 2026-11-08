@@ -39,7 +39,7 @@ func verify() -> void:
 	scene = await play("tutorial")
 	scene._end_run(true)
 	column = scene.run_status.column
-	check(column.get_node("NextLevel").visible and column.get_node("Home").visible, "A win must offer the next level and the main menu")
+	check(column.get_node("TutorialActions").visible and not column.get_node("TutorialActions/Continue").disabled and column.get_node("Home").visible and not column.get_node("NextLevel").visible, "Tutorial win offers one continue action and the main menu")
 	check(scene.run_status.next_map != null and scene.run_status.next_map.id == "frontier", "The tutorial's win unlocks frontier")
 	await leave(scene)
 
@@ -62,5 +62,8 @@ func verify() -> void:
 		await process_frame
 		if not transition.active: break
 	check(current_scene.scene_file_path == "res://scenes/menus/main_menu.tscn", "Home did not open the main menu")
+	current_scene.free()
+	root.get_node("GameAudio").queue_free()
+	await create_timer(0.15,true,false,true).timeout
 	print("RESULT_ACTIONS_CHECK:", JSON.stringify({"failures": failures}))
 	quit(1 if not failures.is_empty() else 0)

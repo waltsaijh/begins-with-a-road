@@ -71,6 +71,15 @@ static func rotate_cell(cell: Vector2i, turns: int) -> Vector2i:
 		cell = Vector2i(-cell.y, cell.x)
 	return cell
 
+## Translate the authored origin so pointer rotation pivots around the whole body.
+## Compute absolutely from the selection's initial facing: rounding never accumulates.
+func rotation_anchor_offset(turns: int, initial_turns := 0) -> Vector2i:
+	if traffic != null or tower == null: return Vector2i.ZERO
+	var initial_center := TowerBodyGeometry.center(tower_cells(Vector2i.ZERO, initial_turns))
+	var rotated_center := TowerBodyGeometry.center(tower_cells(Vector2i.ZERO, turns))
+	# Mixed odd/even rectangles need the nearest half-cell snap on a square grid.
+	return Vector2i((initial_center-rotated_center).round())
+
 func tower_anchor(anchor: Vector2i, turns := 0) -> Vector2i:
 	return anchor + rotate_cell(tile_preset.tower_offset, turns) if tile_preset != null and traffic == null else anchor
 

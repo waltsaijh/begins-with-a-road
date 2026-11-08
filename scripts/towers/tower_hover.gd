@@ -16,6 +16,8 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	hide()
+	# Formal levels use the fixed inspection panel; keep legacy hover for tools.
+	if is_instance_valid(tower_map.get_parent().get("unit_inspection")): return
 	# Keep the upper canvas empty while gameplay is paused or preparing to load.
 	if get_tree().paused or not tower_map.can_process(): return
 	feedback_seconds = maxf(0, feedback_seconds-delta)

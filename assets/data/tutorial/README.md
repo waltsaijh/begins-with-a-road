@@ -1,6 +1,6 @@
 # 教學初始手牌設定
 
-在 Godot 開啟 `intro.tres`，Inspector 的 **Starting Cards** 即為初始三張手牌，依陣列順序執行：第一張指定位置原向放置、第二張依 Guided Turns 轉到 hologram 方向放置（目前 180°）、第三張自由合法放置。
+在 Godot 開啟 `intro.tres`，Inspector 的 **Starting Cards** 即為鏡頭練習結束後，第二步動畫發出的三張手牌，依陣列順序執行：第一張指定位置原向放置、第二張依 Guided Turns 轉到 hologram 方向放置（目前 180°）、第三張自由合法放置。
 
 目前三張為獨立 BuildCard，方便直接編輯：
 
@@ -16,4 +16,4 @@
 - **Upgrade Card**：商店教學要求購買的升級牌，預設哨塔。其塔種必須出現在初始手牌任一位置，升級 hologram 會尋找實際建好的同種塔。
 - **New Card**：刷新後必出的新牌，預設交叉火力；其塔種必須不在初始三張中。若將交叉火力改入初始牌，請將此欄改成另一個塔種。
 
-教學波次另由 `assets/data/levels/tutorial.tres` 的 Acts → Waves 編輯，目前 1 ACT、3 波。首波後進入商店教學，買到新牌後恢復一般建造／交易及剩餘波次；第三波與最後 ACT 獎勵結束才通關。
+教學波次另由 `assets/data/levels/tutorial.tres` 的 Acts → Waves 編輯，目前 1 ACT、3 波。首波後進入商店教學，買到新牌後恢復一般建造／交易及剩餘波次；第三波及在途攻擊結束就通關，不進遺物選擇；完成文字位於勝利結算，可重玩或繼續至第二關選圖。

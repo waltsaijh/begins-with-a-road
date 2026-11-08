@@ -13,9 +13,12 @@
 ./tools/build/build_native.ps1 -Platform web -Target template_release
 python tools/web/serve_web.py --port 8765
 godot --headless --path . --script res://tools/assets/build_tile_library.gd
+godot --headless --path . --script res://tools/assets/build_sentry_shot.gd
 ```
 
 建置環境、SDK 版本與額外參數見 [原生核心](../native/README.md)。伺服器預設讀取 `build/web/`，只監聽 `127.0.0.1`。
+
+`build_sentry_shot.gd` 以固定亂數種子合成哨塔弓弦與箭矢破風聲，輸出 `assets/audio/towers/sentry_shot.wav`（0.22 秒、48 kHz、16-bit mono，無外部取樣）。重新產生後讓 editor 匯入 WAV；正式關卡只讀取音檔，不執行合成器。
 
 五塔離線轉換為 `godot --headless --path . --script res://tools/assets/restore_towers.gd -- --prototype=D:/games/card-tower-defense`；只讀來源，會覆寫 Sandbox 內產生的五塔資源／模型／音效，不處理 Sentry。圖示使用實際渲染命令 `godot --path . --script res://tools/assets/render_restored_tower_icons.gd`，完成後讓 editor 匯入圖片，再重跑轉換器即可綁定新圖示。重建前檢查人工修改，來源與參數語意見 [塔資料](../assets/data/towers/README.md)。
 

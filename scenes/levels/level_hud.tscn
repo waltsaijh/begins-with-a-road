@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://ffwij66hhev7" path="res://assets/sprites/interface/speed_1x.png" id="8"]
 [ext_resource type="Theme" uid="uid://2jxxonbusayy" path="res://assets/themes/pause_controls.tres" id="9_pause"]
 [ext_resource type="PackedScene" path="res://scenes/levels/components/pause_menu_item.tscn" id="10_menu_item"]
+[ext_resource type="PackedScene" path="res://scenes/levels/coin_feedback.tscn" id="coin_feedback"]
 
 [sub_resource type="StyleBoxEmpty" id="PauseMenuStyle"]
 
@@ -16,6 +17,8 @@
 process_mode = 3
 layer = 6
 script = ExtResource("4")
+
+[node name="CoinFeedback" parent="." instance=ExtResource("coin_feedback")]
 
 [node name="WorldActions" type="Control" parent="." unique_id=1265644877]
 layout_mode = 3

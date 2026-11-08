@@ -1,5 +1,6 @@
 extends Node
 signal balance_changed(coins: int)
+signal gold_granted(amount: int, reason: String, world_position: Variant)
 signal purchased(card: BuildCard)
 signal rerolled
 ## Optional scenario policies; ordinary levels leave these empty.
@@ -207,10 +208,11 @@ func _refresh(insert_offers := false) -> void:
 	view.show_offers(offers, prices, sold, coins, maxi(0, reroll_price), insert_offers)
 	balance_changed.emit(coins)
 
-func grant_gold(amount: int, reason: String) -> void:
+func grant_gold(amount: int, reason: String, world_position: Variant = null) -> void:
 	coins += maxi(0,amount)
 	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":maxi(0,amount),"balance":coins,"reason":reason},"shop")
 	_refresh()
+	if amount > 0: gold_granted.emit(amount, reason, world_position)
 
 func _exit_tree() -> void:
 	if is_instance_valid(_wave):

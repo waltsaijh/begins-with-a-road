@@ -48,6 +48,15 @@ func open() -> void:
 	else: start_button.grab_focus()
 	$Entry.play("enter")
 
+func select_level(id: String) -> bool:
+	for i in maps.size():
+		if maps[i].id == id:
+			selected = i
+			_refresh()
+			if visible: map_changed.emit(maps[selected])
+			return true
+	return false
+
 func select_map(step: int) -> void:
 	if current_step != Step.MAP or maps.size() < 2: return
 	selected = posmod(selected+step, maps.size())

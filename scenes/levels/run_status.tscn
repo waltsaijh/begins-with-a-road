@@ -2,17 +2,20 @@
 [ext_resource type="Script" path="res://scripts/levels/presentation/run_status.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/sprites/interface/integrity.svg" id="integrity"]
 [ext_resource type="Theme" path="res://assets/themes/inspection_controls.tres" id="controls"]
-[sub_resource type="StyleBoxFlat" id="Panel"]
-bg_color = Color(0.94, 0.93, 0.87, 0.97)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.37, 0.43, 0.39, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_left = 8
-corner_radius_bottom_right = 8
+[ext_resource type="PackedScene" path="res://scenes/settings/components/settings_button.tscn" id="result_action"]
+[ext_resource type="Theme" path="res://assets/themes/settings.tres" id="result_theme"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Medium.ttf" id="medium"]
+[ext_resource type="PackedScene" path="res://scenes/menus/components/menu_crest.tscn" id="crest"]
+[ext_resource type="Script" path="res://scripts/levels/presentation/victory_confetti.gd" id="confetti"]
+[sub_resource type="Gradient" id="VeilGradient"]
+offsets = PackedFloat32Array(0,0.45,1)
+colors = PackedColorArray(0.98,0.99,0.98,0.88, 0.98,0.99,0.98,0.78, 0.98,0.99,0.98,0.32)
+[sub_resource type="GradientTexture2D" id="VeilTexture"]
+gradient = SubResource("VeilGradient")
+fill = 1
+fill_from = Vector2(0.5,0.5)
+fill_to = Vector2(0.5,0)
+[sub_resource type="StyleBoxEmpty" id="Panel"]
 [node name="RunStatus" type="CanvasLayer"]
 layer = 5
 script = ExtResource("1")
@@ -43,43 +46,144 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("result_theme")
+[node name="Veil" type="TextureRect" parent="ResultLayer/Result"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = SubResource("VeilTexture")
+expand_mode = 1
+[node name="Confetti" type="Control" parent="ResultLayer/Result"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+process_mode = 3
+script = ExtResource("confetti")
 [node name="Center" type="CenterContainer" parent="ResultLayer/Result"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 [node name="Panel" type="PanelContainer" parent="ResultLayer/Result/Center"]
-custom_minimum_size = Vector2(340, 220)
+custom_minimum_size = Vector2(440, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("Panel")
 [node name="Margin" type="MarginContainer" parent="ResultLayer/Result/Center/Panel"]
 layout_mode = 2
 theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 24
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_bottom = 16
 [node name="Column" type="VBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 16
+[node name="Crest" parent="ResultLayer/Result/Center/Panel/Margin/Column" instance=ExtResource("crest")]
+layout_mode = 2
+size_flags_horizontal = 4
+[node name="Eyebrow" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("medium")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.38,0.51,0.52,1)
 [node name="Title" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.23, 0.29, 0.27, 1)
-theme_override_font_sizes/font_size = 26
-[node name="Details" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+theme_override_colors/font_color = Color(0.125,0.243,0.278,1)
+theme_override_font_sizes/font_size = 36
+[node name="Rule" type="ColorRect" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+custom_minimum_size = Vector2(64,1)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+color = Color(0.45,0.58,0.58,0.4)
+[node name="Details" type="HBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 40
+[node name="Waves" type="VBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details"]
+custom_minimum_size = Vector2(100,0)
+layout_mode = 2
+theme_override_constants/separation = 6
+[node name="Value" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Waves"]
 layout_mode = 2
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.23, 0.29, 0.27, 1)
-[node name="NextLevel" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+theme_override_fonts/font = ExtResource("medium")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+[node name="Caption" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Waves"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.32,0.45,0.46,1)
+text = "result.waves"
+[node name="Leaks" type="VBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details"]
+custom_minimum_size = Vector2(100,0)
+layout_mode = 2
+theme_override_constants/separation = 6
+[node name="Value" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Leaks"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("medium")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+[node name="Caption" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Leaks"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.32,0.45,0.46,1)
+text = "result.leaks"
+[node name="Gold" type="VBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details"]
+custom_minimum_size = Vector2(100,0)
+layout_mode = 2
+theme_override_constants/separation = 6
+[node name="Value" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Gold"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("medium")
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.2,0.36,0.38,1)
+[node name="Caption" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column/Details/Gold"]
+layout_mode = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.32,0.45,0.46,1)
+text = "result.gold"
+[node name="Completion" type="Label" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+visible = false
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.25,0.38,0.4,1)
+theme_override_font_sizes/font_size = 16
+theme_override_constants/line_spacing = 4
+[node name="Restart" parent="ResultLayer/Result/Center/Panel/Margin/Column" instance=ExtResource("result_action")]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+text = "重新開始"
+[node name="TutorialActions" type="HBoxContainer" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+visible = false
+theme = ExtResource("result_theme")
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 32
+[node name="Restart" parent="ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions" instance=ExtResource("result_action")]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 48)
+text = "tutorial.restart"
+[node name="Continue" parent="ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions" instance=ExtResource("result_action")]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 48)
+text = "tutorial.continue"
+[node name="NextLevel" parent="ResultLayer/Result/Center/Panel/Margin/Column" instance=ExtResource("result_action")]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(0, 42)
 text = "ui.result.next_level"
-[node name="Restart" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 42)
-text = "重新開始"
-[node name="Home" type="Button" parent="ResultLayer/Result/Center/Panel/Margin/Column"]
+[node name="Home" parent="ResultLayer/Result/Center/Panel/Margin/Column" instance=ExtResource("result_action")]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 42)
 text = "ui.pause.home"

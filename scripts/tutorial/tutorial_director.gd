@@ -15,6 +15,11 @@ var cards: Node3D
 var shop: Node
 var overlay: CanvasLayer
 var ghost: Node3D
+var focus_layer: CanvasLayer
+var focus: Control
+var _ghost_material: ShaderMaterial
+var _pulse_started := 0
+var _overlay_motion: Tween
 
 func setup(host: Node3D, data: TutorialDefinition) -> void:
 	session = host
@@ -39,6 +44,12 @@ func setup(host: Node3D, data: TutorialDefinition) -> void:
 	session.level_finished.connect(func(): _set_stage(Stage.DONE))
 	overlay = Overlay.instantiate()
 	add_child(overlay)
+	focus_layer = preload("res://scenes/tutorial/tutorial_focus.tscn").instantiate()
+	add_child(focus_layer)
+	focus = focus_layer.get_node("Focus")
+	_ghost_material = ShaderMaterial.new()
+	_ghost_material.shader = preload("res://assets/shaders/tutorial_hologram.gdshader")
+	_pulse_started = Time.get_ticks_usec()
 	ghost = Ghost.instantiate()
 	ghost.valid_color = Color(1.0,0.8,0.3,0.32)
 	add_child(ghost)
@@ -46,10 +57,14 @@ func setup(host: Node3D, data: TutorialDefinition) -> void:
 
 func _process(_delta: float) -> void:
 	if not is_instance_valid(session) or not is_instance_valid(overlay): return
-	var active: bool = session.is_inside_tree() and session.can_process() and not get_tree().paused and not session._loading and not session.choosing_relic and not ScreenTransition.active
+	var active: bool = session.is_inside_tree() and session.can_process() and not session.finished and not get_tree().paused and not session._loading and not session.choosing_relic and not ScreenTransition.active
 	overlay.visible = active
+	focus_layer.visible = active
 	ghost.visible = active and stage in [Stage.FIRST,Stage.ROTATED,Stage.UPGRADE]
 	if not active: return
+	var time := (Time.get_ticks_usec()-_pulse_started)/1000000.0
+	_ghost_material.set_shader_parameter("tint",Color(0.34,0.84,0.82,0.24+0.16*(0.5+0.5*sin(time*TAU/1.6))))
+	focus.follow(_focus_target())
 	if stage == Stage.CAMERA:
 		camera_actions[0] = camera_actions[0] or camera.focus.distance_to(_camera_focus) > 0.1
 		camera_actions[1] = camera_actions[1] or absf(camera.size-_camera_size) > 0.2
@@ -109,6 +124,10 @@ func after_wave() -> bool:
 
 func _set_stage(value: int) -> void:
 	stage = value
+	if stage == Stage.FIRST and cards.cards.is_empty():
+		cards.cards.assign(definition.starting_cards)
+		cards.hand.deal_cards(cards.cards)
+		cards.cards_changed.emit()
 	session.get_node("EnemyWave").start_allowed = can_start_wave()
 	session.get_node("EnemyWave")._update_button()
 	cards._dirty = true
@@ -123,16 +142,47 @@ func _set_stage(value: int) -> void:
 				ghost.show_upgrade(cards.placement.map,tower,"")
 				break
 	if stage == Stage.UPGRADE: shop.close_shop()
-	if stage in [Stage.BUY_SENTRY,Stage.REROLL]: shop.open_shop.call_deferred()
+	if ghost.ghost != null:
+		for mesh in ghost.ghost.find_children("*","MeshInstance3D",true,false): mesh.material_override = _ghost_material
+	ghost.ground.material_override = _ghost_material
 	_update_text()
+	if _overlay_motion != null: _overlay_motion.kill()
+	var panel: Control = overlay.get_node("Panel")
+	panel.modulate.a = 0.0
+	_overlay_motion = create_tween().set_ignore_time_scale(true)
+	_overlay_motion.tween_property(panel,"modulate:a",1.0,0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	session._update_start_callout()
+	if stage == Stage.DONE:
+		overlay.hide()
+		ghost.hide()
+		focus.follow(null)
+		focus_layer.hide()
+
+func _focus_target() -> Control:
+	if stage in [Stage.FIRST,Stage.ROTATED,Stage.FREE,Stage.UPGRADE]:
+		var wanted: BuildCard = definition.upgrade_card if stage == Stage.UPGRADE else definition.starting_cards[stage-Stage.FIRST]
+		for i in cards.cards.size():
+			if (cards.cards[i].tower == wanted.tower if stage == Stage.UPGRADE else cards.cards[i] == wanted):
+				return cards.hand.views[i] if cards.selected != i and cards.hand._entering.is_empty() else null
+	if stage in [Stage.BUY_SENTRY,Stage.REROLL,Stage.BUY_NEW]:
+		if not shop.available: return null
+		if not shop.view.opened: return shop.view.slots.back().get_node("Face/Back")
+		if stage == Stage.REROLL: return shop.view.slots[0].get_node("Face/Back")
+		var wanted: BuildCard = definition.new_card if stage == Stage.BUY_NEW else definition.upgrade_card
+		for i in shop.offers.size():
+			if shop.offers[i].tower == wanted.tower and not shop.sold[i]: return shop.view.slots[i+1].get_node("Face/Card")
+	if stage == Stage.START:
+		return session.get_node("LevelHUD").early_start.get_node("Title")
+	return null
 
 func _update_text() -> void:
 	var keys := ["camera","first","rotated","free","start","combat","buy_sentry","upgrade","reroll","buy_new","practice","done"]
 	var numbers := [1,2,2,2,3,3,4,4,5,5,5,5]
-	overlay.get_node("Panel/Margin/Rows/Title").text = tr("tutorial.step").format({"step":numbers[stage]})
-	if stage == Stage.PRACTICE: overlay.get_node("Panel/Margin/Rows/Title").text = tr("tutorial.practice_title")
-	elif stage == Stage.DONE: overlay.get_node("Panel/Margin/Rows/Title").text = tr("tutorial.complete_title")
+	overlay.get_node("Panel/Margin/Rows/Title").text = tr("tutorial.step").format({"step":"%02d" % numbers[stage]})
+	overlay.get_node("Panel/Margin/Rows/Heading").text = tr("tutorial.heading."+keys[stage]) if stage < Stage.PRACTICE else tr("tutorial.practice_title" if stage == Stage.PRACTICE else "tutorial.complete_title")
+	var shortcut: Label = overlay.get_node("Panel/Margin/Rows/Keys")
+	shortcut.visible = stage in [Stage.CAMERA,Stage.FIRST,Stage.ROTATED,Stage.FREE,Stage.UPGRADE]
+	shortcut.text = tr("tutorial.keys.camera" if stage == Stage.CAMERA else ("tutorial.keys.rotate" if stage == Stage.ROTATED else "tutorial.keys.select"))
 	var names := {"first_tower":definition.starting_cards[0].tower.localized_name(),"second_tower":definition.starting_cards[1].tower.localized_name(),"third_tower":definition.starting_cards[2].tower.localized_name(),"upgrade_tower":definition.upgrade_card.tower.localized_name(),"new_tower":definition.new_card.tower.localized_name()}
 	overlay.get_node("Panel/Margin/Rows/Body").text = tr("tutorial."+keys[stage]).format(names)
 	var progress: Label = overlay.get_node("Panel/Margin/Rows/Progress")

@@ -30,6 +30,7 @@ var total_leaks := 0
 var total_kills := 0
 var victory := false
 var run_status: CanvasLayer
+var unit_inspection: Node3D
 var _owns_balance_trace := false
 var _balance_seed := -1
 @onready var expansion: Node3D = $SpawnExpansion
@@ -55,7 +56,9 @@ func _enter_tree() -> void:
 	if not error.is_empty():
 		push_error(error)
 		return
-	if level.tutorial != null: get_node("CardPlacement").cards = level.tutorial.starting_cards.duplicate()
+	if level.tutorial != null:
+		get_node("CardPlacement").cards.clear()
+		get_node("CardPlacement").initial_card_count = 0
 	var source_node := level.terrain.instantiate()
 	if not source_node is GridMap:
 		source_node.free()
@@ -127,7 +130,11 @@ func _ready() -> void:
 	_wave.wave_started.connect(_on_wave_started)
 	_wave.wave_finished.connect(_on_wave_finished)
 	_wave.enemy_leaked.connect(_on_enemy_leaked)
-	_wave.enemy_killed.connect(func(_enemy): total_kills += 1)
+	_wave.enemy_killed.connect(_on_enemy_killed)
+	$LevelHUD/CoinFeedback.setup(shop, _balance)
+	unit_inspection = preload("res://scenes/levels/unit_inspection.tscn").instantiate()
+	add_child(unit_inspection)
+	unit_inspection.setup(self)
 	expansion.completed.connect(_on_start_added)
 	if _wave.controls != null:
 		# Formal levels own the opening transition; standalone maps start immediately.
@@ -143,6 +150,11 @@ func _ready() -> void:
 
 func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
+
+func _on_enemy_killed(enemy: Node3D) -> void:
+	if finished or is_queued_for_deletion(): return
+	total_kills += 1
+	get_node("CardPlacement/Shop").grant_gold(1, "enemy_kill", _wave.visuals.death_position(enemy))
 
 ## Generic transition contract; reports completed work, never an estimated time.
 func prepare_for_play(report: Callable) -> int:
@@ -226,6 +238,7 @@ func _begin_wave_start() -> void:
 	if is_instance_valid(construction) and not construction.commit().ok: return
 	if _owns_balance_trace: BalanceTrace.wave = current_wave+1
 	_wave_starting = true
+	GameAudio.begin_wave()
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = true
 	_opening_shop_available = get_node("CardPlacement/Shop").available
@@ -234,6 +247,7 @@ func _begin_wave_start() -> void:
 	set_process(true)
 
 func _on_wave_started() -> void:
+	GameAudio.begin_wave()
 	_wave_starting = false
 	if _wave.controls != null: _wave.controls.start_pending = false
 	timeline.set_state(current_wave, 1.0, true)
@@ -254,6 +268,7 @@ func _advance_wave_start(delta: float) -> void:
 	timeline.set_state(current_wave, progress, false)
 	if _wave_start_elapsed >= WAVE_START_SECONDS:
 		if not _wave.start_wave():
+			GameAudio.play_default()
 			_wave_starting = false
 			if _wave.controls != null: _wave.controls.start_pending = false
 			get_node("CardPlacement")._wave_start_pending = false
@@ -279,6 +294,7 @@ func _on_wave_finished() -> void:
 	_finish_wave_transition()
 
 func _finish_wave_transition() -> void:
+	if current_wave+1 < _waves.size() or level.reward_final_act: GameAudio.play_default()
 	_settling_wave = false
 	set_process(false)
 	current_wave += 1
@@ -363,6 +379,7 @@ func _on_enemy_leaked(enemy: Node3D) -> void:
 
 func _end_run(won: bool) -> void:
 	if finished: return
+	if not won: GameAudio.play_default()
 	finished = true
 	victory = won
 	_wave_starting = false
@@ -388,5 +405,6 @@ func _end_run(won: bool) -> void:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"victory" if won else "defeat","base_health":base_health,"completed_waves":current_wave})
 
 func _exit_tree() -> void:
+	GameAudio.play_default()
 	if _owns_balance_trace and BalanceTrace.enabled:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"interrupted","completed_waves":current_wave})

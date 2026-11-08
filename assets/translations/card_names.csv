@@ -46,6 +46,9 @@ ui.settings.back,Back,返回
 ui.settings.general,General,一般
 ui.settings.display,Display,顯示
 ui.settings.audio,Audio,音效
+ui.settings.master_volume,Master volume,整體音量
+ui.settings.bgm_volume,BGM volume,BGM 音量
+ui.settings.combat_volume,Combat effects volume,戰鬥音效音量
 ui.settings.language,Language,語言
 ui.settings.msaa,Anti-aliasing,抗鋸齒
 ui.settings.mute,Mute all audio,全部靜音
@@ -137,23 +140,104 @@ relic.choose,Choose a relic,選擇一件遺物
 relic.debug_reroll,Reroll relics (Debug),重新隨機抽選（Debug）
 ui.maps.title.tutorial,First Steps,第一條防線
 ui.maps.description.tutorial,Learn camera controls and reshape roads with cards before upgrading your first tower.,練習鏡頭操作、用卡牌改變道路，再升級你的第一座塔。
-tutorial.step,Tutorial · {step} / 5,教學・{step} / 5
-tutorial.camera,Try left-drag outside cards to pan and the wheel to zoom. Right-drag around the screen center to rotate.,在卡牌以外按住左鍵拖曳平移、滾輪縮放；按住右鍵繞畫面中心拖曳旋轉。請各試一次。
+tutorial.step,TUTORIAL  {step} / 05,教學  {step} / 05
+tutorial.heading.camera,Frame the battlefield,視角定位
+tutorial.heading.first,Your first defense,第一座防線
+tutorial.heading.rotated,Turn the layout,轉向配置
+tutorial.heading.free,Choose your position,自由部署
+tutorial.heading.start,Begin the defense,開始防守
+tutorial.heading.combat,Watch the road,觀察戰況
+tutorial.heading.buy_sentry,Reinforce the defense,補強火力
+tutorial.heading.upgrade,Upgrade your tower,升級防禦
+tutorial.heading.reroll,Refresh the supply,更新補給
+tutorial.heading.buy_new,Expand your defense,擴充防線
+tutorial.keys.camera,LMB DRAG  /  WHEEL  /  RMB ORBIT,左鍵拖曳  /  滾輪  /  右鍵環繞
+tutorial.keys.rotate,R  /  RIGHT CLICK,R  /  單擊右鍵
+tutorial.keys.select,NUMBER KEYS  /  CLICK,數字鍵  /  點擊選牌
+result.complete,DEFENSE / COMPLETE,防線紀錄 / 作戰完成
+result.failed,DEFENSE / ENDED,防線紀錄 / 作戰結束
+result.waves,WAVES HELD,完成波次
+result.leaks,ENEMIES LEAKED,漏敵數
+result.gold,GOLD REMAINING,剩餘金幣
+tutorial.camera,"Left-drag to pan the view.
+Use the wheel to zoom.
+Right-drag around screen center
+to rotate. Try each once.","按住左鍵拖曳，平移視角。
+滾動滾輪，調整遠近。
+按住右鍵繞畫面中心拖曳，
+旋轉視角。請各試一次。"
 tutorial.camera_progress,{pan} Pan   {zoom} Zoom   {orbit} Rotate,{pan} 平移　{zoom} 縮放　{orbit} 旋轉
-tutorial.first,Select the {first_tower} card and place it on the golden hologram without rotating. Watch the road bend around the tower.,選擇{first_tower}卡，依金色 hologram 原方向放置。注意：塔占住原路，卡牌附帶的道路讓敵人繞行。
-tutorial.rotated,Select the {second_tower} card. Use R or a right click to rotate it until it matches the golden hologram.,選擇{second_tower}卡，按 R 或單擊右鍵旋轉到與金色 hologram 相同方向後放置，讓道路繞過第二座塔。
-tutorial.free,Place the {third_tower} card anywhere legal. Try a position and direction that keep the entrance connected to the goal.,最後一張{third_tower}自由放置。選擇你喜歡的位置與方向，記得保持入口到終點連通。
-tutorial.start,Ready? Click Start next wave above the entrance.,準備好了嗎？點入口上方的「開始下一波」。
-tutorial.combat,Watch your towers defend the road. The shop opens after the wave.,觀察防禦塔如何守住道路。這一波結束後，再到商店補強。
-tutorial.buy_sentry,Buy the {upgrade_tower} offered in the shop. You already have one on the map.,購買商店中的{upgrade_tower}卡。地圖上已經有一座同種塔，可以用這張卡升級。
-tutorial.upgrade,Place the purchased {upgrade_tower} card on your existing {upgrade_tower} to upgrade it. No extra roads or coins are needed.,把剛買的{upgrade_tower}卡放到原本的{upgrade_tower}上，升到 Lv.2。升級不增加道路，也不額外扣錢。
-tutorial.reroll,Use the reroll card at the lower right of the shop to refresh its offers.,點商店右下角的刷新牌，換一批商品。刷新會花費金幣。
-tutorial.buy_new,Buy {new_tower} from the refreshed shop. This tower was not in your starting hand.,購買刷新後出現的{new_tower}，試著擴充初始手牌以外的塔種。
+tutorial.first,"Select the {first_tower} card.
+Match the translucent hologram.
+The tower blocks the old road;
+its card adds a way around it.","選擇{first_tower}卡。
+依半透明指示的方向放置。
+塔會占住原路，
+附帶道路可讓敵人繞行。"
+tutorial.rotated,"Select the {second_tower} card.
+Press R or right-click to rotate.
+Match the pulsing hologram
+and place your second tower.","選擇{second_tower}卡。
+按 R 或單擊右鍵旋轉，
+對齊半透明指示後放置。
+讓道路繞過第二座塔。"
+tutorial.free,"Place your last {third_tower}.
+Choose a position and direction.
+Keep the entrance connected
+to the goal.","最後一張{third_tower}可自由放置。
+挑選位置與方向，
+保持入口到終點連通。"
+tutorial.start,"Ready?
+Click Start next wave
+above the entrance.","準備好了嗎？
+點入口上方的
+「開始下一波」。"
+tutorial.combat,"Watch your towers defend.
+After the wave ends,
+visit the shop to reinforce.","觀察防禦塔如何守住道路。
+這一波結束後，
+再到商店補強。"
+tutorial.buy_sentry,"Open the lower-right shop.
+Buy the {upgrade_tower} card.
+Use it to upgrade the matching
+tower already on the map.","點開右下角商店，
+購買{upgrade_tower}卡。
+用它升級地圖上的同種塔。"
+tutorial.upgrade,"Place the {upgrade_tower} card
+on your existing {upgrade_tower}
+to upgrade it to Lv.2.
+No extra roads or coins needed.","把剛買的{upgrade_tower}卡，
+放到原本的{upgrade_tower}上，
+升級至 Lv.2。
+升級不增加道路或額外花費。"
+tutorial.reroll,"Open the shop.
+Click its lower-right reroll card
+to refresh the offers.
+Rerolling costs gold.","點開商店，
+再點右下角的刷新牌。
+刷新商品會花費金幣。"
+tutorial.buy_new,"Buy {new_tower} from the shop.
+Try a tower that was not
+in your starting hand.","購買刷新後的{new_tower}卡，
+擴充初始手牌以外的塔種。"
 tutorial.practice_title,Put it into practice,自由實戰
-tutorial.practice,The guided steps are complete. Build and shop freely and defend all three waves to finish the level.,基本操作練習完成！接下來可以自由建造、購買與升級，守完全部三波並領取 ACT 獎勵才會通關。
+tutorial.practice,"The guided steps are complete!
+Build and shop freely.
+Defend all three waves
+to finish the level.","基本操作練習完成！
+接下來可以自由建造，
+也能購買與升級。
+守完全部三波即可通關。"
 tutorial.complete_title,Level complete,教學關卡通關
-tutorial.done,All three waves cleared! The next level is now unlocked.,三波防守完成！後續關卡已解鎖，可以返回主畫面繼續挑戰。
-tutorial.match_ghost,Match the highlighted card and hologram position and direction.,請依提示選牌，並配合金色 hologram 的位置與方向。
+tutorial.done,"All three waves cleared!
+The next level is now unlocked.
+Continue to choose your next battlefield.","三波防守完成！
+後續關卡已解鎖。
+繼續選擇下一個戰場吧。"
+tutorial.restart,Restart this level,重新開始這關
+tutorial.continue,Continue to next level,繼續下一關
+tutorial.return,Return to main menu,返回主畫面
+tutorial.match_ghost,Match the highlighted card and hologram position and direction.,請依提示選牌，並配合半透明指示的位置與方向。
 tutorial.follow_step,Complete the current tutorial step first.,請先完成目前的教學步驟。
 relic.empty,No relics yet,尚未取得遺物
 troop.rats.name,Rat Swarm,鼠群

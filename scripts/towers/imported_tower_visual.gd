@@ -14,7 +14,7 @@ const MESH_FLAGS := (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_S
 const MORTAR_DISC_REACH := 0.65
 static var _mortar_stops := {}
 @export_enum("ballista","sentry","barracks","mortar","crossfire","broadside") var tower_kind := "sentry"
-var shot_sound: AudioStream
+@export var shot_sound: AudioStream
 var shot_count := 0
 var deployment_count := 0
 var side := 1

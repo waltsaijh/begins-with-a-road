@@ -32,21 +32,22 @@ func verify() -> void:
 	await click(hud.speed_button)
 	await click(hud.speed_button)
 	check(Engine.time_scale == 4.0,"Real speed clicks reach 4x")
-	await click(hud.start_callouts[0])
+	await click(hud.start_callouts[0].get_node("Title"))
 	check(scene._wave_starting,"Real start click enters opening delay")
 	for frame in 3000:
 		if scene.finished: break
 		await get_tree().process_frame
 	check(scene.finished and not scene.victory and scene.total_leaks == 1,"Actual movement to goal ends run in defeat")
-	await get_tree().process_frame
+	await get_tree().create_timer(0.5,true,false,true).timeout
 	check(scene.get_node("EnemyWave").alive == 0 and scene.get_node("EnemyWave")._pending.is_empty(),"Loss cleans living and pending enemies")
 	check(scene.get_node("CardPlacement/Shop").coins == 9,"Loss gives no completion Gold")
+	check(not scene.run_status.get_node("ResultLayer/Result/Confetti")._started and not GameAudio._victory_pending and not GameAudio._victory.playing,"Defeat must not trigger victory confetti or the victory cue")
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(output+"/defeat.png")
 	await click(scene.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/Restart"))
 	for frame in 8: await get_tree().process_frame
 	var restarted: Node = get_tree().current_scene
-	check(restarted != scene and restarted.current_wave == 0 and restarted.base_health == 20 and Engine.time_scale == 1.0,"Defeat restart reloads authored Frontier and resets speed")
+	check(restarted != scene and restarted.current_wave == 0 and restarted.base_health == restarted.level.base_health and restarted.level.progress_id() == "frontier" and Engine.time_scale == 1.0,"Defeat restart reloads the selected Frontier fixture and resets speed")
 	get_tree().current_scene = self
 	restarted.queue_free()
 	await get_tree().process_frame

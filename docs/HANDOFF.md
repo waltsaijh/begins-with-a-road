@@ -1,5 +1,94 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-08 最新 main 合併
+
+本次從 bf3ed4b 的既有衝突開始，先完成 d52329e 的 Merge Commit 24c0712，再整合 fetch 後 origin/main e1100ed。使用者明確選擇「採用 main 最新介面與規則，保留 Sandbox 新增音效／教學／單位檢視」。保留擊殺金幣、旋轉放置及教學慶祝；時間線、進度頁、尋路與敵人技能採用 main。
+
+衝突整合：CSV 保留教學多行文案並接入新增按鈕；兩個二進位翻譯由 Godot CSV 匯入重建。RunStatus 場景與程式保留輕量結算／音效／碎紙，加入返回主選單、普通下一關及 ResultLayer 分層；教學繼續仍進選圖頁。LevelSession 保留完整結算清理；TutorialDirector 保留聚焦框初始化。systems 合併新版時間線與音量說明；tower_integration 同時保留新版砲管／弩砲／交叉火力斷言與 Sandbox 射擊音效檢查。相關呼叫者同步新結算節點路徑。
+
+相容修正：單位資訊讀 Enemy 的 base_damage／damage_reduction 快照，舷炮射程依各砲口膠囊聯集顯示。盾衛英文移除已不適用的固定 25% 減傷。音訊程式與合併前一致；舊音訊測試仍假設 click=0.55，已依實際已提交設定更新為 click=0.11、hover=0.1375。
+
+驗證（本次 Windows Godot 4.7.2 Compatibility）：editor import 無解析／資源錯誤；原生 Windows Debug、Release 重建成功。實際畫面 unit_inspection 97 項、coin_feedback 29 項、HUD 96 項、game_audio、tutorial/intro、tutorial/completion_flow 全部通過；教學 800×600 英文結算截圖無溢出。pause_menu、ui_scene_templates、level_flow、result_actions、road_traffic、synergy/routing（272）、synergy/combat（60）、tower_integration（84 組配置／旋轉）、progress_page 邏輯斷言通過。synergy/visuals 顯示 failures=[]；此場景設計為持續展示，檢查後手動停止。
+
+限制：部分快速退出測試仍報 4 ObjectDB／2 resources 未釋放（含 progress_page），level_flow 為 9／4；不宣稱無警告。level_flow 另報 tutorial 引用 UID 快取未命中並改用有效文字路徑；已核對來源／引用 UID 相同，正式教學實際載入與流程通過，未任意改動有效資源 ID。未重跑十五波平衡、Web 匯出／瀏覽器與完整效能基準。日誌、截圖及稽核保存在忽略的 .godot/merge-2026-11-08 與 .godot/test-results，不提交。
+
+初始工作目錄／index 已逐檔比對原始合併樹，無額外未提交工作；只有兩份歷史 stash（60a9224、d884400），本次無新 stash，不重複套用、不刪除。此次只完成 Merge Commit，不 push。
+
+Git 交付（2026-11-08）：使用者以「git更新並push到遠端」授權提交以下擊殺金幣、旋轉硬幣、音量及完整單位檢視／膠囊精簡的累積成果、資源、測試與文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD f0284da，fetch 後與追蹤分支同步；不合併其他分支、不動 stash／其他 worktree，不強制推送。下方未 commit／push 為當時實作紀錄；本次整理核對差異與最後測試紀錄，不宣稱重新跑整套測試。
+
+## 2026-11-08 檢視面板精簡追加
+
+依使用者改為更小、更扁的半透明膠囊：最大寬 540、標題 17px、圖示 18px、內距 28／9px、行距 4px；敵人標籤併入標題，移除關閉提示列、塔攻擊類型列與重複 traits、自訂射程不再顯示「標示格域」。保留實際數值、AOE／減速、駐軍與已生效加成；盾衛只保留一次減傷，去掉優先級／距離／出生順序等選敵內部描述。射程改明顯綠色填色／細邊，幾何不變。
+
+底部位置優先在手牌右側保持低位，放不下才移到手牌上方；戰鬥保持底部中央。所報「塔旁面板」為舊 TowerHover 懸停／升級泡泡與新面板共存，正式關卡有 UnitInspection 時停用舊泡泡，獨立工具保留。Godot 4.7.2 Compatibility 實際 unit_inspection 90 checks／0 failures、stderr 空白，新增高度／寬度、行數與重複內容、盾衛文字、綠色範圍、舊泡泡不顯示斷言；更新中英截圖已檢視。日誌 `.godot/inspect-compact-final.out`／`.err`。Web 未測，未 commit／push。
+
+## 2026-11-08 戰場單位檢視
+
+沿用先前未提交的金幣／音量修改，沒有 commit／push。新增 UnitInspection 共用場景、選取／取消與清理、底部即時資訊、純模型射線拾取與單選範圍模組；LevelSession 初始化、LevelHUD 的 Esc 優先處理、EnemyMultiMesh 只新增呈現查詢。沒有修改塔／敵人／關卡 Resource 的數值、戰鬥／導航／經濟規則。教學 PRACTICE 前保留原操作優先；暫停、卡牌、商店、載入及結算整合見 systems「戰場單位檢視」。
+
+本次 Windows Godot 4.7.2 Compatibility 實際 unit_inspection：83 checks／failures=0，stderr 空白。真實點塔／點敵人、六種塔、升級／加成、方向／多格攻擊原點、兵營道路可達區、即時血盾／主堡傷害、移動、空白／Esc、UI 不穿透、持牌優先、拖鏡不選取、移除清理、重疊深度、穩定資料不重建與小視窗英文通過；sentry／mortar／enemy／enemy_small_en 截圖已檢視。實際 camera_orbit、pause_menu（含重新開始）、card_drag_placement 全部 failures=0，stderr 空白。Headless level_flow、tutorial/intro failures=0；快速退出有此前已知音訊 Resource 清理警告。日誌 `.godot/inspect-*.out`／`.err`。
+
+初輪解析型別、測試塔 footprint fixture 及包圍盒取樣問題已修正；測試直接刪除 TowerMap 登錄塔會破壞原系統持有關係，改用真實 remove_tower，另保留敵人外部移除案例。空範圍避免提交零頂點 ImmediateMesh。首次 editor import 的原生暫存 DLL 複製失敗，後續實際專項與回歸可正常載入原生擴充。編輯器只重排塔 Resource／Theme 的序列化內容，逐區段比對資料一致後恢復原格式，沒有保留無關資源差異。
+
+Web 匯出／瀏覽器未驗證：本機有 4.7.2 樣板，但 bin/ 缺少路網 Web wasm，不能將桌面 PASS 當成 Web PASS。本輪只使用既有 Compatibility UI／ImmediateMesh／CPU 射線與 Tween，不新增平台依賴。拾取為各可見模型的 AABB，並非逐三角形精準選取；全十五波及性能基準未重跑。
+
+## 2026-11-08 音量與單枚硬幣追加
+
+本次將 CLICK_GAIN 降至 0.55、VICTORY_GAIN 提至 0.8；所有一般音效基礎增益集中至 EFFECT_GAINS，hover 保留點擊音量的 25%。Popup 移除數字與舊疊幣圖示，改為 16px 金色圓片 SVG，上升時繞中心垂直直徑翻轉一圈；合併／上限／收益規則保留。已在 systems 補個別音檔與遊戲內 bus 音量的修改說明。Godot 4.7.2 Compatibility 實際專項 29 checks／0 failures，音訊專項 failures=0，兩者 stderr 空白；已檢視更新截圖。Web 未重測，未 commit／push。
+
+## 2026-11-08 擊殺金幣 Popup
+
+開始 HEAD f0284da、experiment/routing-sandbox，工作區乾淨；本輪未 commit／push。使用者確認每隻擊殺新增 1 金幣，保留原清波獎勵。LevelSession 沿用 Shop.grant_gold，新增正數入帳 signal 通知 HUD；純呈現層不補發金幣。新增六個重用 Popup 範本、0.25 秒／70px 合併、0.6 秒上浮淡出、HUD 限頻縮放及指定 gain_gold.mp3 副本。音效使用 Combat 音量，單聲道、不疊音、暫停／離場處理；細節見 systems 的擊殺金幣章節。
+
+本次 Godot 4.7.2 Compatibility：專項 headless 初版 23 checks／0 failures，最終實際渲染 27 checks／0 failures、stderr 空白；截圖 `.godot/test-results/levels/coin_popup.png` 已檢視。涵蓋真實二十隻死亡與清波收益、重複傷害防重複入帳、合併與上限、邊界、鏡頭平移縮放、暫停、四倍速、HUD 及音效節流。初次 render 測試因截圖慢幀跨過短生命、相機控制器覆寫測試位移而失敗；將截圖獨立於生命時序並停用測試相機控制後通過，未放寬正式條件。首次音檔尚未匯入造成 preload 報錯，匯入後重查無錯。
+
+本次 headless 回歸：level_flow、tutorial/intro、game_audio 全部 failures=0；level_flow 的預期收益更新為原清波獎勵加每波測試的一次擊殺。前兩者快速關閉仍有既有音訊 mixer／Resource 清理警告，audio 與最終實際 Popup 專項無警告。日誌 `.godot/coin-*.out`／`.err`。未執行 Web 匯出／瀏覽器、全十五波平衡或效能基準；本次新增擊殺收入會提高可用金幣，尚未重新平衡。
+
+## 2026-11-08 教學體驗優化
+
+Git 交付：使用者以「git更新 並 push到遠端」授權將本節教學流程、精確焦點框、輕量結算、勝利音效與向外彩帶，以及所有相關素材／測試／文件提交並正常推送 origin/experiment/routing-sandbox。開始 HEAD 4a61359，fetch 後與追蹤分支同步；本節下方未 commit／push 為各實作當時快照。提交整理沿用已完成的實測並核對 staged diff，不宣稱重新執行整套測試；.godot/ 臨時音訊探測器、日誌與截圖不提交。
+
+最新彩帶方向：使用者要求向左右外側噴發，保持碎片尺寸，將水平速度改為 100–210 px/s、阻尼 0.9，增加距離與散度；仍各 12 片、1.4 秒內清除，中央文字與按鈕保持排除區。音訊無聲已由使用者確認是 Discord 語音影響、目前正常，因此未改動音訊邏輯或音量；排查時另外用實際混音 PCM 測過正式 boot → 選單 → 關卡準備 → 號角 → 勝利 → BGM，所有段落都有非零訊號，臨時探測器與原始記錄留在 .godot/。本輪未 commit／push。
+
+最新比例／勝利慶祝：教學標註整體縮小 10%。RunStatus 勝利時只觸發一次 VictoryConfetti（UI 畫布繪製，左右各 12 片低彩度紙片，0.08／0.13 秒延遲、1.4 實際秒內清空，避開中央文字／按鈕），不生成砲具或 3D 道具；失敗不觸發。使用 Downloads 指定 victory.mp3 原檔副本，BGM bus／基礎增益 0.5；出現結算先淡掉原 BGM，約 3.918 秒音效自然結束後才接回平時 BGM，重玩／離場取消 pending 接歌。同次 finish 重入不重播。Native game_audio、實際 completion_flow（等待原音檔自然完成後恢復 BGM）與 defeat_input 通過；intro 新增 24 片、排除文字區、重入不重播與自動清理斷言亦通過。已檢視縮小教學與勝利碎片峰值截圖 05_victory_burst.png；發牌測試原以三個 GUI frame 後的到達狀態斷言，並行 GPU 載入可能已跑完動畫，改在既有 cards_changed 訊號當下驗證三牌淡入初態，保持原動畫要求。未 commit／push，Web 未測。
+
+最新美術方向覆蓋下方矩形框版本：教學改單側細線、低透明度向右淡出的資訊標註，加 01 / 05 小標、操作標題與快捷鍵層級；原說明／步驟／限制保留。結算移除米色圓角窗與實心按鈕，採中央主選單徽記＋勝敗主標＋三欄統計與文字操作，教學完成內容／兩個操作仍是同一中央內容群組。白色徑向柔罩保留背景與雲海，勝敗以文字與金／暖灰紅線色區別，實際時間快速淡入。Godot Compatibility 的 intro、completion_flow 與實際行走至漏敵敗北／重新開始的 defeat_input 均通過；已檢視中文教學、勝利、800×600 英文與一般失敗截圖。defeat_input 舊回歸點擊整個開波容器中心、且仍假設重玩會丟棄所選 Level override，修正為實際 Title 命中與既有保留選中 Resource 的契約後通過，沒有改遊戲規則。未 commit／push，Web 未測。
+
+最新追修：重玩／繼續改放在勝利結算 Panel 內的 TutorialActions，移除畫面底部獨立按鈕與 Footer 漸層。焦點框改追蹤卡面 Visuals 實際四角，包含扇形轉角與搖動，以來源／目標 CanvasLayer 變換轉為焦點層局部座標；暗罩使用同一四邊形半平面裁切，避免軸向包圍框造成的偏移，繪製時重取最終布局／動畫變換。收斂後留白約 3–5 px。中英文教學與完成文案改以 CSV 引號多行按語意預先換行；實際各步提示行數沒有額外半句自動折行。新增 focus_geometry 跨 CanvasLayer／縮放／旋轉四角對齊與暗罩不重覆覆蓋回歸通過；intro 與 completion_flow 實際渲染再次通過，800×600 英文與中文結算、兩按鈕在框內截圖均已檢視。本輪仍未 commit／push。
+
+開始 branch experiment/routing-sandbox／HEAD 4a61359，工作區乾淨。本輪未 commit／push。完成無牌鏡頭練習、第二步三牌依序飛入左下角、教學目標的半透明脈動材質、獨立挖孔暗罩與收斂／脈動／淡出焦點框，以及讓玩家自行開店。第三波不選遺物、直接完成並保存通關；原完成提示移至共用勝利結算，下方按鈕可重玩本關或白色轉場至第二關選擇戰場頁（單次選圖 ID handoff，未直接開戰）。現有相機／放置／商店交易權威不代操作。
+
+已完成 Godot 4.7.2 Compatibility 真實渲染：tutorial/intro（全三波、發牌、半透明 pulse、焦點收縮、手動開店、完整操作與無遺物通關）、tutorial/completion_flow（實際點擊重玩與繼續第二關）、menus/main_menu（含9次白色過渡與設定／進關／返回），全部通過；headless balance/rules 67 項通過，確認普通十五波與四次遺物流程。代表截圖在 .godot/test-results/tutorial/，已檢視發牌、焦點暗罩、放置指示、結算與第二關選圖。Headless balance 快速結束有既有音訊 Resource 清理警告。Web／真人長局未測；完成流程測試以直接觸發勝利隔離兩個按鈕，全三波流程另由 intro 驗證。初次 completion_flow 腳本的型別／autoload 參照編譯錯誤已修正後通過。
+
+## 2026-11-08 完整塔體中心旋轉
+
+Git 交付：使用者以「git更新並push到遠端」授權將本節旋轉／異種重疊成果提交並正常推送 origin/experiment/routing-sandbox，連同先前本機音訊提交 6163ba8 一起交付。開始 HEAD 6163ba8；fetch 後領先追蹤分支 1 筆、無落後，未合併 origin/main 新更新。本節下方未 commit／push 為各實作當時快照；提交整理沿用已完成的測試並核對 staged diff，不宣稱整套重測。
+
+追加異種塔重疊：只對相同 TowerDefinition 顯示升級預覽並取消游標旋轉補償；不同種維持所持牌完整預覽與一般碰撞錯誤。權威 validate／place／construction_plan 與批次草稿預覽同步使用依卡牌塔種過濾的 upgrade_target，防止顯示與提交規則分歧。最終實際 rotation_pivot 1148 checks／failures=0，stderr 空白；已檢視異種模型重疊但仍保留紅色地塊與原卡射程的截圖。本項未 commit／push。
+
+開始 HEAD 6163ba8，工作區乾淨；本輪未 commit／push。新增 BuildCard 的旋轉原點補償與 CardPlacement 共用游標取格，讓正式選牌／拖牌繞整個塔占格包圍框中心轉動，2×2 迫擊砲／交叉火力四方向保留同組格子，道路跟隨轉向。採起始方向的絕對補償，矩形半格情況作最近整格吸附，無累積漂移；升級仍命中游標下原塔。直接放置 API、教學資料／hologram、已建塔及獨立批次預擺旋轉保持原資料座標契約。
+
+本次 Godot 4.7.2 Compatibility：rotation_pivot 1132 checks／failures=0，實際 R／右鍵／拖放／旋轉後升級皆通過；tutorial/intro、camera_orbit、card_drag_placement 實際渲染回歸通過。已檢視迫擊砲／交叉火力四方向預覽代表截圖。專項早期測試 fixture 曾因未指定 typed Array 及主 viewport 合成滑鼠位置不同而失敗，改以既有測試的 SubViewport 方式後通過；實際渲染快速退出曾出現前輪已知音訊 Resource 清理警告，專項清理改等待 mixer 後，最終 headless 1132 checks／failures=0 且 stderr 空白。Web 未測，未重新執行與此變更無關的整套戰鬥／導航回歸。
+
+## 2026-11-07 背景音樂與音量設定
+
+Git 更新：使用者以「git更新」授權將本節累積成果提交於 experiment/routing-sandbox（提交前 HEAD e5088df），不 push。本節下方各次實作的「未 commit／push」為當時快照，本次一併納入提交；其測試結果沿用已完成的實測，提交整理只重查差異及 git diff --check，不宣稱重新執行整套測試。
+
+最新 BGM 格式替換：使用 Downloads 指定的 bgm_default.ogg／bgm_battle.ogg，複製至 assets/audio/music/ 並更新 GameAudio 引用，移除舊 MP3 副本及其 .import。原生 loop=false，保留 BGM 基礎增益、設定滑桿、號角與所有淡化時序。OGG 匯入無錯誤，Compatibility 實際 game_audio failures=0（包含兩曲 OggVorbis 類型、解碼、循環重疊與開波／結束切換）；未 commit／push。
+
+新增哨塔攻擊聲：程序合成 `assets/audio/towers/sentry_shot.wav`（0.22 秒弓弦／破風），重建腳本 `tools/assets/build_sentry_shot.gd`；integrated/sentry.tscn 指定匯出的 shot_sound，沿用真實射擊事件與 Combat 音量。Godot 4.7.2 Compatibility 實際 tower_integration：84 次配置／旋轉、所有塔事件及哨塔開火時的音檔／bus 斷言通過，failures=[]、stderr 空白。未修改原攻速／傷害，未 commit／push；Web 與真人主觀混音未測。
+
+新增 hover 音效：assets/audio/ui/hover.mp3（按鈕）與 card_hover.mp3（手牌、展開商店、遺物卡），播放增益均為 click 的 25%，走 Master。音訊專項 headless 與實際 card_drag_placement 回歸均 failures=0，涵蓋種類分流、低增益、停用按鈕靜音與同卡移動不重播。快速關閉仍可能出現前述 mixer Resource 清理警告，非斷言失敗。
+
+
+本次追加（依使用者澄清修正）：全部 BGM 播放基礎增益 50%、滑桿預設恢復 50%、號角增益 50%，回平時音樂為 4 秒 smoothstep 交叉淡化。新增 Downloads 指定的 click／placement／wrong_placement 原檔副本，按鈕由 BaseButton.pressed 統一觸發、放置依提交結果觸發；非法放置只短亮紅色格面 0.4 秒。新增回歸斷言驗證預設音量、4 秒包絡、按鈕聲、成功／失敗放置聲、拒絕不消耗卡與紅色閃亮恢復。game_audio headless、card_drag_placement 實際 Compatibility 均 failures=0；已檢視 invalid_ground_before／flash 截圖，地塊區域 812 像素有明顯變化（RGB 差值總和 >10），效果不擴散至其他格色。首次新增音檔匯入前 preload 暫時報錯，素材匯入完成後測試可載入；Web 與主觀混音尚未驗證。
+
+
+本輪使用使用者指定的三份原型音檔，在 assets/audio/music/ 保存獨立副本；新增 GameAudio Autoload、正式開波／收尾／離場接線、射擊 Combat bus 及共用設定頁三個百分比滑桿。開波號角一次、戰鬥結束不播號角；音樂淡化與雙 player 循環銜接以實際時間執行，跨場景保留音樂與音量。音量設定不跨次啟動保存。完整行為與測試入口見 systems.md「設定頁面」。沒有 commit／push。
+
+本輪 Godot 4.7.2：隔離 APPDATA／LOCALAPPDATA 的 headless editor import 無錯誤；game_audio headless 與 Compatibility 實際渲染均 failures=0；既有 level_flow headless、pause_menu 實際渲染均 failures=0。音效設定截圖 .godot/audio-settings.png 已檢視，三滑桿及百分比沒有重疊。level_flow 快速關閉時有音訊播放 Resource 的清理警告；音訊專項在刪除播放器後等待 mixer 收尾，及 pause_menu 正常重玩／結束皆無此警告。主觀混音平衡、Web 匯出與瀏覽器使用者手勢音訊解鎖未測。原型專案未修改。
+
+
 ## 2026-11-07 本次 main → routing-sandbox 整合
 
 以 Sandbox `d85f60b` 為基礎完成既有 `origin/main`／`MERGE_HEAD=6141d51` 合併。授權包含 Merge Commit，不 push。以下為本次紀錄；後續兩個分支的歷史紀錄不代表現況或本次重測結果。

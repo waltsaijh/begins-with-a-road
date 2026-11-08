@@ -65,6 +65,9 @@ func _input(event: InputEvent) -> void:
 func _set_hover(index: int) -> void:
 	if not opened or _animating or index == _hovered: return
 	_hovered = index
+	if index >= 0:
+		var face: BaseButton = slots[index].get_node("Face/Back" if index == 0 else "Face/Card")
+		if not face.disabled: GameAudio.play_effect(&"card_hover")
 	_layout(true, false, false)
 
 func _unhandled_input(event: InputEvent) -> void:
