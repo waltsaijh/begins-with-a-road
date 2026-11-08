@@ -287,6 +287,20 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 攻擊與效果
 
+### 戰場單位檢視
+
+正式關卡共用 `scenes/levels/unit_inspection.tscn`。LevelSession 持有一個 UnitInspection，分離 unit_pick（只在點擊掃描模型）、unit_inspection_data（即時實例數值的純呈現）及 unit_range（單個選取 mesh）。左鍵點塔／敵人直接切換，點空白取消；有選取時第一個 Esc 先取消，沒有選取才進入原暫停。鏡頭拖曳不觸發選取，按鈕、卡牌與資訊面板由 GUI 先消耗事件；持牌、拖牌、開店、入口／遺物選擇、載入／轉場與教學 PRACTICE 前停用，避免干擾原教學及放置。戰鬥中可選敵人，不暫停、不改路線／攻擊。暫停時隱藏面板／標記，恢復顯示；結算、死亡、抵達及 tree_exiting 清除。
+
+既有單位沒有 PhysicsBody，因此以相機 ray 與可見 MeshInstance3D 的局部 AABB 交點求最近正向深度，跨塔與敵人統一比較；不按字典順序、不加碰撞或逐幀人口掃描。EnemyMultiMesh.inspection_parts 提供與 GPU／場景顯示一致的 pose yaw、避讓偏移、模型 adjustment／imported transform 與 mesh bounds；純 CPU 查詢，不回讀 GPU buffer。這是模型包圍盒拾取，沒有逐三角形／逐像素精確遮擋判定。
+
+塔資訊取目前 damage × attack.damage_multiplier、attack_interval、level、range_multiplier、有效 relic_effects；兵營改讀當局 deployment 士兵傷害／間隔／接戰距離、數量／生命／重生，不顯示無意義的塔攻速 0。敵人顯示當局 health／max_health、shield、abilities.base_damage 快照與兵種現有圖示／類型／簡短描述；盾衛去掉選敵排序細節，已有減傷描述時不重複追加百分比；Boss 提醒抵達即敗，不顯示選路權重。只為目前選取計算小型數值 signature，改變時才寫文字／血條，不重建整個 UI。
+
+非連續攻擊使用塔目前 attack_offsets，加上實際 anchor 或 departure 巡邏格；VolleyAttack.circular_range 使用 combat_origin 及 attack_radius × range_multiplier 的連續橢圓投影，與實際格子尺寸／地圖變換一致。crew_concentration 依當前局部右半平面裁切，不能以完整圓冒充有效範圍；自訂直線／側舷格域只畫聯集外框與 16% 綠色面。兵營將每名士兵 home_position 的 engage_radius 圓與 BarracksSystem.path 可達道路相交，有 sharpshooter 時另畫每名存活士兵當下的遠程範圍。AOE 爆炸半徑在文字說明，沒有在塔底畫出誤導的固定爆炸落點。選取底部金色細標記使用完整塔 footprint；敵人只顯示隨實際避讓位置移動的小圈。範圍 signature 改變才重建，移動敵人只更新標記 transform。
+
+面板共用 Light／Medium 字體、圖示調色與半透明淺紙膠囊背景；最大寬 540px、標題 17px、圖示 18px，內距 28／9px，行距 4px，敵人類型併名稱旁，省略關閉提示、塔類型及可由圖形辨認的射程／traits 說明，0.18 實際秒淡入／淡出；準備期優先在手牌右側維持低位，放不下才上移避讓，戰鬥收牌後回到底部中央；正式關卡停用舊的塔旁 TowerHover 泡泡，工具場景保留。支援語言／viewport 改變。專項入口 `godot --path . --script res://tests/levels/unit_inspection.gd`，可加 `--headless`；實際截圖在 `.godot/test-results/levels/inspection_*.png`。
+
+### 攻擊策略與命中
+
 在 `assets/data/towers/sentry.tres` 的 Combat 設定 max_health、default_damage、attack_interval、attack，以及 aim_pivot_path、muzzle_path（相對模型根節點）；無發射點標記時才使用 muzzle_offset。瞄準只旋轉 AimPivot，底座保持固定；ArrowRelease 標記位於箭尖，光束與投射物均從該處發射。格形攻擊區域以塔 anchor 加上 footprint 幾何偏移與敵人所在格座標判定整格覆蓋，規則和 threat／預覽一致；attack_area 可引用可編輯的 TowerAttackArea `.tres`，offsets 使用 Vector2i(X,Z)，(0,0) 為塔中心，(0,-1) 為模型前方一格。可建立直線、L 型、有缺口或不連續範圍；空清單屬錯誤，不偷偷回退圓形。attack_area 空引用才使用 attack_radius 圓形；自訂形狀不再被半徑裁切。不使用模型中心的世界距離，也不做障礙遮擋判定。每幀持續瞄準最近格的敵人（等距挑 enemy_id 較小者），冷卻時也平滑轉向。圓形範圍保留射程＋1 格的預瞄，且不擴大實際射程；自訂範圍只在覆蓋格中選取目標，避免範圍外更近的敵人搶走射擊機會。無目標時保持最後方向。首次攻擊或換目標若尚未對準，會等誤差小於 3° 才開火，不會在發射時瞬間轉向。轉向速度、容許角度及預瞄格數集中在 TowerConstants 的 AIM_TURN_SPEED、AIM_TOLERANCE、AIM_LOOKAHEAD_TILES。塔實例各自複製攻擊 Resource，可在程式修改 damage、attack_interval、attack.effects 等，不影響同種其他塔。
 
 - `ArrowAttack`：快速單體箭矢，只追蹤原先鎖定者，抵達後扣血；目標已死亡或抵達終點時飛至最後位置後消失，不轉移目標或造成範圍傷害。sentry_arrow.tres 可調 speed（世界單位／秒，預設 24）、arrow_length／arrow_width、trail_length／trail_width／color。
@@ -431,7 +445,15 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 Title 在整組提示頂部水平置中，下方 NextWaveIntel 依圖示框的實際寬度置中排列，hover 拓寬時同步調整整組寬度，保持出生點的投影錨點。對話框左右內距 12px、上下內距 8px、下方尖角高 8px，最小寬度 144px，隨內容自動延展；不使用原固定 216px 寬度或最多三列限制。單項範本 `troop_intel_item.tscn` 保存圖示、數量與邊框，平時不顯示兵種名稱，名稱以 tooltip 提供；點圖示暫停並開啟進度頁的該敵人，不再另外配置 ? 按鈕。
 
-開波不發金幣，只有清完每波時發放 WaveDefinition.reward。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
+開波不發金幣；每隻有效擊殺發放 1 金幣，清完每波仍發放原 WaveDefinition.reward，遺物金幣也保留。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
+
+### 擊殺金幣回饋
+
+正式 LevelSession 於 EnemyWave.enemy_killed 呼叫 Shop.grant_gold(1, "enemy_kill", world_position)，沿用既有入帳／BalanceTrace／商店可購買狀態／HUD 更新；抵達、外部刪除及重複傷害不給擊殺金幣。Shop.gold_granted 在正數入帳後發通知，世界位置可省略；波次與遺物只回饋頂部數字。Popup 不計算或補發獎勵，略過動畫不影響入帳。
+
+LevelHUD 的 CoinFeedback 預先實例化六個 coin_popup 範本，以單枚 16px 低飽和金色圓片 coin_popup.svg 呈現，沒有數字；繞中央垂直直徑翻轉，透過水平餘弦縮放及輕微明暗模擬正面／側緣／背面，0.6 秒內轉一圈。世界錨點保留死亡時視覺避讓偏移，使用 Camera3D.unproject_position 及反向 Canvas transform 投影；鏡頭移動時重投影，UI 尺寸固定，背後／畫外不新建動畫，畫內以 5px 邊界夾住。每個 Popup 0.6 實際秒，上浮 20px 後淡出；0.25 秒內、70px 內找最近既有錨點合併，累計內部金額並短縮放，不顯示數字、不重設生命。滿六個時仍先找候選，無符合者省略視覺。
+
+ignore_time_scale Tween 在暫停時停止生命與縮放，仍隨可操作的鏡頭重投影；結算／離場清除。頂部金幣數字縮放至 1.055 再復原，0.25 秒限頻、不改容器排版。assets/audio/ui/gain_gold.mp3 是使用者原檔副本，native loop=false；走 Combat bus、增益 0.35、max_polyphony=1，至少間隔 0.25 秒且前次仍在播時略過，不疊音；暫停凍結、離場停止。驗證入口：`godot --path . --script res://tests/levels/coin_feedback.gd`。
 
 水平線、波次圓點與 ACT 分隔線共用同一個由左至右的填色邊界，進度經過圖形時逐部分覆蓋，包含手動開波的 ease-in-out 動畫；填色終點對齊標記右緣，使該波開始時圓點或直線已完全填滿，戰鬥與下一段準備期之間不跳動。`wave_timeline.tscn` 的 Track／Progress 共用軌道與標記場景，Progress 以 Control 的 clip_contents 水平裁切，ACT Label 不受裁切。完整 UI 場景索引見 [scenes/UI_README.md](../scenes/UI_README.md)。
 
@@ -658,3 +680,7 @@ EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結�
 緊湊時間線、遺物圖示列、實際出生通知、共用敵軍圖鑑及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
 
 頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。緊湊未來波次空心圈，兩模式增加ACT遺物雙菱形，移除緊湊底部細進度條；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。
+
+### 調整個別音檔的基礎音量
+
+在 scripts/audio/game_audio.gd 的音量常數區調整：CLICK_GAIN=0.55 控制按鈕點擊；EFFECT_GAINS 字典包含 hover、card_hover（皆為 click 的 25%）、placement、wrong_placement、gain_gold。VICTORY_GAIN=0.8 控制勝利，BUGLE_GAIN 控制號角，BGM_GAIN 控制全部背景曲的基礎增益。0.0 為靜音、1.0 為音檔原音量，修改後重新執行。遊戲內「設定 → 音效」的整體／BGM／戰鬥滑桿是額外 bus 倍率：勝利隨 BGM，金幣／號角／放置隨戰鬥，點擊／hover 直接隨整體。改單一音檔請調上述基礎增益；滑桿預設是另一個層次，DEFAULT_BGM_VOLUME 不等於 BGM_GAIN。

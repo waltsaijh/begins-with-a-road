@@ -145,7 +145,7 @@ func verify() -> void:
 			scene.relic_choice.choose(choice)
 			await get_tree().create_timer(0.3).timeout
 		check(not wave.active and (cards.input_suspended if index == 2 else not cards.hand.stowed and not cards.input_suspended), "Wave end did not apply the preparation/terminal lock")
-		check(shop.coins == expected_rewards[index], "Wave completion reward used the wrong value or was duplicated")
+		check(shop.coins == expected_rewards[index]+index+1, "Wave completion and one kill reward per wave used the wrong value or were duplicated")
 		check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after a wave reward")
 		check(scene.current_wave == index+1 and scene.timeline.wave_index == index+1, "Timeline did not advance across the ACT boundary")
 		if index < 2:

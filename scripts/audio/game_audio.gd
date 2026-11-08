@@ -9,13 +9,36 @@ const HOVER = preload("res://assets/audio/ui/hover.mp3")
 const CARD_HOVER = preload("res://assets/audio/ui/card_hover.mp3")
 const PLACEMENT = preload("res://assets/audio/placement/placement.wav")
 const WRONG_PLACEMENT = preload("res://assets/audio/placement/wrong_placement.wav")
+const GAIN_GOLD = preload("res://assets/audio/ui/gain_gold.mp3")
+var _gold_ready_usec := 0
+
+func play_gold() -> void:
+	var now := Time.get_ticks_usec()
+	if get_tree().paused or now < _gold_ready_usec: return
+	var player: AudioStreamPlayer = _effects[&"gain_gold"]
+	if player.playing: return
+	_gold_ready_usec = now+250000
+	player.play()
+
+func stop_gold() -> void:
+	if _effects.has(&"gain_gold"): _effects[&"gain_gold"].stop()
 const FADE_SECONDS := 1.5
 const RETURN_SECONDS := 4.0
 const LOOP_SECONDS := 2.0
 const DEFAULT_BGM_VOLUME := 0.5
 const BGM_GAIN := 0.5
 const BUGLE_GAIN := 0.5
-const VICTORY_GAIN := 0.5
+const VICTORY_GAIN := 0.8
+## Per-clip base volume. 0.0 = silent, 1.0 = original file volume.
+const CLICK_GAIN := 0.55
+const EFFECT_GAINS := {
+	&"click": CLICK_GAIN*0.2,
+	&"hover": CLICK_GAIN*0.25,
+	&"card_hover": CLICK_GAIN*0.25,
+	&"placement": 1.0,
+	&"wrong_placement": 1.0,
+	&"gain_gold": 0.35,
+}
 var _voices: Array[AudioStreamPlayer] = []
 var _targets: Array[float] = [0.0, 0.0]
 var _active := -1
@@ -72,14 +95,17 @@ func _ready() -> void:
 			AudioServer.set_bus_name(index, bus_name)
 			AudioServer.set_bus_send(index, &"Master")
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index(&"BGM"), DEFAULT_BGM_VOLUME)
-	var streams := {&"click": CLICK, &"hover": HOVER, &"card_hover": CARD_HOVER, &"placement": PLACEMENT, &"wrong_placement": WRONG_PLACEMENT}
+	var streams := {&"click": CLICK, &"hover": HOVER, &"card_hover": CARD_HOVER, &"placement": PLACEMENT, &"wrong_placement": WRONG_PLACEMENT, &"gain_gold": GAIN_GOLD}
 	for kind in streams:
 		var effect := AudioStreamPlayer.new()
-		effect.bus = &"Combat" if kind in [&"placement", &"wrong_placement"] else &"Master"
+		effect.bus = &"Combat" if kind in [&"placement", &"wrong_placement", &"gain_gold"] else &"Master"
 		effect.stream = streams[kind]
 		var hovering: bool = kind in [&"hover", &"card_hover"]
-		effect.volume_linear = 0.25 if hovering else 1.0
+		effect.volume_linear = EFFECT_GAINS[kind]
 		effect.max_polyphony = 1 if hovering else 4
+		if kind == &"gain_gold":
+			effect.max_polyphony = 1
+			effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 		add_child(effect)
 		_effects[kind] = effect
 	get_tree().node_added.connect(_watch_button)

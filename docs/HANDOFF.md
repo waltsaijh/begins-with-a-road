@@ -1,5 +1,35 @@
 # Routing Sandbox — Phase 5 交接
 
+Git 交付（2026-11-08）：使用者以「git更新並push到遠端」授權提交以下擊殺金幣、旋轉硬幣、音量及完整單位檢視／膠囊精簡的累積成果、資源、測試與文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD f0284da，fetch 後與追蹤分支同步；不合併其他分支、不動 stash／其他 worktree，不強制推送。下方未 commit／push 為當時實作紀錄；本次整理核對差異與最後測試紀錄，不宣稱重新跑整套測試。
+
+## 2026-11-08 檢視面板精簡追加
+
+依使用者改為更小、更扁的半透明膠囊：最大寬 540、標題 17px、圖示 18px、內距 28／9px、行距 4px；敵人標籤併入標題，移除關閉提示列、塔攻擊類型列與重複 traits、自訂射程不再顯示「標示格域」。保留實際數值、AOE／減速、駐軍與已生效加成；盾衛只保留一次減傷，去掉優先級／距離／出生順序等選敵內部描述。射程改明顯綠色填色／細邊，幾何不變。
+
+底部位置優先在手牌右側保持低位，放不下才移到手牌上方；戰鬥保持底部中央。所報「塔旁面板」為舊 TowerHover 懸停／升級泡泡與新面板共存，正式關卡有 UnitInspection 時停用舊泡泡，獨立工具保留。Godot 4.7.2 Compatibility 實際 unit_inspection 90 checks／0 failures、stderr 空白，新增高度／寬度、行數與重複內容、盾衛文字、綠色範圍、舊泡泡不顯示斷言；更新中英截圖已檢視。日誌 `.godot/inspect-compact-final.out`／`.err`。Web 未測，未 commit／push。
+
+## 2026-11-08 戰場單位檢視
+
+沿用先前未提交的金幣／音量修改，沒有 commit／push。新增 UnitInspection 共用場景、選取／取消與清理、底部即時資訊、純模型射線拾取與單選範圍模組；LevelSession 初始化、LevelHUD 的 Esc 優先處理、EnemyMultiMesh 只新增呈現查詢。沒有修改塔／敵人／關卡 Resource 的數值、戰鬥／導航／經濟規則。教學 PRACTICE 前保留原操作優先；暫停、卡牌、商店、載入及結算整合見 systems「戰場單位檢視」。
+
+本次 Windows Godot 4.7.2 Compatibility 實際 unit_inspection：83 checks／failures=0，stderr 空白。真實點塔／點敵人、六種塔、升級／加成、方向／多格攻擊原點、兵營道路可達區、即時血盾／主堡傷害、移動、空白／Esc、UI 不穿透、持牌優先、拖鏡不選取、移除清理、重疊深度、穩定資料不重建與小視窗英文通過；sentry／mortar／enemy／enemy_small_en 截圖已檢視。實際 camera_orbit、pause_menu（含重新開始）、card_drag_placement 全部 failures=0，stderr 空白。Headless level_flow、tutorial/intro failures=0；快速退出有此前已知音訊 Resource 清理警告。日誌 `.godot/inspect-*.out`／`.err`。
+
+初輪解析型別、測試塔 footprint fixture 及包圍盒取樣問題已修正；測試直接刪除 TowerMap 登錄塔會破壞原系統持有關係，改用真實 remove_tower，另保留敵人外部移除案例。空範圍避免提交零頂點 ImmediateMesh。首次 editor import 的原生暫存 DLL 複製失敗，後續實際專項與回歸可正常載入原生擴充。編輯器只重排塔 Resource／Theme 的序列化內容，逐區段比對資料一致後恢復原格式，沒有保留無關資源差異。
+
+Web 匯出／瀏覽器未驗證：本機有 4.7.2 樣板，但 bin/ 缺少路網 Web wasm，不能將桌面 PASS 當成 Web PASS。本輪只使用既有 Compatibility UI／ImmediateMesh／CPU 射線與 Tween，不新增平台依賴。拾取為各可見模型的 AABB，並非逐三角形精準選取；全十五波及性能基準未重跑。
+
+## 2026-11-08 音量與單枚硬幣追加
+
+本次將 CLICK_GAIN 降至 0.55、VICTORY_GAIN 提至 0.8；所有一般音效基礎增益集中至 EFFECT_GAINS，hover 保留點擊音量的 25%。Popup 移除數字與舊疊幣圖示，改為 16px 金色圓片 SVG，上升時繞中心垂直直徑翻轉一圈；合併／上限／收益規則保留。已在 systems 補個別音檔與遊戲內 bus 音量的修改說明。Godot 4.7.2 Compatibility 實際專項 29 checks／0 failures，音訊專項 failures=0，兩者 stderr 空白；已檢視更新截圖。Web 未重測，未 commit／push。
+
+## 2026-11-08 擊殺金幣 Popup
+
+開始 HEAD f0284da、experiment/routing-sandbox，工作區乾淨；本輪未 commit／push。使用者確認每隻擊殺新增 1 金幣，保留原清波獎勵。LevelSession 沿用 Shop.grant_gold，新增正數入帳 signal 通知 HUD；純呈現層不補發金幣。新增六個重用 Popup 範本、0.25 秒／70px 合併、0.6 秒上浮淡出、HUD 限頻縮放及指定 gain_gold.mp3 副本。音效使用 Combat 音量，單聲道、不疊音、暫停／離場處理；細節見 systems 的擊殺金幣章節。
+
+本次 Godot 4.7.2 Compatibility：專項 headless 初版 23 checks／0 failures，最終實際渲染 27 checks／0 failures、stderr 空白；截圖 `.godot/test-results/levels/coin_popup.png` 已檢視。涵蓋真實二十隻死亡與清波收益、重複傷害防重複入帳、合併與上限、邊界、鏡頭平移縮放、暫停、四倍速、HUD 及音效節流。初次 render 測試因截圖慢幀跨過短生命、相機控制器覆寫測試位移而失敗；將截圖獨立於生命時序並停用測試相機控制後通過，未放寬正式條件。首次音檔尚未匯入造成 preload 報錯，匯入後重查無錯。
+
+本次 headless 回歸：level_flow、tutorial/intro、game_audio 全部 failures=0；level_flow 的預期收益更新為原清波獎勵加每波測試的一次擊殺。前兩者快速關閉仍有既有音訊 mixer／Resource 清理警告，audio 與最終實際 Popup 專項無警告。日誌 `.godot/coin-*.out`／`.err`。未執行 Web 匯出／瀏覽器、全十五波平衡或效能基準；本次新增擊殺收入會提高可用金幣，尚未重新平衡。
+
 ## 2026-11-08 教學體驗優化
 
 Git 交付：使用者以「git更新 並 push到遠端」授權將本節教學流程、精確焦點框、輕量結算、勝利音效與向外彩帶，以及所有相關素材／測試／文件提交並正常推送 origin/experiment/routing-sandbox。開始 HEAD 4a61359，fetch 後與追蹤分支同步；本節下方未 commit／push 為各實作當時快照。提交整理沿用已完成的實測並核對 staged diff，不宣稱重新執行整套測試；.godot/ 臨時音訊探測器、日誌與截圖不提交。

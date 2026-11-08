@@ -30,6 +30,7 @@ var total_leaks := 0
 var total_kills := 0
 var victory := false
 var run_status: CanvasLayer
+var unit_inspection: Node3D
 var _owns_balance_trace := false
 var _balance_seed := -1
 @onready var expansion: Node3D = $SpawnExpansion
@@ -129,7 +130,11 @@ func _ready() -> void:
 	_wave.wave_started.connect(_on_wave_started)
 	_wave.wave_finished.connect(_on_wave_finished)
 	_wave.enemy_leaked.connect(_on_enemy_leaked)
-	_wave.enemy_killed.connect(func(_enemy): total_kills += 1)
+	_wave.enemy_killed.connect(_on_enemy_killed)
+	$LevelHUD/CoinFeedback.setup(shop, _balance)
+	unit_inspection = preload("res://scenes/levels/unit_inspection.tscn").instantiate()
+	add_child(unit_inspection)
+	unit_inspection.setup(self)
 	expansion.completed.connect(_on_start_added)
 	if _wave.controls != null:
 		# Formal levels own the opening transition; standalone maps start immediately.
@@ -145,6 +150,11 @@ func _ready() -> void:
 
 func _on_balance_changed(coins: int) -> void:
 	_balance.text = str(coins)
+
+func _on_enemy_killed(enemy: Node3D) -> void:
+	if finished or is_queued_for_deletion(): return
+	total_kills += 1
+	get_node("CardPlacement/Shop").grant_gold(1, "enemy_kill", _wave.visuals.death_position(enemy))
 
 ## Generic transition contract; reports completed work, never an estimated time.
 func prepare_for_play(report: Callable) -> int:

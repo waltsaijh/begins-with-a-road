@@ -18,6 +18,8 @@ func advance(seconds: float) -> void:
 func verify() -> void:
 	RenderingServer.set_default_clear_color(Color.WHITE)
 	audio = root.get_node("GameAudio")
+	check(is_equal_approx(audio._effects[&"click"].volume_linear,0.55),"Click cue uses reduced base gain")
+	check(is_equal_approx(audio.VICTORY_GAIN,0.8),"Victory cue uses increased base gain")
 	check(is_equal_approx(Settings.read(root)[&"bgm_volume"], 50.0), "BGM slider should retain its 50 percent default")
 	var button := Button.new()
 	root.add_child(button)

@@ -346,7 +346,10 @@ func _input(event: InputEvent) -> void:
 		var shortcut: int = event.physical_keycode if event.physical_keycode else event.keycode
 		if shortcut == KEY_ESCAPE or (shortcut == KEY_TAB and not pause_requested):
 			if event.pressed and not event.echo:
-				if shortcut == KEY_ESCAPE: set_paused(not pause_requested)
+				if shortcut == KEY_ESCAPE:
+					var units: Node = get_parent().get("unit_inspection")
+					if not pause_requested and is_instance_valid(units) and units.has_selection(): units.cancel_selection()
+					else: set_paused(not pause_requested)
 				else: cycle_speed()
 			get_viewport().set_input_as_handled()
 			return

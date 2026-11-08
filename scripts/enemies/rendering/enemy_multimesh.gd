@@ -94,6 +94,32 @@ func update_enemy(enemy: Node3D) -> void:
 	if appearance.batch != null:
 		appearance.batch.update(enemy,global_transform.affine_inverse()*model_transform,appearance.custom_data(pose))
 
+func death_position(enemy: Node3D) -> Vector3:
+	var slot: int = _slots.get(enemy, -1)
+	if slot < 0: return enemy.global_position
+	var offset := _offsets[slot]
+	var shift := Vector3(offset.x,0,offset.y)
+	if map != null: shift = map.global_basis*Basis.from_scale(map.cell_size)*shift
+	return enemy.global_position+shift
+
+## Read the same rendered pose/avoidance/model transforms without GPU readback.
+func inspection_parts(enemy: Node3D) -> Array[Dictionary]:
+	var slot: int = _slots.get(enemy,-1)
+	if slot < 0: return []
+	var appearance: RefCounted = _appearances[slot]
+	if appearance.gpu_model == null:
+		var result: Array[Dictionary] = []
+		if not is_instance_valid(appearance.instance): return result
+		var meshes: Array[Node] = appearance.instance.find_children("*","MeshInstance3D",true,false)
+		if appearance.instance is MeshInstance3D: meshes.append(appearance.instance)
+		for view: MeshInstance3D in meshes:
+			if view.is_visible_in_tree() and view.mesh != null: result.append({"transform":view.global_transform,"bounds":view.get_aabb()})
+		return result
+	var display := enemy.global_transform
+	display.origin = death_position(enemy)
+	display.basis = Basis(Vector3.UP,_poses[slot].yaw).scaled(display.basis.get_scale())
+	return [{"transform":display*appearance.adjustment*appearance.imported_transform,"bounds":appearance.gpu_model.mesh.get_aabb()}]
+
 func _on_enemy_died(enemy: Node3D) -> void:
 	var slot: int = _slots.get(enemy, -1)
 	if slot < 0: return

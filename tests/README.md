@@ -1,5 +1,9 @@
 # 測試
 
+單位檢視：`godot --path . --script res://tests/levels/unit_inspection.gd`（可加 `--headless`）。驗證真實滑鼠／鏡頭 click 仲裁、六塔與方向／多格原點、升級／加成即時數值、選取不暫停、敵人血量／護盾／主堡傷害、正常移動、UI 不穿透、持牌優先、Esc 與暫停、空白／死亡／離場清除、重疊的深度優先、固定資料不重建、準備期避讓手牌及 800×600 英文。截圖 `.godot/test-results/levels/inspection_*.png`。
+
+擊殺金幣回饋：`godot --path . --script res://tests/levels/coin_feedback.gd`（可加 `--headless`）。涵蓋時間／空間合併、不延長生命、六個重用節點、滿池省略／合併、鏡頭投影／縮放、畫面邊界、暫停與四倍速、二十隻真實死亡完整入帳及清波獎勵、重複傷害、HUD 限頻／恢復、音效分流／單聲道／限頻／暫停、離場清除。實際渲染截圖在 `.godot/test-results/levels/coin_popup.png`。
+
 完整塔體中心旋轉：`godot --path . res://tests/cards/rotation_pivot.tscn`。驗證正式配置的起始朝向、全體占格中心與整圈不漂移，並以真實 R／右鍵／點放／拖放確認 2×2 塔維持原占地、道路與預覽一致、旋轉卡仍可升級；四方向截圖在 `.godot/test-results/cards/pivot_*.png`。加 `--headless` 可驗證資料與輸入，略過截圖。
 
 五步教學入口與人工操作見 [tutorial/README.md](tutorial/README.md)，`tutorial/intro.tscn` 驗證固定手牌、hologram 位置／90° 旋轉、自由放置、開波、保證哨塔升級、付費刷新與新塔購買，包含實際滑鼠／鍵盤及重玩重置。
