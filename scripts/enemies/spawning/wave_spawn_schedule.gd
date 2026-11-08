@@ -28,16 +28,32 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 				sources[key] = {"profile": group.troop, "origin": origin}
 			quotas[key] += 1
 	var batches := {}
+	# Troops that weigh traffic plan second, against the first pass's routes.
+	var followers: Array[Troop] = []
 	for key: String in quotas:
-		var source: Dictionary = sources[key]
-		var batch: Dictionary = controller.prepare_route_batch(source.profile, quotas[key], source.origin, modifiers)
+		var profile: Troop = sources[key].profile
+		if profile.road_traffic_weight != 0:
+			if not profile in followers: followers.append(profile)
+			continue
+		var batch: Dictionary = controller.prepare_route_batch(profile, quotas[key], sources[key].origin, modifiers)
 		if batch.is_empty(): return {}
 		batches[key] = batch.routes
 		pool_size += int(batch.pool_size)
+	if not followers.is_empty():
+		controller.tile_parameters.set_road_traffic(_traffic_shares(definition,batches,sources),followers)
+		for key: String in quotas:
+			if batches.has(key): continue
+			var batch: Dictionary = controller.prepare_route_batch(sources[key].profile, quotas[key], sources[key].origin, modifiers)
+			if batch.is_empty(): return {}
+			batches[key] = batch.routes
+			pool_size += int(batch.pool_size)
 	var pending: Array[Dictionary] = []
 	var offset := 0
 	var map: GridMap = controller.map
 	var waypoint_cache := {}
+	var junctions := {}
+	if definition.groups.any(func(group: WaveSpawnGroup): return group.troop.flight_height > 0.0):
+		junctions = Waypoints.junctions(controller.route_history.current)
 	for group_index in definition.groups.size():
 		var group := definition.groups[group_index]
 		var profile := group.troop
@@ -48,7 +64,7 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 			var allocation_index := int(used[key])
 			used[key] += 1
 			var route: Dictionary = batches[key][allocation_index]
-			var points := Waypoints.for_route(route, map, waypoint_cache, profile.flight_height)
+			var points := Waypoints.for_route(route, map, waypoint_cache, profile.flight_height, junctions)
 			var members: Array[Dictionary] = []
 			for i in range(first, mini(first+profile.cohort_size, group.enemy_count)):
 				members.append({"id": first_id+offset+i, "wave_index": offset+i, "route": route.duplicate(), "points": points,
@@ -79,6 +95,20 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 	pending.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a.spawn_tick < b.spawn_tick if a.spawn_tick != b.spawn_tick else a.slot < b.slot)
 	return {"pending": pending, "pool_size": pool_size, "waypoint_paths": waypoint_cache.size()}
+
+## Each tile's share of first-pass individuals whose route crosses it, so the
+## weight keeps its meaning whatever the wave's size.
+static func _traffic_shares(definition: WaveDefinition, batches: Dictionary, sources: Dictionary) -> Dictionary:
+	var counts := {}
+	var total := 0.0
+	for key: String in batches:
+		var profile: Troop = sources[key].profile
+		for route: Dictionary in batches[key]:
+			for cell: Vector2 in route.cells: counts[Vector2i(cell)] = float(counts.get(Vector2i(cell),0.0))+profile.cohort_size
+			total += profile.cohort_size
+	if total > 0:
+		for cell: Vector2i in counts: counts[cell] /= total
+	return counts
 
 ## The same deterministic entrance assignment used by combat, without route queries.
 static func _assigned_origins(definition: WaveDefinition, additional_starts: PackedInt32Array) -> Array[PackedInt32Array]:

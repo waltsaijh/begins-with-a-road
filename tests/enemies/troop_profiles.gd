@@ -169,7 +169,7 @@ func verify() -> void:
 				check(plan.get("reachable", false), "Troop lost a test-map origin")
 				for i in mini(plan.get("routes", 0), 8):
 					var route: Dictionary = controller.sample_for(profile, i, origin, i)
-					if profile.route_rule == Troop.RouteRule.COST:
+					if profile.tile_cost_reduce == Troop.TileCostReduce.ADD:
 						check(not route.is_empty() and route.score == actual_score(controller, profile, route), "Test-map score not exact")
 					else:
 						check(not route.is_empty() and route.identity == str(route.cells), "Hard-rule route lost physical identity")

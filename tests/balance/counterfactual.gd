@@ -41,7 +41,11 @@ func encounter(mechanic: String, enabled: bool, traffic: bool) -> void:
 				"healing": profile.heal_amount = 0
 				"disable", "boss": profile.sabotage_radius = 0
 				"swarm": profile.cohort_size = 1
-				"scout", "flying": profile.route_rule = Troop.RouteRule.COST
+				"scout", "flying":
+					profile.tile_cost_reduce = Troop.TileCostReduce.ADD
+					profile.path_base_cost = 1.0
+					profile.road_age_weight = 0.0
+					profile.score_threshold = INF
 		var group := WaveSpawnGroup.new()
 		group.troop = profile
 		group.enemy_count = entry[1]

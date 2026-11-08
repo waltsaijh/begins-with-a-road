@@ -19,7 +19,7 @@
 
 ## 尋路
 
-預設 **Route Rule = COST**，此模式的 **Path Evaluation** 用資料描述評分，不必寫 evaluation 函式：
+**Path Evaluation** 用資料描述評分，不必寫 evaluation 函式：
 
 `Path Base Cost + threat × Threat Weight + num_towers_around × Tower Count Weight + movement_multiplier × Movement Weight + damage_per_second × Damage Weight + cover × Cover Weight`
 
@@ -64,7 +64,8 @@ Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large�
 
 新增 rats、rook、bloodmage、winged、scout、bomber；完整數值／Tag／能力與限制見 [Phase 4](../../../docs/phase4.md)。
 
-- **Route Rule**：COST 沿用原候選／評分；SHORTEST 直接使用合法路網的實際最短格距；NEWEST 依本局已提交道路歷史選最新有效批次。後兩者不使用普通 Search Budget／Score Threshold，再套 Uniform／Softmax 及適用設施倍率。
+- **Road Traffic Weight**：乘上同波其他兵種走過該格的人數比例。設定不為 0 的兵種會等其他兵種分配完才規劃；負值跟著人群，配合 Max 可讓整條路線都有人；盾衛兵使用此設定。
+- **Tile Cost Reduce**（Path Evaluation）：路線如何合併地塊分數，越低越好。Add 加總，Max 看最差一格，Min 看最好一格。**Road Age Weight** 乘上地塊接入路線後經過的波次；偵查兵用 Min 加此權重，走最新接通的道路。
 - **Cohort Size／Cohort Interval Ticks**：大於 1 時以整群分配入口／路線，尾群可不足額；個體仍獨立。每 tick 為 0.25 秒；群模式使用群間 interval，取代 Batch Size 的並發規則。
 - **Damage Reduction／Taunt**：減傷比例、嘲諷半徑與穩定優先級。
 - **Heal**：回復量、間隔、範圍。多來源獨立，不復活或超過上限。

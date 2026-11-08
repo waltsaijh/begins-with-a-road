@@ -41,3 +41,21 @@ static func room(with_obstacle: bool) -> Array[Vector2i]:
 	for x in range(11, 14):
 		cells.append(Vector2i(x, 5))
 	return cells
+
+## Plain BFS over reciprocal road ports, independent of every route search.
+static func road_distance(snapshot: Dictionary, start: Vector2i, goal: Vector2i) -> int:
+	var masks := {}
+	for i in snapshot.ports.size(): masks[Vector2i(snapshot.cells[2*i],snapshot.cells[2*i+1])] = int(snapshot.ports[i])
+	var steps := [Vector2i.UP,Vector2i.RIGHT,Vector2i.DOWN,Vector2i.LEFT]
+	var distance := {start:0}
+	var queue: Array[Vector2i] = [start]
+	while not queue.is_empty():
+		var at: Vector2i = queue.pop_front()
+		if at == goal: return distance[at]
+		for d in 4:
+			var next: Vector2i = at+steps[d]
+			if distance.has(next) or not masks.has(next): continue
+			if masks[at] & (1 << d) and masks[next] & (1 << ((d+2)%4)):
+				distance[next] = distance[at]+1
+				queue.append(next)
+	return -1

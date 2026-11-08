@@ -19,5 +19,6 @@ accent_color = Color(0.4, 0.82, 0.7, 1)
 debug_color = Color(0.44, 0.64, 0.55, 1)
 ability_text = "沿道路上方飛行，無法被兵營攔截。普通迫擊砲無法攻擊；空中打擊可解鎖防空。"
 ability_text_en = "Flies above roads; cannot be intercepted. Mortars need Air Strike to target or damage it. Other shooting towers can attack it."
-route_rule = 1
+score_threshold = 0.5
+search_budget = 4
 flight_height = 1.2

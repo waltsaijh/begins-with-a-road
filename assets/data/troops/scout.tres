@@ -6,7 +6,9 @@
 
 [resource]
 script = ExtResource("1")
-route_rule = 2
+tile_cost_reduce = 2
+path_base_cost = 0.0
+road_age_weight = 1.0
 ability_text = "只走最新一批仍有效的完整道路；同一波新增的路線可共同分流。"
 ability_text_en = "Uses the newest surviving complete routes. Routes established in the same wave can share traffic."
 body_size = "small"

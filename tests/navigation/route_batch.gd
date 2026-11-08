@@ -134,9 +134,9 @@ func verify() -> void:
 
 func verify_modified_batches(controller: Node, profile: Troop) -> void:
 	var effect := {"tags": [&"ground"], "cells": {Vector2i(3, 0): true}, "multiplier": 0.5}
-	for rule in [Troop.RouteRule.COST, Troop.RouteRule.SHORTEST, Troop.RouteRule.NEWEST]:
+	for reduce in [Troop.TileCostReduce.ADD, Troop.TileCostReduce.MIN]:
 		var selected := profile.duplicate() as Troop
-		selected.route_rule = rule
+		selected.tile_cost_reduce = reduce
 		var baseline: Dictionary = controller.plan_for(selected)
 		var modified: Dictionary = controller.plan_for(selected, 0, [effect])
 		check(baseline.route_probabilities != modified.route_probabilities, "Traffic fixture did not change the selected rule's distribution")

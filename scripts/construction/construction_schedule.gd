@@ -14,11 +14,10 @@ static func build(tower_map: Node, proposal: Dictionary, wave: Node) -> Dictiona
 	probe.troop = source.troop
 	probe.traffic_effects = source.traffic_effects.duplicate(true)
 	probe.route_history.wave = source.route_history.wave
-	probe.route_history.snapshots.assign(source.route_history.snapshots.duplicate(true))
+	probe.route_history.tile_waves = source.route_history.tile_waves.duplicate()
 	probe.route_history.current = source.route_history.current.duplicate(true)
 	probe.route_history.revision = source.route_history.revision
 	probe.route_history.record(proposal.snapshot,terminals)
-	probe._special_routes.history = probe.route_history
 	var builder: RefCounted = ClassDB.instantiate("RoadPortalGraph")
 	probe.graph = builder.build(proposal.snapshot.cells,proposal.snapshot.ports,terminals[1],terminals[0],false,PackedVector2Array(terminals.slice(1)))
 	var result := {"ok":false,"error":"無法建立預擺路線","pending":[]}
@@ -51,6 +50,7 @@ static func build(tower_map: Node, proposal: Dictionary, wave: Node) -> Dictiona
 		else:
 			tile.threat = source.tile_parameters._tower_threat.get(tile.cell,0.0)
 			tile.num_towers_around = source.tile_parameters._tower_counts.get(tile.cell,0)
+	probe.tile_parameters.set_road_ages(probe.route_history.tile_ages())
 	for entry: Dictionary in proposal.builds:
 		var cells: Array[Vector2i] = tower_map.relics.preview_cells(entry.card.tower,entry.at,entry.turns,TowerBodyGeometry.local_cells(entry.card.tile_preset))
 		for tile in probe.tile_parameters.all_tiles():
