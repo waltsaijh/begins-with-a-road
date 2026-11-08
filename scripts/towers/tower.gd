@@ -85,6 +85,49 @@ func _refresh_disable_visual() -> void:
 		_disable_icon.no_depth_test = true
 		add_child(_disable_icon)
 	if is_instance_valid(_disable_icon): _disable_icon.visible = disabled
+	if disabled != _dimmed: _fade_dim(disabled)
+
+const DISABLED_DIM := 0.45
+const DIM_SECONDS := 0.2
+const SolidShader = preload("res://assets/shaders/solid_color.gdshader")
+var _dimmed := false
+var _dim_motion: Tween
+## This tower's copy of the shared solid_color material, used only while dimmed.
+var _dim_material: ShaderMaterial
+## Mesh -> its own material_override before dimming, restored afterwards.
+var _dim_meshes := {}
+
+## Darkens the whole model while disabled. Meshes drawn with the shared
+## solid_color material switch to this tower's own copy of it (same shader, so
+## no new program) whose `dim` fades; they switch back once fully restored.
+func _fade_dim(disabled: bool) -> void:
+	_dimmed = disabled
+	if _dim_motion != null: _dim_motion.kill()
+	if disabled:
+		if _dim_material == null:
+			_dim_material = ShaderMaterial.new()
+			_dim_material.shader = SolidShader
+			_dim_material.set_shader_parameter(&"dim", 0.0)
+		for node in find_children("*", "MeshInstance3D", true, false):
+			var mesh := node as MeshInstance3D
+			if _dim_meshes.has(mesh) or mesh.mesh == null: continue
+			var solid := true
+			for surface in mesh.mesh.get_surface_count():
+				var material := mesh.get_active_material(surface) as ShaderMaterial
+				if material == null or material.shader != SolidShader: solid = false
+			if not solid: continue
+			_dim_meshes[mesh] = mesh.material_override
+			mesh.material_override = _dim_material
+	elif _dim_material == null: return
+	var from := float(_dim_material.get_shader_parameter(&"dim"))
+	_dim_motion = create_tween()
+	_dim_motion.tween_method(func(value: float): _dim_material.set_shader_parameter(&"dim", value), from, DISABLED_DIM if disabled else 0.0, DIM_SECONDS)
+	if not disabled: _dim_motion.tween_callback(_restore_materials)
+
+func _restore_materials() -> void:
+	for mesh: Variant in _dim_meshes:
+		if is_instance_valid(mesh) and mesh.material_override == _dim_material: mesh.material_override = _dim_meshes[mesh]
+	_dim_meshes.clear()
 
 func effect(id: StringName) -> Dictionary: return relic_effects.get(id,{})
 func has_relic(id: StringName) -> bool: return relic_effects.has(id)

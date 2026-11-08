@@ -152,9 +152,12 @@ godot --headless --path . res://tests/relics/rewards.tscn
 godot --headless --path . res://tests/relics/mechanisms.tscn
 godot --headless --path . res://tests/synergy/routing.tscn
 godot --headless --path . res://tests/synergy/combat.tscn
+godot --headless --path . res://tests/synergy/visuals.tscn
 godot --path . res://tests/levels/road_flow_preview.tscn
 godot --path . res://scenes/level.tscn --quit-after 180
 ```
+
+`synergy/visuals` 把偵查兵痕跡、被癱瘓的塔變暗與兵營友軍血條擺在同一畫面，印出 `SYNERGY_VISUALS:{...}`，5 秒後切到友軍特寫；可用 `tools/web/export_test.ps1 -Scene res://tests/synergy/visuals.tscn` 匯出到 Web 目視比對。
 
 每次用不同的 `--log-file` 保存原始輸出；測試的固定 JSON／截圖位置可能覆寫前次產物，必要時先複製保存。Windows GUI 執行檔可用 `Start-Process -PassThru -Wait -WindowStyle Hidden` 等待。判定須同時檢查退出碼、完成標記、斷言與 GDScript error；正式關卡最後一項只有有限啟動 Smoke，不代表完成九波或驗證完整 Run。
 

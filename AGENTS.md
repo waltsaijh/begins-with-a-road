@@ -64,7 +64,7 @@
 
 ## 進度頁
 
-- 「進度」是唯一的塔／敵軍／遺物目錄，取代遊戲內左側敵軍情報按鈕與暫停選單的敵軍圖鑑；主畫面與暫停選單都可開啟，繼承 settings_page 的外殼、捲動、Esc 與焦點。頁面分三欄：左側「我方防禦塔／敵軍／遺物」，中間條目（40px 圖示、名稱，遺物另有使用情境，列高 52px），右側詳情（數值、特性與描述只在此顯示）。點擊條目前詳情只顯示提示，切換分類會清空；塔與敵人以 24°/s 緩慢旋轉的實際模型呈現（scenes/progress/components/model_preview.tscn，共用 enemy_model_preview.gd，暫停時仍轉動），遺物顯示大圖示，未解鎖敵人顯示「?」且不揭露資料。敵人詳情文字沿用 enemy_codex_text.gd。塔清單在 ProgressCatalog.TOWERS 明確定義，須與 card_shop.tscn 的 catalog 同內容同順序（回歸檢查）；敵人沿用 TroopCatalog 自動發現與 sort_order。ProgressCatalog 從 TowerDefinition／Troop 讀名稱、圖示與數值：塔描述與特性在翻譯 key tower.<id>.description／tower.<id>.traits（特性以 | 分隔），敵人描述沿用 ability_text／ability_text_en，特性由 tags、減傷與硬性選路產生。遺物直接讀 assets/data/relics/catalog.tres 的順序，名稱下方以 RelicDefinition.usage_text()／icon_color() 用對應色小字標示塔名或「通用」，三選一卡片共用同一標示（12px，塔色加深 45%）；可重複者列持有上限；專屬圖示套塔色，通用保留原色。全部條目直接顯示，沒有解鎖或遇敵紀錄。塔與敵人圖示都無底板，以 ui_icon_mask 套 accent_color 加深 45%，與手牌／商店一致。敵人圖示一律是 assets/sprites/enemies/<troop_name>.png 的 64×64 白色遮罩，顏色由 Troop.accent_color 分配且各不相同，開波提示共用 Troop.icon_color()，波次編輯器直接以 accent_color 調色；不再使用 SVG 或 sprites/troops/。
+- 「進度」是唯一的塔／敵軍／遺物目錄，取代遊戲內左側敵軍情報按鈕與暫停選單的敵軍圖鑑；主畫面與暫停選單都可開啟，繼承 settings_page 的外殼、捲動、Esc 與焦點。頁面分三欄：左側「我方防禦塔／敵軍／遺物」，中間條目（40px 圖示、名稱，遺物另有使用情境，列高 52px），右側詳情（數值、特性與描述只在此顯示）。點擊條目前詳情只顯示提示，切換分類會清空；塔與敵人以 24°/s 緩慢旋轉的實際模型呈現（scenes/progress/components/model_preview.tscn，共用 enemy_model_preview.gd，以實際時間轉動，不受遊戲暫停的 time_scale=0 或倍速影響），遺物顯示大圖示，未解鎖敵人顯示「?」且不揭露資料。敵人詳情文字沿用 enemy_codex_text.gd。塔清單在 ProgressCatalog.TOWERS 明確定義，須與 card_shop.tscn 的 catalog 同內容同順序（回歸檢查）；敵人沿用 TroopCatalog 自動發現與 sort_order。ProgressCatalog 從 TowerDefinition／Troop 讀名稱、圖示與數值：塔描述與特性在翻譯 key tower.<id>.description／tower.<id>.traits（特性以 | 分隔），敵人描述沿用 ability_text／ability_text_en，特性由 tags、減傷與硬性選路產生。遺物直接讀 assets/data/relics/catalog.tres 的順序，名稱下方以 RelicDefinition.usage_text()／icon_color() 用對應色小字標示塔名或「通用」，三選一卡片共用同一標示（12px，塔色加深 45%）；可重複者列持有上限；專屬圖示套塔色，通用保留原色。全部條目直接顯示，沒有解鎖或遇敵紀錄。塔與敵人圖示都無底板，以 ui_icon_mask 套 accent_color 加深 45%，與手牌／商店一致。敵人圖示一律是 assets/sprites/enemies/<troop_name>.png 的 64×64 白色遮罩，顏色由 Troop.accent_color 分配且各不相同，開波提示共用 Troop.icon_color()，波次編輯器直接以 accent_color 調色；不再使用 SVG 或 sprites/troops/。
 
 ## 卡牌、商店與放置
 
@@ -98,6 +98,7 @@
 - RoadEditGuard 透過 Tarjan／block-cut 與並查集延後不影響有效路網的死路新增重建；新增死路仍立即擁有地塊資料。刪除、任意改接口或移動端點需明確完整重建。
 - 每格一份 TileParameters，每張地圖一份 store；store 管理座標、成本快取與失效，不負責尋路。成本變更與道路幾何變更分別失效。
 - 新增兵種使用 `assets/data/troops/` 的 Troop `.tres`，由 TroopCatalog 自動發現，不為每個兵種新增腳本子類別或硬編目錄。缺失的兵種不能偷偷替換後開波。
+- 敵人技能是 Troop.abilities（Array[EnemyAbility]）中的獨立 Resource：每種技能一個類別（scripts/enemies/abilities/，目前 HealAbility／TauntAbility／SabotageAbility／TrailAbility），@export 為設定、一般變數為單隻敵人狀態，提供 start／update／stop、taunt_rank、is_casting、describe 與 configuration_error。預設在兵種 .tres 內嵌；需多兵種同步調整時才另存共用 .tres（建議 assets/data/troops/abilities/），共用檔改值會影響所有引用者，個別差異用 Inspector 的 Make Unique。開波時 Troop.combat_snapshot() 為每個待出生敵人 duplicate() 一份技能並固定減傷與基地傷害；EnemyAbilities 只驅動各技能並提供附近敵人、塔、距離、格子、光束與能力環查詢，不再保存技能參數或狀態；需要跨敵人共享的每波資料用 service(script) 建立一份輔助節點（放在地圖旁、沿用地圖 transform），每幀 update、波次結束 clear。減傷、護盾、速度、飛行高度、基地傷害與近戰仍是 Troop 數值，不做成技能。新增技能只需新類別，加入兵種的 Abilities 清單即可；空項目忽略。
 
 ## Routing Sandbox Phase 2：臨時交通設施
 
@@ -135,11 +136,12 @@
 - 鼠群預設 5 隻一群；每個 WaveSpawnGroup 在尾端可不足額，不跨編輯群組拼群。入口和路線均按群分配，同兵種同入口跨群組共用整波「群」配額；只洗牌整群，尾群保持尾端。每隻仍有獨立生命及完整固定行程。群內 1 刻度（0.25 秒）；群首間隔為 max(interval_ticks, cohort_size × cohort_interval_ticks)，鼠群模式不使用 batch_size 分拆群。一般兵種原刻度／batch_size 語意不變。預覽、列表與正式出兵共用 WaveSpawnSchedule，顯示總個體數。
 - 所有兵種都由 Path Evaluation 決定路線，沒有 Route Rule 欄位。Tile Cost Reduce 決定路線如何合併地塊分數（越低越好）：Add 加總，走有限候選池與 strict threshold；Max 看路上最差一格，Min 看路上最好一格，這兩種由 reduced_routes.gd 與原生 RoadReducedRoutes 精確求解。三者都共用 threshold、Uniform／Softmax、交通倍率與配額。新六兵基準 Uniform；盾衛兵用 Max、path_base_cost 0、road_traffic_weight −1 跟著同波人群，不使用威脅尋路；血法師與爆破手不追友。飛翼獸對所有地面交通倍率免疫。
 - 飛翼獸用 Add：path_base_cost 1、無威脅權重、score_threshold 0.5（門檻 0 會清空候選池）、search_budget 4、Uniform，只留與最短路等長的候選並分流；等長路線很多時只保留有限條，不保證涵蓋全部。路線仍依合法道路選出，但飛行 waypoints 只保留起點、路線經過的路口（三條以上雙向連線的地塊）與終點，在路口之間以 1.2 格高度直線飛行，不沿轉角；流量預覽仍畫在道路上。不被兵營近戰攔截。普通迫擊砲索敵與爆炸都排除 flying；空中打擊解鎖三維球形命中。其他射擊塔與神射手可對空。
+- 偵查兵的 TrailAbility 把自己走過的道路格標記到波次結束：RoadTrail 以偵查兵 accent_color、opacity 0.35、寬 0.16 格的半透明純色條（SolidMaterials.transparent，中心方塊＋接口臂互不重疊，轉角不變深）畫在路面上，波次結束時加速立即停止、色條 0.8 秒淡出。站在標記格上的其他地面敵人（排除 flying；標記者自己不吃自己的痕跡，另一隻偵查兵走在前一隻的痕跡上仍會加速，各格記錄標記來源）每幀刷新加速：速度 ×(1+0.25)，離開後持續 0.5 秒，顯示 assets/sprites/effects/agile.png。加速與減速一樣取最強幅度與最長剩餘時間、不疊加，與減速／冰霜相乘。數值都在 TrailAbility 可調。
 - 偵查兵用 Min：path_base_cost 0、road_age_weight 1，路線分數就是路上最年輕一格的年齡。TileParameters.road_age 由 route_history 維護：地塊第一次進入 route_cells 時記下波次，與路面黃灰判定同一份資料（RoadEditGuard）；初圖為 0，準備第 N 波的編輯記 N，同波多次提交同齡，重接沿用首次，年齡以目前最新的已接通地塊為 0 起算。
 - road_traffic_weight 不為 0 的兵種在同波其他兵種配額確定後才規劃：WaveSpawnSchedule 先分配其他兵種，依其路線逐格統計人數占該批總人數的比例寫入 TileParameters.road_traffic（以 tile 統計，避免平行道路共用路口時無法分辨；多入口加總；只算人數不算出發時間），只讓這些兵種的成本失效後再規劃。跟著人群用 Max 加負權重（最冷清的一格也盡量熱鬧），避開人群用正權重；目前只有盾衛兵使用。驗證在 tests/navigation/road_traffic.gd。
 - Min 從分數最低的一批地塊開始，對每格用容量 1 的頂點最大流找經過它的簡單入口至終點路線，排除死路／單接點環；這批都走不通（例如只屬於另一入口）才退回下一批。Max 先求最低可達的最差地塊，再取該上限內的最短路 DAG，每條邊一條代表路線。年齡記在地塊上：正式牌沒有 explicit_road_ports，相鄰道路一定自動連通，新連接一定帶新地塊；只有獨立試驗的複合配置或手動接口配置能在舊地塊間只補接口，這類捷徑不算新路。原生改動需重建並重啟 Godot；目前載入 bin/road_graph.candidates.*。
-- 盾衛嘲諷只在符合原攻擊射程／方向／對空條件的候選中比較，依 taunt_priority、塔至盾衛距離、enemy_id 決定；全目標交叉火力不受限制。一般射擊、齊射、狩獵及兵營單體攻擊共用優先規則。減傷不修改共享資料，狩獵仍能處決非 boss。
-- 血法師每個實例獨立治療時計，治療附近仍活著的受傷友軍（含自己）、不超上限；每幀最多一次脈衝，慢幀不累積爆發。綠色擴散環提供提示。爆破手選最近合法塔、同距以格座標穩定排序；橘色前搖環／連線／技能條完成後施加癱瘓，塔頂顯示閃電。重疊取最長剩餘時間，不相加；每個來源獨立到期，來源死亡／離場或波次結束立即清除。停止塔普通／遺物攻擊及兵營友軍攻擊，釋放接戰；既有飛行攻擊快照繼續。等級、定義、地塊、道路和行程不變；暫停不走能力時計。
+- 盾衛嘲諷只在符合原攻擊射程／方向／對空條件的候選中比較，依 TauntAbility 的 priority、塔至盾衛距離、enemy_id 決定；全目標交叉火力不受限制。一般射擊、齊射、狩獵及兵營單體攻擊共用優先規則。減傷不修改共享資料，狩獵仍能處決非 boss。
+- 血法師每個實例獨立治療時計，治療附近仍活著的受傷友軍（含自己）、不超上限；每幀最多一次脈衝，慢幀不累積爆發。綠色擴散環提供提示。爆破手選最近合法塔、同距以格座標穩定排序；橘色前搖環／連線／技能條完成後施加癱瘓，塔頂顯示閃電，整座塔模型以 0.2 秒變暗 45%、解除後同速恢復（被癱瘓期間該塔使用 solid_color 的網格暫時改用該塔自己的同 shader 材質副本並漸變一般 uniform `dim`，恢復後還原原 material_override；同一 shader 不增加 program。WebGL 不套用 instance uniform，曾導致 Web 上不變暗並出現 WebGL 警告，不要改回）。重疊取最長剩餘時間，不相加；每個來源獨立到期，來源死亡／離場或波次結束立即清除。停止塔普通／遺物攻擊及兵營友軍攻擊，釋放接戰；既有飛行攻擊快照繼續。等級、定義、地塊、道路和行程不變；暫停不走能力時計。
 - 下一波兵種圖示保留 hover 兵種／入口篩選，hover 時展開顯示該入口的個體數；點擊圖示不開波、不開啟其他頁面。
 - tests/synergy/playground.tscn 是獨立 A–D 可玩驗收：可切換重置場景、套用分流、B 補缺牌、D 按 N 同波新增雙路與切換空中打擊、F9 清波。不要將測試工具或合成波次加到正式 Frontier；詳見 tests/synergy/README.md。
 
@@ -166,7 +168,7 @@
 - 戰鬥系統在敵人移動後建立共用格子索引；塔查詢覆蓋格，不逐塔掃全圖。瞄準持續平滑更新，對準後才發射；預瞄不擴大實際射程。
 - 箭矢追蹤原目標、抵達才扣血；光束立即結算；拋射物飛向固定落點、落地時對範圍內仍在場的敵人結算。發射時快照傷害與效果，塔消失不取消已發射攻擊。
 - 護盾先於生命扣除。一般同類 effects 不疊加（Phase 3 冰霜是獨立可堆疊種類），只保存一份「最佳強度＋最長剩餘時間」的合併狀態；新效果時長與既有剩餘時間取最大，不相加。減速取最低速度倍率，即使較弱效果提供較長時間，最強減速也維持到合併時間結束，不退回弱效果；圖示跟隨最強效果。不同效果種類可各自存在。死亡退出波次及顯示；擊殺與抵達分開統計，接戰敵人可反擊兵營友軍。
-- 共用 Resource 保存設定，即時血量、位置與冷卻屬於實例；可變攻擊資料需實例獨立。技能條由 Phase 4 爆破手用於施法前搖；能力計時與癱瘓來源仍屬於實例。
+- 共用 Resource 保存設定，即時血量、位置與冷卻屬於實例；可變攻擊資料需實例獨立。技能條由 SabotageAbility 用於施法前搖；能力計時、施法目標與癱瘓來源屬於每隻敵人自己的技能副本。
 - 正式 Soldier／Quickfeet／Heavy 使用專案內 grunt／runner／brute 外觀，各有單一 surface 網格與獨立 MultiMesh，三者共用 `solid_color.gdshader`。Troop 的 GPU Model 引用離線網格與步態 Resource；Quickfeet／Heavy 直接烘焙目前保存的來源場景，不重建原型，保留配色、武器、支點與原 Walk 的 17 個線性插值關鍵影格。Soldier 維持依距離推進、停止回中立；Quickfeet／Heavy 維持依模擬時間推進、停止凍結姿勢，Quickfeet 保留 3 倍播放。正式敵群不建立逐隻模型或 AnimationPlayer；各模型獨立緊密 slot 與容量，全敵群頭頂狀態另有獨立順序，開波依模型合計人口預留。任意匯入模型未提供相符 GPU Model 時仍保留原材質／骨架／動畫。修改來源後需重新烘焙，入口與限制見 `assets/models/enemies/README.md`。視覺避讓使用固定工作量，不改邏輯位置、速度或路線；轉彎時忽略接觸並保留偏移。
 - 頭頂血量／護盾／技能／效果採共用 overlay 中的單一 MultiMeshInstance2D，依原繪製順序以共用材質及圖集合批，一次提交可重用 buffer。外觀仍取自可編輯 Appearance；矩形邊框由 shader 保持清晰，其他樣式一次烘焙。敵人清空時清除可見 instance 與圖示快取；暫停移動鏡頭時仍重新投影，不能停在原畫面位置。
 - 地塊連接與外觀分開。柱子與木橋保留合法舊配置，固定 seed 與修改順序可重現；不能為外觀變種更改導航或兵種成本。
@@ -295,4 +297,4 @@
 - LevelHUD.begin_inspection/end_inspection 為單一詳情頁的暫停擁有權，沿用收牌與遮罩，鎖住鏡頭並保存原 HUD／外部暫停、倍速及焦點，拒絕詳情頁重疊。共用 inspection_panel 只管輸入焦點／Esc，不管理戰鬥。
 - LevelProgress 沿用 user://level_completion.cfg 的 v1 progress 格式，另存 codex.encountered（PackedStringArray）；舊檔缺少 codex 時為空，儲存保留通關及其他 section。不保存當局通知、血量或進度。細節／測試見 docs/ui_slice_a.md。
 
-- 2026-11-06 UI Slice A 頂列追修：防線改盾牌＋目前數值，與金幣／遺物／時間線／通知／速度及暫停同高；整列依可見項目置中，項目間距16px，空遺物／無通知不留固定槽。防線、金幣、操作與時間線波次／遺物節點均有淡紙色 hover 資訊；遺物標記依 ACT 及 reward_final_act 產生，正式四個，沒有第五件。見 docs/ui_slice_a.md。
+- 2026-11-06 UI Slice A 頂列追修：防線改盾牌＋目前數值，與金幣／遺物／時間線／通知／速度及暫停同高；整列依可見項目置中，項目間距16px，空遺物／無通知不留固定槽。防線、金幣、操作與時間線波次／遺物節點均有淡紙色 hover 資訊；遺物標記依 ACT 及 reward_final_act 產生，正式四個，沒有第五件。見 docs/ui_slice_a.md。RunStatus 的防線／Boss 資訊位於 CanvasLayer 5，低於 LevelHUD（6）的暫停白色遮罩，暫停時與金幣、時間線一起淡化；勝敗結果面板放在子 ResultLayer（8），維持最上層。
