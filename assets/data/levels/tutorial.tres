@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cahlwhgvymd6c" path="res://scripts/levels/definitions/wave_spawn_group.gd" id="3_l2lal"]
 [ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/definitions/level_definition.gd" id="4_86rb2"]
 [ext_resource type="PackedScene" path="res://scenes/maps/tutorial.tscn" id="5_d3556"]
-[ext_resource type="Resource" path="res://assets/data/tutorial/intro.tres" id="6_5bysg"]
+[ext_resource type="Resource" uid="uid://kjj24npyu6vr" path="res://assets/data/tutorial/intro.tres" id="6_5bysg"]
 
 [sub_resource type="Resource" id="Resource_c88qf"]
 script = ExtResource("3_l2lal")
