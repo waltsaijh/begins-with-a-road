@@ -1,5 +1,7 @@
 # Agent 工作共識
 
+- 2026-11-08 Merge 授權：完成目前 bf3ed4b 與 d52329e 的既有 Merge，再整合 fetch 後最新 origin/main e1100ed。使用者確認採用 main 最新介面與規則，保留 Sandbox 音效／教學／單位檢視及擊殺金幣回饋；不 push，不動兩份舊 stash。初始 index 與工作目錄與重建合併樹完全一致，沒有額外未提交修改。
+
 - 2026-11-08 本次 Git 授權：使用者要求「git更新並push到遠端」，授權提交 f0284da 之後本聊天累積的擊殺 1 金幣／旋轉硬幣／HUD 與音效、點擊與勝利音量、單位選取／即時資訊／範圍、緊湊膠囊排版與舊 hover 修正，以及相關素材、測試和文件，正常推送 origin/experiment/routing-sandbox。fetch 後本分支與追蹤分支同步；下方本輪未 commit／push 為實作快照。本次不合併其他分支、不操作其他 worktree、不強制推送、不動 stash；.godot/ 日誌與截圖不提交。
 
 - 2026-11-08 單位檢視：正式 LevelSession 加入單一 UnitInspection，左鍵點塔／敵人切換即時資訊；空白取消，有選取時 Esc 先取消，沒有選取才沿用暫停。點擊經既有鏡頭 click／drag 仲裁及 GUI 後才拾取，不增加 PhysicsBody；以模型各 Mesh 的局部 AABB 與正確 world transform 求最近射線交點，GPU 敵人沿用實際 pose／避讓／匯入 transform。建造持牌／拖牌、開店、入口／遺物／載入／轉場及教學引導至 PRACTICE 前停用選取，戰鬥中可檢視且不暫停。共用底部緊湊半透明膠囊面板（540px、17px 標題，敵人標籤併標題，移除重複類型／格域／關閉列）讀實例數值、攻擊倍率、士兵設定、敵人波次快照與即時 HP／護盾，僅資料變動更新文字。範圍沿用 attack_offsets 或 Volley 的 combat_origin／連續半徑，包含方向、完整塔體、巡邏與右側限定；兵營依實際駐點／接戰半徑及 path 可達道路裁切，有遠程遺物時另標士兵當下射程。只重建選取範圍，死亡／抵達／移除／結算／離場清除，暫停隱藏而保留選取。準備期面板優先在手牌右側保留低位、空間不足才上移，戰鬥回底部中央；正式關卡停用舊 TowerHover 泡泡，範圍改明顯綠色；0.18 實際秒淡入淡出。未更改戰鬥、道路或經濟規則，此輪未 commit／push。
@@ -60,7 +62,7 @@
 
 - LevelDefinition 保存穩定 ID、前置 ID、Terrain、ACT、可選的 Tutorial 引用，以及 Phase 5 的 base_health／starting_gold／opening_shop／reward_final_act；移除獨立 Title、Title Key／Description Key，由 ID 推導 ui.maps.title.<id>／ui.maps.description.<id>。起終點完全由 TerrainEndpoint 讀取，不保留 Starts／Goal、Use Terrain Endpoints 或 Marker Height。端點的 Height Offset 控制模型相對格子表面的垂直偏移（預設 0.0305），ACT 新增入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。
 
-- 開場採全白品牌畫面：左無框 Godot 機器人（assets/godot_mark.svg）、右同尺寸 assets/team_icon.png，兩者以 75% 不透明度在白底上呈深灰色（Row 的 modulate 與 shell 的 opacity 須一致），版面由 IntroLogos 定義。Web HTML shell 在引擎尚未能畫時只顯示兩個 logo，沒有文字與進度條，失敗才顯示訊息，必須同時收到引擎啟動完成與首個 native draw 通知才移除；shell 以 canvas_items 同比例（1152×648）重現位置，兩張 logo 是 base64 內嵌副本；改尺寸、間距或素材時須同步 shell，否則換手會跳動。Boot 維持相同畫面，下方加更寬更細的進度條與小字（LoadingDisplay.compact）；沒有確切工作數時隱藏進度條。交接主選單時 ScreenTransition 以 intro 模式接續不透明白底，主選單首次繪製後 logo 先淡出，白底再淡出到主畫面。隱藏的 IntroLogos 會錯過 Web 畫布首次改尺寸，顯示時必須呼叫 refresh()；此問題只在 Web 出現。Logo 開場淡入 0.8 秒：Web 由 shell 的 CSS 動畫播放（主執行緒阻塞時仍能動），Boot 不重播；桌面由 Boot 淡入。選圖進關卡的讀條與一般選單切換維持白底，雲海載入畫面試過後已撤回。桌面關閉引擎預設 splash。
+- 開場採全白品牌畫面：左無框 Godot 機器人（assets/godot_mark.svg）、右 assets/team_icon.png；兩者各占 200px 欄位，機器人在欄位內置中並縮至 75%（150px），使兩圖中心與畫面中央等距，兩者以 75% 不透明度在白底上呈深灰色（Row 的 modulate 與 shell 的 opacity 須一致），版面由 IntroLogos 定義。Web HTML shell 在引擎尚未能畫時只顯示兩個 logo，沒有文字與進度條，失敗才顯示訊息，必須同時收到引擎啟動完成與首個 native draw 通知才移除；shell 以 canvas_items 同比例（1152×648）重現位置，兩張 logo 是 base64 內嵌副本；改尺寸、間距或素材時須同步 shell，否則換手會跳動。Boot 維持相同畫面，下方加更寬更細的進度條與小字（LoadingDisplay.compact）；沒有確切工作數時隱藏進度條。交接主選單時 ScreenTransition 以 intro 模式接續不透明白底，主選單首次繪製後 logo 先淡出，白底再淡出到主畫面。隱藏的 IntroLogos 會錯過 Web 畫布首次改尺寸，顯示時必須呼叫 refresh()；此問題只在 Web 出現。Logo 開場淡入 0.8 秒：Web 由 shell 的 CSS 動畫播放（主執行緒阻塞時仍能動），Boot 不重播；桌面由 Boot 淡入。選圖進關卡的讀條與一般選單切換維持白底，雲海載入畫面試過後已撤回。桌面關閉引擎預設 splash。
 
 - 共用顯示預熱在啟動場景、主選單出現前完成：明確配置相機、與關卡共用的 Environment、同設定方向光、原 renderer 及白色載入介面，不初始化敵群、導航、商店或關卡。DisplayWarmup 依材質設定、網格格式、一般／MultiMesh 繪製、蒙皮／blend shape 與陰影挑代表，不按兵種名稱硬編；原三種兵共用 GPU shader 與頂點格式，只需 Soldier 一個兵種代表；新六種兵帶有獨立模型腳本，保守地各自預熱。啟動場景另明確繪製塔底座的純顯示網格，涵蓋世界共用色盤材質；移除舊 CPU 模型後不能把其原本附帶涵蓋的編譯延後到進關卡。未知腳本或非變換動畫軌採保守場景區分。代表在主 viewport 實際繪製後清理或隱藏；服務保留代表 Resource、世界材質網格與完成紀錄，切場景後重用 shader／材質。快取包含 viewport、MSAA、Environment 與可見光源／陰影組合；條件改變或新組合由關卡補漏，不用單一布林值永久跳過。
 - 地圖選擇確認作戰後，白色轉場中顯示極簡載入介面，完成關卡準備才淡入遊戲。場景載入尚無確切工作量時只顯示狀態；已知階段按「入口圖就緒＋第一波各兵種／入口候選池＋尚未準備的顯示代表」推進細進度條；Frontier 第一波以目前 Resource 為準（恢復的本地編成目前只有 Quickfeet）；候選池依兵種／入口各準備一次，顯示工作量依尚未預熱的代表動態計算，包含 Phase 5 Boss。啟動與轉場共用 LoadingDisplay，不當成剩餘時間或 shader 編譯百分比。ScreenTransition 透過可選準備方法及進度回呼協調，不直接引用敵人或導航。準備不加入敵群、不分配配額、不消耗 RNG，不增加移動階段工作。準備期間停用關卡 processing、攔截輸入並拒絕開波，完成後恢復原模式，第一波仍手動開始。失敗或目標中途離場時恢復來源場景並清掉遮罩；啟動預熱失敗仍進選單，由關卡重試未完成組合。Headless 略過 GPU 預熱；直接執行 level 的偵錯入口保留原行為，直接開主選單會在進關卡補漏。單項同步編譯仍可能暫停載入畫面，未涵蓋的新特效仍可能首次停頓。
@@ -170,7 +172,7 @@
 
 ## Routing Sandbox Phase 5：完整長局與平衡證據
 
-- Frontier 五 ACT／十五波，沒有自動新增入口。防線 20，普通漏敵扣 1，攻城巨獸漏敵立即敗北；敗北取消後續排程與場上敵人，不發過波獎勵。勝敗均鎖定建造／交易／開波；結果頁重新開始重載場景、恢復 1x 與未暫停狀態。base_health=0 保留舊獨立測試不敗北的語意。
+- Frontier 五 ACT／十五波，沒有自動新增入口。防線 20，普通漏敵扣 1，攻城巨獸漏敵立即敗北；敗北取消後續排程與場上敵人，不發過波獎勵。勝敗均鎖定建造／交易／開波；結果頁重新開始重載場景、恢復 1x 與未暫停狀態。勝敗都有「回到主畫面」；獲勝且 LevelCatalog 順序中此關之後有已解鎖關卡時另顯示「下一關」，走與選圖相同的 prepare_for_play 載入；通關在顯示結果前保存，才能帶到剛解鎖的關卡。教學通關提示不再自帶返回按鈕。base_health=0 保留舊獨立測試不敗北的語意。
 - 初始三張免費塔牌、9 Gold、第一波前可買商店。擊殺 Gold 全為 0；完成波次依序給 9／9／9、11／11／11、12／12／12、14／14／14、15／15／0，共 168。重刷原價 1、設施 3／三波、金幣遺物 20 不變。疊塔不重複收費。
 - 塔價依 sentry／ballista／broadside／crossfire／mortar／barracks 為 9／8／8／10／9／8；單發傷害為 12／30／16／8／24，兵營每名友軍 6。原攻擊間隔、範圍、生命、Lv.3 上限及成長倍率保留。Resource 的 script 必須先於自訂屬性，驗證 Inspector 載入值，不只讀文字。
 - 最終一隻攻城巨獸適配舊專案裝甲撞槌模型與雙塔癱瘓：1200 HP、速度 ×0.4、冷卻 8 秒後蓄力 1.2 秒，再癱瘓 3 格內最多兩塔 3 秒。沿目前固定道路，狩獵不處決 boss，減速／冰霜／攔截仍適用。模型已烘焙到本專案；不能引入舊路線、管理器、法術或動態插怪依賴。

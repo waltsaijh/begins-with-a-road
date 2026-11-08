@@ -176,3 +176,12 @@ text = "tutorial.restart"
 layout_mode = 2
 custom_minimum_size = Vector2(240, 48)
 text = "tutorial.continue"
+[node name="NextLevel" parent="Result/Center/Panel/Margin/Column" instance=ExtResource("result_action")]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+text = "ui.result.next_level"
+[node name="Home" parent="Result/Center/Panel/Margin/Column" instance=ExtResource("result_action")]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 42)
+text = "ui.pause.home"

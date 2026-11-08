@@ -58,6 +58,7 @@ Web 啟動頁交接回歸：`node tests/menus/web_loading_shell.cjs`，依環境
 
 ```powershell
 godot --headless --path . res://tests/levels/level_flow.tscn
+godot --headless --path . --script res://tests/levels/result_actions.gd
 godot --headless --path . res://tests/levels/terrain_endpoints.tscn
 godot --headless --path . res://tests/levels/wave_spawn_groups.tscn
 godot --headless --path . res://tests/levels/road_flow_preview.tscn
