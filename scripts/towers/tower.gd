@@ -49,6 +49,7 @@ var patrol_distance := 0.0
 var rapid_remaining := 0
 var rapid_next := 0.0
 var mortar_shots := 0
+var _gun_ready := {}
 var _disables := {}
 var _disable_icon: Sprite3D
 
@@ -252,11 +253,18 @@ func damage_against(_target: Node3D) -> float:
 ## Called every combat frame, including cooldown and the extra tile of lookahead.
 ## Returns true once the weapon is close enough to fire without snapping.
 func aim_at(target: Vector3, delta: float) -> bool:
+	if attack is VolleyAttack and attack.mortar_visual and _visual != null and _visual.has_method("aim_ballistic"):
+		return _visual.aim_ballistic(target,attack.shell_arc_height,delta)
 	if _aim_pivot == null:
 		return true
 	var direction := _aim_pivot.get_parent_node_3d().to_local(target)-_aim_pivot.position
 	if direction.length_squared() <= 0.000001:
 		return false
+	if _visual.has_method("aim_pitch_limits"):
+		# The weapon stops short of its mount; shots still fly from the muzzle to the target.
+		var limits: Vector2 = _visual.aim_pitch_limits()
+		var flat := Vector2(direction.x,direction.z).length()
+		direction.y = flat*tan(clampf(atan2(direction.y,flat),limits.x,limits.y))
 	var up := Vector3.UP
 	if absf(direction.normalized().dot(up)) > 0.999:
 		up = Vector3.RIGHT
@@ -268,8 +276,20 @@ func aim_at(target: Vector3, delta: float) -> bool:
 		# exactly, so a moving enemy cannot keep the tower perpetually unaligned.
 		var blend := minf(1.0, TowerConstants.AIM_TURN_SPEED*maxf(0.0, delta)/angle)
 		_aim_pivot.quaternion = current.slerp(desired, blend)
-	var forward := (-_aim_pivot.global_basis.z).normalized()
-	return forward.dot((target-_aim_pivot.global_position).normalized()) >= cos(TowerConstants.AIM_TOLERANCE)
+	return _aim_pivot.quaternion.angle_to(desired) <= TowerConstants.AIM_TOLERANCE
+
+func set_wave_motion(active: bool) -> void:
+	if _visual != null and _visual.has_method("set_wave_motion"): _visual.set_wave_motion(active)
+
+func has_gun_lines() -> bool:
+	return _visual != null and _visual.has_method("gun_count") and _visual.gun_count() > 0
+
+func gun_count() -> int: return _visual.gun_count()
+func gun_position(gun: int) -> Vector3: return _visual.gun_position(gun)
+func gun_direction(gun: int) -> Vector3: return _visual.gun_direction(gun)
+func gun_ready_time(gun: int) -> float: return float(_gun_ready.get(gun,0.0))
+func set_gun_ready_time(gun: int, time: float) -> void: _gun_ready[gun] = time
+func present_gun_shot(gun: int, effects: Node) -> void: _visual.fire_gun(gun,effects)
 
 func prepare_shot(target: Node3D) -> void:
 	if _visual != null and _visual.has_method("prepare_target"): _visual.prepare_target(target)

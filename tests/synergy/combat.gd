@@ -82,6 +82,10 @@ func run() -> void:
 	print("SYNERGY_COMBAT:",JSON.stringify(output))
 	get_tree().quit(0 if failures.is_empty() else 1)
 
+func land_bolts() -> void:
+	for shot in combat.projectiles: combat._advance_arrow(shot,100.0)
+	combat.projectiles.clear()
+
 func verify_guardian() -> void:
 	var tower := build("ballista",Vector2i(4,5))
 	var rat := enemy("rats",Vector2i(4,4))
@@ -91,11 +95,13 @@ func verify_guardian() -> void:
 	var guard := enemy("rook",Vector2i(4,3))
 	check(tower.attack.select_target(combat,tower) == guard,"guardian overrides earlier/nearer rat for single target")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))
+	land_bolts()
 	check(rat.health == rat.max_health and guard.health < guard.max_health,"same-lane guardian absorbs a shot that would hit rat")
 	guard.global_position = world(Vector2i(5,4))
 	combat._index.rebuild(wave.living_enemies(),map)
 	check(tower.attack.select_target(combat,tower) == rat,"out-of-shape guardian never taunts")
 	tower.attack.fire(combat,tower,tower.attack.select_target(combat,tower))
+	land_bolts()
 	check(rat.health < rat.max_health,"separating guardian lets unchanged single-target damage reach rat")
 	guard.global_position = world(Vector2i(4,1))
 	combat._index.rebuild(wave.living_enemies(),map)

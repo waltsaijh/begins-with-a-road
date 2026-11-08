@@ -374,6 +374,7 @@ func _end_run(won: bool) -> void:
 		_wave.abort_wave()
 		get_node("TowerMap").combat.projectiles.clear()
 	get_node("TowerMap").combat.enemy_abilities.clear()
+	get_node("TowerMap").combat.set_wave_motion(false)
 	get_node("TowerMap").combat.barracks._process(0.0)
 	_update_start_callout()
 	set_process(false)
