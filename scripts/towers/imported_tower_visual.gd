@@ -2,6 +2,17 @@ extends Node3D
 const COLOR_IDENTITY = preload("res://assets/data/rendering/tower_color_identity.tres")
 ## Presentation-only adapter for the GLB-derived Art Slice D assets.
 ## Manual animation advance follows simulation delta; idle towers do no per-frame work.
+const SENTRY_PITCH := Vector2(-0.14,0.21)
+const MORTAR_REST_ELEVATION := deg_to_rad(48.5)
+const MORTAR_ELEVATION := Vector2(deg_to_rad(35.0),deg_to_rad(80.0))
+const SPIN_SPEED := deg_to_rad(300.0)
+const SPIN_ACCELERATION := deg_to_rad(720.0)
+const GUN_KICK := 0.06
+const GUN_RECOVERY := 5.0
+const MESH_FLAGS := (Mesh.ARRAY_CUSTOM_RGBA_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT) | (Mesh.ARRAY_CUSTOM_RG_FLOAT << Mesh.ARRAY_FORMAT_CUSTOM1_SHIFT)
+## Art-space distance from the mortar's center beyond which a block is a bed stop.
+const MORTAR_DISC_REACH := 0.65
+static var _mortar_stops := {}
 @export_enum("ballista","sentry","barracks","mortar","crossfire","broadside") var tower_kind := "sentry"
 @export var shot_sound: AudioStream
 var shot_count := 0
@@ -15,11 +26,19 @@ var _motion_rest := Vector3.ZERO
 var _aim: Node3D
 var _muzzles: Array[Node3D] = []
 var _target := Vector3.ZERO
-var _directions := {}
 var _players := {}
 var _active := {}
 var _preview := false
-var _bolt_meshes: Array[MeshInstance3D] = []
+var _bolt: Node3D
+var _rotor: Node3D
+var _spin_speed := 0.0
+var _spin_target := 0.0
+var _yaw := 0.0
+var _barrels := PackedVector3Array()
+var _mortar_elevation := MORTAR_REST_ELEVATION
+var _guns: Array[Node3D] = []
+var _gun_rest: Array[Vector3] = []
+var _gun_kick: Array[float] = []
 var _configured := false
 
 func supports_body(body: Array[Vector2i]) -> bool:
@@ -72,10 +91,14 @@ func _ready() -> void:
 		_motion=Node3D.new();_motion.name="MotionRoot";add_child(_motion)
 		_art.reparent(_motion,true)
 	_motion_rest=_motion.position
-	_aim=_part("AimPivot") if tower_kind=="sentry" else null
+	_aim=_part("AimPivot") if tower_kind in ["sentry","mortar"] else null
+	if tower_kind=="ballista":_bolt=_part("BoltCarrier")
 	for node in _art.find_children("*","Node3D",true,false):
 		if node is Marker3D and ("Muzzle" in String(node.name) or "ArrowRelease" in String(node.name)):_muzzles.append(node)
-		if node is MeshInstance3D and "ReadyBolt" in String(node.name):_bolt_meshes.append(node)
+	if tower_kind=="mortar":
+		_fix_mortar_stops()
+		_mount_rotor("LoadBearingBed")
+	if tower_kind=="crossfire":_mount_rotor("FixedBase")
 	var sources: Array[Node]=_art.find_children("*","AnimationPlayer",true,false)
 	if not sources.is_empty():
 		var source:=sources[0] as AnimationPlayer
@@ -93,7 +116,102 @@ func _ready() -> void:
 		source.stop()
 	set_process(false)
 
-func aim_pivot() -> Node3D:return _aim
+## The two bed stops were baked into the turning assembly's mesh; they stay on the bed.
+func _fix_mortar_stops() -> void:
+	var assembly: MeshInstance3D=_part("FixedBase").get_child(0)
+	var source: Mesh=assembly.mesh
+	if not _mortar_stops.has(source):_mortar_stops[source]=_split_blocks(source,Vector2(-.5,.5))
+	assembly.mesh=_mortar_stops[source][0]
+	var stops:=MeshInstance3D.new();stops.name="BedStops";stops.mesh=_mortar_stops[source][1]
+	add_child(stops)
+	stops.global_transform=assembly.global_transform
+
+## Solid blocks centered beyond the reach go to the second mesh.
+static func _split_blocks(source: Mesh, center: Vector2) -> Array[ArrayMesh]:
+	var arrays:=source.surface_get_arrays(0)
+	var points: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+	var indices: PackedInt32Array=arrays[Mesh.ARRAY_INDEX]
+	var owners:={}
+	var weld:=func(index: int) -> String:return str(points[index].snappedf(.0005))
+	var root:=func(key: String) -> String:
+		while owners.get(key,key)!=key:key=owners[key]
+		return key
+	for t in range(0,indices.size(),3):
+		for k in [1,2]:owners[root.call(weld.call(indices[t+k]))]=root.call(weld.call(indices[t]))
+	var bounds:={}
+	for index in points.size():
+		var block: String=root.call(weld.call(index))
+		bounds[block]=bounds[block].expand(points[index]) if bounds.has(block) else AABB(points[index],Vector3.ZERO)
+	var kept:=PackedInt32Array();var moved:=PackedInt32Array()
+	for t in range(0,indices.size(),3):
+		var middle: Vector3=bounds[root.call(weld.call(indices[t]))].get_center()
+		var triangle:=PackedInt32Array([indices[t],indices[t+1],indices[t+2]])
+		if Vector2(middle.x,middle.z).distance_to(center)>MORTAR_DISC_REACH:moved.append_array(triangle)
+		else:kept.append_array(triangle)
+	var result: Array[ArrayMesh]=[]
+	for part in [kept,moved]:
+		var copy:=arrays.duplicate()
+		copy[Mesh.ARRAY_INDEX]=part
+		var mesh:=ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,copy,[],{},MESH_FLAGS)
+		mesh.surface_set_material(0,source.surface_get_material(0))
+		result.append(mesh)
+	return result
+
+## Turns everything but the named part around the body center. Art keeps its
+## internal layout, so the baked animation paths stay valid.
+func _mount_rotor(fixed: String) -> void:
+	var part:=_part(fixed)
+	if part!=null:part.reparent(self,true)
+	_rotor=Node3D.new();_rotor.name="Rotor";_rotor.position=_center;add_child(_rotor)
+	_art.reparent(_rotor,true)
+	for marker in _muzzles:_barrels.append(_rotor.to_local(marker.global_position))
+
+func aim_pivot() -> Node3D:return _aim if tower_kind=="sentry" else null
+func aim_pitch_limits() -> Vector2:return SENTRY_PITCH
+## Yaw follows the target; elevation is the launch angle of the shell's actual arc.
+func aim_ballistic(point: Vector3, arc: float, delta: float) -> bool:
+	if _rotor==null or _aim==null or _preview:return true
+	var start:=muzzle_position()
+	var offset:=point-start
+	var flat:=Vector2(offset.x,offset.z).length()
+	var elevation:=clampf(atan2(offset.y+4.0*arc,flat),MORTAR_ELEVATION.x,MORTAR_ELEVATION.y)
+	var local:=to_local(point)-_center
+	var yaw:=atan2(-local.x,-local.z) if Vector2(local.x,local.z).length_squared()>0.0001 else _yaw
+	var turn:=TowerConstants.AIM_TURN_SPEED*maxf(0.0,delta)
+	_yaw=rotate_toward(_yaw,yaw,turn)
+	_mortar_elevation=move_toward(_mortar_elevation,elevation,turn)
+	_rotor.rotation.y=_yaw
+	_aim.rotation.x=_mortar_elevation-MORTAR_REST_ELEVATION
+	return absf(angle_difference(_yaw,yaw))<=TowerConstants.AIM_TOLERANCE and absf(_mortar_elevation-elevation)<=TowerConstants.AIM_TOLERANCE
+func set_wave_motion(active: bool) -> void:
+	if tower_kind!="crossfire" or _preview or _rotor==null:return
+	_spin_target=SPIN_SPEED if active else 0.0
+	set_process(true)
+func rotor() -> Node3D:return _rotor
+func spin_speed() -> float:return _spin_speed
+func stream_ready() -> bool:return _rotor!=null and _spin_target>0.0 and _spin_speed>SPIN_SPEED*.5
+## Muzzles in the rotor's frame, read while it is at rest.
+func stream_barrels() -> PackedVector3Array:return _barrels
+func gun_count() -> int:return _muzzles.size() if tower_kind=="broadside" else 0
+func gun_position(gun: int) -> Vector3:return _muzzles[gun].global_position
+## Every muzzle faces straight out of its own side of the hull.
+func gun_direction(gun: int) -> Vector3:
+	var along:=motion_root().global_basis.x.normalized()
+	return along*signf(motion_root().to_local(_muzzles[gun].global_position).x-_center.x)
+func fire_gun(gun: int, effects: Node) -> void:
+	if _preview:return
+	shot_count+=1
+	if _guns.is_empty():
+		for marker in _muzzles:
+			_guns.append(marker.get_parent_node_3d())
+			_gun_rest.append(_guns[-1].position)
+			_gun_kick.append(0.0)
+	_gun_kick[gun]=1.0
+	if effects!=null:
+		effects.play_restored_shot(3,shot_sound)
+		effects.restored_bursts.emit(_muzzles[gun].global_position,"broadside")
+	set_process(true)
 func motion_root() -> Node3D:return _motion if _motion!=null else self
 func set_patrol_offset(offset: float) -> void:
 	if _motion!=null:_motion.position=_motion_rest+Vector3(offset,0,0)
@@ -101,20 +219,12 @@ func set_preview() -> void:
 	_preview=true
 	set_process(false)
 	for mesh in find_children("*","MeshInstance3D",true,false):mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-func _direction(point: Vector3) -> int:
-	var d:=to_local(point)-_center
-	return (1 if d.x>0 else 3) if absf(d.x)>absf(d.z) else (2 if d.z>0 else 0)
 func prepare_target(target: Node3D) -> void:
 	_target=target.global_position
-	if tower_kind=="crossfire":_directions[_direction(_target)]=true
 	if tower_kind=="broadside":side=-1 if motion_root().to_local(_target).x<_center.x else 1
-func _muzzle_direction(marker: Node3D) -> int:
-	var n:=String(marker.name)
-	return int(n.right(1)) if tower_kind=="crossfire" else 0
 func _selected_muzzles() -> Array[Node3D]:
 	if tower_kind=="broadside":
 		return _muzzles.filter(func(n):return signf(motion_root().to_local(n.global_position).x-_center.x)==side)
-	if tower_kind=="crossfire":return _muzzles.filter(func(n):return _muzzle_direction(n)==_direction(_target))
 	return _muzzles
 func muzzles() -> Array[Node3D]:return _muzzles
 func muzzle_position() -> Vector3:
@@ -155,11 +265,9 @@ func fire_event(_target_node: Node3D, effects: Node, interval: float) -> void:
 		"sentry":_play("fire",interval,4.0/24.0)
 		"mortar":_play("fire",interval,6.0/24.0)
 		"crossfire":
-			if _directions.is_empty():_directions[_direction(_target)]=true
-			for direction in _directions:_play(["fire_north","fire_east","fire_south","fire_west"][direction],interval,4.0/24.0)
-			firing=_muzzles.filter(func(n):return _directions.has(_muzzle_direction(n)))
+			for clip in ["fire_north","fire_east","fire_south","fire_west"]:_play(clip,interval,4.0/24.0)
+			firing=[]
 		"broadside":_play("fire_port" if side<0 else "fire_starboard",interval,4.0/24.0)
-	_directions.clear()
 	if effects!=null:
 		var kind: int={"sentry":0,"mortar":1,"ballista":2,"broadside":3,"crossfire":4}.get(tower_kind,0)
 		effects.play_restored_shot(kind,shot_sound)
@@ -175,13 +283,28 @@ func deploy() -> void:
 func _update_bolt() -> void:
 	if tower_kind!="ballista" or not _players.has("attack"):return
 	var player: AnimationPlayer=_players.attack
-	var visible_bolt:=not _active.has("attack") or player.current_animation_position>=58.0/24.0
-	# The actual combat projectile is authoritative; suppress the preview flying bolt.
-	for mesh in _bolt_meshes:mesh.visible=visible_bolt
+	# The combat projectile is authoritative; the clip's own flying bolt stays hidden.
+	if _bolt!=null:_bolt.visible=not _active.has("attack") or player.current_animation_position>=58.0/24.0
 func _process(delta: float) -> void:
 	for clip in _active.keys():
 		var player: AnimationPlayer=_players[clip]
 		player.advance(maxf(0,delta))
 		if not player.is_playing():_active.erase(clip)
 	_update_bolt()
-	if _active.is_empty():set_process(false)
+	_advance_rotor(delta)
+	var recoiling:=_advance_guns(delta)
+	if _active.is_empty() and not recoiling and is_zero_approx(_spin_speed) and is_zero_approx(_spin_target):set_process(false)
+
+func _advance_rotor(delta: float) -> void:
+	_spin_speed=move_toward(_spin_speed,_spin_target,SPIN_ACCELERATION*maxf(0,delta))
+	if _rotor!=null and tower_kind=="crossfire":_rotor.rotate_y(_spin_speed*delta)
+
+func _advance_guns(delta: float) -> bool:
+	var moving:=false
+	for gun in _guns.size():
+		if is_zero_approx(_gun_kick[gun]):continue
+		_gun_kick[gun]=move_toward(_gun_kick[gun],0.0,GUN_RECOVERY*maxf(0,delta))
+		var inward:=-signf(motion_root().to_local(_muzzles[gun].global_position).x-_center.x)
+		_guns[gun].position=_gun_rest[gun]+Vector3.RIGHT*inward*GUN_KICK*_gun_kick[gun]
+		moving=true
+	return moving

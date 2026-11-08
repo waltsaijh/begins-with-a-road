@@ -81,10 +81,8 @@ func run() -> void:
 	timeline.configure(final_reward_level)
 	check(timeline.reward_indices() == PackedInt32Array([2,5,8,11,14]) and is_equal_approx(timeline.reward_fraction(14),1.0),"optional final ACT reward has its own final milestone")
 	timeline.configure(scene.level)
-	var compact: Array = timeline.compact_entries()
-	check(compact.any(func(entry): return entry.reward),"compact horizon includes its ACT relic choice")
-	check(timeline._get_tooltip(timeline.compact_point(0,compact.size())).contains("1 / 15"),"compact wave node explains global progress")
-	check(timeline._get_tooltip(timeline.compact_point(3,compact.size())).contains("ACT I"),"compact relic icon explains its ACT reward")
+	check(timeline._get_tooltip(Vector2(timeline.size.x*timeline.node_fraction(0),43)).contains("1 / 15"),"wave node explains global progress")
+	check(timeline._get_tooltip(Vector2(timeline.size.x*timeline.reward_fraction(2),43)).contains("ACT I"),"relic node explains its ACT reward")
 	check(scene.level.wave_count() == 15 and scene.level.acts.size() == 5,"formal five ACT/fifteen waves unchanged")
 	check(guide.seen.is_empty() and guide.pending.is_empty(),"preparation does not discover future troops")
 	check(not choice.get_node("RelicBar").visible,"empty relic bar has no empty slots")
@@ -105,7 +103,7 @@ func run() -> void:
 	shop.open_shop()
 	shop.view.finish_animation()
 	await wait_real(0.4)
-	await capture("compact_shop_relics")
+	await capture("shop_relics")
 	await hover_capture(integrity,integrity.size*0.5,"health_tooltip")
 	var wallet: int = shop.coins
 	var fee: int = shop.reroll_price
@@ -114,38 +112,15 @@ func run() -> void:
 	shop.view._stop_reroll_animation()
 	shop.view.finish_animation()
 	shop.close_shop()
-	var center := timeline.get_global_rect().get_center()
-	var left_before: float = integrity.position.x
-	var right_before: float = hud.get_node("Header/Actions").position.x
-	if DisplayServer.get_name() == "headless": timeline.set_expanded(true)
-	else:
-		var hover := InputEventMouseMotion.new()
-		hover.position = center
-		get_viewport().push_input(hover,true)
-		# Flush deferred GUI hover before measuring its real-time tween.
-		await frames(2)
-	await wait_real(0.24)
-	await frames(2)
-	check(timeline.expanded and timeline.expansion > 0.99 and timeline.size.x > 300,"hover smoothly expands all ACTs")
-	check(integrity.position.x < left_before and hud.get_node("Header/Actions").position.x > right_before,"both icon groups move outward with timeline expansion")
-	check(is_equal_approx(hud.status_row_rect.get_center().x,get_viewport().get_visible_rect().size.x*0.5),"expanded status group remains centered")
-	check(absf(hud.get_node("Header/Actions").position.x-timeline.get_global_rect().end.x-16.0) < 0.1,"expansion preserves the gap beside the timeline")
-	check(timeline.get_node("Rewards").get_child_count() == 4 and timeline._get_tooltip(Vector2(timeline.size.x*timeline.reward_fraction(2),43)).contains("ACT I"),"expanded timeline has four relic icons with hover details")
-	await capture("expanded_timeline")
-	if DisplayServer.get_name() != "headless":
-		await click(timeline)
-		check(timeline._pinned,"real click pins timeline open")
-	else: timeline._pinned = true
-	timeline.mouse_exited.emit()
-	await wait_real(0.24)
-	await frames(2)
-	check(timeline.expanded,"click latch survives pointer exit")
+	check(timeline.size.x > 300 and timeline.get_node("Track").visible and timeline.get_node("Acts").visible,"timeline always shows every ACT")
+	check(is_equal_approx(hud.status_row_rect.get_center().x,get_viewport().get_visible_rect().size.x*0.5),"status group remains centered")
+	check(absf(hud.get_node("Header/Actions").position.x-timeline.get_global_rect().end.x-16.0) < 0.1,"actions keep their gap beside the timeline")
+	check(timeline.get_node("Rewards").get_child_count() == 4 and timeline._get_tooltip(Vector2(timeline.size.x*timeline.reward_fraction(2),43)).contains("ACT I"),"timeline has four relic icons with hover details")
+	await capture("timeline")
+	var width: float = timeline.size.x
+	if DisplayServer.get_name() != "headless": await click(timeline)
+	check(timeline.size.x == width,"clicking the timeline does not change it")
 	await hover_capture(timeline,Vector2(timeline.size.x*timeline.reward_fraction(2),43),"relic_node_tooltip")
-	timeline._pinned = false
-	timeline.mouse_exited.emit()
-	await wait_real(0.24)
-	await frames(2)
-	check(not timeline.expanded and timeline.size.x == 300 and center.is_equal_approx(timeline.get_global_rect().get_center()),"compact timeline retains center")
 	var anchor: Vector2 = timeline.position
 	timeline.set_state(6,0.5,true)
 	check(timeline.position == anchor and scene.current_wave == 0,"progress display does not move HUD or advance simulation")
@@ -153,7 +128,7 @@ func run() -> void:
 	timeline.set_state(2,1,true)
 	scene.choosing_relic = true
 	timeline.set_reward_active(true)
-	check(timeline.compact_entries()[0].reward,"current relic choice is first in the compact horizon")
+	check(timeline.reward_active,"current relic choice stays marked")
 	await capture("relic_milestone_active")
 	scene.choosing_relic = false
 	timeline.set_reward_active(false)
@@ -163,8 +138,7 @@ func run() -> void:
 	choice.open_collection(relic)
 	check(get_tree().paused and hud.inspection_owner == choice,"relic detail uses HUD pause ownership")
 	await capture("relic_detail")
-	guide.open_codex()
-	check(not guide.panel.visible,"another detail panel cannot steal the pause lease")
+	check(not hud.begin_inspection(guide),"another detail panel cannot steal the pause lease")
 	hud.open_progress()
 	hud.open_settings()
 	check(not hud.progress_page.visible and not hud.settings_page.visible and hud.inspection_owner == choice,"catalog/settings cannot steal an inspection pause")
@@ -172,18 +146,19 @@ func run() -> void:
 	check(not get_tree().paused and not hud.pause_requested and Engine.time_scale == 2.0,"detail restores gameplay and speed")
 	hud.set_paused(true)
 	await wait_real(0.4)
-	await capture("pause_codex_entry")
-	if DisplayServer.get_name() == "headless": hud.get_node("PauseBlocker/Menu/Margin/Actions/Codex/Button").pressed.emit()
-	else: await click(hud.get_node("PauseBlocker/Menu/Margin/Actions/Codex/Button"))
-	check(guide.panel.visible and guide.title.text == "???","codex conceals undiscovered enemies")
-	guide.close_panel()
-	check(get_tree().paused and hud.pause_requested and hud.pause_menu.get_node("Menu").visible,"closing codex restores prior pause menu")
+	await capture("pause_menu")
+	check(hud.get_node_or_null("PauseBlocker/Menu/Margin/Actions/Codex") == null,"the progress page is the only catalog")
+	hud.open_progress()
+	hud.progress_page._select(1)
+	check(hud.progress_page.rows.get_child(0).get_node("Text/Name").text == "???","catalog conceals undiscovered enemies")
+	hud.progress_page.close()
+	check(get_tree().paused and hud.pause_requested and hud.pause_menu.get_node("Menu").visible,"closing the catalog restores prior pause menu")
 	hud.set_paused(false)
 	# Also preserve a pause requested outside the HUD.
 	get_tree().paused = true
 	Engine.time_scale = 4.0
-	guide.open_codex()
-	guide.close_panel()
+	choice.open_collection(relic)
+	choice.close_collection()
 	check(get_tree().paused and Engine.time_scale == 4.0 and not hud.pause_requested,"external pause is preserved")
 	get_tree().paused = false
 	Engine.time_scale = 1.0
@@ -208,51 +183,38 @@ func run() -> void:
 	await capture("discovery_notice")
 	if DisplayServer.get_name() == "headless": guide.open_notifications()
 	else: await click(guide.toggle)
-	check(guide.panel.visible and get_tree().paused and guide.selected.troop_name == "quickfeet","click notice opens first discovered enemy and pauses")
-	check(guide.layout.get_node("Close").get_theme_color("font_focus_color").r < 0.5,"focused close button remains readable")
-	check(guide.title.text == TroopCatalog.find("quickfeet").localized_name() and guide.detail.get_node("Appearance/Stats").text.contains("50"),"name and HP come from Troop")
-	check(not guide.detail.get_node("Route").text.contains("Softmax"),"route explanation contains no developer algorithm terms")
-	check(not guide.read.has("quickfeet") and guide.pending.size() == 3,"notice remains unread until leaving its page")
+	var page: Control = hud.progress_page
+	check(page.visible and get_tree().paused and page.selected_section == 1,"clicking the notice opens the progress page on enemies")
+	var shown := TroopCatalog.find("quickfeet").localized_name()
+	check(page.column.get_node("Name").text == shown and page.preview.model != null,"the first discovered enemy is shown in detail")
+	check(guide.pending.is_empty() and guide.read.size() == 3 and not guide.toggle.visible,"opening the page reads every notice")
 	await capture("new_enemy_detail")
-	guide.close_panel()
-	check(guide.panel.visible and guide.selected.troop_name == "soldier" and get_tree().paused,"next enemy uses the same paused page")
-	guide.close_panel()
-	check(guide.selected.troop_name == "heavy" and guide.pending.size() == 1,"queue advances in encounter order")
-	guide.close_panel()
-	check(guide.pending.is_empty() and guide.read.size() == 3 and not get_tree().paused,"last close clears read notices and resumes")
+	page.close()
+	hud.set_paused(false)
+	await frames()
 	check(wave.spawned >= spawned+2,"UI keeps real spawned enemy instances")
 	guide._on_enemy_spawned(wave.living_enemies()[0])
 	check(guide.pending.is_empty(),"later appearance does not notify again in this run")
-	guide.show_profile(TroopCatalog.find("heavy"))
-	check(guide.panel.visible and guide.title.text == TroopCatalog.find("heavy").localized_name(),"read enemy can be reopened in codex")
+	hud.set_paused(true)
+	hud.open_progress()
+	hud.progress_page._select(1)
 	for i in 6:
 		var tab := InputEventKey.new()
 		tab.keycode = KEY_TAB
 		tab.pressed = true
 		get_viewport().push_input(tab,true)
-		check(guide.panel.is_ancestor_of(get_viewport().gui_get_focus_owner()),"Tab focus remains inside codex")
-	await capture("codex_known")
+		check(hud.progress_page.is_ancestor_of(get_viewport().gui_get_focus_owner()),"Tab focus remains inside the catalog")
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
 	get_viewport().push_input(escape,true)
 	await frames()
-	check(not guide.panel.visible and not get_tree().paused,"Escape closes codex and restores prior state")
-	# Responsive layout and all ten real model previews, without gameplay spawns.
-	guide.show_profile(TroopCatalog.find("heavy"))
+	check(not hud.progress_page.visible and get_tree().paused,"Escape closes the catalog back to the pause menu")
+	hud.set_paused(false)
+	await frames()
 	for profile in TroopCatalog.all():
 		LevelProgress.encounter_enemy(profile.troop_name)
-		guide.show_profile(profile)
-		check(guide.detail.get_node("Appearance/Preview").model != null and not profile.route_description().contains("Softmax"),"catalog preview and player wording: "+profile.troop_name)
-	if DisplayServer.get_name() != "headless":
-		for extent in [Vector2i(800,600),Vector2i(1600,900)]:
-			get_window().size = extent
-			await frames(8)
-			var paper: Control = guide.get_node("Screen/Panel/Paper")
-			check(guide.panel.get_global_rect().encloses(paper.get_global_rect()) and paper.get_global_rect().encloses(guide.layout.get_node("Close").get_global_rect()),"codex and close fit viewport "+str(extent))
-			await capture("codex_"+str(extent.x))
-		get_window().size = Vector2i(1280,800)
-	guide.close_panel()
+		check(not profile.route_description().contains("Softmax"),"route text contains no developer algorithm terms")
 	check(LevelProgress.mark_completed("new_level") == OK,"level completion can still save")
 	var saved := ConfigFile.new()
 	saved.load(path)
@@ -265,9 +227,6 @@ func run() -> void:
 	await frames(8)
 	guide = scene.enemy_intelligence
 	check(guide.seen.is_empty() and guide.pending.is_empty() and LevelProgress.enemy_unlocked("heavy"),"new run resets notices but retains codex")
-	guide.show_profile(TroopCatalog.find("heavy"))
-	check(guide.title.text == TroopCatalog.find("heavy").localized_name(),"cross-run known page unlock is retained")
-	guide.close_panel()
 	scene.free()
 	LevelProgress.save_path = old_path
 	LevelProgress._completed = old_completed

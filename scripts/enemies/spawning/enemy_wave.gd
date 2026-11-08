@@ -153,7 +153,7 @@ func _prepare_legacy_wave() -> bool:
 		var id := _next_enemy_id+i
 		var route: Dictionary = batch.routes[i]
 		var points := Waypoints.for_route(route, map, waypoint_cache, profile.flight_height)
-		_pending.append({"id": id, "wave_index": i, "route": route, "points": points, "abilities":profile.ability_snapshot()})
+		_pending.append({"id": id, "wave_index": i, "route": route, "points": points, "combat":profile.combat_snapshot()})
 	# Randomness changes departure timing only; route quotas are already fixed.
 	_pending.shuffle()
 	return true
@@ -237,7 +237,7 @@ func _spawn_entry(data: Dictionary) -> void:
 	enemy.max_shield = data.get("shield", _wave_shield)
 	enemy.shield = enemy.max_shield
 	enemy.move_speed = data.get("speed", _wave_speed)
-	enemy.abilities = data.get("abilities",enemy.troop.ability_snapshot()).duplicate(true)
+	enemy.apply_snapshot(data["combat"] if data.has("combat") else enemy.troop.combat_snapshot())
 	enemy.arrived.connect(_on_arrived)
 	enemy.died.connect(_on_enemy_died)
 	enemy.damaged.connect(func(_enemy, amount: float): damage_received += amount)

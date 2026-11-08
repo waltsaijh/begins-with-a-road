@@ -1,24 +1,32 @@
-[gd_resource type="Resource" script_class="Troop" load_steps=4 format=3]
-[ext_resource type="Script" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[gd_resource type="Resource" script_class="Troop" format=3 uid="uid://cdex8taqfqbb3"]
+
+[ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
+[ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_05iof"]
 [ext_resource type="PackedScene" path="res://assets/models/enemies/rook.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/sprites/enemies/rook.png" id="3"]
+[ext_resource type="Script" uid="uid://cqiial8p7uqi7" path="res://scripts/enemies/abilities/taunt_ability.gd" id="2_fisrx"]
+[ext_resource type="Texture2D" uid="uid://daxjgsuhfcbqh" path="res://assets/sprites/enemies/rook.png" id="3"]
+
+[sub_resource type="Resource" id="Resource_rjhn0"]
+script = ExtResource("2_fisrx")
+
 [resource]
 script = ExtResource("1")
+abilities = Array[ExtResource("1_05iof")]([SubResource("Resource_rjhn0")])
+ability_text = "跟著多數友軍走的道路。3.5 格內可被攻擊時吸引單體火力。多盾衛依優先級、距離、出生順序選定。"
+ability_text_en = "Follows the roads most allies take. Draws eligible single-target fire within 3.5 tiles; priority, distance, then spawn order break ties."
+body_size = "large"
+tags = Array[StringName]([&"ground", &"armored", &"guardian"])
 troop_name = "rook"
 name_key = "troop.rook.name"
 sort_order = 11
-body_size = "large"
-tags = Array[StringName]([&"ground", &"armored", &"guardian"])
-max_health = 180.0
-speed_multiplier = 0.65
-melee_damage = 10.0
-route_selection = 0
-model = ExtResource("2")
 icon = ExtResource("3")
 accent_color = Color(0.42, 0.62, 0.9, 1)
+melee_damage = 10.0
 debug_color = Color(0.31, 0.47, 0.65, 1)
-ability_text = "減傷 25%；3.5 格內可被攻擊時吸引單體火力。多盾衛依優先級、距離、出生順序選定。"
-ability_text_en = "25% damage reduction. Draws eligible single-target fire within 3.5 tiles; priority, distance, then spawn order break ties."
-damage_reduction = 0.25
-taunt_radius = 3.5
-taunt_priority = 1
+max_shield = 100.0
+score_threshold = 25.0
+search_budget = 16
+tile_cost_reduce = 1
+path_base_cost = 0.0
+road_traffic_weight = -1.0
+model = ExtResource("2")

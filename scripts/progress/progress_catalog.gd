@@ -10,6 +10,8 @@ const TOWERS: Array[TowerDefinition] = [
 	preload("res://assets/data/towers/crossfire.tres"),
 	preload("res://assets/data/towers/barracks.tres"),
 ]
+const CodexText = preload("res://scripts/enemies/presentation/enemy_codex_text.gd")
+const BodyVisual = preload("res://scripts/towers/body_visual.gd")
 ## Tower art is an alpha mask, tinted like the hand and shop icons.
 const TOWER_ICON_DARKENING := 0.45
 const RELICS: RelicCatalog = preload("res://assets/data/relics/catalog.tres")
@@ -39,6 +41,15 @@ static func relics() -> Array[Dictionary]:
 	for relic in RELICS.entries: result.append(_relic_entry(relic))
 	return result
 
+## The tower as it first appears on the map, for a preview in its own world.
+static func tower_model(definition: TowerDefinition) -> Node3D:
+	var preset := definition.first_tile_preset()
+	var body: Array[Vector2i] = definition.footprint
+	if preset != null and not preset.tower_footprint.is_empty(): body = preset.tower_footprint
+	var model := BodyVisual.create(definition, body)
+	BodyVisual.set_level(model, 1)
+	return model
+
 static func _tower_entry(definition: TowerDefinition) -> Dictionary:
 	var id := definition.name_key.get_slice(".", 1)
 	var deployment := definition.deployment
@@ -49,7 +60,7 @@ static func _tower_entry(definition: TowerDefinition) -> Dictionary:
 		_stat("price", definition.card_price),
 	])
 	return {"id": id, "name": TranslationServer.translate(definition.name_key), "icon": definition.icon, "tile": Color.TRANSPARENT, "tint": definition.accent_color.darkened(TOWER_ICON_DARKENING),
-		"description": TranslationServer.translate("tower.%s.description" % id), "stats": stats,
+		"tower": definition, "description": TranslationServer.translate("tower.%s.description" % id), "stats": stats,
 		"traits": TranslationServer.translate("tower.%s.traits" % id).split("|", false)}
 
 static func _enemy_entry(profile: Troop) -> Dictionary:
@@ -66,9 +77,10 @@ static func _enemy_entry(profile: Troop) -> Dictionary:
 	for tag in profile.tags:
 		if tag != &"ground": traits.append(TranslationServer.translate("ui.progress.tag.%s" % tag))
 	if profile.damage_reduction > 0.0: traits.append(_stat("reduction", profile.damage_reduction*100.0))
-	if profile.route_rule != Troop.RouteRule.COST: traits.append(profile.route_description())
+	if profile.prefers_new_roads() or profile.only_shortest(): traits.append(profile.route_description())
 	var english := TranslationServer.get_locale().begins_with("en")
 	return {"id": profile.troop_name, "name": profile.localized_name(), "icon": profile.icon, "tile": Color.TRANSPARENT, "tint": profile.icon_color(),
+		"troop": profile, "detail": CodexText.description(profile),
 		"description": profile.ability_text_en if english else profile.ability_text, "stats": stats, "traits": traits}
 
 ## Generic relics keep their icon's own colors, as they do in a run.

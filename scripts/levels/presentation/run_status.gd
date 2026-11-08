@@ -1,5 +1,7 @@
 extends CanvasLayer
 ## Compact integrity/boss feedback and terminal result, authored in a shared scene.
+## Integrity/boss sit below the HUD pause veil (layer 5) so they fade with the
+## header; only the result panel keeps its own layer above everything.
 var session: Node3D
 var boss: WeakRef
 var _won := false
@@ -8,19 +10,19 @@ var _leaving := false
 var _entry_motion: Tween
 var _presented := false
 var next_map: MenuMapDefinition
-@onready var column: VBoxContainer = $Result/Center/Panel/Margin/Column
+@onready var column: VBoxContainer = $ResultLayer/Result/Center/Panel/Margin/Column
 func setup(value: Node3D) -> void:
 	session = value
-	$Result.hide()
+	$ResultLayer/Result.hide()
 	$Boss.hide()
 	$Integrity.visible = session.level.base_health > 0
 	session.get_node("EnemyWave").enemy_spawned.connect(func(enemy):
 		if enemy.troop.has_tag(&"boss"):
 			boss = weakref(enemy)
 			$Boss.show())
-	$Result/Center/Panel/Margin/Column/Restart.pressed.connect(restart)
-	$Result/Center/Panel/Margin/Column/TutorialActions/Restart.pressed.connect(restart)
-	$Result/Center/Panel/Margin/Column/TutorialActions/Continue.pressed.connect(continue_next)
+	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.pressed.connect(restart)
+	$ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions/Restart.pressed.connect(restart)
+	$ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions/Continue.pressed.connect(continue_next)
 	ScreenTransition.finished.connect(_on_transition_finished)
 	column.get_node("NextLevel").pressed.connect(next_level)
 	column.get_node("Home").pressed.connect(return_home)
@@ -33,7 +35,7 @@ func refresh() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and session != null:
 		refresh()
-		if $Result.visible: _update_result()
+		if $ResultLayer/Result.visible: _update_result()
 func _process(_delta: float) -> void:
 	if boss == null: return
 	var enemy: Node3D = boss.get_ref()
@@ -41,7 +43,7 @@ func _process(_delta: float) -> void:
 		$Boss.hide()
 		boss = null
 		return
-	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.cast_remaining > 0 else ""]
+	$Boss.text = "%s  %d / %d%s" % [enemy.troop.localized_name(),ceili(enemy.health),int(enemy.max_health),"  ⚡" if enemy.is_casting() else ""]
 func finish(won: bool) -> void:
 	if _presented: return
 	_presented = true
@@ -49,17 +51,17 @@ func finish(won: bool) -> void:
 	next_map = _following_map() if won else null
 	_next_map_id = next_map.id if next_map != null else ""
 	_update_result()
-	$Result.show()
+	$ResultLayer/Result.show()
 	_present_result()
 	if won:
 		GameAudio.play_victory()
-		$Result/Confetti.burst($Result/Center/Panel/Margin/Column)
+		$ResultLayer/Result/Confetti.burst($ResultLayer/Result/Center/Panel/Margin/Column)
 
 func _present_result() -> void:
 	if _entry_motion != null: _entry_motion.kill()
 	_entry_motion = create_tween().set_parallel(true).set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	$Result/Veil.modulate.a = 0.0
-	_entry_motion.tween_property($Result/Veil,"modulate:a",1.0,0.3)
+	$ResultLayer/Result/Veil.modulate.a = 0.0
+	_entry_motion.tween_property($ResultLayer/Result/Veil,"modulate:a",1.0,0.3)
 	for entry in [["Crest",0.0],["Eyebrow",0.03],["Title",0.06],["Rule",0.08],["Details",0.1],["Completion",0.13],["Restart",0.15],["TutorialActions",0.15],["NextLevel",0.15],["Home",0.18]]:
 		var item: Control = column.get_node(entry[0])
 		item.modulate.a = 0.0
@@ -68,21 +70,21 @@ func _present_result() -> void:
 func _update_result() -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
 	var tutorial_complete: bool = _won and session.level.tutorial != null
-	$Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if _won else "Defense broken") if english else ("守住了這條路" if _won else "防線失守")
-	$Result/Center/Panel/Margin/Column/Eyebrow.text = tr("tutorial.complete_title") if tutorial_complete else tr("result.complete" if _won else "result.failed")
+	$ResultLayer/Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if _won else "Defense broken") if english else ("守住了這條路" if _won else "防線失守")
+	$ResultLayer/Result/Center/Panel/Margin/Column/Eyebrow.text = tr("tutorial.complete_title") if tutorial_complete else tr("result.complete" if _won else "result.failed")
 	var accent := Color(0.7,0.61,0.38,1) if _won else Color(0.58,0.37,0.33,1)
-	$Result/Center/Panel/Margin/Column/Crest/Diamond.default_color = accent
-	$Result/Center/Panel/Margin/Column/Rule.color = Color(accent,0.5)
-	$Result/Center/Panel/Margin/Column/Title.add_theme_color_override("font_color",Color(0.125,0.243,0.278,1) if _won else Color(0.37,0.25,0.24,1))
-	$Result/Center/Panel/Margin/Column/Details/Waves/Value.text = "%02d / %02d" % [session.current_wave,session.level.wave_count()]
-	$Result/Center/Panel/Margin/Column/Details/Leaks/Value.text = str(session.total_leaks)
-	$Result/Center/Panel/Margin/Column/Details/Gold/Value.text = str(session.get_node("CardPlacement/Shop").coins)
-	$Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
-	$Result/Center/Panel/Margin/Column/Completion.visible = tutorial_complete
-	$Result/Center/Panel/Margin/Column/Completion.text = tr("tutorial.done")
-	$Result/Center/Panel/Margin/Column/Restart.visible = not tutorial_complete
-	$Result/Center/Panel/Margin/Column/TutorialActions.visible = tutorial_complete
-	$Result/Center/Panel/Margin/Column/TutorialActions/Continue.disabled = _next_map_id.is_empty()
+	$ResultLayer/Result/Center/Panel/Margin/Column/Crest/Diamond.default_color = accent
+	$ResultLayer/Result/Center/Panel/Margin/Column/Rule.color = Color(accent,0.5)
+	$ResultLayer/Result/Center/Panel/Margin/Column/Title.add_theme_color_override("font_color",Color(0.125,0.243,0.278,1) if _won else Color(0.37,0.25,0.24,1))
+	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Waves/Value.text = "%02d / %02d" % [session.current_wave,session.level.wave_count()]
+	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Leaks/Value.text = str(session.total_leaks)
+	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Gold/Value.text = str(session.get_node("CardPlacement/Shop").coins)
+	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
+	$ResultLayer/Result/Center/Panel/Margin/Column/Completion.visible = tutorial_complete
+	$ResultLayer/Result/Center/Panel/Margin/Column/Completion.text = tr("tutorial.done")
+	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.visible = not tutorial_complete
+	$ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions.visible = tutorial_complete
+	$ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions/Continue.disabled = _next_map_id.is_empty()
 	column.get_node("NextLevel").visible = next_map != null and not tutorial_complete
 
 func continue_next() -> void:

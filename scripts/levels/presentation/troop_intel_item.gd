@@ -1,8 +1,7 @@
 extends HBoxContainer
-## Hover reveals this entrance's quota; clicking opens the field guide.
+## Hover reveals this entrance's quota and filters the flow preview.
 signal filter_entered(profile: Troop)
 signal filter_exited(profile: Troop)
-signal info_requested(profile: Troop)
 var profile: Troop
 var count := 0
 var _motion: Tween
@@ -34,7 +33,6 @@ func _ready() -> void:
 	body.mouse_exited.connect(func():
 		set_expanded(false)
 		filter_exited.emit(profile))
-	body.pressed.connect(func(): info_requested.emit(profile))
 
 func set_expanded(value: bool) -> void:
 	if _expanded == value: return

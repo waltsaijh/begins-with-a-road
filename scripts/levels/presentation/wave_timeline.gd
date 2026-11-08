@@ -5,6 +5,8 @@ extends Control
 const NODE_RADIUS := 4.0
 const NODE_OUTLINE_WIDTH := 1.5
 const DIVIDER_WIDTH := 2.0
+## The relic diamond sits on its divider like a pin head, above the track.
+const REWARD_HEAD_Y := 30.0
 const RELIC_ICON = preload("res://assets/sprites/interface/relic_choice.svg")
 @export var act_label_scene: PackedScene = preload("res://scenes/levels/components/wave_timeline_act.tscn")
 @export var level: LevelDefinition:
@@ -24,44 +26,34 @@ const RELIC_ICON = preload("res://assets/sprites/interface/relic_choice.svg")
 @export var progress_color := Color("218f9b")
 var _act_signature: Array = []
 var _act_labels: Array[Label] = []
-var expanded := false
-var _pinned := false
-var _hovered := false
-var _motion: Tween
 var reward_active := false
 var _reward_icons: Array[Sprite2D] = []
 var _header_managed := false
 var _header_width_limit := 640.0
-var expansion := 0.0:
-	set(value):
-		expansion = value
-		if is_node_ready() and not Engine.is_editor_hint():
-			var full_width := _header_width_limit if _header_managed else minf(640.0,maxf(180.0,get_viewport_rect().size.x-40.0))
-			var width := lerpf(minf(300.0,full_width),full_width,value)
-			if _header_managed:
-				size.x = width
-			else:
-				offset_left = -width*0.5
-				offset_right = width*0.5
-			_refresh()
+func _apply_width() -> void:
+	if Engine.is_editor_hint() or not is_node_ready(): return
+	if _header_managed:
+		size.x = _header_width_limit
+	else:
+		var width := minf(640.0,maxf(180.0,get_viewport_rect().size.x-40.0))
+		offset_left = -width*0.5
+		offset_right = width*0.5
+	_refresh()
 
 func manage_header_width(limit: float) -> void:
 	var next := clampf(limit,180.0,640.0)
 	if _header_managed and is_equal_approx(next,_header_width_limit): return
 	_header_managed = true
 	_header_width_limit = next
-	expansion = expansion
+	_apply_width()
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	focus_mode = Control.FOCUS_ALL
 	if not Engine.is_editor_hint():
 		anchor_left = 0.5
 		anchor_right = 0.5
-		expansion = 0.0
-		mouse_entered.connect(func(): _hovered = true; set_expanded(true))
-		mouse_exited.connect(func(): _hovered = false; set_expanded(_pinned))
-		get_viewport().size_changed.connect(func(): expansion = expansion)
+		_apply_width()
+		get_viewport().size_changed.connect(_apply_width)
 	resized.connect(_refresh)
 	set_process(Engine.is_editor_hint())
 	_refresh()
@@ -79,12 +71,6 @@ func _refresh() -> void:
 	_refresh_labels()
 	_refresh_rewards()
 	tooltip_text = _summary()
-	var amount := 1.0 if Engine.is_editor_hint() else expansion
-	for child in [$Track,$Progress,$Acts]:
-		child.modulate.a = amount
-		if child != $Progress: child.visible = amount > 0.001
-	$Progress.visible = amount > 0.001 and position_fraction() > 0.0
-	queue_redraw()
 
 func set_reward_active(value: bool) -> void:
 	if reward_active == value: return
@@ -98,8 +84,9 @@ func reward_indices() -> PackedInt32Array:
 		if is_act_end(i) and (i+1 < level.wave_count() or level.reward_final_act): result.append(i)
 	return result
 
+## The relic choice sits on the divider of the ACT it follows.
 func reward_fraction(index: int) -> float:
-	return node_fraction(index)+0.5/(level.wave_count()+(0.5 if level.reward_final_act else 0.0))
+	return node_fraction(index)
 
 func _refresh_rewards() -> void:
 	var indices := reward_indices()
@@ -111,57 +98,8 @@ func _refresh_rewards() -> void:
 		_reward_icons.append(icon)
 	for i in indices.size():
 		var active := reward_active and indices[i] == wave_index
-		_reward_icons[i].position = Vector2(size.x*reward_fraction(indices[i]),43)
+		_reward_icons[i].position = Vector2(size.x*reward_fraction(indices[i]),REWARD_HEAD_Y)
 		_reward_icons[i].scale = Vector2.ONE*(0.95 if active else 0.75)
-		_reward_icons[i].modulate.a = (1.0 if active or indices[i] < wave_index else 0.7)*(1.0 if Engine.is_editor_hint() else expansion)
-
-func set_expanded(value: bool) -> void:
-	expanded = value
-	if _motion != null: _motion.kill()
-	_motion = create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	_motion.tween_property(self,"expansion",1.0 if value else 0.0,0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-
-func _gui_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept") or event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		_pinned = not _pinned
-		set_expanded(_pinned)
-		accept_event()
-
-func _draw() -> void:
-	if Engine.is_editor_hint() or level == null or level.wave_count() == 0 or expansion >= 0.999: return
-	var font := get_theme_default_font()
-	var color := Color(label_color,1.0-expansion)
-	var muted := Color(muted_color,1.0-expansion)
-	var text := _summary().get_slice("\n",0)
-	draw_string(font,Vector2(4,20),text,HORIZONTAL_ALIGNMENT_LEFT,-1,14,color)
-	var entries := compact_entries()
-	for i in entries.size():
-		var point := compact_point(i,entries.size())
-		if i+1 < entries.size(): draw_line(point,compact_point(i+1,entries.size()),Color(muted,0.35*(1.0-expansion)),1)
-		if entries[i].reward:
-			draw_texture_rect(RELIC_ICON,Rect2(point-Vector2(7,7),Vector2(14,14)),false,Color(1,1,1,1.0-expansion))
-		else:
-			var complete: bool = entries[i].index < wave_index or (running and entries[i].index == wave_index)
-			if not complete: draw_circle(point,4,Color(0.953,0.973,0.969,1.0-expansion))
-			draw_circle(point,4,color if complete else muted,complete,-1.0 if complete else 1.5,true)
-			draw_string(font,point+Vector2(10,5),str(entries[i].index+1),HORIZONTAL_ALIGNMENT_LEFT,-1,13,color)
-	draw_string(font,Vector2(size.x-24,43),"−" if _pinned else "+",HORIZONTAL_ALIGNMENT_LEFT,-1,16,color)
-
-func compact_entries() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	if level == null or level.wave_count() == 0: return result
-	var current := mini(wave_index,level.wave_count()-1)
-	var rewards := reward_indices()
-	if reward_active:
-		result.append({"index":current,"reward":true})
-		current += 1
-	for index in range(current,mini(current+3,level.wave_count())):
-		result.append({"index":index,"reward":false})
-		if rewards.has(index): result.append({"index":index,"reward":true})
-	return result
-
-func compact_point(index: int, count: int) -> Vector2:
-	return Vector2(16.0+index*minf(72.0,(size.x-64.0)/maxi(1,count-1)),43)
 
 func _act_for(index: int) -> Dictionary:
 	var first := 0
@@ -178,7 +116,7 @@ func _summary() -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
 	var text := "ACT %d / %d · %s %d / %d" % [act.index+1,level.acts.size(),"Wave" if english else "波次",index+1,level.wave_count()]
 	if reward_active: text = "ACT %d / %d · %s" % [act.index+1,level.acts.size(),"Choose a relic" if english else "選擇遺物"]
-	return text+("\nHover to expand · click to pin or collapse." if english else "\n移入展開全局時間線；點擊固定展開或收合。")
+	return text
 
 func milestone_tooltip(index: int, reward: bool) -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
@@ -194,15 +132,11 @@ func milestone_tooltip(index: int, reward: bool) -> String:
 
 func _get_tooltip(at_position: Vector2) -> String:
 	if level == null or level.wave_count() == 0: return ""
-	if expansion >= 0.5:
-		for index in reward_indices():
-			if at_position.distance_to(Vector2(size.x*reward_fraction(index),43)) <= 10: return milestone_tooltip(index,true)
-		for index in level.wave_count():
-			if at_position.distance_to(Vector2(size.x*node_fraction(index),43)) <= 12: return milestone_tooltip(index,false)
-	else:
-		var entries := compact_entries()
-		for i in entries.size():
-			if at_position.distance_to(compact_point(i,entries.size())) <= 14: return milestone_tooltip(entries[i].index,entries[i].reward)
+	for index in reward_indices():
+		# The whole pin answers, from its head down to the end of the divider.
+		if absf(at_position.x-size.x*reward_fraction(index)) <= 10 and at_position.y >= REWARD_HEAD_Y-10 and at_position.y <= 53: return milestone_tooltip(index,true)
+	for index in level.wave_count():
+		if at_position.distance_to(Vector2(size.x*node_fraction(index),43)) <= 12: return milestone_tooltip(index,false)
 	return _summary()
 
 func _notification(what: int) -> void:
@@ -220,7 +154,7 @@ func set_state(index: int, fraction: float, active: bool) -> void:
 	_refresh()
 
 func node_fraction(index: int) -> float:
-	return float(index+1)/(level.wave_count()+(0.5 if level.reward_final_act else 0.0))
+	return float(index+1)/level.wave_count()
 
 func is_act_end(index: int) -> bool:
 	if level == null: return false
@@ -283,4 +217,6 @@ func _refresh_labels() -> void:
 		label.add_theme_font_override("font", label_font)
 		label.add_theme_font_size_override("font_size", font_size)
 		label.add_theme_color_override("font_color", label_color if current else muted_color)
+		# Only the ACT being played is named; the others are read from the dividers.
+		label.visible = current
 		first = last

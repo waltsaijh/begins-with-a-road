@@ -17,7 +17,9 @@ static func tower(t: DefenseTower, catalog: RelicCatalog) -> Dictionary:
 		stats.append(("Damage  %s" if en else "傷害  %s") % number(t.damage*t.attack.damage_multiplier))
 		stats.append(("Interval  %s s" if en else "攻擊間隔  %s 秒") % number(t.attack_interval))
 		var circular: bool = t.attack is VolleyAttack and t.attack.circular_range
-		if circular: stats.append(("Range  %s tiles" if en else "射程  %s 格") % number(t.attack_radius*t.range_multiplier))
+		if t.attack is VolleyAttack and t.attack.gun_lines:
+			stats.append(("Gun reach  %s tiles" if en else "砲管射程  %s 格") % number(t.attack.gun_reach*t.range_multiplier))
+		elif circular: stats.append(("Range  %s tiles" if en else "射程  %s 格") % number(t.attack_radius*t.range_multiplier))
 		if t.attack is ProjectileAttack or t.attack is VolleyAttack and t.attack.mode == VolleyAttack.Mode.SPLASH:
 			notes.append(("Blast radius  %s tiles" if en else "爆炸半徑  %s 格") % number(t.attack.splash_radius))
 		for effect in t.attack.effects:
@@ -36,7 +38,7 @@ static func tower(t: DefenseTower, catalog: RelicCatalog) -> Dictionary:
 static func enemy(e: Node3D) -> Dictionary:
 	var en := TranslationServer.get_locale().begins_with("en")
 	var stats := PackedStringArray(["HP  %s / %s" % [number(e.health),number(e.max_health)]])
-	stats.append(("Base damage  %d" if en else "主堡傷害  %d") % int(e.abilities.get("base_damage",1)))
+	stats.append(("Base damage  %d" if en else "主堡傷害  %d") % e.base_damage)
 	if e.max_shield > 0: stats.append(("Shield  %s / %s" if en else "護盾  %s / %s") % [number(e.shield),number(e.max_shield)])
 	var types := PackedStringArray([TranslationServer.translate("ui.progress.size.%s" % e.troop.body_size)])
 	for tag: StringName in e.troop.tags:
@@ -45,7 +47,7 @@ static func enemy(e: Node3D) -> Dictionary:
 	var description: String = e.troop.ability_text_en if en else e.troop.ability_text
 	description = description.replace("多盾衛依優先級、距離、出生順序選定。", "").replace("; priority, distance, then spawn order break ties.", ".").strip_edges()
 	if not description.is_empty(): notes.append(description)
-	var reduction := float(e.abilities.get("damage_reduction",0.0))
+	var reduction: float = e.damage_reduction
 	if reduction > 0 and not ("減傷" in description or "damage reduction" in description.to_lower()): notes.append(("Damage reduction %s%%" if en else "傷害減免 %s%%") % number(reduction*100))
 	if e.troop.has_tag(&"boss"): notes.append("Ends the run if it reaches the base" if en else "抵達主堡即戰敗")
 	return {"name":e.troop.localized_name(),"kind":" · ".join(types),"stats":stats,"notes":" · ".join(notes),"icon":e.troop.icon,"color":e.troop.icon_color(),"health":100.0*e.health/e.max_health}

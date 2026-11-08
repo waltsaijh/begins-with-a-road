@@ -6,4 +6,5 @@
 [resource]
 script = ExtResource("2_7kdr1")
 mode = 2
+shockwave = true
 color = Color(1, 0.9529412, 0.6901961, 1)

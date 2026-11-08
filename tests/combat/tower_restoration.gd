@@ -112,16 +112,19 @@ func verify_restored_attacks() -> void:
 		var shots: int = combat.shots_fired
 		var bursts: int = combat.visuals.restored_bursts.bursts.size()
 		combat._process(0.01)
-		check(combat.shots_fired == shots+1 and first.health == (100 if key == "mortar" else 100-definition.default_damage),"Actual combat did not fire restored resource: "+key)
+		check(combat.shots_fired == shots+1 and first.health == (100 if key in ["mortar","ballista"] else 100-definition.default_damage),"Actual combat did not fire restored resource: "+key)
 		check(second.health == (100-definition.default_damage if key == "crossfire" else 100),"Restored single/all/splash distinction lost: "+key)
 		check(outside.health == 100,"Restored attack hit outside range: "+key)
 		check(tower._visual.pulse == 1 and tower._visual.shot_sound != null,"Restored recoil/audio event missing: "+key)
 		check(not combat.visuals.restored_bursts.bursts.is_empty(),"Original muzzle burst missing: "+key)
 		check(tower._visual.muzzles().size() == (6 if key == "broadside" else (4 if key == "crossfire" else 1)),"Original multi-muzzle metadata lost: "+key)
-		check(combat.visuals.restored_bursts.bursts.size()-bursts == (3 if key == "broadside" else (4 if key == "crossfire" else 1)),"Original firing-side muzzle flashes incorrect: "+key)
+		check(combat.visuals.restored_bursts.bursts.size()-bursts == (3 if key == "broadside" else (5 if key == "crossfire" else 1)),"Original firing-side muzzle flashes incorrect: "+key)
 		if key == "mortar":
 			combat._process(combat.projectiles[0].duration+0.01)
 			check(first.health == 100-definition.default_damage and second.health == 100-definition.default_damage,"Mortar landing splash missing")
+		if key == "ballista":
+			combat._process(0.2)
+			check(first.health == 100-definition.default_damage and combat.projectiles.is_empty(),"Heavy bolt must land its hit and end")
 		var before: float = first.health
 		combat._process(0.2)
 		check(first.health == before,"Visual flight or cooldown inflicted extra damage: "+key)

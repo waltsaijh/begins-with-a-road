@@ -71,11 +71,6 @@ func _ready() -> void:
 	resume_button.pressed.connect(set_paused.bind(false))
 	restart_button.pressed.connect(request_restart)
 	home_button.pressed.connect(request_return_home)
-	var codex: Button = $PauseBlocker/Menu/Margin/Actions/Codex/Button
-	_menu_buttons.append(codex)
-	codex.pressed.connect(func():
-		var guide: Node = get_parent().get("enemy_intelligence")
-		if guide != null: guide.open_codex())
 	ScreenTransition.finished.connect(_on_transition_finished)
 	settings_page = SettingsScene.instantiate()
 	add_child(settings_page)
@@ -100,14 +95,15 @@ func open_settings() -> void:
 	settings_page.configure(SettingsAdapter.sections(), SettingsAdapter.read(get_viewport()))
 	settings_page.open()
 
-## Pauses first when opened from a next-wave troop icon, then lands on that entry.
-func open_progress(entry_id := "") -> void:
-	if ScreenTransition.active or is_instance_valid(inspection_owner) or _page_open(): return
+## Returns whether the page opened; an entry id lands on that entry.
+func open_progress(entry_id := "") -> bool:
+	if ScreenTransition.active or is_instance_valid(inspection_owner) or _page_open(): return false
 	set_paused(true)
-	if not pause_requested: return
+	if not pause_requested: return false
 	progress_page.configure(ProgressCatalog.sections(), {})
 	progress_page.open()
-	if not entry_id.is_empty(): progress_page.show_entry(entry_id)
+	if not entry_id.is_empty(): progress_page.focus_entry(entry_id)
+	return true
 
 func _page_open() -> bool:
 	return (is_instance_valid(settings_page) and settings_page.visible) or (is_instance_valid(progress_page) and progress_page.visible)
@@ -136,8 +132,7 @@ func _process(_delta: float) -> void:
 	$Header/WaveTimeline.set_reward_active(get_parent().get("choosing_relic") == true)
 	_layout_status_row()
 
-## Center the visible information as one row. Timeline width drives every
-## position during its existing real-time tween, keeping the gaps constant.
+## Center the visible information as one row, keeping the gaps constant.
 func _layout_status_row() -> void:
 	if _header_layout_busy or not is_node_ready(): return
 	_header_layout_busy = true
@@ -282,7 +277,6 @@ func _update_labels() -> void:
 	progress_button.text = tr("ui.pause.progress")
 	settings_button.text = tr("ui.pause.settings")
 	home_button.text = tr("ui.pause.home")
-	$PauseBlocker/Menu/Margin/Actions/Codex/Button.text = "Enemy codex" if TranslationServer.get_locale().begins_with("en") else "敵軍圖鑑"
 
 func _update_wallet_tooltip(amount: int) -> void:
 	$Header/Balance.tooltip_text = ("Gold: %d\nBuy tower cards or refresh the shop." if TranslationServer.get_locale().begins_with("en") else "金幣：%d\n用於購買塔牌與重刷商店。") % amount

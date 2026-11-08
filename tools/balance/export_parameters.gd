@@ -60,6 +60,6 @@ func meaning(key: String) -> String:
 	if key.contains("price") or key.contains("reward"): return "Gold"
 	if key.contains("tick"): return "quarter-second ticks"
 	if key.contains("interval") or key.contains("duration") or key.contains("seconds"): return "simulation seconds unless cohort ticks"
-	if key.contains("health") or key.contains("shield") or key.contains("damage") or key.contains("heal_amount"): return "HP / damage; multiplier when named multiplier"
+	if key.contains("health") or key.contains("shield") or key.contains("damage") or key == "amount": return "HP / damage; multiplier when named multiplier"
 	if key.contains("radius") or key.contains("offset"): return "map cells (model offsets in world units)"
 	return key+"; see runtime_usage export declaration"

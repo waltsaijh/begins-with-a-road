@@ -2,7 +2,7 @@
 
 本文件保留系統責任、演算法與功能細節；開發共識見 [AGENTS.md](../AGENTS.md)，專案結構見 [architectures.md](architectures.md)，遊戲體驗見 [首頁](../README.md)，接手快照／本次驗證見 [HANDOFF](HANDOFF.md)。正式關卡與獨立試驗場景的行為分開描述；下文的 64 隻自動生怪及單塔工具屬於獨立試驗流程。兵種與塔的即時數值以 `assets/data/` 為準，歷史摘要放在 `reports/`，當次測試 JSON／截圖放在 `.godot/test-results/`，不能將舊摘要視為目前通過證據。
 
-目前共用保留雙向道路與環的路網。一般 COST 兵種先用正成本探索有限候選，再依原始 evaluation 與 strict threshold 篩選；Phase 4 的 SHORTEST／NEWEST 依同一已提交路網生成硬性候選，不使用普通 Cost 池或 cutoff。合格候選共用 Uniform／Softmax、交通權重與確定性配額；Soldier 及新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax。WaveSpawnSchedule 在開波前固定完整行程與數值，鼠群以整群分配後展開個體，只打亂出發順序。正式關卡依 Resource 的人數與刻度手動開波；64 隻自動出兵只屬獨立舊場景。普通導航不使用全域 DAG、ZDD 或 Yen，最短路硬規則的 DAG 僅用於合法最短代表。
+目前共用保留雙向道路與環的路網。Add 模式兵種先用正成本探索有限候選，再依原始 evaluation 與 strict threshold 篩選；Tile Cost Reduce 為 Max／Min 的兵種依同一已提交路網精確求解，不使用普通候選池。合格候選共用 Uniform／Softmax、交通權重與確定性配額；Soldier 及新六兵基準 Uniform，Quickfeet／Heavy 基準 Softmax。WaveSpawnSchedule 在開波前固定完整行程與數值，鼠群以整群分配後展開個體，只打亂出發順序。正式關卡依 Resource 的人數與刻度手動開波；64 隻自動出兵只屬獨立舊場景。普通導航不使用全域 DAG、ZDD 或 Yen。
 
 Construction Prototype 是獨立可選擴充：`construction/` 保存草稿、隔離預測與兩種幾何效果，仍由 TowerMap 提交及原生 RoadPortalGraph／RoadSpecialRoutes 規劃，未另建敵人尋路系統。TilePreset 的明確接口與塔偏移經 `map/tile/construction_layout` 產生預覽／驗證／提交共用聯集；TilePlacement 保存本局允許接口，空字典相容舊地形。批次放置保留手牌直到成功，只有最終合法拓樸進入歷史；開始波次先驗證完整排程，直接 EnemyWave 入口也不能略過草稿。未安裝管理器的 Frontier 維持即時規則。操作、數值、限制、測試及九組幾何對照集中於 [Construction Prototype](construction_prototype.md)。
 
@@ -176,7 +176,7 @@ Troop 的 `body_size` 是單選體型，`tags: Array[StringName]` 保存 ground�
 
 WaveFlowPreview 同時持有 baseline 與候選 forecast。兩者使用同一 WaveSpawnSchedule.build(..., shuffle_departures=false)，候選以明確 modifiers 參數覆寫，不切換正式全域狀態。懸停只篩選已算好的入口／兵種資料；候選位置不變時不重建。`TrafficFlowDelta` 從互通接口判斷實際岔路，逐有向出口比較整數 visit count，達 `minimum_quota_change`（預設 1）才產生 ↑／↓。標記放在該出口的 0.65 格位置，投影後保持螢幕垂直；不含數字或百分比。增量箭頭沿螢幕向上漂移、減量向下，以實際時間推進，不受倍速影響；每個週期接縫平滑淡出／淡入避免跳回。Float Distance（預設 5px）與 Float Period（預設 2 秒）、顏色／大小可編輯 `scenes/traffic/components/traffic_delta_overlay.tscn`。流動中心線繼續使用 Phase 1 Renderer。
 
-卡牌取消、無效位置、UI、離開視窗、失焦、暫停及開波清除候選；expiry／成本／幾何變更令正式預覽失效。所有已開波 pending/live 行程保持快照。驗證與人工操作見 [tests/traffic/README.md](../tests/traffic/README.md)。
+卡牌取消、無效位置、UI、離開視窗、失焦、暫停及開波清除候選；expiry／成本／幾何變更令正式預覽失效。所有已開波 pending/live 行程保持快照。原驗證與人工場景 tests/traffic 已刪除。
 
 ### 除錯顯示的資料
 
@@ -192,7 +192,7 @@ F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線�
 
 正式關卡的 `LevelHUD/WorldActions/EarlyStart/NextWaveIntel` 使用 `scenes/levels/components/next_wave_intel.tscn`，依 WaveSpawnSchedule 不洗牌排程中的 start_index 與 Troop Resource 加總各入口實際分配的數量；圖示取自資源，不列舉固定兵種。準備期常駐顯示上方置中的「開始下一波」與下方單列、由左至右的兵種圖示，不再使用菱形或整體 hover 展開面板。整個標題與圖示列包在淡色、青灰描邊、切角及下方置中尖角的共用對話框內。標題 16px、圖示框 34×34px、圖示 24×24px、框距 6px，整列置中；hover 單一框時以 0.15 秒拓寬並淡入 14px 的 ×數量，其餘框只顯示圖示，離開收回。超過 480px 時水平捲動。標題與空白選取該入口全兵種，圖示再篩選該兵種的既有流量預測；以實際 GUI 命中與 viewport 座標核對，不因子控制項或圖示展開改變而丟失入口。暫停、失焦或離窗清除 hover。
 
-每個入口都使用相同的開波命令，點擊上方標題會開始整波，不是只啟動該入口；圖示點擊改為暫停並開啟進度頁的該敵人，不開波。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示標題及 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
+每個入口都使用相同的開波命令，點擊上方標題會開始整波，不是只啟動該入口；圖示只供 hover 篩選，點擊不開波、不開啟其他頁面。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示標題及 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
 
 `wave_flow_preview.gd` 監聽 LevelSession.preparation_changed、EnemyWave.routes_changed、PortalMap.graph_changed／plan_changed 與 tile_parameters.costs_changed（包含非目前選取兵種）。失效先清除舊 mesh，待導航不在 computing 時合併重算一次。直接呼叫 `WaveSpawnSchedule.build(definition, controller, first_id, false, additional_starts)`；與開波共用跨群組、跨入口的完整配額流程，僅略過出發洗牌，不使用 global RNG，也不修改 pending／committed routes。預測是當前有限候選池的分配結果，不是所有可能道路的機率。
 
@@ -293,9 +293,9 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 既有單位沒有 PhysicsBody，因此以相機 ray 與可見 MeshInstance3D 的局部 AABB 交點求最近正向深度，跨塔與敵人統一比較；不按字典順序、不加碰撞或逐幀人口掃描。EnemyMultiMesh.inspection_parts 提供與 GPU／場景顯示一致的 pose yaw、避讓偏移、模型 adjustment／imported transform 與 mesh bounds；純 CPU 查詢，不回讀 GPU buffer。這是模型包圍盒拾取，沒有逐三角形／逐像素精確遮擋判定。
 
-塔資訊取目前 damage × attack.damage_multiplier、attack_interval、level、range_multiplier、有效 relic_effects；兵營改讀當局 deployment 士兵傷害／間隔／接戰距離、數量／生命／重生，不顯示無意義的塔攻速 0。敵人顯示當局 health／max_health、shield、abilities.base_damage 快照與兵種現有圖示／類型／簡短描述；盾衛去掉選敵排序細節，已有減傷描述時不重複追加百分比；Boss 提醒抵達即敗，不顯示選路權重。只為目前選取計算小型數值 signature，改變時才寫文字／血條，不重建整個 UI。
+塔資訊取目前 damage × attack.damage_multiplier、attack_interval、level、range_multiplier、有效 relic_effects；兵營改讀當局 deployment 士兵傷害／間隔／接戰距離、數量／生命／重生，不顯示無意義的塔攻速 0。敵人顯示當局 health／max_health、shield、base_damage／damage_reduction 實例快照與兵種現有圖示／類型／簡短描述；盾衛去掉選敵排序細節，已有減傷描述時不重複追加百分比；Boss 提醒抵達即敗，不顯示選路權重。只為目前選取計算小型數值 signature，改變時才寫文字／血條，不重建整個 UI。
 
-非連續攻擊使用塔目前 attack_offsets，加上實際 anchor 或 departure 巡邏格；VolleyAttack.circular_range 使用 combat_origin 及 attack_radius × range_multiplier 的連續橢圓投影，與實際格子尺寸／地圖變換一致。crew_concentration 依當前局部右半平面裁切，不能以完整圓冒充有效範圍；自訂直線／側舷格域只畫聯集外框與 16% 綠色面。兵營將每名士兵 home_position 的 engage_radius 圓與 BarracksSystem.path 可達道路相交，有 sharpshooter 時另畫每名存活士兵當下的遠程範圍。AOE 爆炸半徑在文字說明，沒有在塔底畫出誤導的固定爆炸落點。選取底部金色細標記使用完整塔 footprint；敵人只顯示隨實際避讓位置移動的小圈。範圍 signature 改變才重建，移動敵人只更新標記 transform。
+舷炮 gun_lines 優先使用每根實際砲口／方向、gun_reach × range_multiplier 與 gun_half_width 的膠囊聯集，包含圓形端點；隨砲口位置或朝向更新，沿用右側限制裁切。其餘非連續攻擊使用塔目前 attack_offsets，加上實際 anchor 或 departure 巡邏格；VolleyAttack.circular_range 使用 combat_origin 及 attack_radius × range_multiplier 的連續橢圓投影，與實際格子尺寸／地圖變換一致。crew_concentration 依當前局部右半平面裁切，不能以完整圓冒充有效範圍；自訂直線／側舷格域只畫聯集外框與 16% 綠色面。兵營將每名士兵 home_position 的 engage_radius 圓與 BarracksSystem.path 可達道路相交，有 sharpshooter 時另畫每名存活士兵當下的遠程範圍。AOE 爆炸半徑在文字說明，沒有在塔底畫出誤導的固定爆炸落點。選取底部金色細標記使用完整塔 footprint；敵人只顯示隨實際避讓位置移動的小圈。範圍 signature 改變才重建，移動敵人只更新標記 transform。
 
 面板共用 Light／Medium 字體、圖示調色與半透明淺紙膠囊背景；最大寬 540px、標題 17px、圖示 18px，內距 28／9px，行距 4px，敵人類型併名稱旁，省略關閉提示、塔類型及可由圖形辨認的射程／traits 說明，0.18 實際秒淡入／淡出；準備期優先在手牌右側維持低位，放不下才上移避讓，戰鬥收牌後回到底部中央；正式關卡停用舊的塔旁 TowerHover 泡泡，工具場景保留。支援語言／viewport 改變。專項入口 `godot --path . --script res://tests/levels/unit_inspection.gd`，可加 `--headless`；實際截圖在 `.godot/test-results/levels/inspection_*.png`。
 
@@ -316,7 +316,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ## 入口圖
 
-一般 COST 兵種共用正成本候選探索，再以原始 evaluation 加總與套用 threshold。搜尋成本與最終評分分開處理；SHORTEST／NEWEST 見 Phase 4，勿套普通池的完整性假設。
+Add 模式兵種共用正成本候選探索，再以原始 evaluation 加總與套用 threshold。搜尋成本與最終評分分開處理；Max／Min 模式見 Phase 4，勿套普通池的完整性假設。
 
 四方向且模型接口相接才算道路邊；石地與斜角不連通。每四格完整形成 2×2 方圈時，視為可換道的填滿面。無洞的連續寬區直接合併成一筆區段資料；有洞的寬區則沿掃描線在分開／匯合處切分，1 對 1 相接的區段持續合併，不因寬度變化切成多個矩形。
 
@@ -437,13 +437,13 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示或按 Tab 依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、開場等待、出生、移動與動畫。Esc 或頂部暫停按鈕立即暫停 SceneTree 並將 Engine.time_scale 設為 0，同時鎖住選牌、旋轉、放置、商店與手動開波；遊戲中 Esc 優先於取消選牌／關閉商店，暫停保留原選取與商店狀態。快捷鍵按住不重複觸發，暫停時 Tab 只保留選單導覽，設定頁仍使用 Tab 移動焦點、Esc 返回暫停選單；1x／2x／4x 都不經過減速過渡。暫停時仍可滾輪縮放、左鍵平移與右鍵拖曳旋轉鏡頭，其他遊戲輸入由 HUD 攔截。暫停請求接受後立即停用頂部倍速與暫停按鈕，同時忽略其 hover／點擊；暫停期間也不接受程式發起的倍速切換。恢復後才重新啟用。右下選單使用右對齊的細字與透明底，不使用 hover／focus 底線，暫停／繼續時皆以實際 0.35 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；手牌與商店的呈現根節點在實際 0.35 秒內一起滑至畫面下方，時長由 LevelHUD 的 `pause_seconds` 調整，僅控制介面收合，保留選牌、商品及展開狀態；恢復時反向滑回。背景使用 `PauseBlocker/WhiteVeil` 的白色 ColorRect（透明度以場景中的 color.a 為準），隨右下選單一起淡入／淡出，圖示與選單保留原色。繼續遊戲或 Esc 會還原卡牌位置／選取及選定速度，未完成的開波過渡也會接續；介面收合途中恢復會立即繼續模擬，並從當前位置與透明度反向還原。「回到主畫面」會結束目前關卡，白色過渡遮住畫面前保持暫停，返回後可重新開始全新進度。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的立即暫停、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換與繼續；返回主畫面的完整往返由 menus/main_menu 回歸驗證。
 
-暫停選單依序為「繼續遊戲／重新開始／進度／設定／敵軍圖鑑／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px，文字變黑但不縮放；移開後反向還原。Button 的 Hover Shift／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／4x 影響。鍵盤可切換六個選項，以文字顏色表示焦點。
+暫停選單依序為「繼續遊戲／重新開始／進度／設定／回到主畫面」，支援英文。每列使用 `scenes/levels/components/pause_menu_item.tscn`，固定 Control 包住可動畫的 Button，hover 於實際 0.2 秒以二次 ease-in-out 左移 12px，文字變黑但不縮放；移開後反向還原。Button 的 Hover Shift／Hover Seconds 可在範本中調整。命中範圍包含原列與變形後的按鈕，HUD 也以相同範圍放行滑鼠；動畫不受 0 delta 或 1x／2x／4x 影響。鍵盤可切換六個選項，以文字顏色表示焦點。
 
 重新開始先解除暫停並還原 1x，再以 SceneTree.reload_current_scene() 重載目前場景，回到第一波準備，重置敵人、商店金幣及初始手牌；關閉舊場景沿用清理保護。設定會開啟 `scenes/settings/settings_page.tscn`，隱藏暫停選單文字但保留背景遮罩與暫停狀態。返回或 Esc 只關閉設定並將焦點還給設定按鈕。`tests/levels/pause_menu.tscn` 使用實際滑鼠及渲染檢查 hover 進出、原邊緣命中、無橫線、雙語與設定，再由 4x 戰鬥中暫停並點擊重新開始，檢查重載後狀態。
 
 開波提示位於 `scenes/levels/components/start_wave_callout.tscn`，上方置中的文字依語言顯示「開始下一波」／「Start next wave」，下方為橫排敵軍圖示；標題與橫排同置於先前設計的淡色對話框中，Shape/Background 與 Shape/Border 保留青灰邊框、切角和下方置中尖角；標題與圖示列均常駐，不加問號、倒數或獎勵。每個入口各有一份範本實例，隨相機平移／縮放更新投影位置，尺寸保持螢幕大小，hover 不縮放或上浮整組提示；部分超出視窗由視窗自然裁切，完全離開畫面才隱藏。開波時沿用 0.24 秒二次 ease-in 收回起點塔，下一波準備時以 0.36 秒二次 ease-out 回到原位，動畫隨暫停停止。LevelHUD Inspector 的 Start Retract Seconds／Start Reveal Seconds 可調整時長，Start Collapse Height 可調整塔內收回位置。商店開啟仍可點擊可見的開波標題。
 
-Title 在整組提示頂部水平置中，下方 NextWaveIntel 依圖示框的實際寬度置中排列，hover 拓寬時同步調整整組寬度，保持出生點的投影錨點。對話框左右內距 12px、上下內距 8px、下方尖角高 8px，最小寬度 144px，隨內容自動延展；不使用原固定 216px 寬度或最多三列限制。單項範本 `troop_intel_item.tscn` 保存圖示、數量與邊框，平時不顯示兵種名稱，名稱以 tooltip 提供；點圖示暫停並開啟進度頁的該敵人，不再另外配置 ? 按鈕。
+Title 在整組提示頂部水平置中，下方 NextWaveIntel 依圖示框的實際寬度置中排列，hover 拓寬時同步調整整組寬度，保持出生點的投影錨點。對話框左右內距 12px、上下內距 8px、下方尖角高 8px，最小寬度 144px，隨內容自動延展；不使用原固定 216px 寬度或最多三列限制。單項範本 `troop_intel_item.tscn` 保存圖示、數量與邊框，平時不顯示兵種名稱，名稱以 tooltip 提供；點圖示沒有動作，不另外配置 ? 按鈕。
 
 開波不發金幣；每隻有效擊殺發放 1 金幣，清完每波仍發放原 WaveDefinition.reward，遺物金幣也保留。已移除關卡的 Early Start Max Bonus、倒數比例計算與浮動獎勵文字場景；重複點擊不改變金額或重新計時。
 
@@ -665,22 +665,27 @@ TutorialDirector 保存本局五步進度。鏡頭步驟觀察實際 focus、siz
 
 ## 敵軍協同與專用路線（Phase 4）
 
-六種新兵種仍由 TroopCatalog 自動發現。Route Rule 區分 COST／SHORTEST／NEWEST，硬性資格先於 Uniform／Softmax 與 TrafficWeights；飛行高度、群體大小、減傷、嘲諷、治療與癱瘓參數均在 Troop Inspector。普通 Cost 的有限池和 strict threshold 不變。拒馬目前只作用於 small＋ground；窄口只作用於 large＋ground；flying 不套地面設施倍率。
+六種新兵種仍由 TroopCatalog 自動發現。Tile Cost Reduce 區分 Add／Max／Min，硬性資格先於 Uniform／Softmax 與 TrafficWeights；飛行高度、群體大小、減傷、嘲諷、治療與癱瘓參數均在 Troop Inspector。普通 Cost 的有限池和 strict threshold 不變。拒馬目前只作用於 small＋ground；窄口只作用於 large＋ground；flying 不套地面設施倍率。
 
 WaveSpawnSchedule 先分配整群入口／路線，再展開獨立個體，固定所有行程、生命、速度與能力快照。群內短間隔、最後不足額群、跨 SpawnGroup 共用配額及不洗牌預覽共用此入口。一般兵種的批次與刻度語意保留；鼠群每群的開始間隔至少容納群內的 0.25 秒間隔。
 
-PortalMap 保存已提交路網歷史，與預覽／普通候選快取分開。原生 RoadSpecialRoutes 處理精確最短格距與最新完整選路的代表通路；歷史判定、非單調重接的預算限制與錯誤處理見 [Phase 4 詳細說明](phase4.md)。這些策略不重寫已開波的路線。流量仍從正式排程的每一名個體累加。
+PortalMap 的 route_history 記錄地塊接入路線的波次，與預覽／普通候選快取分開。原生 RoadReducedRoutes 處理 Tile Cost Reduce 的 Max／Min 模式。
 
 EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結算治療、前搖與癱瘓。盾衛優先只套用到合法單體目標，全體範圍攻擊照常。來源死亡、離場、清波及重開清理所有癱瘓，重疊不累加；在途攻擊快照照常結算。
 
-情報列的兵種圖示打開進度頁的該敵人，不觸發開波，未解鎖者保持問號；首次實際出生才排入側邊未讀通知。通知／圖鑑與遺物詳情共用 HUD 暫停擁有權，真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。
+情報列的兵種圖示點擊沒有動作；首次實際出生才排入側邊未讀通知。通知與遺物詳情共用 HUD 暫停擁有權，真實 hover 入口見 tests/synergy/input.tscn。獨立可玩場景與驗證命令見 [驗收說明](../tests/synergy/README.md)。
 
 ## UI Slice A
 
-緊湊時間線、遺物圖示列、實際出生通知、共用敵軍圖鑑及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
+常駐展開時間線、遺物圖示列、實際出生通知、三欄進度頁及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
 
-頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。緊湊未來波次空心圈，兩模式增加ACT遺物雙菱形，移除緊湊底部細進度條；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。
+頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。時間線常駐展開，含ACT遺物雙菱形；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。
 
 ### 調整個別音檔的基礎音量
 
-在 scripts/audio/game_audio.gd 的音量常數區調整：CLICK_GAIN=0.55 控制按鈕點擊；EFFECT_GAINS 字典包含 hover、card_hover（皆為 click 的 25%）、placement、wrong_placement、gain_gold。VICTORY_GAIN=0.8 控制勝利，BUGLE_GAIN 控制號角，BGM_GAIN 控制全部背景曲的基礎增益。0.0 為靜音、1.0 為音檔原音量，修改後重新執行。遊戲內「設定 → 音效」的整體／BGM／戰鬥滑桿是額外 bus 倍率：勝利隨 BGM，金幣／號角／放置隨戰鬥，點擊／hover 直接隨整體。改單一音檔請調上述基礎增益；滑桿預設是另一個層次，DEFAULT_BGM_VOLUME 不等於 BGM_GAIN。
+在 scripts/audio/game_audio.gd 的音量常數區調整：CLICK_GAIN=0.55 作為基準；EFFECT_GAINS 的 click 另乘 0.2，實際為 0.11，hover、card_hover 各乘 0.25，實際為 0.1375。字典另包含、placement、wrong_placement、gain_gold。VICTORY_GAIN=0.8 控制勝利，BUGLE_GAIN 控制號角，BGM_GAIN 控制全部背景曲的基礎增益。0.0 為靜音、1.0 為音檔原音量，修改後重新執行。遊戲內「設定 → 音效」的整體／BGM／戰鬥滑桿是額外 bus 倍率：勝利隨 BGM，金幣／號角／放置隨戰鬥，點擊／hover 直接隨整體。改單一音檔請調上述基礎增益；滑桿預設是另一個層次，DEFAULT_BGM_VOLUME 不等於 BGM_GAIN。
+
+
+### 2026-11-08 結算整合
+
+防線與 Boss 留在 layer 5，結算獨立 ResultLayer 為 layer 8。保留 Sandbox 勝利音效、碎紙與輕量結算；新增 main 返回主選單與普通關卡下一關操作。普通勝利直接載入下一張已解鎖地圖，教學完成則維持繼續至 Frontier 選圖頁；重複結算不重播，轉場失敗可重試。

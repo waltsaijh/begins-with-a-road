@@ -144,7 +144,7 @@ scripts/
 
 新增內容優先沿用對應功能與上述責任邊界。共用常數跟隨所屬功能，Resource 型別跟隨其資料領域；可編輯的 `.tres` 實例仍放 `assets/data/`。UI、渲染、測試與工具各自透過現有介面協作，搬移腳本時同步更新明確路徑並保留 UID。
 
-`traffic/` 由 TowerMap 持有設施管理器，另存占位及效果，不加入導航障礙或戰鬥塔列表。PortalMap 保存正式效果與獨立配額快取；候選探索仍歸 navigation/routes。CardPlacement 將唯讀候選效果送至既有 WaveFlowPreview，沿用出生排程、流量統計與渲染器。資料／模型／圖示位於 assets 對應的 traffic 子目錄，岔路標記外觀在 scenes/traffic/components；驗證位於 tests/traffic。
+`traffic/` 由 TowerMap 持有設施管理器，另存占位及效果，不加入導航障礙或戰鬥塔列表。PortalMap 保存正式效果與獨立配額快取；候選探索仍歸 navigation/routes。CardPlacement 將唯讀候選效果送至既有 WaveFlowPreview，沿用出生排程、流量統計與渲染器。資料／模型／圖示位於 assets 對應的 traffic 子目錄，岔路標記外觀在 scenes/traffic/components；原驗證 tests/traffic 已刪除。
 
 ## 資料與責任邊界
 

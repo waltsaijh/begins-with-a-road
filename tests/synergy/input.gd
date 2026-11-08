@@ -31,12 +31,6 @@ func click(point: Vector2) -> void:
 func capture(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	viewport_target.get_texture().get_image().save_png(Artifacts.path("synergy/"+name+".png"))
-func lane_counts(forecast: RoadFlowForecast, profile: Troop) -> Array:
-	var paths: Dictionary = forecast.by_troop.get(profile,{})
-	return [int(paths.get(Vector4i(8,0,9,0),0)),int(paths.get(Vector4i(8,6,9,6),0))]
-func overlap(a: Array,b: Array) -> float:
-	if a[0]+a[1] == 0 or b[0]+b[1] == 0: return 0.0
-	return minf(float(a[0])/(a[0]+a[1]),float(b[0])/(b[0]+b[1]))+minf(float(a[1])/(a[0]+a[1]),float(b[1])/(b[0]+b[1]))
 func verify() -> void:
 	if DisplayServer.get_name() == "headless":
 		push_error("Synergy input requires real rendering")
@@ -66,27 +60,8 @@ func verify() -> void:
 		check(action._hovered and preview.selected_origin == 0 and action.get_node("NextWaveIntel").selected == item.profile,"new troop hover filters correct origin and profile")
 		await click(item.body.get_global_rect().get_center())
 		await frames(3)
-		check(hud.progress_page.visible and hud.pause_requested and not wave.active and not session._wave_starting,"Troop icon opens details without starting a wave")
-		check(hud.progress_page.selected_section == 1,"Troop icon lands on the enemy section")
-		await capture("case_%d_intelligence" % case)
-		hud.progress_page.close()
-		hud.set_paused(false)
-		await frames(3)
-		if case < 3:
-			var rat := TroopCatalog.find("rats")
-			var guard := TroopCatalog.find("rook")
-			var mage := TroopCatalog.find("bloodmage")
-			var a := lane_counts(preview.baseline,rat if case == 0 else mage)
-			var b := lane_counts(preview.baseline,guard)
-			await click(split_button.get_global_rect().get_center())
-			await frames(5)
-			check(split_structures.size() == 2,"real click places both test splitting structures")
-			if case == 0 or case == 1:
-				var aa := lane_counts(preview.baseline,rat if case == 0 else mage)
-				var bb := lane_counts(preview.baseline,guard)
-				observations[str(case)] = {"before":[a,b],"after":[aa,bb],"overlap_before":overlap(a,b),"overlap_after":overlap(aa,bb)}
-				check(overlap(aa,bb) < overlap(a,b),"splitting reduces guardian/support route overlap")
-		else:
+		check(not hud.progress_page.visible and not hud.pause_requested and not wave.active and not session._wave_starting,"Troop icon click must do nothing")
+		if case == 3:
 			var flyer := TroopCatalog.find("winged")
 			var old: Dictionary = preview.baseline.by_troop[flyer].duplicate(true)
 			await click(new_roads_button.get_global_rect().get_center())
@@ -98,7 +73,7 @@ func verify() -> void:
 			var south := 0
 			for member: Dictionary in schedule.pending:
 				if member.profile != scout: continue
-				check(member.route.birth_wave == 1,"scout selects current prep wave birth")
+				check(member.route.score == 0.0,"scout selects the newest connected road")
 				if Vector2(8,-3) in member.route.cells: north += 1
 				if Vector2(8,9) in member.route.cells: south += 1
 			check(north > 0 and south > 0,"both same-wave new routes receive actual scouts")

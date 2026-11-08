@@ -1,5 +1,19 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-08 最新 main 合併
+
+本次從 bf3ed4b 的既有衝突開始，先完成 d52329e 的 Merge Commit 24c0712，再整合 fetch 後 origin/main e1100ed。使用者明確選擇「採用 main 最新介面與規則，保留 Sandbox 新增音效／教學／單位檢視」。保留擊殺金幣、旋轉放置及教學慶祝；時間線、進度頁、尋路與敵人技能採用 main。
+
+衝突整合：CSV 保留教學多行文案並接入新增按鈕；兩個二進位翻譯由 Godot CSV 匯入重建。RunStatus 場景與程式保留輕量結算／音效／碎紙，加入返回主選單、普通下一關及 ResultLayer 分層；教學繼續仍進選圖頁。LevelSession 保留完整結算清理；TutorialDirector 保留聚焦框初始化。systems 合併新版時間線與音量說明；tower_integration 同時保留新版砲管／弩砲／交叉火力斷言與 Sandbox 射擊音效檢查。相關呼叫者同步新結算節點路徑。
+
+相容修正：單位資訊讀 Enemy 的 base_damage／damage_reduction 快照，舷炮射程依各砲口膠囊聯集顯示。盾衛英文移除已不適用的固定 25% 減傷。音訊程式與合併前一致；舊音訊測試仍假設 click=0.55，已依實際已提交設定更新為 click=0.11、hover=0.1375。
+
+驗證（本次 Windows Godot 4.7.2 Compatibility）：editor import 無解析／資源錯誤；原生 Windows Debug、Release 重建成功。實際畫面 unit_inspection 97 項、coin_feedback 29 項、HUD 96 項、game_audio、tutorial/intro、tutorial/completion_flow 全部通過；教學 800×600 英文結算截圖無溢出。pause_menu、ui_scene_templates、level_flow、result_actions、road_traffic、synergy/routing（272）、synergy/combat（60）、tower_integration（84 組配置／旋轉）、progress_page 邏輯斷言通過。synergy/visuals 顯示 failures=[]；此場景設計為持續展示，檢查後手動停止。
+
+限制：部分快速退出測試仍報 4 ObjectDB／2 resources 未釋放（含 progress_page），level_flow 為 9／4；不宣稱無警告。level_flow 另報 tutorial 引用 UID 快取未命中並改用有效文字路徑；已核對來源／引用 UID 相同，正式教學實際載入與流程通過，未任意改動有效資源 ID。未重跑十五波平衡、Web 匯出／瀏覽器與完整效能基準。日誌、截圖及稽核保存在忽略的 .godot/merge-2026-11-08 與 .godot/test-results，不提交。
+
+初始工作目錄／index 已逐檔比對原始合併樹，無額外未提交工作；只有兩份歷史 stash（60a9224、d884400），本次無新 stash，不重複套用、不刪除。此次只完成 Merge Commit，不 push。
+
 Git 交付（2026-11-08）：使用者以「git更新並push到遠端」授權提交以下擊殺金幣、旋轉硬幣、音量及完整單位檢視／膠囊精簡的累積成果、資源、測試與文件，正常推送 origin/experiment/routing-sandbox。開始 HEAD f0284da，fetch 後與追蹤分支同步；不合併其他分支、不動 stash／其他 worktree，不強制推送。下方未 commit／push 為當時實作紀錄；本次整理核對差異與最後測試紀錄，不宣稱重新跑整套測試。
 
 ## 2026-11-08 檢視面板精簡追加

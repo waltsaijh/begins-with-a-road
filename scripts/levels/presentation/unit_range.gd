@@ -7,6 +7,7 @@ var cells: Array[Vector2i] = []
 var circular := false
 var center := Vector3.ZERO
 var radius := 0.0
+var gun_segments: Array = []
 var rebuilds := 0
 var _signature: Array = []
 var _planes: Array[Plane] = []
@@ -26,17 +27,26 @@ func clear() -> void:
 	mesh = null
 	_signature.clear()
 	cells.clear()
+	gun_segments.clear()
 	hide()
 
 func update_tower(t: DefenseTower, map: GridMap) -> void:
 	global_transform = map.global_transform
 	var attack := t.attack
-	var is_circle: bool = attack is VolleyAttack and attack.circular_range and t.deployment == null
+	var has_guns: bool = attack is VolleyAttack and attack.gun_lines and t.has_gun_lines()
+	var is_circle: bool = attack is VolleyAttack and attack.circular_range and t.deployment == null and not has_guns
+	var segments: Array = []
+	if has_guns:
+		var tile := map.cell_size.x*map.global_basis.x.length()
+		for gun in t.gun_count():
+			var start := t.gun_position(gun)
+			var end: Vector3 = start+t.gun_direction(gun)*attack.gun_reach*t.range_multiplier*tile
+			segments.append([map.to_local(start)/map.cell_size,map.to_local(end)/map.cell_size,attack.gun_half_width])
 	var origin := map.to_local(t.combat_origin())
 	var anchor := t.grid_cell
 	if t.has_relic(&"departure"): anchor = Vector2i(map.local_to_map(map.to_local(t.patrol_visual().global_position)).x,map.local_to_map(map.to_local(t.patrol_visual().global_position)).z)
 	var coverage: Array[Vector2i] = []
-	if not is_circle and t.deployment == null and attack != null:
+	if not is_circle and not has_guns and t.deployment == null and attack != null:
 		for offset in t.attack_offsets(): coverage.append(anchor+offset)
 	var home := t.garrison_cell()
 	var soldier_state: Array = []
@@ -45,6 +55,7 @@ func update_tower(t: DefenseTower, map: GridMap) -> void:
 		for unit: Node3D in t.get_parent().combat.barracks.units:
 			if unit.tower == t: soldier_state.append([unit.home_position,unit.global_position if t.has_relic(&"sharpshooter") and not unit.dead else Vector3.ZERO])
 	var signature: Array = [t.get_instance_id(),is_circle,origin if is_circle else Vector3.ZERO,t.attack_radius,t.range_multiplier,coverage,t.occupied_cells.duplicate(),home,soldier_state,t.has_relic(&"crew_concentration"),t.combat_origin() if t.has_relic(&"crew_concentration") else Vector3.ZERO,t.rotation_steps]
+	signature.append(segments)
 	if signature == _signature: return
 	_signature = signature
 	rebuilds += 1
@@ -53,6 +64,7 @@ func update_tower(t: DefenseTower, map: GridMap) -> void:
 	center.y = map.map_to_local(Vector3i.ZERO).y+0.13
 	radius = t.attack_radius*t.range_multiplier
 	cells = coverage
+	gun_segments = segments
 	var result := ImmediateMesh.new()
 	result.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	_vertices = 0
@@ -60,7 +72,8 @@ func update_tower(t: DefenseTower, map: GridMap) -> void:
 	if t.has_relic(&"crew_concentration"):
 		var normal := map.global_basis.inverse()*t.patrol_visual().global_basis.x
 		_planes.append(Plane(normal.normalized(),origin))
-	if circular: _circle(result,center,radius*map.cell_size.x,radius*map.cell_size.z,FILL,EDGE)
+	if has_guns: _guns(result,map,segments)
+	elif circular: _circle(result,center,radius*map.cell_size.x,radius*map.cell_size.z,FILL,EDGE)
 	elif t.deployment == null: _tiles(result,map,coverage,FILL,EDGE)
 	else:
 		_garrison(result,t,map)
@@ -76,6 +89,7 @@ func update_tower(t: DefenseTower, map: GridMap) -> void:
 	show()
 
 func update_enemy(at: Vector3, map: GridMap) -> void:
+	gun_segments.clear()
 	global_transform = map.global_transform
 	var local := map.to_local(at)
 	local.y = map.map_to_local(Vector3i.ZERO).y+0.14
@@ -91,6 +105,38 @@ func update_enemy(at: Vector3, map: GridMap) -> void:
 	result.surface_end()
 	mesh = result
 	show()
+
+## Match targets_along_segment's capsule in map-cell coordinates, including
+## the rounded ends. Merge overlapping guns so their shared area is not darker.
+func _guns(result: ImmediateMesh, map: GridMap, segments: Array) -> void:
+	var polygons: Array[PackedVector2Array] = []
+	for segment in segments:
+		var a := Vector2(segment[0].x,segment[0].z)
+		var b := Vector2(segment[1].x,segment[1].z)
+		var angle := (b-a).angle()
+		var polygon := PackedVector2Array()
+		for i in 13: polygon.append(b+Vector2.from_angle(angle-PI*0.5+PI*i/12.0)*float(segment[2]))
+		for i in 13: polygon.append(a+Vector2.from_angle(angle+PI*0.5+PI*i/12.0)*float(segment[2]))
+		var index := 0
+		while index < polygons.size():
+			var merged := Geometry2D.merge_polygons(polygon,polygons[index])
+			if merged.size() == 1:
+				polygon = merged[0]
+				polygons.remove_at(index)
+				index = 0
+			else: index += 1
+		polygons.append(polygon)
+	for polygon in polygons:
+		var points: Array[Vector3] = []
+		for p in polygon: points.append(Vector3(p.x*map.cell_size.x,center.y,p.y*map.cell_size.z))
+		var triangles := Geometry2D.triangulate_polygon(polygon)
+		for i in range(0,triangles.size(),3):
+			_polygon(result,[points[triangles[i]],points[triangles[i+1]],points[triangles[i+2]]],FILL)
+		for i in points.size():
+			var a := points[i]
+			var b := points[(i+1)%points.size()]
+			var side := (b-a).normalized().cross(Vector3.UP)*0.0125
+			_polygon(result,[a-side,b-side,b+side,a+side],EDGE)
 
 func _tiles(result: ImmediateMesh, map: GridMap, covered: Array[Vector2i], fill: Color, edge: Color) -> void:
 	var lookup := {}

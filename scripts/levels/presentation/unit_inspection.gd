@@ -79,7 +79,7 @@ func _refresh() -> void:
 	var signature: Array = [TranslationServer.get_locale(),target.health,target.max_health]
 	if target is DefenseTower:
 		signature.append_array([target.level,target.damage,target.attack_interval,target.attack_radius,target.range_multiplier,target.support_bonus,target.geometry_damage_bonus,target.relic_effects.hash(),target.is_disabled(),target.attack,target.attack.damage_multiplier if target.attack != null else 0.0,target.deployment.damage if target.deployment != null else 0.0,target.deployment.health if target.deployment != null else 0.0,target.deployment.interval if target.deployment != null else 0.0,target.deployment.count if target.deployment != null else 0])
-	else: signature.append_array([target.shield,target.max_shield,target.abilities.hash()])
+	else: signature.append_array([target.shield,target.max_shield,target.base_damage,target.damage_reduction,target.abilities.hash()])
 	if signature == _signature: return
 	_signature = signature
 	updates += 1

@@ -158,9 +158,18 @@ func verify() -> void:
 		inspect.select_unit(tower)
 		await frames()
 		check(inspect.target == tower and inspect.range_view.visible and inspect.range_view.mesh != null,"Switch to "+id+" clears old presentation")
-		if id in ["ballista","broadside"]:
+		if id == "ballista":
 			check(not inspect.range_view.circular,"Directional tower is not shown as a circle")
 			for offset in tower.attack_offsets(): check(inspect.range_view.cells.has(tower.grid_cell+offset),"Rotated shaped range matches combat")
+		if id == "broadside":
+			check(not inspect.range_view.circular and inspect.range_view.cells.is_empty(),"Gun lines replace the old shaped coverage")
+			check(inspect.range_view.gun_segments.size() == tower.gun_count(),"Each live gun contributes its actual range")
+			for gun in tower.gun_count():
+				var segment: Array = inspect.range_view.gun_segments[gun]
+				var start: Vector3 = towers.map.to_local(tower.gun_position(gun))/towers.map.cell_size
+				check(segment[0].is_equal_approx(start),"Rotated gun range starts at the actual muzzle")
+				check(is_equal_approx(segment[0].distance_to(segment[1]),tower.attack.gun_reach*tower.range_multiplier),"Gun range follows combat reach")
+				check(is_equal_approx(segment[2],tower.attack.gun_half_width),"Gun range includes combat capsule width")
 		if id == "barracks":
 			check(inspect.column.get_node("Stats/First").text.contains(str(snappedf(tower.deployment.damage,0.01))),"Barracks shows live soldier damage")
 			check(inspect.column.get_node("Stats/Second").text.contains(str(snappedf(tower.deployment.interval,0.01))),"Barracks shows meaningful soldier interval")
@@ -188,12 +197,13 @@ func verify() -> void:
 	check(inspect.column.get_node("Stats/First").text.contains(str(snappedf(enemy.health,0.01))),"Enemy HP is live")
 	check(is_equal_approx(inspect.column.get_node("Health").value,100*enemy.health/enemy.max_health),"Health bar follows damage")
 	check(inspect.column.get_node("Stats/Third").text.contains("7"),"Live shield is shown")
-	check(inspect.column.get_node("Stats/Second").text.contains(str(int(enemy.abilities.get("base_damage",1)))),"Base damage uses wave snapshot")
+	check(inspect.column.get_node("Stats/Second").text.contains(str(enemy.base_damage)),"Base damage uses wave snapshot")
 	check(not inspect.column.get_node("Heading/Kind").text.contains("ui.progress"),"Enemy types are readable localized text")
 	check(inspect.column.get_node("Heading/Kind").get_parent() == inspect.column.get_node("Heading"),"Enemy tags share the name row")
 	var rook: Node3D = load("res://scenes/enemies/enemy.tscn").instantiate()
 	rook.troop = load("res://assets/data/troops/rook.tres")
-	rook.abilities = rook.troop.ability_snapshot()
+	rook.apply_snapshot(rook.troop.combat_snapshot())
+	rook.damage_reduction = 0.25 # A live snapshot override must not read the resource default.
 	var rook_data: Dictionary = inspect.Data.enemy(rook)
 	check(rook_data.notes.count("25") == 1 and not rook_data.notes.contains("優先級") and not rook_data.notes.contains("出生順序"),"Rook description contains one reduction and no internal tie-break rules")
 	rook.free()

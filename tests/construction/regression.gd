@@ -23,7 +23,7 @@ func state(session: Node3D) -> Dictionary:
 	var portal: Node = session.get_node("PortalMap")
 	var towers: Node = session.get_node("TowerMap")
 	var cards: Node = session.get_node("CardPlacement")
-	return {"ground":session.get_node("TileMap").get_used_cells(), "snapshot":Snapshot.capture(session.get_node("TileMap"), towers.occupied), "occupied":towers.occupied.duplicate(), "towers":towers.towers.duplicate(), "history":portal.route_history.snapshots.duplicate(true), "history_revision":portal.route_history.revision, "cards":cards.cards.duplicate(), "coins":cards.get_node("Shop").coins}
+	return {"ground":session.get_node("TileMap").get_used_cells(), "snapshot":Snapshot.capture(session.get_node("TileMap"), towers.occupied), "occupied":towers.occupied.duplicate(), "towers":towers.towers.duplicate(), "history":portal.route_history.tile_waves.duplicate(), "history_revision":portal.route_history.revision, "cards":cards.cards.duplicate(), "coins":cards.get_node("Shop").coins}
 
 func create_session() -> Node3D:
 	var session := Fixture.session(2)
@@ -91,17 +91,16 @@ func run() -> void:
 	check(committed.ok and batch.entries.is_empty(), "Whole legal batch commits successfully")
 	await settle(session)
 	check(towers.towers.size() == 2 and cards.cards.size() == initial.cards.size()-2 and cards.get_node("Shop").coins == initial.coins, "Batch creates two towers, consumes exactly two owned cards and charges no extra Gold")
-	check(portal.route_history.revision == initial.history_revision+1 and portal.route_history.snapshots.size() == initial.history.size()+1, "Only one final topology snapshot is recorded")
+	check(portal.route_history.revision == initial.history_revision+1, "Only one final topology snapshot is recorded")
 	check(Snapshot.connects_terminals(Snapshot.capture(session.get_node("TileMap"), towers.occupied), portal.terminal_cells()), "Committed reciprocal topology connects all active entrances")
 	var canonical: Dictionary = portal.route_history.current.duplicate(true)
 	var final_plan: Dictionary = WaveSpawnSchedule.build(wave.definition, portal, 91, true)
 	check(RoadFlowForecast.from_pending(final_plan.pending).all == predicted,"Read-only pending forecast equals committed mixed troop quotas including geometry influence")
 	check(not final_plan.is_empty() and final_plan.pending.size() == wave.definition.total_count(), "Final topology schedules every mixed troop")
-	var shortest: Dictionary = portal.route_history.candidates(0, true)
 	for member: Dictionary in final_plan.get("pending", []):
 		check(_route_legal(member.route.cells, canonical), "Committed troop route uses reciprocal roads and avoids towers")
-		if member.profile == TroopCatalog.find("scout"): check(member.route.birth_wave == 1, "Scout new bypass birth is this preparation wave")
-		if member.profile == TroopCatalog.find("winged"): check(member.route.cells.size()-1 == shortest.distance, "Winged Beast uses actual shortest committed path")
+		if member.profile == TroopCatalog.find("scout"): check(member.route.score == 0.0, "Scout takes the newest bypass")
+		if member.profile == TroopCatalog.find("winged"): check(member.route.cells.size()-1 == preload("res://tests/fixtures/portal_fixture.gd").road_distance(canonical,Vector2i(canonical.starts[0]),canonical.goal), "Winged Beast uses actual shortest committed path")
 	var upgrade_card := Fixture.card("cross", "ballista")
 	cards.add_card(upgrade_card)
 	var upgrade_index: int = cards.cards.size()-1
@@ -110,7 +109,7 @@ func run() -> void:
 	check(batch.stage(upgrade_card, Vector3i(6, 0, 0), 3, upgrade_index).ok and batch.commit().ok, "Same-definition pending card upgrades a confirmed tower")
 	await settle(session)
 	check(target.level == 2 and towers.towers.size() == 2 and cards.cards.size() == before_upgrade.cards.size()-1, "Upgrade consumes one card and preserves tower identity")
-	check(Snapshot.capture(session.get_node("TileMap"), towers.occupied) == before_upgrade.snapshot and portal.route_history.snapshots == before_upgrade.history, "Upgrade ignores new card's roads and does not change route birth history")
+	check(Snapshot.capture(session.get_node("TileMap"), towers.occupied) == before_upgrade.snapshot and portal.route_history.tile_waves == before_upgrade.history, "Upgrade ignores new card's roads and does not change route birth history")
 	session.queue_free()
 	await get_tree().process_frame
 	# Reverse stage order must result in the same canonical final route history.

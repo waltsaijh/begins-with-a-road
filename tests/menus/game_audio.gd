@@ -18,7 +18,7 @@ func advance(seconds: float) -> void:
 func verify() -> void:
 	RenderingServer.set_default_clear_color(Color.WHITE)
 	audio = root.get_node("GameAudio")
-	check(is_equal_approx(audio._effects[&"click"].volume_linear,0.55),"Click cue uses reduced base gain")
+	check(is_equal_approx(audio._effects[&"click"].volume_linear,0.11),"Click cue preserves the final Sandbox attenuation")
 	check(is_equal_approx(audio.VICTORY_GAIN,0.8),"Victory cue uses increased base gain")
 	check(is_equal_approx(Settings.read(root)[&"bgm_volume"], 50.0), "BGM slider should retain its 50 percent default")
 	var button := Button.new()
@@ -28,7 +28,7 @@ func verify() -> void:
 	button.mouse_entered.emit()
 	check(audio._effects[&"hover"].playing, "Buttons must play their hover cue")
 	for kind in [&"hover", &"card_hover"]:
-		check(audio._effects[kind].volume_linear < audio._effects[&"click"].volume_linear and audio._effects[kind].bus == &"Master", "Hover cues must be quieter than clicks and controlled by Master")
+		check(is_equal_approx(audio._effects[kind].volume_linear,0.1375) and audio._effects[kind].bus == &"Master", "Hover cues preserve their independent base gain and Master bus")
 	audio._effects[&"hover"].stop()
 	button.disabled = true
 	button.mouse_entered.emit()

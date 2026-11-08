@@ -41,10 +41,10 @@ func verify() -> void:
 	await get_tree().create_timer(0.5,true,false,true).timeout
 	check(scene.get_node("EnemyWave").alive == 0 and scene.get_node("EnemyWave")._pending.is_empty(),"Loss cleans living and pending enemies")
 	check(scene.get_node("CardPlacement/Shop").coins == 9,"Loss gives no completion Gold")
-	check(not scene.run_status.get_node("Result/Confetti")._started and not GameAudio._victory_pending and not GameAudio._victory.playing,"Defeat must not trigger victory confetti or the victory cue")
+	check(not scene.run_status.get_node("ResultLayer/Result/Confetti")._started and not GameAudio._victory_pending and not GameAudio._victory.playing,"Defeat must not trigger victory confetti or the victory cue")
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(output+"/defeat.png")
-	await click(scene.run_status.get_node("Result/Center/Panel/Margin/Column/Restart"))
+	await click(scene.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/Restart"))
 	for frame in 8: await get_tree().process_frame
 	var restarted: Node = get_tree().current_scene
 	check(restarted != scene and restarted.current_wave == 0 and restarted.base_health == restarted.level.base_health and restarted.level.progress_id() == "frontier" and Engine.time_scale == 1.0,"Defeat restart reloads the selected Frontier fixture and resets speed")

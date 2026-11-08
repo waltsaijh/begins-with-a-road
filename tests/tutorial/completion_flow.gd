@@ -32,8 +32,8 @@ func complete(level: Node) -> void:
 	await frames()
 	check(level.finished and not level.choosing_relic and not level.tutorial.overlay.visible,"Tutorial victory must bypass relics and hide the teaching overlay")
 	check(level.run_status._next_map_id == "frontier", "Tutorial continuation must select the second battlefield")
-	var panel: Control = level.run_status.get_node("Result/Center/Panel")
-	var actions: Control = level.run_status.get_node("Result/Center/Panel/Margin/Column/TutorialActions")
+	var panel: Control = level.run_status.get_node("ResultLayer/Result/Center/Panel")
+	var actions: Control = level.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions")
 	check(panel.get_global_rect().encloses(actions.get_global_rect()),"Tutorial actions must sit inside the victory panel")
 	if DisplayServer.get_name() != "headless":
 		await create_timer(0.5,true,false,true).timeout
@@ -51,7 +51,7 @@ func verify() -> void:
 	var level := current_scene
 	await complete(level)
 	var old: WeakRef = weakref(level)
-	await click(level.run_status.get_node("Result/Center/Panel/Margin/Column/TutorialActions/Restart"))
+	await click(level.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions/Restart"))
 	await frames(15)
 	level = null
 	check(old.get_ref() == null and current_scene.level.progress_id() == "tutorial", "Restart must replace the old scene with the same tutorial")
@@ -60,7 +60,7 @@ func verify() -> void:
 	await create_timer(4.1,true,false,true).timeout
 	var audio: Node = root.get_node("GameAudio")
 	check(not audio._victory_pending and not audio._victory.playing and audio._active >= 0 and audio._voices[audio._active].stream == audio.DEFAULT,"The real victory clip must finish once and hand back to BGM naturally")
-	await click(current_scene.run_status.get_node("Result/Center/Panel/Margin/Column/TutorialActions/Continue"))
+	await click(current_scene.run_status.get_node("ResultLayer/Result/Center/Panel/Margin/Column/TutorialActions/Continue"))
 	if root.get_node("ScreenTransition").active: await root.get_node("ScreenTransition").finished
 	await frames(12)
 	check(current_scene.scene_file_path == "res://scenes/menus/main_menu.tscn" and current_scene._selecting and not current_scene.home.visible, "Continue must open the battlefield selection page directly")

@@ -10,6 +10,18 @@ enum Mode { SINGLE, SPLASH, ALL }
 @export var shell_speed := 6.0
 @export var shell_minimum_seconds := 0.25
 @export var shell_arc_height := 1.1
+## One fast pulse over the whole range, drawn as a ring instead of per-target beams.
+@export var shockwave := false
+## A visible bolt that flies to the target and lands the hit on arrival.
+@export var heavy_bolt := false
+@export var bolt_speed := 24.0
+@export var bolt_length := 1.0
+@export var bolt_width := 0.09
+## Each muzzle owns the straight line in front of it and its own attack timer.
+@export var gun_lines := false
+## Tiles beyond the muzzle, and half of the line's width.
+@export var gun_reach := 3.0
+@export var gun_half_width := 0.5
 
 func configuration_error() -> String:
 	var error := super.configuration_error()
@@ -35,6 +47,12 @@ func fire(combat: Node, tower: Node3D, target: Node3D) -> void:
 		return
 	if tower.has_relic(&"powerful_shot"):
 		combat.fire_piercing_bolt(tower,target,self)
+		return
+	if heavy_bolt:
+		combat.fire_heavy_bolt(tower,target,self)
+		return
+	if shockwave:
+		combat.fire_shockwave(tower,self)
 		return
 	var victims: Array[Node3D] = [target]
 	if mode == Mode.ALL: victims = targets(combat,tower)

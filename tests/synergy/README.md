@@ -31,7 +31,7 @@ godot --path . res://tests/synergy/input.tscn
 
 - `routing`：六兵種資料、128 張小圖完整 oracle 對照、穩定出生身份、死路、同波雙新路、新路失效與恢復、普通搜尋預算／threshold 隔離、舊路旗幟資格、非單調搜尋超限、整群分配／不足尾群、跨群組多入口個體總數及預覽一致性。
 - `combat`：合法與越界嘲諷、穩定優先級、真實單體／ALL 傷害差異、減傷、治療時鐘／多來源／上限／死亡、對空與迫擊砲遺物、飛行不攔截、前搖與癱瘓重疊／死亡／波次清理／恢復攻擊。
-- `input`：真實渲染的 A–D 場景、實際滑鼠 hover／?／分流／開波、UI 個體數、雙新路、取得移除空中打擊、正式排程與預覽完整流量相同，戰鬥中實際治療及癱瘓；產生每場景準備／情報／戰鬥截圖。不可用 headless 代替此項。
+- `input`：真實渲染的 A–D 場景、實際滑鼠 hover／?／開波（交通設施分流已不在自動驗證範圍；盾衛兵改為跟著人群）、UI 個體數、雙新路、取得移除空中打擊、正式排程與預覽完整流量相同，戰鬥中實際治療及癱瘓；產生每場景準備／情報／戰鬥截圖。不可用 headless 代替此項。
 
 相關回歸包含 `relics/{stacking,rewards,mechanisms,input}`、`combat/tower_restoration`、`traffic/{weights,integration,input}`、`levels/{wave_spawn_groups,level_flow,level_teardown,road_flow_preview,pause_menu}`、`navigation/{route_distribution,multiple_starts,waypoint_routes}` 與 `enemies/{troop_profiles,enemy_status}`。
 

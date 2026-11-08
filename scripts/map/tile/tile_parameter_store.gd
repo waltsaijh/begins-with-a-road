@@ -15,6 +15,7 @@ var _tower_threat := {}
 var _update_depth := 0
 var _update_dirty := false
 var _parameters_dirty := false
+var _road_traffic := {}
 
 func _create_tile(cell: Vector2i) -> TileRecord:
 	var tile := TileRecord.new()
@@ -53,6 +54,7 @@ func sync(cells: PackedVector2Array, retained_cells: Dictionary = {}) -> void:
 			_tiles[cell].changed.disconnect(_on_tile_changed.bind(cell))
 	_tiles = kept
 	ordered = next
+	_road_traffic.clear()
 	revision += 1
 	_cache.clear()
 
@@ -92,6 +94,20 @@ func change_tower_influence(cell: Vector2i, nearby_delta: int, threat_delta: flo
 	if tile != null:
 		tile.num_towers_around = count
 		tile.threat = amount
+
+func set_road_ages(ages: Dictionary) -> void:
+	begin_update()
+	for tile: TileRecord in _tiles.values(): tile.road_age = ages.get(tile.cell,0.0)
+	end_update()
+
+## Only the troops that weigh traffic depend on it, so only their costs are dropped.
+func set_road_traffic(shares: Dictionary, profiles: Array) -> void:
+	if shares == _road_traffic: return
+	_road_traffic = shares.duplicate()
+	for tile: TileRecord in _tiles.values(): tile.road_traffic = shares.get(tile.cell,0.0)
+	for profile: Troop in profiles:
+		_cache.erase(profile.get_instance_id())
+		costs_changed.emit(profile.get_instance_id())
 
 func evaluate(profile: Troop) -> Dictionary:
 	var id := profile.get_instance_id()

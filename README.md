@@ -68,11 +68,10 @@
 
 一般商店目前恢復為四張防禦塔，單排右端保留重刷牌；臨時設施暫不販售，資源與獨立測試工具保留。旗幟吸引地面敵軍，拒馬讓小型地面敵軍迴避，窄口讓大型敵軍迴避；這些設施改變選路比例，並在參與三個完整波次後消失。選牌移到合法位置時，道路先顯示放置後的下一波預測，岔路的 ↑／↓ 表示實際配額增減；沒有實際分流變化時會顯示提示。Hover 已建設施可查看剩餘波數。
 
-獨立人工驗收：F6 執行 `tests/traffic/playground.tscn`，提供三種輔助牌、100 金幣與雙入口環路；詳見 [Phase 2 驗收操作](tests/traffic/README.md)。
 
 Phase 3 人工驗收：F6 執行 `tests/relics/playground.tscn`，提供六塔、同種手牌、逐件遺物選擇及快捷操作，見 [驗收步驟](tests/relics/README.md)。
 
-鼠群、盾衛兵、血法師、飛翼獸、偵查兵與爆破手均已編入 Frontier，可透過分流嘗試拆散嘲諷、治療與癱瘓協同；硬性選路及配額有時會限制設施效果。首次實際出現的敵人會留下側邊未讀通知，點擊後才暫停並依序閱讀；暫停選單的「敵軍圖鑑」可重開已解鎖情報，跨局保留。下一波兵種圖示可開啟進度頁，主畫面與暫停選單的「進度」提供塔、敵人及遺物資料；未遭遇敵人保持問號。F6 執行 `tests/synergy/playground.tscn` 可玩四組獨立測試波次，見 [Phase 4 驗收操作](tests/synergy/README.md)。完整長局與證據見 [Phase 5](docs/phase5.md)、[數值與限制](docs/balance/phase5_final.md)，真人測試入口見 [遊玩驗收表](docs/balance/phase5_human_playtest.md)。
+鼠群、盾衛兵、血法師、飛翼獸、偵查兵與爆破手均已編入 Frontier，可透過分流嘗試拆散嘲諷、治療與癱瘓協同；硬性選路及配額有時會限制設施效果。首次實際出現的敵人會留下側邊未讀通知，點擊後才暫停並依序閱讀；已解鎖情報跨局保留，可在進度頁查看。主畫面與暫停選單的「進度」提供塔、敵人及遺物資料；未遭遇敵人保持問號。F6 執行 `tests/synergy/playground.tscn` 可玩四組獨立測試波次，見 [Phase 4 驗收操作](tests/synergy/README.md)。完整長局與證據見 [Phase 5](docs/phase5.md)、[數值與限制](docs/balance/phase5_final.md)，真人測試入口見 [遊玩驗收表](docs/balance/phase5_human_playtest.md)。
 
 ## 修改內容與開發
 
