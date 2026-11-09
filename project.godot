@@ -37,7 +37,7 @@ project/assembly_name="BEGINS WITH A ROAD"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/wave_editor/plugin.cfg")
+enabled=PackedStringArray("res://addons/wave_editor/plugin.cfg", "res://addons/text_editor/plugin.cfg")
 
 [gui]
 

@@ -25,7 +25,7 @@ func update(host: Node, delta: float) -> void:
 		host.visual(enemy).heal_pulse()
 
 func describe(english: bool) -> String:
-	return "Periodically heals nearby allies." if english else "定期治療附近的友軍。"
+	return (GameText.text("text.heal_ability.1",{},english)) % ([str(snappedf(interval,0.01)),str(snappedf(amount,0.01)),str(snappedf(radius,0.01))] if english else [str(snappedf(interval,0.01)),str(snappedf(radius,0.01)),str(snappedf(amount,0.01))])
 
 func configuration_error() -> String:
 	if not is_finite(amount) or amount < 0 or not is_finite(radius) or radius < 0: return "治療量與半徑必須非負且有限"

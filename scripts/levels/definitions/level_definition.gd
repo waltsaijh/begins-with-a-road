@@ -18,6 +18,18 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var reward_final_act := false
 @export_range(0, 100, 1) var starting_gold := 0
 @export var opening_shop := false
+## Positive values replace ACT expansion flags with a global completed-wave cadence.
+@export_range(0, 100, 1) var expansion_wave_interval := 0
+
+func expands_after(completed_waves: int) -> bool:
+	if completed_waves <= 0 or completed_waves >= wave_count(): return false
+	if expansion_wave_interval > 0: return completed_waves % expansion_wave_interval == 0
+	var count := 0
+	for act in acts:
+		if act == null: continue
+		count += act.waves.size()
+		if count == completed_waves: return act.add_start_after_completion
+	return false
 
 func progress_id() -> String:
 	if not level_id.strip_edges().is_empty(): return level_id.strip_edges()

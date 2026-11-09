@@ -1,35 +1,40 @@
-[gd_resource type="Theme" format=3]
-[ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
+[gd_resource type="Theme" format=3 uid="uid://dmiqh5mnratul"]
+
+[ext_resource type="FontFile" uid="uid://b0uneetxvpb70" path="res://assets/fonts/NotoSansTC-Light.ttf" id="1"]
 [ext_resource type="StyleBox" path="res://assets/themes/hud_tooltip.tres" id="tooltip"]
-[sub_resource type="StyleBoxEmpty" id="Transparent"]
-[sub_resource type="StyleBoxFlat" id="List"]
-bg_color = Color(0.86, 0.91, 0.89, 0.3)
-content_margin_left = 6.0
-content_margin_right = 6.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
+
 [sub_resource type="StyleBoxFlat" id="Selection"]
 bg_color = Color(0.39, 0.57, 0.55, 0.18)
 border_width_left = 2
 border_color = Color(0.39, 0.57, 0.55, 0.6)
+
+[sub_resource type="StyleBoxEmpty" id="Transparent"]
+
+[sub_resource type="StyleBoxFlat" id="List"]
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.86, 0.91, 0.89, 0.3)
+
 [resource]
 default_font = ExtResource("1")
 default_font_size = 16
-TooltipPanel/styles/panel = ExtResource("tooltip")
-TooltipLabel/colors/font_color = Color(0.14, 0.298, 0.32, 1)
 Button/colors/font_color = Color(0.2, 0.36, 0.38, 1)
 Button/colors/font_focus_color = Color(0.2, 0.36, 0.38, 1)
 Button/colors/font_hover_color = Color(0.08, 0.12, 0.12, 1)
 Button/colors/font_pressed_color = Color(0.2, 0.36, 0.38, 0.7)
-Button/colors/icon_normal_color = Color(0.22, 0.38, 0.4, 1)
 Button/colors/icon_hover_color = Color(0.1, 0.2, 0.22, 1)
-Button/styles/normal = SubResource("Transparent")
-Button/styles/hover = SubResource("Transparent")
-Button/styles/pressed = SubResource("Transparent")
+Button/colors/icon_normal_color = Color(0.22, 0.38, 0.4, 1)
 Button/styles/focus = SubResource("Selection")
+Button/styles/hover = SubResource("Transparent")
+Button/styles/normal = SubResource("Transparent")
+Button/styles/pressed = SubResource("Transparent")
+ItemList/colors/font_color = Color(0.2, 0.36, 0.38, 1)
+ItemList/colors/font_selected_color = Color(0.15, 0.29, 0.3, 1)
+ItemList/styles/focus = SubResource("Transparent")
 ItemList/styles/panel = SubResource("List")
 ItemList/styles/selected = SubResource("Selection")
 ItemList/styles/selected_focus = SubResource("Selection")
-ItemList/styles/focus = SubResource("Transparent")
-ItemList/colors/font_selected_color = Color(0.15, 0.29, 0.3, 1)
-ItemList/colors/font_color = Color(0.2, 0.36, 0.38, 1)
+TooltipLabel/colors/font_color = Color(0.14, 0.298, 0.32, 1)
+TooltipPanel/styles/panel = ExtResource("tooltip")

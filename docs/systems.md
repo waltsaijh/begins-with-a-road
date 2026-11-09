@@ -62,6 +62,22 @@ Tower Tile Editor 的具名測試組合由 catalog 保存塔種＋配置 ID 成�
 
 兵種設定存成 `assets/data/troops/*.tres`，不需為每個兵種建立 GDScript 類別。`Troop` 繼承 Resource，保留變更通知與評分快取失效機制；`TroopCatalog` 以檔案路徑保留共用設定。每隻敵人的目前血量、位置與行程獨立保存。一般共用常數修改後重新執行生效；已有場景覆寫的 `@export` 值優先於共用預設。
 
+## 集中遊戲文本工具
+
+Godot 主工作區「遊戲文本」由 addons/text_editor 提供，進入方式、分類及操作見該目錄 README。共同資料仍是 assets/translations/card_names.csv 的 keys／en／zh_TW，工具只允許修改後兩欄；不儲存任何 .tres 或改動價格、戰鬥、尋路、技能數值。GameText 將原先分散在腳本的中英玩家文案接到共同詞條，printf 的參數值與順序仍由原機制傳入；敵人故事與原 Resource 的資訊文字遷移時保留起始原文。RelicDefinition.description_values 與 localized_description 共用數值來源，工具預覽直接讀參數但不提供修改介面。
+
+每筆兩語可直接換行，分類／搜尋涵蓋識別碼及完整文字；切換筆目保留草稿，原生 EditorUndoRedoManager 用於文字修改。重載以新文件模型取代草稿，不復用已確認捨棄的編輯狀態。必要命名參數與 printf 型別／數量必須保留，避免文字編輯刪掉動態數值；儲存前拒絕缺漏／新增錯誤參數與不完整大括號。原檔 hash 有外部變更時拒絕覆寫。CSV 解析支援引號內換行及雙引號 escaping；無改動不寫檔，修改僅重建改過資料列，保留其餘列與順序、BOM及既有換行。暫存寫入與讀回驗證後以同目錄 rename 替換，失敗不動原檔，成功通知 Godot 重匯翻譯；遊戲下一次啟動使用新文案。
+
+驗證入口：text_document_check 驗證 CSV／衝突／佔位符／資源數值預覽；--editor -- --test-text-editor 實際載入外掛測試編輯／Undo／Redo／Save／Reload；text_editor_preview 擷取較小視窗版面。測試只寫 .godot/text-editor 副本，不寫正式表格。查詢是否改數值需比對本輪起始 Resource bytes，不能將本來的使用者未提交修改歸到工具修改。
+
+## 遺物與敵人說明的資料來源
+
+所有遺物呈現共用 `RelicDefinition.localized_description()`：將 `card_names.csv` 的多行描述模板以 Resource.parameters 格式化，再提供給三選一、進度、已持有詳情與圖示 tooltip／獨立試驗場。原始參數、百分比、倍率增幅、間隔倒數、疊加上限，以及塔成長／兵營部署數均讀來源，整數不保留 .0，非整數至兩位小數。冰霜的單次移速下降由目前強度與上限算出，敘述單次效果與漸近上限，不把強度0.18誤稱固定18%減速。右舷集中正確為×2.5／+150%；爆炸友傷對象為防禦塔、含自身。三選一保持原交易流程，只加大卡片至232×400，描述依語意分段／預換行，行距3px，必要時14px降至12px；debug重抽按鈕跟隨卡片底緣。切語言更新既有卡片文字，不重新抽獎、不改焦點或選取狀態。修改文案在CSV，改效果值仍在對應遺物Resource。
+
+敵人進度資料共用 EnemyCodexText，分故事、行進路線與特殊能力段落；路線文字依 Troop 現有設定描述玩家可觀察結果，不顯示搜尋或分配演算法。快行兵避開重火力、重裝兵迎向火力、爆破手偏好塔群、盾衛與血法師選主力隊伍將走的道路，偵查兵只走最新可達完整路、飛翼獸沿最短道路飛行而非跨越空地、鼠群同群共路、普通兵與首領多路分流。每波路線固定不臨時換路，與特殊能力追蹤／治療不同；未遭遇敵人仍隱藏。EnemyAbility.describe 讀取實際技能距離、時間、目標數及幅度，不改技能執行。能力中的優先級／距離排序不列入玩家說明。
+
+文字／版面專項：`tests/relics/descriptions.tscn` 遍歷21遺物×中英、三選一800×600、動態參數及敵人行為，並保存進度與三選一畫面；原進度驗證仍為 `--script res://tests/menus/progress_page.gd`。
+
 ## Tile 規格
 
 MeshLibrary ID：石地 0、直路 1、轉角 2、獨立道路地塊 3、道路端頭 4、T 字路口 5、十字路口 6。所有模型共用 1 × 1 格尺寸、0.10 石面厚度、0.27 石底厚度及約 2/3 格道路寬度。石面位於 Y = 0；道路中心 Y = 0.01，轉角保留手動調整後的接合位置。直路預設沿 Z 軸；轉角預設連接 -Z 與 +X，其他方向使用 90 度旋轉。
@@ -132,7 +148,7 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 
 卡片與舊單塔工具共用 TowerMap 的驗證／提交流程；批次地塊由 `TilePlacement.add_cells()` 去重後一次刷新所有相鄰接口。地塊服務不處理滑鼠輸入，也不建立單格預覽；選卡時停用單塔工具的滑鼠輸入。預覽只在游標換格、旋轉或地圖失效時更新；被拒絕的預覽每 0.25 秒重試，敵人通過後可恢復，未選卡時停止逐幀處理。每次檢查成本為 O(地塊＋相鄰邊)，不枚舉路線。
 
-新增地塊配置時，在 `assets/data/tile_presets/` 新增 TilePreset `.tres`，設定 Prefix Key 與 Road Offsets，再加入需要使用它的塔資源之 Tile Preset Candidates。每個候選有 Preset Path 與 Weight，各塔可引用同一地塊並設定不同權重；權重 0、失效檔案與空項目不參與抽取。新塔種則在 `assets/data/towers/` 建立 TowerDefinition，並加入 `scenes/cards/card_shop.tscn` 根節點的 Catalog；塔的 Card Price 決定新卡售價。商店與初始手牌先抽塔，再依該塔自己的候選清單及權重抽 preset。沒有可用候選的塔不參與抽牌。CardPlacement 的 Initial Card Count 預設三張；Cards 留空時隨機生成，填入 BuildCard 時保留固定初始手牌。舊的三張 sentry＋地塊組合資源已移除。資料、輸入、UI、預覽及世界提交各自獨立，不需複製管理腳本。`turns` 採 90 度順時針步數，原點為塔 anchor；API 的 `cell` 使用 GridMap 格座標。
+新增地塊配置時，在 `assets/data/tile_presets/` 新增 TilePreset `.tres`，設定 Prefix Key 與 Road Offsets，再加入需要使用它的塔資源之 Tile Preset Candidates。每個候選有 Preset Path 與 Weight，各塔可引用同一地塊並設定不同權重；權重 0、失效檔案與空項目不參與抽取。新塔種則在 `assets/data/towers/` 建立 TowerDefinition，並加入 `scenes/cards/card_shop.tscn` 根節點的 Catalog；塔的 Card Price 決定新卡售價；Godot 點開 assets/data/towers/ 對應 .tres 後，在屬性檢視器最前方的「商店 → Card Price」直接輸入金額，儲存並重新執行即可。欄位沿用 card_price 儲存 key、整數且最低0、變更發出 changed；同種塔的不同地塊配置共用此金額，tower_tiles 配方不保存售價。商店與初始手牌先抽塔，再依該塔自己的候選清單及權重抽 preset。沒有可用候選的塔不參與抽牌。CardPlacement 的 Initial Card Count 預設三張；Cards 留空時隨機生成，填入 BuildCard 時保留固定初始手牌。舊的三張 sentry＋地塊組合資源已移除。資料、輸入、UI、預覽及世界提交各自獨立，不需複製管理腳本。`turns` 採 90 度順時針步數，原點為塔 anchor；API 的 `cell` 使用 GridMap 格座標。
 
 命名分成兩個欄位：TowerDefinition 的 Name Key 指向塔名（例如 `tower.sentry.name`），TilePreset 的 Prefix Key 指向地塊前綴（例如 `tile_preset.corner`）；不要再儲存完整卡名。`BuildCard.localized_name()` 組合兩者，沒有前綴時只回傳塔名。商店標題列左側只顯示塔本名，右側靠右放金幣與實際售價；手牌左側顯示快捷數字，右側依語言排版：中文同一行，地塊前綴用 Medium、塔名用 Light，均為 16 px；英文分兩行靠右，上方前綴 12 px Medium，下方塔名 16 px Light。沒有前綴時不保留空白行。
 
@@ -155,6 +171,11 @@ Corner、Bridge、Flank 是人工命名的預設，分別為塔上方＋左側�
 商店直接顯示在遊戲畫面，不使用 Dimmer、全螢幕攔截區或標題面板。鏡頭平移／縮放可繼續操作；只有收回商店的那次地圖點擊會被消耗，避免誤放地塊。展開的手牌與商店共用 `CardFanLayout`：左側手牌從左向右逐漸降低，右側商店從右向左逐漸降低，形成朝螢幕外側抬高的鏡像弧度。卡牌上端的中心位於同一圓弧上，旋轉角度沿圓弧切線計算，讓相鄰上緣平順銜接；高度不再另設獨立落差。最大旋轉 4°、相鄰邊緣僅重疊 8 個原始像素（正常顯示約 7 px），卡片統一縮至原尺寸的 82%。原始卡面場景維持 144×208，方便編輯素材。
 
 Hover 沿卡牌自身上方提起 6 原始 px（正常顯示約 5 px）；手牌選中上提 24 原始 px（約 20 px），選中優先於 hover，不相加。Hand 的 `selected_lift`／`selection_seconds` 控制選中高度與切換時間，預設 24px／0.22 實際秒；hover 使用 CardFanLayout 的 6px／0.14 秒。切換、移開或取消選中都從當前位置接續 Tween，上提與命中區的 `hover_lift` 同步過渡。選中卡面在可編輯的 Visuals 子節點以 ±0.6°、3.6 秒週期輕晃，選取振幅在 0.22 秒內淡入／淡出；CardView 的 Selection Motion 可調整幅度、週期與混合時長。只有正在選中或淡出中的卡面逐幀更新搖動，速度獨立於 1x／2x／4x；暫停依場景樹凍結。外層 Button 不跟著晃動，所以命中與拖曳穩定，且不與扇形布局的旋轉 Tween 競爭。所有卡牌維持原尺寸與順序，不放大或置頂。正面與牌背共用 CardButton，提起時保留原位置下緣的命中範圍；CardFanLayout.pick 也使用當前命中延伸，讓選中牌移開 hover 後仍可從原下緣操作。命中依旋轉／縮放後座標，只在實際滑鼠移動時重新挑選；動畫不會反覆觸發布局，折疊時清除上提與焦點。
+
+卡片 hover 資訊由 CardPlacement 下單一 `CardHoverNote` CanvasLayer（layer 5）讀取手牌／商店已有的穩定 hover index，不建立另一套命中或交易規則。`scenes/cards/components/card_hover_note.tscn` 保存三張橫長便利貼：傷害、攻速各為 152／170px ×至少30px，描述為 260px ×至少60px，內容增加時自動長高；只顯示這三項，不顯示塔名、射程、基礎數值或描述標題。一般三貼左側重疊卡牌右緣5px；商店最右側尚未售出的塔卡則改為三貼右端對齊左緣5px、向左展開（不包含刷新牌），依實際商品位置判定，售出後自然更新最右側商品，取 Visuals 的實際 canvas transform（含扇形、縮放與搖動）跟隨位置與角度，0.18 實際秒依序裁切向外展開，左展開時保持紙張右端固定。靠螢幕右／下緣時整組向內收，仍與卡牌重疊貼合，不另漂浮到上方。所有 Control mouse_filter=IGNORE，不影響購買／選牌／拖牌或鏡頭仲裁。離開 hover 立即收起；切卡重新展開。買不起但尚未售出的商店卡仍能查看；牌背／刷新牌／交通卡不顯示塔攻擊貼片。收牌、開波、戰鬥、入口選擇、拖牌、暫停、離窗、失焦及轉場清除。
+
+紙條只描述基礎塔卡：整數傷害讀取 default_damage×attack.damage_multiplier 後四捨五入；兵營改為每名士兵的 deployment.damage 與近戰 interval，避免將建築本身的 default_damage 當成士兵傷害。攻速按實際秒間隔分為 ≤0.6 快／≤1.2 中速／≤2 慢／其餘極慢；不從動畫推算。說明讀 `assets/translations/card_names.csv` 的 `tower.<id>.description`，攻速／射程短文案為 `card.info.*`；文字只在來源資料／語言變更時更新。六塔描述於翻譯 CSV 以引號多行預先做語意換行；迫擊砲移除不追蹤／可能落空文案、十字火力移除波次旋轉、舷炮描述兩側攻擊。每張貼片排版時先以字型實際字寬檢查各完整行，僅過長行逐級從原14／15px 降至最小12px；容器按文字最小高度成長，描述仍允許自動折行，不截斷文字。便利貼不顯示射程列；地面射程仍依真實形狀、以共用風格呈現。實際已放置塔的遺物／升級／配置加成仍由單位檢視讀實例值。
+
 
 預設初始金幣 0、每波獲得 10、每張卡 3、重刷 1。`ShopConstants` 管理共用預設；card_shop.tscn 可在 Inspector 覆寫金幣、波次獎勵、重刷價格與 seed，塔資源的 Card Price 決定每次抽出卡片的價格；已抽出的 BuildCard 保存當時價格。購買扣款並加入手牌，同一商品不能重複購買；重刷只重新產生四張塔牌；輔助資源與 roll_traffic_cards API 保留，一般商店不使用。塔種使用洗牌袋補足四個位置，地塊預設則為每張卡依所屬塔的候選權重獨立抽取，因此可能重複同種組合。商店有自己的 RNG，不影響敵人選路。
 
@@ -277,7 +298,7 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 - `tile.num_towers_around`：周圍上下左右與對角共八格的塔數，不含本格的塔。
 - `tile.threat`：所有攻擊區域包含本格的塔之 threat 加總（不額外擴張投射物的範圍傷害外溢）。自訂 TowerAttackArea 對 offsets 去重後依 rotation_steps 轉向；attack_area 空引用則使用圓形距離 `dx²+dy² <= radius²`，含本格與半徑邊界，半徑 3 仍覆蓋 29 格。
 
-TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以淡金色連續色面與聯集外輪廓顯示完整攻擊範圍（包含空地），圓形為圓盤，內部不畫格線；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都經 TowerDefinition.effective_attack_cells 並傳入 TowerBodyGeometry 的局部塔體快照，不在每幀重建 mesh。二十份基礎版與兵營的來源、外觀、砲口及三層預覽見 [塔體與預覽](tower_visuals_and_preview.md)。
+TowerAttackArea 資源可在 Godot Inspector 編輯 offsets，Sentry 預設資源與例圖見 [ranges/README.md](../assets/data/towers/ranges/README.md)。放置時 `scenes/cards/components/card_preview.tscn` 的 Ground 顯示卡片地塊，AttackArea 以與單位檢視共用的綠色半透明連續色面與聯集外輪廓顯示完整攻擊範圍（包含空地），圓形為圓盤，內部不畫格線；使用 `scripts/towers/range_appearance.gd` 共用 FILL／EDGE／BORDER_WIDTH（0.025 格），只統一風格，不更改各塔的格域／圓形或選敵規則；Preview 的 valid_color／invalid_color／range_fill_color／range_border_color 可調整外觀。預覽與實際塔都經 TowerDefinition.effective_attack_cells 並傳入 TowerBodyGeometry 的局部塔體快照，不在每幀重建 mesh。二十份基礎版與兵營的來源、外觀、砲口及三層預覽見 [塔體與預覽](tower_visuals_and_preview.md)。
 
 重疊塔會相加；移除、修改範圍／威脅值會更新影響。僅修改暫緩地塊時發出參數顯示通知，不使現有路線成本快取失效。每次只處理前後範圍格子聯集與八鄰格，整批更新僅發出一次成本失效通知，不重建道路幾何。空格也保留稀疏覆蓋資料，因此之後新增道路時立即繼承數值。已經為本波固定的敵人行程保持不變。
 
@@ -409,11 +430,11 @@ F1 的路徑來自本波每隻敵人的完整行程，不受評分正負值影�
 
 ## 關卡、ACT 與波次
 
-F5 先完成啟動顯示預熱並進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。Frontier 包含五個 ACT、每個三波，各 ACT 關閉入口擴張。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的「開始下一波」文字確認；下方橫排圖示表示該入口出發兵種，hover 才展開數量。沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
+F5 先完成啟動顯示預熱並進入開始選單，經選圖與本局設定後載入 `scenes/level.tscn`；關卡設定在 `assets/data/levels/frontier.tres`。Frontier 包含五個 ACT、每個三波，入口擴張改依全局波次，在第 5、10 波完成後觸發；第 15 波直接勝利。準備階段無時間限制，第一波及後續波次都由玩家點任一起點上方的「開始下一波」文字確認；下方橫排圖示表示該入口出發兵種，hover 才展開數量。沒有 60 秒倒數、自動開波或提早開始獎勵。每次確認後等待 1.5 秒才進攻。
 
 介面場景是 `scenes/levels/level_hud.tscn`，包含頂部金幣、時間線、倍速與暫停，以及 `WorldActions/EarlyStart` 起點對話框；已實例化於 `level.tscn` 的 `LevelHUD`。時間線本身是 `scenes/levels/wave_timeline.tscn`，可直接在 2D 編輯器預覽。選取 WaveTimeline 後，可在 Inspector 的 Preview 調整波次索引、準備進度與戰鬥狀態，Appearance 可調字型、字級與顏色；執行時由關卡進度接管。時間線的節點數與 ACT 名稱來自 Level 資源。
 
-- `LevelDefinition`：穩定 ID、前置關卡 ID、必含端點的地形 GridMap 場景、ACT 列表與 Phase 5 的 base_health／starting_gold／opening_shop／reward_final_act。標題／描述 key 由 ID 推導為 `ui.maps.title.<id>`／`ui.maps.description.<id>`，不保存額外名稱、翻譯 key、起終點座標、來源開關或 Marker Height。高度由 TerrainEndpoint.height_offset 控制，ACT 新入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。準備時間、自動開始、開波額外獎勵與全局 ACT 擴張欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。
+- `LevelDefinition`：穩定 ID、前置關卡 ID、必含端點的地形 GridMap 場景、ACT 列表與 Phase 5 的 base_health／starting_gold／opening_shop／reward_final_act。標題／描述 key 由 ID 推導為 `ui.maps.title.<id>`／`ui.maps.description.<id>`，不保存額外名稱、翻譯 key、起終點座標、來源開關或 Marker Height。高度由 TerrainEndpoint.height_offset 控制，ACT 新入口及其預覽沿用第一個地形入口在 GridMap 局部座標中的高度偏移。準備時間、自動開始、開波額外獎勵與全局 ACT 擴張欄位已移除；各波完成獎勵仍由 WaveDefinition.reward 設定。新增 expansion_wave_interval：正整數覆蓋 ACT 旗標，按全局已完成波數觸發入口擴張，0 沿用各 ACT 的規則；最後一波一律不擴張。正式流程與時間軸共用 LevelDefinition.expands_after。
 - `ActDefinition`：ACT 名稱、有順序的波次列表與 `add_start_after_completion`（預設 true）。完成這個 ACT 後若還有下一個 ACT，勾選才進入新增出生點流程；取消則直接進入不限時、手動開始的下一波準備。最後 ACT 直接完成關卡，即使選項勾選也不額外擴張。不同 ACT 各自保存設定。
 - `WaveDefinition`：出生群組列表、共用移動速度與完成獎勵。
 - `WaveSpawnGroup`：兵種、開始刻度、總數、每批隻數、批次間隔刻度與入口索引。
@@ -433,7 +454,7 @@ Godot 底部的「波次編輯器」可直接開啟關卡 `.tres`，分開選擇
 
 `tests/levels/wave_spawn_groups.tscn` 驗證整數邊界、混合與重疊群組、空檔不提早結束、慢幀、快照、多入口及跨組配額。`Godot --editor -- --test-wave-editor` 在實際編輯器內驗證群組編輯、拖曳吸附、原生復原／重做，以及儲存後重載整數資料。
 
-頂部時間線寬度為畫面的 50%，水平置中；每波佔一個等長區間，圓點代表一般波次，ACT 的最後一波由分隔直線表示，起點另有直線；目前 ACT 使用 Noto Sans TC Medium。金幣在時間線左側，右側只有倍速與暫停，商店不另外顯示重複餘額。沒有獨立位置游標。準備期時間線停在已完成節點，不隨等待時間前進。按「開始下一波」後，時間線以二次 ease-in-out 於前 1 秒走完下一段，到達下一節點後停留 0.5 秒才進攻。等待期間停用開波按鈕並鎖住建造與商店。戰鬥期間固定在該波節點；本波完成後進入不限時的下一波準備。
+頂部時間軸固定 360px，在畫面中央顯示五個事件位置，配置為左一個過去事件、第二格為目前事件、右三個後續事件；開場左格留空；事件可為波次、遺物或新增入口，近結尾只顯示實際剩餘事件。波次全數保留為圓點，遺物雙菱形與入口門形加號是各自的事件（圖示本身就是獨立節點，不再附加波次圓點，下方顯示波次／遺物／新入口簡稱）；同波先遺物後入口。黑色實心點固定於第二格，事件整列向左滑，不再由左至右累積填色。波次的左滑使用既有開波前 1 秒二次 ease-in-out 進度，仍停留 0.5 秒才進攻；黑點同步以 sin 包絡最多放大 16% 再回復。第一波已位於目前格，只縮放而不滑移。遺物／入口事件使用 0.35 實際秒二次 ease-in-out 左滑及微縮放，不鎖事件操作，暫停凍結。準備期保留已完成事件位置，等待不滑動。ACT 名稱使用目前事件所屬 ACT，以 Medium 顯示於時間軸上方，跨 ACT 更新；垂直分隔線恢復於相鄰 ACT 之間，位於上一 ACT 的波次及其遺物／入口事件之後、下一 ACT 第一波之前，隨時間軸滑動且不佔事件格；保留五 ACT／十五波及原遺物節奏。兩側 HUD 向外布局，遺物數量變動不改變時間軸或黑點的螢幕位置。事件 tooltip 依滑動後實際座標命中。六個重用 marker（五格及裁切中的入場節點）和固定黑點避免逐幀重建節點。
 
 頂部保持透明，倍速與暫停只顯示低彩度青灰色圖示；正常、懸停、按下與停用狀態都沒有按鈕背景，透過圖示顏色與透明度區分。樣式位於 `assets/themes/level_controls.tres`。點擊倍速圖示或按 Tab 依序切換 1x → 2x → 4x → 1x，以一、二、三個箭頭區分，影響遊戲時間、開場等待、出生、移動與動畫。Esc 或頂部暫停按鈕立即暫停 SceneTree 並將 Engine.time_scale 設為 0，同時鎖住選牌、旋轉、放置、商店與手動開波；遊戲中 Esc 優先於取消選牌／關閉商店，暫停保留原選取與商店狀態。快捷鍵按住不重複觸發，暫停時 Tab 只保留選單導覽，設定頁仍使用 Tab 移動焦點、Esc 返回暫停選單；1x／2x／4x 都不經過減速過渡。暫停時仍可滾輪縮放、左鍵平移與右鍵拖曳旋轉鏡頭，其他遊戲輸入由 HUD 攔截。暫停請求接受後立即停用頂部倍速與暫停按鈕，同時忽略其 hover／點擊；暫停期間也不接受程式發起的倍速切換。恢復後才重新啟用。右下選單使用右對齊的細字與透明底，不使用 hover／focus 底線，暫停／繼續時皆以實際 0.35 秒淡入／淡出，不受倍速或零 delta 影響；時長可在 `pause_menu_fade_seconds` 調整，淡出途中不攔截地圖點擊，連續切換會從當前透明度接續。樣式位於 `assets/themes/pause_controls.tres`；手牌與商店的呈現根節點在實際 0.35 秒內一起滑至畫面下方，時長由 LevelHUD 的 `pause_seconds` 調整，僅控制介面收合，保留選牌、商品及展開狀態；恢復時反向滑回。背景使用 `PauseBlocker/WhiteVeil` 的白色 ColorRect（透明度以場景中的 color.a 為準），隨右下選單一起淡入／淡出，圖示與選單保留原色。繼續遊戲或 Esc 會還原卡牌位置／選取及選定速度，未完成的開波過渡也會接續；介面收合途中恢復會立即繼續模擬，並從當前位置與透明度反向還原。「回到主畫面」會結束目前關卡，白色過渡遮住畫面前保持暫停，返回後可重新開始全新進度。選單節點位於 `scenes/levels/level_hud.tscn`，互動由 `scripts/levels/presentation/level_hud.gd` 管理；`tests/levels/level_hud.tscn` 與 `tests/levels/pause_navigation.tscn` 驗證 1x／2x／4x 下的立即暫停、暫停鏡頭、血條投影像素、選單淡入淡出、遊戲與交易鎖定、快速切換與繼續；返回主畫面的完整往返由 menus/main_menu 回歸驗證。
 
@@ -497,6 +518,12 @@ godot --headless --path . --script tools/assets/build_tile_library.gd
 
 ## Web 匯出
 
+Web 音訊沿用預設 Sample。Godot 4.7.2 的 add_bus(-1) 會讓 JS Sample bus 順序與 AudioServer 不一致，可能把 Master→BGM→Combat 接成閉環而全部無聲（[上游問題 #119026](https://github.com/godotengine/godot/issues/119026)）。GameAudio 新增匯流排改用 bus_count = index+1，使 Master 直接連 destination，BGM／Combat 都送 Master；不以切換 Stream 或提高音量繞過。Chrome 首次有效點擊前 AudioContext 可能 suspended，點擊後自然 resume，無需修改瀏覽器設定。正式成品可使用 tools/web/verify_release_audio.cjs 量測瀏覽器 destination 的真實波形，驗證BGM、UI音效及靜音／恢復，不能只用 AudioStreamPlayer.playing 當作有聲證據。
+
+正式 Web preset 排除 tests、addons、tools、native、reports、docs、build、製作來源與 Windows 二進位，以及舊獨立試驗場景／卡牌編輯 UI。仍採 all_resources，以保留 LevelCatalog 掃描、兵種路徑字串及卡牌 catalog 等動態載入；不可整個排除 scripts/tower_tile_editor，正式抽牌仍依賴 catalog／catalog_data。scenes/main.tscn 是正式 level.tscn 的共用基底，必須保留。
+
+Windows 本機交付可將 tools/web/start_game.ps1 複製為輸出目錄的 StartGame.ps1，附 StartGame.cmd 呼叫它。啟動器使用系統 PowerShell 與 loopback TCP HTTP，不需 Python／Node；自動尋找 Chrome，提供 wasm MIME 與 COOP／COEP／CORP。必須完整解壓所有檔案後啟動，保持伺服器視窗開啟；不可直接雙擊 index.html 用 file:// 執行。上傳網站時只需輸出網頁及 wasm／pck 等遊戲檔，不需這兩個本機啟動檔。
+
 維持 Compatibility／WebGL 2.0、單執行緒與 Extensions Support。需要對應 Godot 版本的 Web GDExtension export templates，以及 `bin/road_graph.*.wasm`：
 
 ```powershell
@@ -541,6 +568,8 @@ Web 匯出引用 `assets/web/shell.html`，白底只顯示內嵌 Godot／團隊 
 轉換工具直接處理目前保存的場景與 MeshLibrary，不重生原型或改路網；保留變換、動畫、項目編號及特殊材質。每格純色面合為一個 surface，柱底另列。雲、柱底漸變／生長、端點發光、透明戰鬥特效與 2D UI 不套用共用不透明材質。啟動仍明確繪製普通 MeshInstance 與敵人 MultiMesh，因為同一材質的不同繪製路徑可能有不同引擎 program。
 
 ## 開始選單
+
+施工狀態提示放在本局設定左側「額外事件／啟用」右側同一行，使用不參與容器排版的 Label；右側起始手牌保留原 ui.run.prototype_hint 提示，輕鬆／標準／挑戰僅切換單句 ui.run.construction.* 文案，不改實際戰局。橋梁（bridge）在地圖說明下方、操作列上方的既有留白顯示未完成訊息，額外節點不參與原 VBox 排版。橋梁仍遵守原解鎖條件；解鎖後點「下一步」不進設定頁，只讓「未完成」三字以 0.665 實際秒變紅、左右搖晃及復原，連點重播，切圖／語言還原。中英文 prefix／word／suffix 分開保存於共同翻譯表，以便只動畫三字。
 
 F5 先載入 `scenes/menus/boot.tscn`，完成共用顯示準備後以白色轉場進入 `scenes/menus/main_menu.tscn`。啟動場景明確保存相機、方向光、原敵人 renderer 與載入介面，與關卡引用同一份 `assets/data/rendering/level_environment.tres`；沒有關卡、敵群、導航或商店。主選單參考原型的左側徽記／標題／操作與右側折線雲橋構圖，使用目前專案內素材與 Compatibility 渲染。Home 的 VBox、Label、開始／設定／離開按鈕、SettingsVeil 與共用 SettingsPage 均明確保存於場景，文字仍使用翻譯 key，透過主 CanvasLayer 繪製；按鈕沿用設定頁的 Light 字重、僅變黑、不縮放的 hover 與底線互動，開始／設定／離開使用相同的青灰色一般狀態、黑色 hover 與深青色焦點，不為開始按鈕單獨覆寫金色。
 
@@ -661,6 +690,8 @@ TutorialDirector 保存本局五步進度。鏡頭步驟觀察實際 focus、siz
 
 ## 塔牌疊加與遺物（Phase 3）
 
+遺物三槽依序為通用、場上塔種弱關聯專屬、任意專屬；後兩槽不以通用補位，專屬不足就減少選項。熟客優惠每局只能取得一次，取得後成功付費刷新 3 次，下一次免費，免費使用後重新累積；計次跨波次保留，由 CardShop 保存。重算塔效果不清除計次，移除遺物或建立新局才重置；失敗、暫停、規則拒絕、候選池空白及一般開店發牌不計次。reroll_price 保留基礎費用，current_reroll_price() 提供本次實付價格給扣款與介面，免費時零金幣仍可刷新；交易與動畫守衛防止連點或 signal 重入重複消耗。
+
 完整資料、每級倍率、21 件遺物參數、三槽抽取、協同、巡航射程聯集與迫擊砲新時序見 [Phase 3 系統](phase3.md)，驗證入口見 [tests/relics](../tests/relics/README.md)。ACT 完成先等待既有投射物；第 3／6／9／12 波後選遺物，最後 ACT 直接結算；準備與交易鎖定覆蓋整個過渡。舊的迫擊砲開火即傷害規則已被取代。
 
 ## 敵軍協同與專用路線（Phase 4）
@@ -677,9 +708,9 @@ EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結�
 
 ## UI Slice A
 
-常駐展開時間線、遺物圖示列、實際出生通知、三欄進度頁及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
+固定五事件時間線、遺物圖示列、實際出生通知、三欄進度頁及 v1 保存相容性已取代舊常駐情報與雙排商店規格；現行責任與驗證見 [UI Slice A](ui_slice_a.md)。
 
-頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。時間線常駐展開，含ACT遺物雙菱形；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。
+頂列追修：防線盾牌與數值、金幣、遺物、時間線、未讀通知與操作按鈕同高。時間線固定五事件，保留 ACT 名稱與遺物雙菱形；各指定項目支援hover資訊，詳見 [UI Slice A](ui_slice_a.md)。
 
 ### 調整個別音檔的基礎音量
 

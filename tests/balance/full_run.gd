@@ -201,7 +201,7 @@ func prepare(scene: Node, agent: RefCounted) -> void:
 	var shop: Node = cards.get_node("Shop")
 	await place_inventory(scene,agent)
 	var rerolls := 0
-	if reroll_first and shop.available and shop.coins >= maxi(0,shop.reroll_price):
+	if reroll_first and shop.available and shop.coins >= shop.current_reroll_price():
 		shop.open_shop()
 		if shop.reroll(): rerolls += 1
 		shop.close_shop()

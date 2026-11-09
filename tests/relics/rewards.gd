@@ -19,7 +19,7 @@ func run() -> void:
 		unique[relic.id] = true
 	for i in 200:
 		var options := manager.options()
-		check(options.size() == 3 and options[0].tower == null and options[0] != options[1] and options[1] != options[2] and options[0] != options[2], "Generic guarantee and no duplicate options")
+		check(options.size() == 3 and options[0].tower == null and options[1].tower != null and options[2].tower != null and options[0] != options[1] and options[1] != options[2] and options[0] != options[2], "Generic guarantee and no duplicate options")
 	for relic in manager.catalog.entries:
 		if relic.tower != null:
 			check(manager.acquire(relic) and not manager.acquire(relic), "Exclusive acquisition once: "+str(relic.id))
@@ -77,8 +77,8 @@ func run() -> void:
 	check(shop.coins == coins+20, "Immediate gold")
 	var price: int = shop.reroll_price
 	relics.acquire(relics.catalog.find(&"reroll_discount"))
-	check(shop.reroll_price == maxi(0,price-1), "Actual reroll cost discounted")
-	check(relics.remove(relics.catalog.find(&"reroll_discount")) and shop.reroll_price == price, "Removing discount restores reroll price")
+	check(shop.reroll_price == price and shop.loyalty_period == 3 and shop.current_reroll_price() == price, "Loyalty starts a three-paid-reroll cycle without reducing the base price")
+	check(relics.remove(relics.catalog.find(&"reroll_discount")) and shop.reroll_price == price and shop.loyalty_period == 0, "Removing loyalty disables the cycle without changing the base price")
 	check(relics.remove(relics.catalog.find(&"global_damage")) and is_equal_approx(b.damage,definition.default_damage), "Removing global damage refreshes existing towers")
 	check(relics.remove(relics.catalog.find(&"protagonist")) and a.level == 5 and not a.unlimited_levels and not a.upgrade(), "Removing protagonist preserves level but restores upgrade cap")
 	check(not relics.remove(relics.catalog.find(&"protagonist")), "Removing unowned relic is a no-op")

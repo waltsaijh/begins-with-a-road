@@ -235,28 +235,43 @@ func prefers_new_roads() -> bool:
 	return tile_cost_reduce == TileCostReduce.MIN and road_age_weight > 0
 
 func route_description() -> String:
-	var english := TranslationServer.get_locale().begins_with("en")
-	if only_shortest(): return "Only takes the shortest passable roads." if english else "只走可以通行的最短道路。"
-	if prefers_new_roads(): return "Only takes the most recently connected roads that remain passable." if english else "只走最近接通、且仍可通行的道路。"
-	if road_traffic_weight < 0: return "Follows the roads most of its allies take." if english else "跟著多數友軍走的道路。"
-	if road_traffic_weight > 0: return "Avoids the roads most of its allies take." if english else "避開多數友軍走的道路。"
-	var text := "Spreads across its available roads." if english else "分散走上可選的道路。"
-	if route_selection == RouteSelection.SOFTMAX and not is_inf(route_temperature):
-		if threat_weight > 0: text = "Usually avoids roads covered by heavy fire." if english else "偏好避開火力密集的道路。"
-		elif threat_weight < 0: text = "Usually heads toward roads covered by heavy fire." if english else "偏好迎向火力密集的道路。"
-		elif path_base_cost > 0: text = "Usually favors shorter available roads." if english else "偏好較短的可選道路。"
-		else: text = "Favors roads that suit its movement and the terrain." if english else "偏好適合自身行進與地形條件的道路。"
-	if cohort_size > 1: text += (" · %d per cohort" if english else " · 每群 %d 隻同路") % cohort_size
+	var en := TranslationServer.get_locale().begins_with("en")
+	var text: String
+	if only_shortest():
+		text = GameText.text("text.troop.1",{},en)
+		if has_tag(&"flying"): text += GameText.text("text.troop.2",{},en)
+	elif prefers_new_roads():
+		text = GameText.text("text.troop.3",{},en)
+	elif road_traffic_weight < 0:
+		text = GameText.text("text.troop.4",{},en)
+	elif road_traffic_weight > 0:
+		text = GameText.text("text.troop.5",{},en)
+	elif tower_count_weight < 0:
+		text = GameText.text("text.troop.6",{},en)
+	elif threat_weight > 0:
+		text = GameText.text("text.troop.7",{},en)
+	elif threat_weight < 0:
+		text = GameText.text("text.troop.8",{},en)
+	else:
+		text = GameText.text("text.troop.9",{},en)
+	if cohort_size > 1:
+		text += (GameText.text("text.troop.10",{},en)) % cohort_size
 	return text
+
+func localized_ability_text() -> String:
+	var key := "enemy.intelligence."+troop_name
+	var text := GameText.text(key)
+	if text != key: return text
+	return ability_text_en if TranslationServer.get_locale().begins_with("en") else ability_text
 
 func intelligence_text() -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
-	return "%s\n\n%s\n\n%s" % [type_description(), ability_text_en if english else ability_text, route_description()]
+	return "%s\n\n%s\n\n%s" % [type_description(), localized_ability_text(), route_description()]
 
 func type_description() -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
-	var sizes := {"small":"Light" if english else "輕型","standard":"Standard" if english else "中型","large":"Heavy" if english else "重型"}
-	var parts: Array[String] = [sizes.get(body_size,body_size),"Flying" if has_tag(&"flying") and english else ("飛行" if has_tag(&"flying") else ("Ground" if english else "地面"))]
-	if has_tag(&"armored"): parts.append("Armored" if english else "裝甲")
-	if has_tag(&"boss"): parts.append("Boss" if english else "首領")
+	var sizes := {"small":GameText.text("text.troop.11",{},english),"standard":GameText.text("text.troop.12",{},english),"large":GameText.text("text.troop.13",{},english)}
+	var parts: Array[String] = [sizes.get(body_size,body_size),GameText.text("ui.progress.tag.flying" if has_tag(&"flying") else "text.troop.14",{},english)]
+	if has_tag(&"armored"): parts.append(GameText.text("text.troop.15",{},english))
+	if has_tag(&"boss"): parts.append(GameText.text("text.troop.16",{},english))
 	return " · ".join(parts)

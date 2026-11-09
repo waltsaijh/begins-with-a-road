@@ -7,7 +7,6 @@ signal acquired(relic: RelicDefinition)
 var tower_map: Node3D
 var held: Dictionary = {}
 var _rng := RandomNumberGenerator.new()
-var _base_reroll_price := -1
 
 func _ready() -> void:
 	_rng.seed = catalog.random_seed
@@ -53,10 +52,9 @@ func refresh_towers() -> void:
 	if not is_instance_valid(tower_map) or not tower_map.is_inside_tree(): return
 	var shop := tower_map.get_node_or_null("../CardPlacement/Shop")
 	if shop != null:
-		if _base_reroll_price < 0: _base_reroll_price = shop.reroll_price
-		var discount := catalog.find(&"reroll_discount")
-		var amount := int(discount.parameters.get("amount",0)) if discount != null else 0
-		shop.reroll_price = maxi(0, _base_reroll_price-int(held.get(&"reroll_discount",0))*amount)
+		var loyalty := catalog.find(&"reroll_discount")
+		var period := int(loyalty.parameters.get("paid_rerolls",0)) if loyalty != null and held.has(&"reroll_discount") else 0
+		shop.configure_loyalty(period)
 		shop._refresh()
 	for tower: DefenseTower in tower_map.towers.values():
 		var previous_effects: Dictionary = tower.relic_effects
@@ -91,6 +89,7 @@ func options() -> Array[RelicDefinition]:
 	var generic: Array[RelicDefinition] = []
 	var related: Array[RelicDefinition] = []
 	var all: Array[RelicDefinition] = []
+	var exclusive: Array[RelicDefinition] = []
 	var counts := {}
 	if tower_map != null:
 		for tower: DefenseTower in tower_map.towers.values(): counts[tower.definition] = int(counts.get(tower.definition,0))+1
@@ -98,20 +97,28 @@ func options() -> Array[RelicDefinition]:
 		if not can_acquire(relic): continue
 		all.append(relic)
 		if relic.tower == null: generic.append(relic)
-		elif counts.has(relic.tower): related.append(relic)
-	for pool: Array[RelicDefinition] in [generic,related,all]:
+		else:
+			exclusive.append(relic)
+			if counts.has(relic.tower): related.append(relic)
+	for slot in 3:
+		var pool: Array[RelicDefinition] = [generic,related,exclusive][slot]
+		var weighted := slot == 1
 		var available: Array[RelicDefinition] = []
 		for relic in pool:
 			if not result.has(relic): available.append(relic)
 		if available.is_empty():
-			for relic in all:
+			weighted = false
+			# Only the first slot may fall back to the complete catalog.
+			# Both tower slots stay exclusive even when their normal pool is empty.
+			var fallback: Array[RelicDefinition] = all if slot == 0 else exclusive
+			for relic in fallback:
 				if not result.has(relic): available.append(relic)
-		if available.is_empty(): break
+		if available.is_empty(): continue
 		var weights: Array[float] = []
 		var total := 0.0
 		for relic in available:
 			var weight := 1.0
-			if pool == related: weight = maxf(0.001, catalog.weak_base_weight+catalog.weak_count_weight*sqrt(float(counts.get(relic.tower,0))))
+			if weighted: weight = maxf(0.001, catalog.weak_base_weight+catalog.weak_count_weight*sqrt(float(counts.get(relic.tower,0))))
 			weights.append(weight)
 			total += weight
 		var roll := _rng.randf()*total

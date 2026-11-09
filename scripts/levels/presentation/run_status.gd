@@ -30,7 +30,7 @@ func setup(value: Node3D) -> void:
 func refresh() -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
 	$Integrity.text = str(session.base_health)
-	$Integrity.tooltip_text = ("Defense integrity: %d / %d\nEnemies reaching the goal damage the defense. A siege behemoth reaching it ends the run." if english else "防線生命：%d / %d\n敵人抵達終點會損傷防線；攻城巨獸抵達即失敗。") % [session.base_health,session.level.base_health]
+	$Integrity.tooltip_text = (GameText.text("text.run_status.1",{},english)) % [session.base_health,session.level.base_health]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and session != null:
@@ -70,7 +70,7 @@ func _present_result() -> void:
 func _update_result() -> void:
 	var english := TranslationServer.get_locale().begins_with("en")
 	var tutorial_complete: bool = _won and session.level.tutorial != null
-	$ResultLayer/Result/Center/Panel/Margin/Column/Title.text = ("Road defended" if _won else "Defense broken") if english else ("守住了這條路" if _won else "防線失守")
+	$ResultLayer/Result/Center/Panel/Margin/Column/Title.text = GameText.text("result.victory_title" if _won else "result.defeat_title",{},english)
 	$ResultLayer/Result/Center/Panel/Margin/Column/Eyebrow.text = tr("tutorial.complete_title") if tutorial_complete else tr("result.complete" if _won else "result.failed")
 	var accent := Color(0.7,0.61,0.38,1) if _won else Color(0.58,0.37,0.33,1)
 	$ResultLayer/Result/Center/Panel/Margin/Column/Crest/Diamond.default_color = accent
@@ -79,7 +79,7 @@ func _update_result() -> void:
 	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Waves/Value.text = "%02d / %02d" % [session.current_wave,session.level.wave_count()]
 	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Leaks/Value.text = str(session.total_leaks)
 	$ResultLayer/Result/Center/Panel/Margin/Column/Details/Gold/Value.text = str(session.get_node("CardPlacement/Shop").coins)
-	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.text = "Play again" if english else "重新開始"
+	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.text = GameText.text("text.run_status.2",{},english)
 	$ResultLayer/Result/Center/Panel/Margin/Column/Completion.visible = tutorial_complete
 	$ResultLayer/Result/Center/Panel/Margin/Column/Completion.text = tr("tutorial.done")
 	$ResultLayer/Result/Center/Panel/Margin/Column/Restart.visible = not tutorial_complete

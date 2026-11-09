@@ -89,7 +89,7 @@ func _trace(data: Dictionary) -> void:
 		BalanceTrace.event("boss_phase", str(enemy.enemy_id), data)
 
 func describe(english: bool) -> String:
-	return "Charges, then briefly disables nearby towers." if english else "蓄力後短暫癱瘓附近防禦塔。"
+	return (GameText.text("text.sabotage_ability.1",{},english)) % ([str(snappedf(windup,0.01)),targets,str(snappedf(radius,0.01)),str(snappedf(duration,0.01)),str(snappedf(interval,0.01))] if english else [str(snappedf(windup,0.01)),str(snappedf(radius,0.01)),targets,str(snappedf(duration,0.01)),str(snappedf(interval,0.01))])
 
 func configuration_error() -> String:
 	if targets < 1 or targets > 4: return "癱瘓目標數必須在 1–4"

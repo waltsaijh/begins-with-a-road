@@ -26,10 +26,10 @@ preset_path = "res://assets/data/tile_presets/crossfire_04.tres"
 
 [resource]
 script = ExtResource("4_fbig6")
+card_price = 50
 name_key = "tower.crossfire.name"
 model = ExtResource("3_st668")
 visual_model = ExtResource("art_slice_e")
-card_price = 10
 icon = ExtResource("2_dc2h6")
 accent_color = Color(0.9490196, 0.5529412, 0.59607846, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])

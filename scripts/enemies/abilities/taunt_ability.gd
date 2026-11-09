@@ -11,7 +11,7 @@ func taunt_rank(distance: float) -> int:
 	return priority if radius > 0 and distance <= radius else -1
 
 func describe(english: bool) -> String:
-	return "Draws nearby single-target attacks." if english else "吸引附近可命中的單體攻擊。"
+	return (GameText.text("text.taunt_ability.1",{},english)) % str(snappedf(radius,0.01))
 
 func configuration_error() -> String:
 	if not is_finite(radius) or radius < 0: return "嘲諷半徑必須非負且有限"

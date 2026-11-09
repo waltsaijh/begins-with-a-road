@@ -29,7 +29,7 @@ func _refresh_notice() -> void:
 	var en := TranslationServer.get_locale().begins_with("en")
 	toggle.text = "!  %d" % pending.size()
 	toggle.icon = pending[0].icon if not pending.is_empty() else null
-	toggle.tooltip_text = ("New enemy discovered · %d unread" if en else "新敵軍發現 · %d 則未讀") % pending.size()
+	toggle.tooltip_text = (GameText.text("text.enemy_intelligence.1",{},en)) % pending.size()
 	# _process stops while paused, so an emptied queue hides the notice here.
 	if pending.is_empty(): toggle.hide()
 

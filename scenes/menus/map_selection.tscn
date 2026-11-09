@@ -244,6 +244,18 @@ underline_inset = 1.0
 toggle_mode = true
 text = "ui.settings.enabled"
 
+[node name="ConstructionHint" type="Label" parent="Footer/Column/Details/RunOptions/LeftColumn/Group/ExtraEvents/Enabled"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = 260.0
+theme_override_font_sizes/font_size = 12
+text = "ui.run.construction.standard"
+vertical_alignment = 1
+mouse_filter = 2
+
 [node name="Hint" type="Label" parent="Footer/Column/Details/RunOptions/RightColumn/Group"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
@@ -266,6 +278,39 @@ mouse_filter = 2
 [node name="Spacer" type="Control" parent="Footer/Column"]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Construction" type="CenterContainer" parent="Footer/Column/Details"]
+visible = false
+anchor_right = 1.0
+offset_top = 108.0
+offset_bottom = 134.0
+mouse_filter = 2
+
+[node name="Row" type="HBoxContainer" parent="Footer/Column/Details/Construction"]
+layout_mode = 2
+theme_override_constants/separation = 0
+mouse_filter = 2
+
+[node name="Prefix" type="Label" parent="Footer/Column/Details/Construction/Row"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "ui.maps.construction.prefix"
+mouse_filter = 2
+
+[node name="Word" type="Control" parent="Footer/Column/Details/Construction/Row"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Footer/Column/Details/Construction/Row/Word"]
+theme_override_font_sizes/font_size = 15
+text = "ui.maps.construction.word"
+mouse_filter = 2
+
+[node name="Suffix" type="Label" parent="Footer/Column/Details/Construction/Row"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "ui.maps.construction.suffix"
 mouse_filter = 2
 
 [node name="Actions" type="Control" parent="Footer/Column"]

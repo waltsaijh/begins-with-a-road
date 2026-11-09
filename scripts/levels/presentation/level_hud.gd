@@ -130,6 +130,7 @@ func _fade_settings_veil(reveal: bool) -> void:
 func _process(_delta: float) -> void:
 	_position_callout()
 	$Header/WaveTimeline.set_reward_active(get_parent().get("choosing_relic") == true)
+	$Header/WaveTimeline.set_expansion_active(get_parent().get("choosing_start") == true)
 	_layout_status_row()
 
 ## Center the visible information as one row, keeping the gaps constant.
@@ -174,8 +175,12 @@ func _layout_status_row() -> void:
 	var signature := [viewport_width,items,widths]
 	if signature != _header_signature:
 		_header_signature = signature
-		var cursor := (viewport_width-total)*0.5
-		status_row_rect = Rect2(cursor,34,total,38)
+		var left_width := 0.0
+		for i in timeline_index: left_width += widths[i]+gap
+		var right_width := total-left_width-timeline.size.x
+		var side_width := maxf(left_width,right_width)
+		var cursor := (viewport_width-timeline.size.x)*0.5-left_width
+		status_row_rect = Rect2((viewport_width-timeline.size.x)*0.5-side_width,34,timeline.size.x+side_width*2,38)
 		for i in items.size():
 			items[i].anchor_left = 0.0
 			items[i].anchor_right = 0.0
@@ -269,8 +274,8 @@ func _update_labels() -> void:
 	speed_button.text = ""
 	speed_button.icon = SPEED_ICONS[speed_index]
 	pause_button.icon = PauseIcon
-	speed_button.tooltip_text = ("Game speed: %d×\nClick / Tab to cycle 1× / 2× / 4×." if english else "遊戲速度：%d 倍\n點擊／Tab 切換 1／2／4 倍速。") % SPEEDS[speed_index]
-	pause_button.tooltip_text = "Pause game · open menu · Esc" if english else "暫停遊戲並開啟選單 · Esc"
+	speed_button.tooltip_text = (GameText.text("text.level_hud.1",{},english)) % SPEEDS[speed_index]
+	pause_button.tooltip_text = GameText.text("text.level_hud.2",{},english)
 	if _cards != null: _update_wallet_tooltip(_cards.get_node("Shop").coins)
 	resume_button.text = tr("ui.pause.resume")
 	restart_button.text = tr("ui.pause.restart")
@@ -279,7 +284,7 @@ func _update_labels() -> void:
 	home_button.text = tr("ui.pause.home")
 
 func _update_wallet_tooltip(amount: int) -> void:
-	$Header/Balance.tooltip_text = ("Gold: %d\nBuy tower cards or refresh the shop." if TranslationServer.get_locale().begins_with("en") else "金幣：%d\n用於購買塔牌與重刷商店。") % amount
+	$Header/Balance.tooltip_text = (GameText.text("text.level_hud.global_1")) % amount
 
 func cycle_speed() -> void:
 	if pause_requested or ScreenTransition.active: return

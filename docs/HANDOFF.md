@@ -1,5 +1,101 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-09 Git 提交與推送授權
+
+使用者要求提交並推送本聊天累積成果。開始HEAD=d0704ad，branch=experiment/routing-sandbox；fetch後追蹤分支與本地0 ahead／0 behind。origin/main更新到591c7ae，本次不合併。提交包括時間軸／入口、卡牌資訊與射程、文案／文本編輯器、Inspector塔價、遺物池與熟客優惠、選圖施工提示、Web匯出與無聲修正，以及使用者工作目錄的關卡／塔價／主題／教學／橋梁地形修改、測試與文件。CSV一筆單空白文本改為引號表示，解析值不變，用以通過尾端空白檢查。下方未commit／push是授權前快照，匯出成品、原生輸出、SDK、日誌與截圖仍在忽略目錄；兩份歷史stash不動。
+
+本次提交前核對沿用本聊天已完成的各階段驗證，不把未執行項目當作通過：最新音訊修正desktop GAME AUDIO failures=0、Chrome正式成品實際波形與靜音／恢復failures=0，Web PCK禁止內容／必要缺失均0；先前遺物1056／0、描述306／0與商店／選圖回歸結果見各節。已知WebGL警告仍保留，未全十五波或Web完整平衡驗收。
+
+## 2026-11-09 Web BGM／音效無聲修正
+
+使用者回報上一版無聲，已在不開autoplay豁免的Chrome156重現：首次點擊後AudioContext=running、AudioBufferSource有start，但destination peak／RMS始終0。直接量測原Web Sample bus sends=[1,2,0]閉環；僅在診斷context重新接線即出現peak0.142，確認不是遺漏素材或Chrome尚未解鎖。GameAudio以bus_count增長取代add_bus()，避開Godot Web Sample addAt(-1)重排錯誤（https://github.com/godotengine/godot/issues/119026）。沒有改聲音音量／格式／淡化，也沒有改成Stream或多執行緒。
+
+Godot4.7.2重新匯出exit0，PCK仍1274項，禁止內容與必要檔缺失均0。Chrome實際destination波形（透過測試專用AnalyserNode，無autoplay豁免／無生產JS補丁）：手勢前suspended／peak0；點擊後running／sends=[null,0,0]／BGM peak0.122；BGM靜音後0；隔離BGM後UI點擊peak0.156；恢復BGM peak0.142；Master靜音0、恢復peak0.188，pageerror／console error均0。Desktop GAME AUDIO failures=0。永久回歸tools/web/verify_release_audio.cjs，證據.godot/test-results/audio/web-release.json、原始壞版.godot/web-audio-before.json。舊版匯出只檢查流程而未量測聲音，是本次補強重點。
+
+build/web已更新；交付ZIP為build/Begins-With-a-Road-Web-2026-11-09-audio-fixed.zip，原無後綴ZIP亦同步更新以免繼續交付無聲版本。完整解壓後執行StartGame.cmd，第一次點擊遊戲頁面後BGM自然播放。沿用上一節既有WebGL buffer警告與未全十五波／未音訊聽感驗證限制；未commit／push。
+
+## 2026-11-09 Chrome Web 匯出交付
+
+接續目前全部未提交內容（包含使用者最新波次／塔價／教學與地形設定），沒有回復或改寫遊戲數值。本次只調整 Web 匯出排除、增加 tools/web/start_game.ps1 與交付文件。SDK Emscripten 4.0.20 下載至忽略的 .godot/emsdk；native/src 與固定 godot-cpp 複製到 .godot/web-native 隔離編譯 threads=no template_release，產生 bin/road_graph.candidates.web.template_release.wasm32.nothreads.wasm。未重建 Windows DLL、未切換原 native/godot-cpp/gen。匯出使用對應 Godot4.7.2 Web GDExtension 單執行緒樣板。
+
+正式 preset 排除測試、addons、tools、native、reports、docs、build、製作來源與 Windows 二進位，另排除舊9x9／11x11試驗場景、獨立遺物工具與卡牌編輯UI。保留 all_resources，避免漏掉正式遊戲的動態關卡／兵種／卡牌資源；catalog與catalog_data雖在tower_tile_editor目錄仍屬正式抽牌必要依賴，main.tscn也是level的共用基底，均保留。PCK稽核1274項，禁止目錄／來源類型0項、必要入口與資料缺失0項，清單 .godot/web-pack-files.txt。
+
+輸出 build/web，ZIP為 build/Begins-With-a-Road-Web-2026-11-09.zip，約28.85MiB；遊戲PCK約22.43MiB。完整ZIP解壓後執行StartGame.cmd，以系統PowerShell啟動loopback HTTP並開Chrome，不依賴Python／Node，保留伺服器視窗；不可直接file://開HTML。包含wasm MIME、COOP／COEP／CORP，網站部署說明在輸出README.txt。所有成品／SDK／原始測試截圖留忽略目錄，未commit／push。
+
+實際Chrome156.0.8078.80（獨立headless測試context、SwiftShader）：正式成品主選單、選圖／本局設定、教學載入、第二關載入、商店開關、第一波開場／敵人出生沿路移動、首次遭遇解鎖及進度頁模型預覽均已檢視，crossOriginIsolated=true，JavaScript/pageerror／HTTP資源錯誤0項。第二關解鎖以臨時context中的測試通關資料完成並重載，不改使用者Chrome profile／正式通關檔；早期兩次存檔fixture路徑選取錯誤已修正，非成品錯誤。圖 .godot/web-main.png、web-level.png、web-frontier.png、web-shop.png、web-combat.png及web-after-wave.png（實際為遭遇進度頁，不代表已清波）；console在.godot/web-console.log。沒有跑完十五波或驗證音訊聽感。另以Intel UHD Graphics／ANGLE Direct3D11硬體WebGL重跑同一路徑，JavaScript／HTTP錯誤仍為0，已檢視畫面與流程正常；軟體與硬體模式皆有重複buffer INVALID_OPERATION警告，最終達Chrome警告抑制上限（硬體log共257則warning）。此為已知限制，尚未定位根因，不宣稱無警告或完整遊戲驗收。匯出exit0，editor settings safe-save及退出ObjectDB環境警告仍存在。
+
+## 2026-11-09 選圖施工提示與橋梁阻擋
+
+MapSelection 的施工提示依使用者修正移到左側「額外事件／啟用」右側同一行，不參與原容器排版；右側起始手牌恢復原 ui.run.prototype_hint 文字，難度選項依序切換指定施工表情文字；橋梁另以不參與既有容器排版的場景節點，在說明與操作之間留白呈現未完成訊息。已解鎖橋梁的下一步只播放「未完成」紅色／水平搖晃 0.665 實際秒，結束復原；連點重啟，換圖或語言清除舊動畫，其他關卡與解鎖條件照舊。新增六個 CSV 詞條與匯入翻譯供文本編輯器修改。沒有改關卡 Resource 或戰鬥設定，未 commit／push。
+
+新增 tests/menus/construction_notice.gd，實際 Compatibility 驗證難度三句、橋梁停頁、三字動畫／連點復原、其他關卡繼續與固定控制項座標；畫面留在 .godot/construction-options.png、construction-bridge.png。Editor import 仍有既有暫存 DLL／settings safe-save 環境錯誤，後續遊戲測試可正常載入。
+
+## 2026-11-09 遺物抽選與熟客優惠
+
+第三槽改為任意塔專屬，保留第二槽原有場上塔種弱關聯權重；第二／三槽都不以通用補位，專屬不足只顯示實際可取得的數量。依使用者確認，熟客優惠每局最多取得一次，取得後付費刷新三次，下一次免費，免費後重新累積，跨波次保留；失敗不計次、基礎價格不變。CardShop 統一提供實付價格給扣款與 UI，免費時零金幣也能操作，防止動畫連點與 signal 重入。資源參數與中英文描述同步更新，接續既有未提交修改，未 commit／push。
+
+Godot 4.7.2：新增 loyalty.tscn 專項 1056 checks／0 failures（抽選唯一性與耗盡、取得上限、兩輪付三免一、跨波、失敗／暫停／空池、零金幣、重入及新局）；rewards failures=[]；descriptions 306／0；實際 Compatibility card_shop failures=0。部分快速退出仍有 ObjectDB／Resource 清理警告；editor import 曾有暫存 GDExtension DLL 複製與 settings safe-save 環境錯誤，後續正式場景測試正常。未重跑完整十五波平衡或 Web。
+
+## 2026-11-09 Inspector 直接調整塔售價
+
+依使用者要求，TowerDefinition.card_price 移至最前面的「商店」分組，保留原欄位名及序列化，補中文 tooltip 與非負整數 setter／changed 通知；商店從 BuildCard.from_parts 讀售價的邏輯保留。點開 assets/data/towers/ 的 .tres 即可於 Inspector「商店 → Card Price」改價；儲存並重新執行。沒有改任何實際塔價，也沒有將數值欄加入文本編輯器；接續既有未提交修改，未 commit／push。
+
+本次 Godot4.7.2 headless 忽略目錄內專項通過：property list 確認為可編輯且可儲存的 Inspector 欄位，分組為商店；changed 通知、新卡讀取17金幣、.godot副本儲存／重載及負值歸0通過。正式塔資源未寫入測試值。快速退出仍有既有 ObjectDB／Resource 清理警告；未重跑整套遊戲／Web。
+
+## 2026-11-08 集中遊戲文本編輯器
+
+接續本聊天未提交成果；開始時另外已存在使用者修改的四種塔資源、inspection／settings 主題與簡化敵人路線文案，均以本輪起始內容為準，未還原。新增 addons/text_editor 主工作區，project.godot 已啟用：Godot頂部「遊戲文本」或專案→工具→遊戲文本編輯器。分類搜尋、中英多行欄、參數提示、唯讀預覽、原生Undo／Redo、未存標記、Save與Reload確認均接實際文件。只儲存翻譯CSV字串，保護命名／printf參數，保留未改列／順序／BOM／換行與引號；寫入驗證後replace、外部hash衝突拒絕覆寫。重新載入使用新文件模型，避免已捨棄的草稿繼續更新畫面。
+
+共同表目前333筆：保留原翻譯表，移入敵人故事／路線／技能／實例資訊、時間軸與HUD／結算／卡片等玩家中英字串及主選單標題；GameText只讀翻譯，不依賴editor外掛。保留起始使用者自訂敵人原文，沒有重新套用上輪較長描述；新兵種缺少詞條仍可走Resource舊文字備援。RelicDefinition抽出description_values供工具與遊戲共用唯讀數值。語言代碼等程式設定未納入可編輯文字。工具README即操作入口。本輪未 commit／push。
+
+本次Godot4.7.2 Windows：CSV模型347 checks／0 failures（最終加主選單標題後348），實際headless EditorPlugin11 checks／0 failures（原生Undo／Redo、Save／Reload、搜尋、參數拒絕、正式CSV未改）；實際編輯器視覺已擷取 .godot/text-editor/editor-actual.png，1280×800等效面板 .godot/text-editor/panel-preview.png 已檢視。修正BOM被Godot解碼移除後的無損保留、工具識別碼被自動翻譯、參數列初始最小高度撐開窄視窗；初期工具／測試型別與native類名衝突已修正。正常GameText執行回歸descriptions306／0、progress_page failures=[]、card_hover_note實際failures=0。測試僅寫.godot/text-editor副本，沒有向正式表格寫入測試詞。
+
+起始120份assets/data與themes Resource逐份SHA256核對均一致，既有使用者價格／主題差異保留。部分editor啟動仍有既有editor settings safe-save環境警告；一次暫存GDExtension DLL複製失敗後後續測試正常；快速退出仍有ObjectDB／Resource清理警告。實際隱藏editor截圖等待曾卡住，已用同步force_draw完成截圖，最終功能測試不依賴GPU截圖等待。未測Web或完整十五波平衡。
+
+## 2026-11-08 遺物數值與敵人行為文案
+
+接續未提交修改，未 commit／push。21件遺物中英文案改為完整數值及限制／副作用，新增 RelicDefinition.localized_description() 以 Resource 參數與塔成長／部署資料填入 CSV 模板；所有正式與試驗呈現呼叫者同步，兩份翻譯重建。三選一卡片232×400、描述行距3px與14→12px適配、debug重抽貼實際底緣；語言切換原地更新文字，保留焦點／選取。更正舊右舷集中倍數、冰霜單次減速與爆炸友傷對象。
+
+敵人進度加入由 Troop 設定推導的具體路線行為（避火力、迎火力、跟隨主力道路、接近塔群、最新路、最短路、同群共路與多路分流），共同註明開波後不臨時換路，不講搜尋演算法。特殊能力 describe 改讀資源的距離／時間／數量，補飛行攔截與首領終點規則。只改文字與排版，不改 Resource 數值、技能執行／路線計算或獎勵抽選。
+
+本次 Windows Godot 4.7.2 Compatibility：descriptions 實際306 checks／failures=0，涵蓋21遺物中英模板無殘留、動態參數、800×600全部三選一卡片與描述不越界、敵人行為、進度頁畫面；progress_page headless failures=[]、rewards headless failures=[]。已檢視三選一 zh_TW／en 批次3／18與 bomber／scout／assembled_cannon 進度截圖，檔案 .godot/test-results/relics/descriptions_*、progress_*。初版排版插入縮排錯誤已修正，數值格式移除多餘 .0；測試不再假設每個原始參數必須原樣顯示（如穿透半寬改顯示完整寬度）。快速退出的既有 ObjectDB／Resource 清理警告保留；未跑Web與整場平衡。最後進度截圖使用白底還原正式頁面的呈現背景。
+
+## 2026-11-08 最右商品左展開與文字排版
+
+接續未提交修改，未 commit／push。商店最右側尚未售出的防禦塔商品改貼左緣向左展開，三張貼片右端對齊，避免整組向內收遮住該卡；以實際商品位置挑最右側，不包含刷新牌，售出後會自動更新。其餘手牌／商品維持右側。六塔中英描述在 CSV 加入語意換行，迫擊砲改為地面範圍傷害、移除可能落空；十字火力移除波次旋轉；舷炮改為側舷對兩側敵人傷害。兩份翻譯重新匯入。單行超寬時以字型實際字寬從14／15px逐級縮到最小12px，描述高度自適應。
+
+本次 Windows Godot 4.7.2 Compatibility 實際 card_hover_note failures=0：右側一般貼合、最右商品左側貼合／卡面不遮擋、中英與800×600、既有買不起／暫停／收店檢查通過。新增六塔兩語逐行字寬／新版三段文案檢查。已檢視 hover_note_rightmost_left.png、hover_note_small_en.png；其餘截圖在 .godot/test-results/cards。Editor import 無腳本／CSV解析錯誤，仍有既有 editor settings safe-save 環境警告。未重跑戰鬥／Web。
+
+## 2026-11-08 三張右側便利貼（最新）
+
+依使用者修正，原單張左側紙條改為三張貼住卡牌右緣的橫長便利貼，依序向右展開；僅傷害／攻速／描述，描述貼較大，移除名稱／射程／基礎數值標題。使用 Visuals transform 跟隨卡面角度與搖動，左邊重疊5px；螢幕右緣不足時整組向內收、與卡牌保持重疊貼合。仍共用單一 CanvasLayer、不攔輸入，數據來源、射程呈現風格與隱藏條件不變。未 commit／push。
+
+本次 Windows Godot 4.7.2 Compatibility 實際 card_hover_note failures=0：三貼數量與右側貼合、描述較大、純三項內容、中英／800×600、未足額商店卡、暫停與收店、透明輸入皆通過。已檢視更新的 hover_note_hand／shop／small_en.png。僅改呈現場景、腳本與其測試／文件，沿用前輪通過的拖牌與單位檢視證據，未重跑戰鬥／Web。下節單張左側與上方備援樣式已由本節取代。
+
+## 2026-11-08 卡牌 hover 紙條與射程樣式
+
+接續本聊天未提交的時間軸／入口修改，未 commit／push。新增 CardHoverNote 單一共用 CanvasLayer、獨立場景及 card_combat_info 純資料格式化。手牌／商店沿用原 hover index，紙條於左側展開，左邊不足移上方，買不起的卡也可查看。顯示整數基礎傷害、攻速分級、射程類型及中英說明，兵營讀士兵數據。描述沿用翻譯 CSV，哨塔改為使用者提供的攻擊方式；新增 card.info.* 並重建兩語翻譯。只讀來源／改變時更新文字，不改塔數值或卡片 hit area。依使用者選擇，射程只統一顯示風格：放置預覽與單位檢視共用 range_appearance 的綠色色面、輪廓與 0.025 線寬；原格域／圓形／砲口膠囊及兵營道路裁切保持真實規則。
+
+本次 Windows Godot 4.7.2 Compatibility：card_hover_note 實際渲染 failures=0（六塔資源數據、哨塔例子、真實手牌／商店 hover、買不起仍可檢視、語言切換、暫停、上方備援、左展開、800×600 英文與不攔輸入）；card_drag_placement 實際渲染 failures=0；unit_inspection 實際 97 checks／failures=0，兩回歸 stderr 空白。已檢視 .godot/test-results/cards/hover_note_hand／shop／en／small_en.png。初輪測試 fixture 的 typed Array／舊 API 呼叫已修正；並行多個實際視窗令紙條依失焦規則隱藏，故紙條以單視窗重新驗證通過，未關閉失焦守衛。Editor import 沒有腳本解析錯誤，仍有環境 editor settings safe-save 警告；未測 Web 與全十五波平衡。另啟動舊獨立 card_preview 場景時，停在等待 PortalMap 非空 plan 的既有無上限迴圈，未取得結果後已停止，不列為通過；本輪正式關卡的拖牌／單位射程回歸如上。
+
+## 2026-11-08 時間軸前後事件與 ACT 分隔線追修
+
+接續未提交修改；未 commit／push。固定五格改為過去一個／當前／未來三個，黑點固定第二格，開場左格留空；沿用左滑、16% 微縮放及暫停凍結。遺物／入口不再以圓點附帶上方圖示呈現，改為軌道上獨立圖示；各波次／遺物／入口加簡短名稱，順序仍為完成波次→遺物→入口→下一波。ACT 垂直分隔線恢復在前一 ACT 的最後事件與下一 ACT 第一波之間，隨時間軸滑動，不取代波次或占事件格。
+
+本次 Windows Godot 4.7.2 Compatibility：ui_scene_templates 實際渲染 failures=0，新增開場左格空白、第二格固定黑點、上一波／上一遺物／上一入口保留、獨立事件圖示、ACT 分界位置檢查；原固定寬度／左滑／縮放／重用節點／暫停測試保持通過。wave_expansion headless failures=0、UI Slice A HUD headless 96 項 failures=[]。已檢視 timeline_scroll_midpoint.png 與 timeline_history_events.png（.godot/test-results/levels）。快速退出仍有既有 Resource 清理警告；未重跑 Web／平衡。下節的第一格當前與右四格布局由本節取代。
+
+## 2026-11-08 固定五事件時間軸追加
+
+依使用者追加保留 ACT，改成固定 360px、五事件視窗。黑點固定第一格、最多放大 16% 回復，波次／遺物／入口向左滑，舊累積填色隱藏。開波仍用 1 秒 ease-in-out＋0.5 秒停留；遺物／入口左滑 0.35 實際秒，暫停凍結，不鎖操作。ACT 標題跟隨目前事件所屬 ACT。HUD 以時間軸為中央固定配置，遺物增長不移動黑點。marker 重用六個（五格加裁切中的入場節點），結尾只顯示剩餘事件。仍未 commit／push。
+
+本輪 Windows Godot 4.7.2 Compatibility：ui_scene_templates 實際渲染 failures=0（固定黑點、左滑／16% 縮放、ACT 切換、五事件、節點重用、固定寬度、取得遺物後螢幕位置及暫停／恢復）；wave_expansion 實際渲染 failures=0，保持第二關第 5／10 波入口與第 15 波勝利；UI Slice A HUD headless／rendered 各 96 項、failures=[]；level_flow headless failures=0。已檢視 .godot/test-results/levels/timeline_scroll_midpoint.png 與新的 wave_expansion_timeline.png。沿用既有 UID 備援／快速退出清理警告；未測 Web／正式十五波平衡。下節全展開樣式已由本節取代。
+
+## 2026-11-08 第二關每五波新增入口
+
+本輪起始工作區乾淨，未 commit／push。保留舊兩階段 SpawnExpansion，新增 LevelDefinition.expansion_wave_interval 與共用 expands_after；Frontier 設為 5，完成第 5、10 波後觸發，第 15 波直接勝利。0 仍使用 ACT 個別旗標；遺物發放不變。時間軸保留全部波次圓點，遺物與入口各自插入獨立節點，入口為門形加號及雙語 tooltip；同波先遺物後入口，準備期進度包含已完成事件。
+
+驗證：Windows Godot 4.7.2 Compatibility，新增 wave_expansion 在 headless 與實際渲染均 failures=0（保留正式地形／五 ACT 十五波，縮短敵軍編成以測流程）；確認兩次實際入口提交、後續敵人從全部入口出生、建造／開波鎖定與最終勝利。舊 act_spawn_expansion、level_flow headless failures=0；UI Slice A HUD 96 項／failures=[]。新增測試另涵蓋遺物與入口同波依序排列、最終遺物及入口 tooltip。已檢視 .godot/test-results/levels/wave_expansion_timeline.png。仍有既有 tutorial UID 文字路徑備援及快速退出 ObjectDB／Resource 清理警告。未做正式十五波平衡、Web 或效能測試。測試 user:// 透過 APPDATA 指至忽略的 .godot/test-appdata，未改正式存檔。
+
 ## 2026-11-08 最新 main 合併
 
 本次從 bf3ed4b 的既有衝突開始，先完成 d52329e 的 Merge Commit 24c0712，再整合 fetch 後 origin/main e1100ed。使用者明確選擇「採用 main 最新介面與規則，保留 Sandbox 新增音效／教學／單位檢視」。保留擊殺金幣、旋轉放置及教學慶祝；時間線、進度頁、尋路與敵人技能採用 main。

@@ -60,7 +60,7 @@ size_flags_horizontal = 0
 layout_mode = 2
 theme_override_colors/font_color = Color(0.125, 0.243, 0.278, 1)
 theme_override_font_sizes/font_size = 30
-text = "BEGINS WITH A ROAD"
+text = "ui.menu.title"
 
 [node name="Subtitle" type="Label" parent="Interface/Home/Column"]
 layout_mode = 2

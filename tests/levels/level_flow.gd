@@ -73,8 +73,8 @@ func verify() -> void:
 	check(scene.timeline.size.x > 300 and is_equal_approx(scene.get_node("LevelHUD").status_row_rect.get_center().x,viewport_width*0.5), "Status row with the full timeline is centered as a group")
 	check(scene.find_children("*", "OptionButton", true, false).is_empty(), "Removed troop/distribution dropdowns remain")
 	check(wave.controls.spawn_button.get_parent() == scene.get_node("LevelHUD/WorldActions") and shop.view.get_node_or_null("Root/Balance") == null, "Start button did not move to its world anchor or wallet remained in shop")
-	check(is_equal_approx(scene.timeline.node_fraction(0), 1.0/3.0) and is_equal_approx(scene.timeline.node_fraction(2), 1.0), "Wave markers include an extra interval before the level end")
-	check(not scene.timeline.is_act_end(0) and scene.timeline.is_act_end(1) and scene.timeline.is_act_end(2), "ACT-ending waves did not replace circle markers with dividers")
+	check(is_equal_approx(scene.timeline.node_fraction(0), 1.0/4.0) and is_equal_approx(scene.timeline.node_fraction(2), 1.0), "Wave markers include an extra interval before the level end")
+	check(not scene.timeline.is_act_end(0) and scene.timeline.is_act_end(1) and scene.timeline.is_act_end(2), "ACT boundaries did not match the wave schedule")
 	var expected_rewards := [3, 10, 21]
 	for index in 3:
 		await wait_map(scene)
@@ -149,8 +149,8 @@ func verify() -> void:
 		check(scene.get_node("LevelHUD/Header/Balance/Amount").text == str(shop.coins), "Top wallet did not update after a wave reward")
 		check(scene.current_wave == index+1 and scene.timeline.wave_index == index+1, "Timeline did not advance across the ACT boundary")
 		if index < 2:
-			check(is_zero_approx(scene.timeline.progress) and is_equal_approx(scene.timeline.position_fraction(), node_position), "New preparation moved away from the finished node")
-			check(is_equal_approx(scene.timeline.fill_cutoff(), held_fill), "New preparation moved the fill away from its completed marker")
+			check(is_zero_approx(scene.timeline.progress) and is_equal_approx(scene.timeline.position_fraction(), scene.timeline.reward_fraction(index) if index == 1 else node_position), "Preparation did not retain the completed wave/event")
+			check(scene.timeline.fill_cutoff() >= held_fill, "Preparation moved progress backward after the reward")
 		await get_tree().process_frame
 	check(scene.finished and completed[0] == 1 and wave.controls.spawn_button.disabled and not wave.start_wave(), "Completed level allowed extra waves or repeated completion")
 	for control: Control in scene.find_children("*", "Control", true, false):

@@ -21,6 +21,10 @@ var prices := PackedInt32Array()
 var sold := PackedByteArray()
 var available := false
 var deals := 0
+## Successful paid rerolls since acquiring/last consuming the loyalty reward.
+var loyalty_period := 0
+var loyalty_paid_rerolls := 0
+var _reroll_in_progress := false
 var _placement: Node3D
 var _wave: Node
 var _rng := RandomNumberGenerator.new()
@@ -188,24 +192,44 @@ func buy(index: int) -> bool:
 	purchased.emit(offers[index])
 	return true
 
+func configure_loyalty(period: int) -> void:
+	period = maxi(0,period)
+	if loyalty_period == period: return
+	loyalty_period = period
+	loyalty_paid_rerolls = 0
+
+func loyalty_free_ready() -> bool:
+	return loyalty_period > 0 and loyalty_paid_rerolls >= loyalty_period
+
+func current_reroll_price() -> int:
+	return 0 if loyalty_free_ready() else maxi(0,reroll_price)
+
 func reroll() -> bool:
-	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or view.rerolling:
+	if _reroll_in_progress or _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or view.rerolling:
 		return false
 	if reroll_rule.is_valid() and not reroll_rule.call(): return false
-	if coins < maxi(0, reroll_price):
-		return false
+	var cost := current_reroll_price()
+	if coins < cost: return false
+	_reroll_in_progress = true
 	var next := roll_offers()
-	if next.is_empty(): return false
-	coins -= maxi(0, reroll_price)
-	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-maxi(0,reroll_price),"balance":coins,"reason":"reroll"},"shop")
+	if next.is_empty():
+		_reroll_in_progress = false
+		return false
+	var was_free := loyalty_free_ready()
+	coins -= cost
+	if loyalty_period > 0:
+		if was_free: loyalty_paid_rerolls = 0
+		elif cost > 0: loyalty_paid_rerolls += 1
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-cost,"balance":coins,"reason":"reroll"},"shop")
 	_accept_deal(next)
 	_refresh(true)
 	view.animate_reroll()
 	rerolled.emit()
+	_reroll_in_progress = false
 	return true
 
 func _refresh(insert_offers := false) -> void:
-	view.show_offers(offers, prices, sold, coins, maxi(0, reroll_price), insert_offers)
+	view.show_offers(offers, prices, sold, coins, current_reroll_price(), insert_offers)
 	balance_changed.emit(coins)
 
 func grant_gold(amount: int, reason: String, world_position: Variant = null) -> void:

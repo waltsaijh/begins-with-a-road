@@ -24,6 +24,10 @@ godot --headless --path . --script res://tools/assets/build_sentry_shot.gd
 
 Web 功能驗證可使用 `web/export_test.ps1 -Godot <Godot執行檔>`，預設將 `tests/enemies/enemies.tscn` 匯出至 `.godot/enemy_web/index.html`。`-Scene` 與 `-OutputDirectory` 可指定其他測試；工具在結束時還原主場景與匯出設定，正式匯出仍排除測試。
 
+正式 Web 輸出可附上 `web/start_game.ps1`（複製為輸出目錄的 `StartGame.ps1`），以 Windows PowerShell 提供本機 HTTP、wasm MIME 與跨來源隔離標頭，自動在 Chrome 開啟。不依賴 Python／Node；`-NoBrowser` 供測試、`-Port` 可改連接埠。它是輸出目錄的啟動輔助工具，不會放入遊戲 PCK；不得直接用本機 file:// 開啟匯出的 HTML。
+
+`node tools/web/verify_release_audio.cjs --directory=build/web` 在獨立Chrome context量測成品destination的真實音訊，無autoplay豁免：首次手勢後BGM、隔離BGM的UI音效、BGM與Master靜音／恢復均須通過。需要Playwright，TEST_BROWSER可指定Chrome；啟動成品StartGame.ps1使用8797連接埠，結束會清理瀏覽器與伺服器。報告位於.godot/test-results/audio/web-release.json，工具不會匯入PCK。
+
 `web/verify_enemy_web.cjs` 讀取已匯出的測試與對應原生 log，比對 Windows／Web 結果。設定 `PLAYWRIGHT_MODULE`、`TEST_PYTHON`、`TEST_BROWSER` 後執行；`--directory=<匯出目錄>` 可指定服務位置。預設比對 enemies，原生輸出需存為 `.godot/enemy_tests.out`。其他選項與檔名見該腳本的 suites 表；多場景驗證需先將各測試以對應 HTML 名稱匯出至同一目錄。JSON、截圖寫入 `.godot/test-results/<功能>/`，log 放 `.godot/`。
 
 已完成的一次性 benchmark 收集與彙整工具已清除，歷史結論見 [報告索引](../reports/README.md)。新的臨時量測工具用完即清除，原始資料保存在 `.godot/test-results/`。

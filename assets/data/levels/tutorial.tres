@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="LevelDefinition" format=3 uid="uid://215oe6ngh8pr"]
+[gd_resource type="Resource" script_class="LevelDefinition" format=3 uid="uid://dhesi85qiurl7"]
 
 [ext_resource type="Script" uid="uid://cfka2isrnffdy" path="res://scripts/levels/definitions/act_definition.gd" id="1_hpbpm"]
 [ext_resource type="Script" uid="uid://cvef4d4fr1kg7" path="res://scripts/levels/definitions/wave_definition.gd" id="2_0h6qf"]
 [ext_resource type="Script" uid="uid://cahlwhgvymd6c" path="res://scripts/levels/definitions/wave_spawn_group.gd" id="3_l2lal"]
 [ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/definitions/level_definition.gd" id="4_86rb2"]
 [ext_resource type="PackedScene" path="res://scenes/maps/tutorial.tscn" id="5_d3556"]
-[ext_resource type="Resource" uid="uid://kjj24npyu6vr" path="res://assets/data/tutorial/intro.tres" id="6_5bysg"]
+[ext_resource type="Resource" uid="uid://ceu6i5u20vcxt" path="res://assets/data/tutorial/intro.tres" id="6_5bysg"]
 
 [sub_resource type="Resource" id="Resource_c88qf"]
 script = ExtResource("3_l2lal")
@@ -16,14 +16,14 @@ interval_ticks = 10
 [sub_resource type="Resource" id="Resource_l3y68"]
 script = ExtResource("2_0h6qf")
 groups = Array[ExtResource("3_l2lal")]([SubResource("Resource_c88qf")])
-reward = 20
+reward = 40
 
 [sub_resource type="Resource" id="Group2"]
 script = ExtResource("3_l2lal")
 troop_path = "res://assets/data/troops/soldier.tres"
 start_tick = 12
 enemy_count = 3
-interval_ticks = 4
+interval_ticks = 10
 
 [sub_resource type="Resource" id="Resource_hpbpm"]
 script = ExtResource("3_l2lal")
@@ -34,18 +34,20 @@ interval_ticks = 4
 [sub_resource type="Resource" id="Wave2"]
 script = ExtResource("2_0h6qf")
 groups = Array[ExtResource("3_l2lal")]([SubResource("Group2"), SubResource("Resource_hpbpm")])
+reward = 80
 
 [sub_resource type="Resource" id="Group3"]
 script = ExtResource("3_l2lal")
 troop_path = "res://assets/data/troops/heavy.tres"
-enemy_count = 1
+enemy_count = 2
+interval_ticks = 16
 
 [sub_resource type="Resource" id="Resource_0h6qf"]
 script = ExtResource("3_l2lal")
 troop_path = "res://assets/data/troops/soldier.tres"
 start_tick = 2
-enemy_count = 3
-interval_ticks = 2
+enemy_count = 5
+interval_ticks = 5
 
 [sub_resource type="Resource" id="Wave3"]
 script = ExtResource("2_0h6qf")
@@ -64,4 +66,3 @@ required_to_complete_levels = PackedStringArray()
 terrain = ExtResource("5_d3556")
 acts = Array[ExtResource("1_hpbpm")]([SubResource("Resource_cto5j")])
 tutorial = ExtResource("6_5bysg")
-reward_final_act = false

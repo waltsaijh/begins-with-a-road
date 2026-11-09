@@ -29,10 +29,10 @@ preset_path = "res://assets/data/tile_presets/broadside_04.tres"
 
 [resource]
 script = ExtResource("5_l6yb8")
+card_price = 40
 name_key = "tower.broadside.name"
 model = ExtResource("4_ggahg")
 visual_model = ExtResource("art_slice_e")
-card_price = 8
 icon = SubResource("CompressedTexture2D_x372t")
 accent_color = Color(0.7882353, 0.63529414, 0.92941177, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
