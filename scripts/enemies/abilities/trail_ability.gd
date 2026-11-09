@@ -27,7 +27,7 @@ func update(host: Node, _delta: float) -> void:
 	_last = cell
 
 func describe(english: bool) -> String:
-	return "Leaves a trail; other ground enemies on it briefly move faster." if english else "沿途留下痕跡，其他地面敵軍走在上面會短暫加速。"
+	return (GameText.text("text.trail_ability.1",{},english)) % [str(snappedf(speed_bonus*100,0.01)),str(snappedf(seconds,0.01))]
 
 func configuration_error() -> String:
 	if not is_finite(speed_bonus) or speed_bonus < 0: return "加速幅度必須非負且有限"

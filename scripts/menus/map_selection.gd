@@ -7,6 +7,7 @@ enum Step { MAP, OPTIONS }
 var maps: Array[MenuMapDefinition] = []
 var selected := 0
 var current_step := Step.MAP
+var _unfinished_tween: Tween
 @onready var previous_button: Button = $Footer/Column/MapRow/Previous
 @onready var next_button: Button = $Footer/Column/MapRow/Next
 @onready var start_button: Button = $Footer/Column/Actions/Start
@@ -23,6 +24,9 @@ func _ready() -> void:
 	next_button.pressed.connect(select_map.bind(1))
 	back_button.pressed.connect(go_back)
 	start_button.pressed.connect(advance)
+	for button: Button in $Footer/Column/Details/RunOptions/LeftColumn/Group/Difficulty/Choices.get_children():
+		button.toggled.connect(func(pressed: bool):
+			if pressed: _refresh_construction_hint())
 	_align_option_keys()
 	_refresh()
 
@@ -65,6 +69,9 @@ func select_map(step: int) -> void:
 
 func advance() -> void:
 	if maps.is_empty() or start_button.disabled: return
+	if maps[selected].id == "bridge":
+		_shake_unfinished()
+		return
 	if current_step == Step.MAP:
 		_set_step(Step.OPTIONS)
 	else:
@@ -120,6 +127,9 @@ func refresh() -> void:
 	_refresh()
 
 func _refresh() -> void:
+	_reset_unfinished()
+	$Footer/Column/Details/Construction.visible = not maps.is_empty() and maps[selected].id == "bridge" and current_step == Step.MAP
+	_refresh_construction_hint()
 	previous_button.disabled = current_step != Step.MAP or maps.size() < 2
 	next_button.disabled = current_step != Step.MAP or maps.size() < 2
 	start_button.disabled = maps.is_empty() or not maps[selected].unlocked
@@ -143,9 +153,30 @@ func _refresh() -> void:
 		$Footer/Column/Details/Info/Index.text += " · "+tr("ui.maps.completed")
 	$Footer/Column/Details/Info/Summary.text = tr("ui.maps.summary") % [definition.level.acts.size(), definition.level.wave_count()]
 
+func _refresh_construction_hint() -> void:
+	var difficulty := _selected_value($Footer/Column/Details/RunOptions/LeftColumn/Group/Difficulty/Choices)
+	$Footer/Column/Details/RunOptions/LeftColumn/Group/ExtraEvents/Enabled/ConstructionHint.text = "ui.run.construction."+difficulty
+
+func _reset_unfinished() -> void:
+	if _unfinished_tween != null: _unfinished_tween.kill()
+	var word: Label = $Footer/Column/Details/Construction/Row/Word/Label
+	word.position = Vector2.ZERO
+	word.modulate = Color.WHITE
+	word.get_parent().custom_minimum_size = word.get_minimum_size()
+
+func _shake_unfinished() -> void:
+	_reset_unfinished()
+	var word: Label = $Footer/Column/Details/Construction/Row/Word/Label
+	_unfinished_tween = create_tween().set_ignore_time_scale(true)
+	_unfinished_tween.tween_property(word,"modulate",Color(0.85,0.22,0.2),0.08)
+	for x in [-5.0,5.0,-4.0,4.0,-2.0,2.0,0.0]:
+		_unfinished_tween.tween_property(word,"position:x",x,0.055).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_unfinished_tween.tween_property(word,"modulate",Color.WHITE,0.2)
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
 		_align_option_keys.call_deferred()
+		_reset_unfinished.call_deferred()
 		_refresh()
 
 func _input(event: InputEvent) -> void:

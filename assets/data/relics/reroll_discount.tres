@@ -10,7 +10,5 @@ name_key = "relic.reroll_discount.name"
 description_key = "relic.reroll_discount.description"
 icon = ExtResource("1_pjnod")
 parameters = {
-"amount": 1
+"paid_rerolls": 3
 }
-repeatable = true
-max_stacks = 2

@@ -1,5 +1,7 @@
 # Phase 3：疊塔、遺物與構築驗收
 
+`tests/relics/loyalty.tscn`：驗證通用／弱關聯專屬／隨機專屬的唯一抽選與耗盡規則，以及熟客優惠的每局一次、付費三次後免費、跨波計次、失敗不消耗、零金幣免費刷新與交易重入防護。可使用 `Godot --headless --path . res://tests/relics/loyalty.tscn` 執行。
+
 本目錄提供獨立合成地形，不寫回 Frontier、塔／兵種 Resource 或舊專案。F5 仍是原三 ACT 正式關卡。結果和截圖放在 `.godot/test-results/relics/`；`.godot/phase3-*.log` 是 Phase 3 歷史驗收，後續回歸使用各次獨立 log。
 
 ## 人工驗收

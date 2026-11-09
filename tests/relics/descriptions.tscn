@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://4jf30aykne0i"]
+
+[ext_resource type="Script" uid="uid://bn4gw57nl2cxy" path="res://tests/relics/descriptions.gd" id="1"]
+
+[node name="DescriptionTest" type="Node" unique_id=264508097]
+script = ExtResource("1")

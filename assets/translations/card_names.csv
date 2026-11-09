@@ -94,47 +94,229 @@ traffic.remaining,{name} · {waves} waves left,{name}・剩餘 {waves} 波
 traffic.no_change,No forecast change: candidate routes or whole-unit quotas limit this effect,分流未變：候選路線或整數配額限制
 traffic.unavailable,No positive-weight route for the next wave,下一波沒有正權重路線
 relic.frost_ray.name,Frost Ray,冰霜射線
-relic.frost_ray.description,Making enemies slower and slower.,讓敵人行動愈加緩慢。
+relic.frost_ray.description,"Each hit slows movement by about
+{single_slow_percent}% for {duration}s.
+
+Repeated hits stack the slow,
+approaching a {maximum_slow_percent}% limit.","每次命中使移速降低約
+{single_slow_percent}%，持續 {duration} 秒。
+
+連續命中可疊加減速，
+逐漸接近 {maximum_slow_percent}% 上限。"
 relic.fuel_supply.name,Fuel Supply,燃料供能
-relic.fuel_supply.description,Towers around it can deal more damage.,強化周圍的防禦塔的攻擊。
+relic.fuel_supply.description,"Each Crossfire boosts damage
+of other towers within {radius} tiles
+by {bonus_percent}%. Soldiers benefit too.
+
+Bonuses from multiple towers add up;
+a tower cannot boost itself.","每座十字火力使 {radius} 格內其他塔
+傷害提高 {bonus_percent}%，士兵也受益。
+
+多座塔的加成可以相加，
+不強化提供效果的塔本身。"
 relic.small_fry.name,Small Fry,專打雜魚
-relic.small_fry.description,More damage to small enemies.,對小體型敵人造成更高傷害。
+relic.small_fry.description,"Crossfire deals {damage_multiplier}× damage
+to small enemies (+{damage_multiplier_increase}%).
+
+Damage to other sizes is unchanged.","十字火力對小型敵人
+造成 {damage_multiplier} 倍傷害（+{damage_multiplier_increase}%）。
+
+對其他體型的傷害不變。"
 relic.air_strike.name,Air Strike,空中打擊
-relic.air_strike.description,Target and hit enemies in the sky.,能瞄準並擊中空中的敵人。
+relic.air_strike.description,"Mortars can target and damage
+flying enemies as well as ground foes.
+
+Damage, range and firing interval
+remain unchanged.","迫擊砲可瞄準並傷害飛行敵人，
+也保留原有的對地範圍攻擊。
+
+傷害、射程與攻擊間隔不變。"
 relic.explosive_shell.name,Explosive Shell!,爆裂彈！
-relic.explosive_shell.description,Who doesn't like explosion? it could hit your allies by the way.,誰不喜歡大爆炸呢? 但小心別炸到友軍。
+relic.explosive_shell.description,"Every {every} shots, the blast radius
+becomes {radius_multiplier}× (+{radius_multiplier_increase}%).
+
+It also damages friendly towers
+in the blast, including its own tower,
+for {friendly_multiplier_percent}% of the shell damage.","迫擊砲每第 {every} 發砲彈，
+爆炸半徑變為 {radius_multiplier} 倍（+{radius_multiplier_increase}%）。
+
+爆炸也傷害範圍內的友方塔，
+包括自身，造成該發傷害的
+{friendly_multiplier_percent}%。"
 relic.assembled_cannon.name,Cannon Assembled,大砲已組裝
-relic.assembled_cannon.description,Heavier but slower shot.,更重也更慢的砲彈。
+relic.assembled_cannon.description,"Mortar damage becomes {damage_multiplier}×
+(+{damage_multiplier_increase}%). Firing interval becomes
+{interval_multiplier}×; attack rate falls to
+{interval_multiplier_inverse_percent}% of its previous rate.
+
+Shell flight speed becomes
+{speed_multiplier_percent}% of its previous speed.","迫擊砲傷害變為 {damage_multiplier} 倍（+{damage_multiplier_increase}%）。
+攻擊間隔變為 {interval_multiplier} 倍，
+攻速降至原本的 {interval_multiplier_inverse_percent}%。
+
+砲彈飛行速度降至
+原本的 {speed_multiplier_percent}%。"
 relic.departure.name,Departure,航行
-relic.departure.description,Patrol back and forth.,前後往返巡航。
+relic.departure.description,"Broadsides patrol back and forth
+at {speed} tiles per second.
+
+Their firing areas move with them,
+sweeping roads along the patrol.","舷炮以每秒 {speed} 格往返巡航。
+
+攻擊範圍隨船體一起移動，
+掃過巡航沿途的道路；
+不改變單次傷害與攻擊間隔。"
 relic.rapid_fire.name,Rapid Fire,快速開火
-relic.rapid_fire.description,Bullet rain with a cooldown.,有冷卻時間的狂轟亂炸。
+relic.rapid_fire.description,"Every {period}s, fire {shots} extra bursts
+with {spacing}s between bursts.
+
+Each side fires at one valid enemy
+per burst; the normal attack continues.","每 {period} 秒觸發 {shots} 輪額外連射，
+各輪相隔 {spacing} 秒。
+
+每輪兩側各攻擊一名有效目標；
+原本的攻擊仍繼續進行。"
 relic.crew_concentration.name,Crew Concentration,人員集中
-relic.crew_concentration.description,"Double damage, but fire only to the right.",雙倍傷害，但只朝右舷開火。
+relic.crew_concentration.description,"Broadside damage becomes
+{damage_multiplier}× (+{damage_multiplier_increase}%).
+
+Only the right side may fire;
+the left side no longer attacks.","舷炮傷害變為
+{damage_multiplier} 倍（+{damage_multiplier_increase}%）。
+
+只朝右舷開火，
+左舷不再攻擊。"
 relic.hunting.name,Hunting,狩獵
-relic.hunting.description,Kill one enemy every 8 seconds.,每 8 秒可處決一名普通敵人。
+relic.hunting.description,"Every {period}s, execute one enemy
+inside the Sentry's firing area.
+
+Prefers large enemies; bosses
+cannot be executed. With no valid
+target, waits until one appears.","哨塔每 {period} 秒可處決
+射程內的一名敵人。
+
+優先選擇大型敵人，對首領無效；
+沒有有效目標時保留就緒狀態。"
 relic.protagonist.name,Become the Protagonist,成為主角
-relic.protagonist.description,No limit to how high this tower can grow.,主角的成長沒有上限。
+relic.protagonist.description,"Remove the Sentry's Lv.{level_cap} cap.
+Upgrades still require matching cards.
+
+Each added level keeps the normal
+{growth_damage}× damage and {growth_interval}× interval.","解除哨塔原本 Lv.{level_cap} 的升級上限，
+仍需同種卡牌才能升級。
+
+每升一級仍依原本成長：
+傷害 ×{growth_damage}、攻擊間隔 ×{growth_interval}。"
 relic.support_attack.name,Supporting Fire,支援攻擊
-relic.support_attack.description,Reach farther to lend a hand.,把火力送到更遠的地方。
+relic.support_attack.description,"Sentry range becomes
+{range_multiplier}× (+{range_multiplier_increase}%).
+
+The existing directional shape
+is enlarged; damage and interval
+remain unchanged.","哨塔射程變為
+{range_multiplier} 倍（+{range_multiplier_increase}%）。
+
+沿原有方向範圍放大，
+傷害與攻擊間隔不變。"
 relic.powerful_shot.name,Powerful Shot,強力射擊
-relic.powerful_shot.description,"One bolt, several enemies.",一箭貫穿整排敵人。
+relic.powerful_shot.description,"Ballista bolts pierce enemies
+along their flight path.
+
+Bolts travel at {speed} tiles/s through
+a {full_width}-tile-wide strip. Each enemy
+can be hit once by each bolt.","弩砲重箭會貫穿沿途敵人。
+
+飛行速度為每秒 {speed} 格，
+可命中寬 {full_width} 格內的敵人；
+同一發對每名敵人只命中一次。"
 relic.secret_mission.name,Secret Mission,隱密任務
-relic.secret_mission.description,Hits harder when no other towers are nearby.,遠離其他防禦塔，才能使出全力。
+relic.secret_mission.description,"With no other tower within
+{radius} tiles, Ballista damage becomes
+{damage_multiplier}× (+{damage_multiplier_increase}%).
+
+Placing another tower within
+that radius removes this bonus.","弩砲周圍 {radius} 格內沒有其他塔時，
+傷害變為 {damage_multiplier} 倍（+{damage_multiplier_increase}%）。
+
+範圍內出現其他塔，
+這項傷害加成便不再生效。"
 relic.heavy_bolts.name,Heavy Bolts,超重型箭矢
-relic.heavy_bolts.description,A heavy hit sends enemies backward.,沉重的箭矢，讓敵人步步後退。
+relic.heavy_bolts.description,"Each Ballista hit pushes its target
+back {distance} tiles along its road.
+
+The enemy resumes moving afterward;
+base damage and interval are unchanged.","弩砲每次命中將敵人
+沿原路擊退 {distance} 格。
+
+敵人之後會繼續前進；
+基礎傷害與攻擊間隔不變。"
 relic.reinforcements.name,Reinforcements,來點增援
-relic.reinforcements.description,There's always room for one more soldier.,多一名士兵，多一份戰力。
+relic.reinforcements.description,"Each Barracks deploys
+{extra_units} additional soldier: {unit_count} total.
+
+Each soldier retains the normal
+damage, health and respawn rules.","每座兵營增加 {extra_units} 名士兵，
+合計部署 {unit_count} 名。
+
+每名士兵的傷害、生命
+與重生規則維持原有設定。"
 relic.sharpshooter.name,Sharpshooter,神射手
-relic.sharpshooter.description,No need to wait for enemies to get close.,不必等敵人靠近，也能出手。
+relic.sharpshooter.description,"Soldiers not engaged in melee
+can shoot enemies within {range} tiles.
+
+Base ranged interval: {interval}s.
+Uses soldier damage; attack-speed
+bonuses also speed up these shots.","士兵未近戰接敵時，
+可射擊 {range} 格內的敵人。
+
+基礎射擊間隔 {interval} 秒，
+使用士兵本身的傷害；
+攻速加成也會加快射擊。"
 relic.global_haste.name,Battle Rhythm,戰鬥節奏
-relic.global_haste.description,All towers and soldiers attack a little faster.,讓防禦塔與友軍出手更快。
+relic.global_haste.description,"All towers and soldiers gain
++{bonus_percent}% attack speed per pick.
+
+Stacks add up, up to {max_stacks} picks.
+Faster attacks shorten the interval;
+movement speed is unchanged.","每次選擇使所有塔與士兵
+攻速提高 {bonus_percent}%。
+
+同遺物加成相加，最多選 {max_stacks} 次；
+攻擊間隔隨之縮短，移速不變。"
 relic.global_damage.name,Refined Arms,精製武裝
-relic.global_damage.description,"Better weapons, harder hits.",讓防禦塔與友軍打得更痛。
+relic.global_damage.description,"All towers and soldiers deal
++{bonus_percent}% damage per pick.
+
+Stacks add up, up to {max_stacks} picks.
+Applies to current and future towers
+and their soldiers.","每次選擇使所有塔與士兵
+傷害提高 {bonus_percent}%。
+
+同遺物加成相加，最多選 {max_stacks} 次；
+現有與之後建造的塔皆生效。"
 relic.gold.name,Supply Cache,補給箱
-relic.gold.description,A little gold for the road ahead.,補點金幣，繼續上路。
+relic.gold.description,"Immediately gain {amount} gold.
+
+Can be chosen up to {max_stacks} times
+per run. Each pick pays once;
+this is not income every wave.","立即獲得 {amount} 金幣。
+
+每局最多選 {max_stacks} 次，
+每次只發放一次，
+不會在每波重複發放。"
 relic.reroll_discount.name,Regular Discount,熟客優惠
-relic.reroll_discount.description,A familiar face gets cheaper rerolls.,熟客優惠，刷新少算一點。
+relic.reroll_discount.description,"After {paid_rerolls} paid shop rerolls,
+the next reroll is free.
+
+Then the cycle starts over. Progress
+carries across waves and starts
+when this relic is acquired.
+Can be acquired once per run.","每付費刷新 {paid_rerolls} 次商店，
+下一次刷新免費。
+
+免費刷新後重新累積，
+進度跨波次保留，取得後才開始計次。
+每局只能取得一次。"
 relic.collection,Relics,本局遺物
 relic.choose,Choose a relic,選擇一件遺物
 relic.debug_reroll,Reroll relics (Debug),重新隨機抽選（Debug）
@@ -209,7 +391,7 @@ to upgrade it to Lv.2.
 No extra roads or coins needed.","把剛買的{upgrade_tower}卡，
 放到原本的{upgrade_tower}上，
 升級至 Lv.2。
-升級不增加道路或額外花費。"
+升級不會增加道路或額外花費。"
 tutorial.reroll,"Open the shop.
 Click its lower-right reroll card
 to refresh the offers.
@@ -274,15 +456,157 @@ ui.progress.tag.guardian,Taunts towers,吸引火力
 ui.progress.tag.scout,Scout,偵查
 ui.progress.tag.saboteur,Disables towers,癱瘓防禦塔
 ui.progress.tag.boss,Boss: a leak ends the run,首領：漏掉即敗北
-tower.sentry.description,A quick-firing watchtower that covers the road ahead of it.,射速快的基礎防線，守住前方的道路。
+tower.sentry.description,"Fires arrows that damage
+a single enemy.","射出箭矢，
+對單一敵人造成傷害。"
 tower.sentry.traits,Single target|Front arc only,單體攻擊|只打前方範圍
-tower.ballista.description,"A heavy bolt thrower with slow, powerful shots along a long line.",沿長直線射出重箭，射速慢但威力強。
+tower.ballista.description,"Fires heavy bolts along a long line.
+Slow shots deal powerful damage.","沿長直線射出重箭，
+射速慢但威力強。"
 tower.ballista.traits,Single target|Long straight range,單體攻擊|長直線射程
-tower.broadside.description,"Six guns each hold their own straight line, firing on their own timers.",六門砲各自守住前方直線，獨立計時開火。
+tower.broadside.description,"Fires from both broadsides,
+damaging enemies on either side.","側舷開火，
+對兩側敵人造成傷害。"
 tower.broadside.traits,Six independent guns|Side range only,六門獨立火砲|只打側舷
-tower.crossfire.description,Releases rapid shockwaves that strike all enemies in range.,快速釋放衝擊波，打擊範圍內的所有敵人；波次中持續旋轉。
+tower.crossfire.description,"Releases rapid shockwaves
+that strike all enemies in range.","快速釋放衝擊波，
+打擊範圍內的所有敵人。"
 tower.crossfire.traits,Hits every enemy in range,命中範圍內全體
-tower.mortar.description,"Lobs shells that explode on landing. Shells do not track, so enemies can walk out of the blast.",拋射砲彈，落地時爆炸。砲彈不追蹤，敵人可能走出爆炸範圍。
+tower.mortar.description,"Fires shells that deal area damage
+to ground enemies.","發射砲彈，對地面敵人
+造成範圍傷害。"
 tower.mortar.traits,Area damage|Cannot hit flying enemies,範圍傷害|無法攻擊飛行敵人
-tower.barracks.description,Deploys two soldiers who hold enemies on the road and fight them in melee.,部署兩名友軍在道路上攔截敵人並近戰。
+tower.barracks.description,"Deploys two soldiers to block enemies
+on the road and fight in melee.","部署兩名友軍在道路上
+攔截敵人並近戰。"
 tower.barracks.traits,Blocks enemies|Soldiers respawn after 5s|Cannot block flying enemies,攔截敵人|友軍陣亡 5 秒後重生|無法攔截飛行敵人
+
+card.info.base,Base stats,基礎數值
+card.info.speed,Attack speed,攻速
+card.info.speed.fast,Fast,快
+card.info.speed.medium,Medium,中速
+card.info.speed.slow,Slow,慢
+card.info.speed.very_slow,Very slow,極慢
+card.info.range,Range,射程
+card.info.range.directional,Directional area,前方範圍
+card.info.range.around,Surrounding area,周圍範圍
+card.info.range.guns,Ahead of each gun,各砲口前方
+card.info.range.garrison,Around road garrisons,道路駐點周圍
+enemy.story.soldier,"Frontline infantry, the backbone of the advancing force.",沿道路推進的前線步兵，是敵軍隊伍的中堅。
+enemy.story.quickfeet,A lightly equipped runner that slips through gaps in the defense.,輕裝斥候善於穿過防線空隙，迅速向終點推進。
+enemy.story.heavy,An armored warrior that advances slowly toward the goal.,沉重裝甲掩護著緩慢推進的戰士。
+enemy.story.rats,Small creatures that surge down the same road in packs.,成群奔竄的小型敵人，沿同一條道路湧向防線。
+enemy.story.rook,A shield bearer that draws fire away from nearby allies.,舉盾前行的守衛，以自身掩護周圍的隊伍。
+enemy.story.bloodmage,A marching spellcaster that restores nearby wounded allies.,隨軍行進的施法者，讓附近受傷的同伴再次站穩腳步。
+enemy.story.winged,A winged creature that follows the attack road from above.,盤旋於道路上方的飛獸，仍沿進攻路線接近終點。
+enemy.story.scout,A scout that takes advantage of newly completed roads.,尋找新通路的偵查兵，會利用最近接通的道路。
+enemy.story.bomber,A saboteur that briefly disables nearby defenses.,潛入火線的破壞者，會讓附近的防禦塔短暫失去作用。
+enemy.story.ravager,A siege beast whose arrival at the goal breaks the defense.,向終點緩慢逼近的攻城巨獸，足以撕開整條防線。
+enemy.story.generic,An enemy advancing along the road.,沿道路接近防線的敵軍。
+enemy.intelligence.bloodmage,Heals allies within 2.5 tiles for 18 every 3 seconds,每 3 秒治療 2.5 格內友軍 18 生命。
+enemy.intelligence.bomber,"Every 6 seconds targets a tower within 3 tiles, winds up for 1 second, then disables it for 2.5 seconds. source death removes its effect.",每 6 秒選附近 3 格內一塔，前搖 1 秒後癱瘓 2.5 秒。死亡即解除。
+enemy.intelligence.heavy,Shielded heavy infantry. Prefers heavily defended routes.,帶護盾的重裝步兵，偏好火力密集的路線。
+enemy.intelligence.quickfeet,Small and fast. Prefers lightly defended routes.,體型小、腳程快，偏好防守薄弱的路線。
+enemy.intelligence.rats,Low health. Cohorts of five share a route; each rat takes damage separately.,低生命，每群 5 隻共用路線，個別承受傷害。
+enemy.intelligence.ravager,"Charges for 1.2s, then disables up to two towers within 3 tiles for 3s; 8s cooldown after casting or cancellation. Follows its fixed road; slow and interception apply. Immune to Hunting execution. Reaching the goal ends the run.","蓄力 1.2 秒後，癱瘓 3 格內最多兩座塔 3 秒；施放或取消後冷卻 8 秒。
+可被減速與攔截。無法被處決；抵達終點即失敗。"
+enemy.intelligence.rook,"Follows the roads most allies take. Draws eligible single-target fire within 3.5 tiles; priority, distance, then spawn order break ties.",跟著多數友軍走的道路。吸引3.5 格內的單體火力。
+enemy.intelligence.scout,Uses the newest surviving complete routes. Routes established in the same wave can share traffic.,只走最新一批仍有效的完整道路
+enemy.intelligence.soldier,"Standard infantry, spread evenly across the routes.",標準步兵，平均分散在各條路線。
+enemy.intelligence.winged,Flies above roads; cannot be intercepted. Mortars need Air Strike to target or damage it. Other shooting towers can attack it.,沿道路上方飛行，無法被兵營攔截。不受地面攻擊影響
+text.level_hud.1,"Game speed: %d×
+Click / Tab to cycle 1× / 2× / 4×.","遊戲速度：%d 倍
+點擊／Tab 切換 1／2／4 倍速。"
+text.level_hud.2,Pause game · open menu · Esc,暫停遊戲並開啟選單 · Esc
+text.run_status.1,"Defense integrity: %d / %d
+Enemies reaching the goal damage the defense. A siege behemoth reaching it ends the run.","防線生命：%d / %d
+敵人抵達終點會損傷防線；攻城巨獸抵達即失敗。"
+text.run_status.2,Play again,重新開始
+text.unit_inspection_data.1,Soldier damage  %s,士兵傷害  %s
+text.unit_inspection_data.2,Melee interval  %s s,近戰間隔  %s 秒
+text.unit_inspection_data.3,Engage radius  %s,接戰距離  %s 格
+text.unit_inspection_data.4,%d soldiers · %s HP each · respawn %s s,%d 名士兵 · 每名生命 %s · 重生 %s 秒
+text.unit_inspection_data.5,Soldier ranged support  %s tiles,士兵遠程支援  %s 格
+text.unit_inspection_data.6,Damage  %s,傷害  %s
+text.unit_inspection_data.7,Interval  %s s,攻擊間隔  %s 秒
+text.unit_inspection_data.8,Gun reach  %s tiles,砲管射程  %s 格
+text.unit_inspection_data.9,Range  %s tiles,射程  %s 格
+text.unit_inspection_data.10,Blast radius  %s tiles,爆炸半徑  %s 格
+text.unit_inspection_data.11,Slow to %s%% for %s s,減速至 %s%%，持續 %s 秒
+text.unit_inspection_data.12,Durability  %s / %s,耐久  %s / %s
+text.unit_inspection_data.13,Small-target damage ×%s,對小型單位傷害 ×%s
+text.unit_inspection_data.14,Support damage +%s%%,支援傷害 +%s%%
+text.unit_inspection_data.15,Geometry damage +%s%%,配置傷害 +%s%%
+text.unit_inspection_data.16,Temporarily disabled,暫時失能
+text.unit_inspection_data.17,Base damage  %d,主堡傷害  %d
+text.unit_inspection_data.18,Shield  %s / %s,護盾  %s / %s
+text.unit_inspection_data.19,Ground,地面
+text.unit_inspection_data.20,Damage reduction %s%%,傷害減免 %s%%
+text.unit_inspection_data.21,Ends the run if it reaches the base,抵達主堡即戰敗
+text.wave_timeline.1,Relic,遺物
+text.wave_timeline.2,Entrance,新入口
+text.wave_timeline.3,Wave %d,第 %d 波
+text.wave_timeline.4,Wave,波次
+text.wave_timeline.5,Choose a new entrance,選擇新增出生點
+text.wave_timeline.6,Choose a relic,選擇遺物
+text.wave_timeline.7,"Choose a relic
+After %s · choose one of three relics.","遺物選擇
+完成 %s 後，從三件遺物選擇一件。"
+text.wave_timeline.8,Completed,已完成
+text.wave_timeline.9,In battle,戰鬥中
+text.wave_timeline.10,Upcoming,即將進行
+text.wave_timeline.11,"%s · Wave %d (%d / %d)
+%s · %d enemies · reward %d gold","%s · 第 %d 波（全局 %d / %d）
+%s · %d 名敵軍 · 完成獎勵 %d 金幣"
+text.heal_ability.1,"Every %s s, restores %s HP to allies within %s tiles, including itself, without exceeding their maximum HP.",每 %s 秒為 %s 格內的友軍（包括自己）恢復 %s 生命，不超過生命上限。
+text.sabotage_ability.1,"After a %s s windup, disables up to %d nearby towers within %s tiles for %s s. Cooldown after casting or cancellation: %s s. Its disables end when it dies or leaves.",蓄力 %s 秒後，使 %s 格內最多 %d 座附近防禦塔癱瘓 %s 秒；施放或取消後冷卻 %s 秒。來源死亡或離場便解除癱瘓。
+text.taunt_ability.1,Draws eligible single-target attacks from towers within %s tiles. Does not redirect attacks that hit the whole area.,吸引 %s 格內防禦塔可命中的單體攻擊，不會轉移整片範圍攻擊。
+text.trail_ability.1,Leaves a road trail that speeds up other ground enemies by %s%% while on it and for %s s after leaving. It does not boost itself; the trail disappears at wave end.,沿路留下痕跡，使其他地面敵軍移速提高 %s%%，離開後再持續 %s 秒。不強化自己，痕跡在波次結束時消失。
+text.enemy_codex_text.1,Shield %d,護盾 %d
+text.enemy_codex_text.2,Incoming damage reduced by %s%%.,受到的傷害降低 %s%%。
+text.enemy_codex_text.3,Cannot be intercepted by soldiers. Mortars require Air Strike to hit it; other shooting towers can attack it.,不能被士兵攔截。迫擊砲需要空襲遺物才能命中，其他射擊塔仍可攻擊。
+text.enemy_codex_text.4,"Can be slowed and intercepted, but Hunting cannot execute it. Reaching the goal ends the run immediately.",可被減速與攔截，但不能被狩獵處決；抵達終點便立即戰敗。
+text.enemy_codex_text.5,"Route behavior
+","行進路線
+"
+text.enemy_codex_text.6," "," "
+text.enemy_codex_text.7,"Abilities
+","特殊能力
+"
+text.enemy_intelligence.1,New enemy discovered · %d unread,新敵軍發現 · %d 則未讀
+text.troop.1,Only follows the shortest passable roads to the goal.,只走能抵達終點的最短道路。
+text.troop.2," It still follows roads from above, rather than flying directly across gaps.",即使在空中，也沿道路前進。
+text.troop.3,Only takes the newest complete routes that still reach the goal. Routes connected in the same wave can share the scouts; a newly built dead end does not attract them.,只走新接通的路線，要注意剛建成的道路。
+text.troop.4,"Tends to use the roads most other enemies will take, so it often travels with the main force. It does not change roads mid-march to chase an ally.",喜歡走其他敵軍多數會經過的道路，因此常與主力隊伍同路。
+text.troop.5,"Tends to avoid the roads most other enemies will take, using quieter routes instead.",傾向避開其他敵軍多數會經過的道路，改走較少敵軍使用的路線。
+text.troop.6,Seeks roads near clusters of defense towers. It may take a longer route to approach more towers instead of rushing along the shortest road.,熱愛危險，偏好靠近防禦塔密集處的道路，可能繞較長的路接近更多塔。
+text.troop.7,Usually chooses roads covered by less tower fire and favors shorter routes when other conditions are similar. It may detour around a heavily defended road.,喜歡走較少防禦塔火力覆蓋的道路，條件相近時也偏向較短路線。
+text.troop.8,Usually heads into roads covered by more tower fire. It may take a longer route through a strong defense instead of avoiding it.,偏好較多防禦塔火力覆蓋的道路。
+text.troop.9,"Splits across several available roads to the goal. It does not deliberately seek or avoid tower fire, and does not always take the shortest road.",平均路線分布，每條道路上都可能會有他們。
+text.troop.10, Groups of %d take the same route; different groups may split onto other roads.,鼠鼠每群 %d 隻共用同一條路線，不同群仍可分流。
+text.troop.11,Light,輕型
+text.troop.12,Standard,中型
+text.troop.13,Heavy,重型
+text.troop.14,Ground,地面
+text.troop.15,Armored,裝甲
+text.troop.16,Boss,首領
+text.card_combat_info.1,Attacks enemies in range.,攻擊射程內的敵人。
+text.card_combat_info.2,Soldier damage  %d,士兵傷害  %d
+text.card_combat_info.3,Damage  %d,傷害  %d
+result.victory_title,Road defended,守住了這條路
+result.defeat_title,Defense broken,防線失守
+text.progress_catalog.global_1,Encounter this enemy to unlock its record.,在戰場遭遇後解鎖此敵軍情報。
+text.relic_choice.global_1,Close,關閉
+text.level_hud.global_1,"Gold: %d
+Buy tower cards or refresh the shop.","金幣：%d
+用於購買塔牌與重刷商店。"
+text.wave_timeline.global_1,"New entrance
+After wave %d · choose a direction and entrance position.","新增出生點
+第 %d 波完成後，選擇擴張方向與入口位置。"
+ui.menu.title,BEGINS WITH A ROAD,BEGINS WITH A ROAD
+ui.run.construction.relaxed,This feature is still under construction (｡A｡),該功能該還在施工(｡A｡)
+ui.run.construction.standard,This feature is still under construction (ﾉ>ω<)ﾉ,該功能該還在施工(ﾉ>ω<)ﾉ
+ui.run.construction.challenge,This feature is still under construction (〒︿〒),該功能該還在施工(〒︿〒)
+ui.maps.construction.prefix,This level is ,關卡還
+ui.maps.construction.word,unfinished,未完成
+ui.maps.construction.suffix, because I bombed my midterms ( ºΔº ), 因為我期中考炸了( ºΔº )

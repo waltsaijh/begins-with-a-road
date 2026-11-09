@@ -7,8 +7,10 @@
 
 [node name="WaveTimeline" type="Control" unique_id=1119920192]
 layout_mode = 3
-anchor_left = 0.25
-anchor_right = 0.75
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -180.0
+offset_right = 180.0
 offset_top = 10.0
 offset_bottom = 80.0
 grow_horizontal = 2
@@ -42,3 +44,5 @@ anchor_bottom = 1.0
 mouse_filter = 2
 
 [node name="Rewards" type="Node2D" parent="."]
+
+[node name="Expansions" type="Node2D" parent="."]

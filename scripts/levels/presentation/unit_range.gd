@@ -1,7 +1,8 @@
 extends MeshInstance3D
 ## Only the selected unit owns visible geometry. Cell coverage is combat's cache.
-const FILL := Color(0.35,0.93,0.75,0.16)
-const EDGE := Color(0.20,0.70,0.46,0.72)
+const Appearance = preload("res://scripts/towers/range_appearance.gd")
+const FILL := Appearance.FILL
+const EDGE := Appearance.EDGE
 const MARK := Color(0.73,0.58,0.30,0.75)
 var cells: Array[Vector2i] = []
 var circular := false
@@ -135,7 +136,7 @@ func _guns(result: ImmediateMesh, map: GridMap, segments: Array) -> void:
 		for i in points.size():
 			var a := points[i]
 			var b := points[(i+1)%points.size()]
-			var side := (b-a).normalized().cross(Vector3.UP)*0.0125
+			var side := (b-a).normalized().cross(Vector3.UP)*(Appearance.BORDER_WIDTH*0.5)
 			_polygon(result,[a-side,b-side,b+side,a+side],EDGE)
 
 func _tiles(result: ImmediateMesh, map: GridMap, covered: Array[Vector2i], fill: Color, edge: Color) -> void:
@@ -143,7 +144,7 @@ func _tiles(result: ImmediateMesh, map: GridMap, covered: Array[Vector2i], fill:
 	for at in covered: lookup[at] = true
 	var x := map.cell_size.x*0.5
 	var z := map.cell_size.z*0.5
-	var width := minf(x,z)*0.045
+	var width := minf(x,z)*2.0*Appearance.BORDER_WIDTH
 	for at in covered:
 		var c := map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*0.13
 		if fill.a > 0: _quad(result,c,-x,-z,x,z,fill)
@@ -153,7 +154,7 @@ func _tiles(result: ImmediateMesh, map: GridMap, covered: Array[Vector2i], fill:
 		if not lookup.has(at+Vector2i.RIGHT): _quad(result,c,x-width,-z,x,z,edge)
 
 func _circle(result: ImmediateMesh, c: Vector3, x: float, z: float, fill: Color, edge: Color) -> void:
-	var width := 0.025
+	var width := Appearance.BORDER_WIDTH
 	for i in 80:
 		var a := Vector3(cos(TAU*i/80.0),0,sin(TAU*i/80.0))
 		var b := Vector3(cos(TAU*(i+1)/80.0),0,sin(TAU*(i+1)/80.0))

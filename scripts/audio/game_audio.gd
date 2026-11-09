@@ -90,8 +90,10 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	for bus_name in [&"BGM", &"Combat"]:
 		if AudioServer.get_bus_index(bus_name) < 0:
-			AudioServer.add_bus()
-			var index := AudioServer.bus_count-1
+			# Web Sample playback misorders buses when add_bus() appends (-1).
+			# Growing the count preserves Master -> destination and bus indices.
+			var index := AudioServer.bus_count
+			AudioServer.bus_count = index+1
 			AudioServer.set_bus_name(index, bus_name)
 			AudioServer.set_bus_send(index, &"Master")
 	AudioServer.set_bus_volume_linear(AudioServer.get_bus_index(&"BGM"), DEFAULT_BGM_VOLUME)

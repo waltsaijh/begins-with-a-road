@@ -3,6 +3,17 @@ class_name TowerDefinition
 extends Resource
 ## Shared tower type data. Runtime stats and occupancy belong to DefenseTower.
 
+@export_group("商店")
+## 防禦塔的商店售價（金幣）。儲存此塔 .tres 後，重新執行遊戲套用。
+## 同一塔種的所有隨機地塊配置共用此金額，不是地塊配方的價格。
+@export_range(0, 100, 1, "or_greater") var card_price := ShopConstants.DEFAULT_CARD_PRICE:
+	set(value):
+		var next := maxi(0,value)
+		if card_price == next: return
+		card_price = next
+		emit_changed()
+@export_group("")
+
 ## Stable translation ID, e.g. tower.sentry.name.
 @export var name_key := "tower.generic.name":
 	set(value):
@@ -15,8 +26,6 @@ extends Resource
 ## Optional friendly deployment; soldiers are not navigation obstacles.
 @export var deployment: BarracksDeployment
 @export var growth: TowerGrowth = preload("res://assets/data/towers/growth/standard.tres")
-## Base shop price when this tower is rolled into a construction card.
-@export_range(0, 100, 1, "or_greater") var card_price := ShopConstants.DEFAULT_CARD_PRICE
 ## Transparent icon silhouette is tinted with a darker accent_color in card UI.
 @export var icon: Texture2D:
 	set(value):

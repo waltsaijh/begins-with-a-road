@@ -67,7 +67,7 @@ static func _enemy_entry(profile: Troop) -> Dictionary:
 	var progress := (Engine.get_main_loop() as SceneTree).root.get_node("LevelProgress")
 	if not progress.enemy_unlocked(profile.troop_name):
 		return {"id": profile.troop_name, "name": "???", "icon": null, "tile": Color.TRANSPARENT,
-			"description": "Encounter this enemy to unlock its record." if TranslationServer.get_locale().begins_with("en") else "在戰場遭遇後解鎖此敵軍情報。",
+			"description": GameText.text("text.progress_catalog.global_1"),
 			"stats": PackedStringArray(), "traits": PackedStringArray()}
 	var stats := PackedStringArray([_stat("health", profile.max_health)])
 	if profile.max_shield > 0.0: stats.append(_stat("shield", profile.max_shield))
@@ -77,11 +77,10 @@ static func _enemy_entry(profile: Troop) -> Dictionary:
 	for tag in profile.tags:
 		if tag != &"ground": traits.append(TranslationServer.translate("ui.progress.tag.%s" % tag))
 	if profile.damage_reduction > 0.0: traits.append(_stat("reduction", profile.damage_reduction*100.0))
-	if profile.prefers_new_roads() or profile.only_shortest(): traits.append(profile.route_description())
-	var english := TranslationServer.get_locale().begins_with("en")
+	var detail := CodexText.description(profile)
 	return {"id": profile.troop_name, "name": profile.localized_name(), "icon": profile.icon, "tile": Color.TRANSPARENT, "tint": profile.icon_color(),
-		"troop": profile, "detail": CodexText.description(profile),
-		"description": profile.ability_text_en if english else profile.ability_text, "stats": stats, "traits": traits}
+		"troop": profile, "detail": detail,
+		"description": detail, "stats": stats, "traits": traits}
 
 ## Generic relics keep their icon's own colors, as they do in a run.
 static func _relic_entry(relic: RelicDefinition) -> Dictionary:
@@ -89,7 +88,7 @@ static func _relic_entry(relic: RelicDefinition) -> Dictionary:
 	if relic.repeatable: stats.append(_stat("stacks", relic.max_stacks))
 	var entry := {"id": String(relic.id), "name": TranslationServer.translate(relic.name_key), "icon": relic.icon, "tile": Color.TRANSPARENT,
 		"usage": relic.usage_text(), "usage_color": relic.icon_color(),
-		"description": TranslationServer.translate(relic.description_key), "stats": stats, "traits": PackedStringArray()}
+		"description": relic.localized_description(), "stats": stats, "traits": PackedStringArray()}
 	if relic.tower != null: entry.tint = relic.icon_color()
 	return entry
 

@@ -171,7 +171,7 @@ func _refresh_relic_tool() -> void:
 	relic_list.select(selected_relic_index)
 	picker.text = relic_list.get_item_text(selected_relic_index)+" ▾"
 	var relic: RelicDefinition = relics.catalog.entries[selected_relic_index]
-	relic_description.text = tr(relic.description_key)
+	relic_description.text = relic.localized_description()
 	if relic.id == &"gold": relic_description.text += "\n移除持有紀錄不回收已發放金幣。"
 	grant_button.disabled = not relics.can_acquire(relic)
 	grant_button.text = "已達持有上限" if grant_button.disabled else "立即增添所選遺物"

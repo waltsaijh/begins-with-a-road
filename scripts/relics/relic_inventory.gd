@@ -36,7 +36,7 @@ func _refresh() -> void:
 		if relic == null: continue
 		var icon: TextureRect = Item.instantiate()
 		icon.texture = relic.icon
-		icon.tooltip_text = "%s\n%s" % [tr(relic.name_key),tr(relic.description_key)]
+		icon.tooltip_text = "%s\n%s" % [tr(relic.name_key),relic.localized_description()]
 		icon.set_meta("relic_id",id)
 		if relic.tower != null:
 			var mask := ShaderMaterial.new()

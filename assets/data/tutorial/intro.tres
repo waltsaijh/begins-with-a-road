@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="TutorialDefinition" format=3 uid="uid://kjj24npyu6vr"]
+[gd_resource type="Resource" script_class="TutorialDefinition" format=3 uid="uid://ceu6i5u20vcxt"]
 
 [ext_resource type="Script" uid="uid://uc2xwo88w3ys" path="res://scripts/cards/definitions/build_card.gd" id="1_2xkhq"]
 [ext_resource type="Resource" uid="uid://bbbau5u7i34ve" path="res://assets/data/towers/crossfire.tres" id="3_l7e5n"]

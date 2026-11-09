@@ -9,38 +9,39 @@
 [sub_resource type="Resource" id="W1G1"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/quickfeet.tres"
-start_tick = 24
-enemy_count = 3
+start_tick = 5
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W1"]
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W1G1")])
 move_speed = 1.25
-reward = 9
+reward = 80
 
 [sub_resource type="Resource" id="W2G0"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/soldier.tres"
-enemy_count = 6
-interval_ticks = 6
+batch_size = 2
+interval_ticks = 8
 
 [sub_resource type="Resource" id="W2G1"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/rats.tres"
 start_tick = 12
+enemy_count = 5
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W2G2"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/rook.tres"
-enemy_count = 1
+enemy_count = 2
+interval_ticks = 10
 
 [sub_resource type="Resource" id="W2"]
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W2G0"), SubResource("W2G1"), SubResource("W2G2")])
 move_speed = 1.25
-reward = 9
+reward = 60
 
 [sub_resource type="Resource" id="W3G0"]
 script = ExtResource("group")
@@ -59,14 +60,14 @@ interval_ticks = 24
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/heavy.tres"
 start_tick = 8
-enemy_count = 2
+enemy_count = 3
 interval_ticks = 24
 
 [sub_resource type="Resource" id="W3"]
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W3G0"), SubResource("W3G1"), SubResource("W3G2")])
 move_speed = 1.25
-reward = 9
+reward = 40
 
 [sub_resource type="Resource" id="A1"]
 script = ExtResource("act")
@@ -96,7 +97,7 @@ interval_ticks = 24
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W4G0"), SubResource("W4G1"), SubResource("W4G2")])
 move_speed = 1.35
-reward = 11
+reward = 40
 
 [sub_resource type="Resource" id="W5G0"]
 script = ExtResource("group")
@@ -122,7 +123,7 @@ interval_ticks = 24
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W5G0"), SubResource("W5G1"), SubResource("W5G2")])
 move_speed = 1.35
-reward = 11
+reward = 30
 
 [sub_resource type="Resource" id="W6G0"]
 script = ExtResource("group")
@@ -154,7 +155,7 @@ enemy_count = 1
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W6G0"), SubResource("W6G1"), SubResource("W6G2"), SubResource("W6G3")])
 move_speed = 1.35
-reward = 11
+reward = 40
 
 [sub_resource type="Resource" id="A2"]
 script = ExtResource("act")
@@ -186,7 +187,7 @@ interval_ticks = 7
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W7G0"), SubResource("W7G1"), SubResource("W7G2")])
 move_speed = 1.45
-reward = 12
+reward = 30
 
 [sub_resource type="Resource" id="W8G0"]
 script = ExtResource("group")
@@ -200,11 +201,19 @@ troop_path = "res://assets/data/troops/heavy.tres"
 enemy_count = 6
 interval_ticks = 12
 
+[sub_resource type="Resource" id="Resource_nxu0v"]
+script = ExtResource("group")
+troop_path = "res://assets/data/troops/bloodmage.tres"
+start_tick = 10
+enemy_count = 4
+batch_size = 2
+interval_ticks = 20
+
 [sub_resource type="Resource" id="W8"]
 script = ExtResource("wave")
-groups = Array[ExtResource("group")]([SubResource("W8G0"), SubResource("W8G1")])
+groups = Array[ExtResource("group")]([SubResource("W8G0"), SubResource("W8G1"), SubResource("Resource_nxu0v")])
 move_speed = 1.45
-reward = 12
+reward = 20
 
 [sub_resource type="Resource" id="W9G0"]
 script = ExtResource("group")
@@ -236,7 +245,7 @@ interval_ticks = 8
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W9G0"), SubResource("W9G1"), SubResource("W9G2"), SubResource("W9G3")])
 move_speed = 1.45
-reward = 12
+reward = 20
 
 [sub_resource type="Resource" id="A3"]
 script = ExtResource("act")
@@ -268,7 +277,7 @@ interval_ticks = 10
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W10G0"), SubResource("W10G1"), SubResource("W10G2")])
 move_speed = 1.5
-reward = 14
+reward = 5
 
 [sub_resource type="Resource" id="W11G0"]
 script = ExtResource("group")
@@ -286,15 +295,16 @@ interval_ticks = 10
 [sub_resource type="Resource" id="W11G2"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/winged.tres"
-start_tick = 24
-enemy_count = 12
-interval_ticks = 3
+start_tick = 20
+enemy_count = 24
+batch_size = 3
+interval_ticks = 4
 
 [sub_resource type="Resource" id="W11"]
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W11G0"), SubResource("W11G1"), SubResource("W11G2")])
 move_speed = 1.5
-reward = 14
+reward = 5
 
 [sub_resource type="Resource" id="W12G0"]
 script = ExtResource("group")
@@ -313,7 +323,8 @@ interval_ticks = 10
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/bomber.tres"
 start_tick = 16
-enemy_count = 3
+enemy_count = 6
+batch_size = 2
 interval_ticks = 10
 
 [sub_resource type="Resource" id="W12G3"]
@@ -334,7 +345,7 @@ interval_ticks = 4
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W12G0"), SubResource("W12G1"), SubResource("W12G2"), SubResource("W12G3"), SubResource("W12G4")])
 move_speed = 1.5
-reward = 14
+reward = 5
 
 [sub_resource type="Resource" id="A4"]
 script = ExtResource("act")
@@ -373,7 +384,6 @@ interval_ticks = 6
 script = ExtResource("wave")
 groups = Array[ExtResource("group")]([SubResource("W13G0"), SubResource("W13G1"), SubResource("W13G2"), SubResource("W13G3")])
 move_speed = 1.55
-reward = 15
 
 [sub_resource type="Resource" id="W14G0"]
 script = ExtResource("group")
@@ -385,7 +395,7 @@ interval_ticks = 3
 [sub_resource type="Resource" id="W14G1"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/scout.tres"
-enemy_count = 14
+enemy_count = 8
 interval_ticks = 3
 
 [sub_resource type="Resource" id="W14G2"]
@@ -402,11 +412,17 @@ start_tick = 12
 enemy_count = 12
 interval_ticks = 3
 
+[sub_resource type="Resource" id="Resource_6ru0y"]
+script = ExtResource("group")
+troop_path = "res://assets/data/troops/rook.tres"
+start_tick = 14
+batch_size = 5
+interval_ticks = 20
+
 [sub_resource type="Resource" id="W14"]
 script = ExtResource("wave")
-groups = Array[ExtResource("group")]([SubResource("W14G0"), SubResource("W14G1"), SubResource("W14G2"), SubResource("W14G3")])
+groups = Array[ExtResource("group")]([SubResource("W14G0"), SubResource("W14G1"), SubResource("W14G2"), SubResource("W14G3"), SubResource("Resource_6ru0y")])
 move_speed = 1.55
-reward = 15
 
 [sub_resource type="Resource" id="W15G0"]
 script = ExtResource("group")
@@ -441,13 +457,6 @@ start_tick = 64
 enemy_count = 6
 interval_ticks = 6
 
-[sub_resource type="Resource" id="W15G5"]
-script = ExtResource("group")
-troop_path = "res://assets/data/troops/scout.tres"
-start_tick = 76
-enemy_count = 8
-interval_ticks = 3
-
 [sub_resource type="Resource" id="W15G6"]
 script = ExtResource("group")
 troop_path = "res://assets/data/troops/winged.tres"
@@ -462,11 +471,17 @@ start_tick = 76
 enemy_count = 2
 interval_ticks = 10
 
+[sub_resource type="Resource" id="Resource_pntgv"]
+script = ExtResource("group")
+troop_path = "res://assets/data/troops/heavy.tres"
+start_tick = 5
+batch_size = 2
+interval_ticks = 15
+
 [sub_resource type="Resource" id="W15"]
 script = ExtResource("wave")
-groups = Array[ExtResource("group")]([SubResource("W15G0"), SubResource("W15G1"), SubResource("W15G2"), SubResource("W15G3"), SubResource("W15G4"), SubResource("W15G5"), SubResource("W15G6"), SubResource("W15G7")])
+groups = Array[ExtResource("group")]([SubResource("W15G0"), SubResource("W15G1"), SubResource("W15G2"), SubResource("W15G3"), SubResource("W15G4"), SubResource("W15G6"), SubResource("W15G7"), SubResource("Resource_pntgv")])
 move_speed = 1.55
-reward = 0
 
 [sub_resource type="Resource" id="A5"]
 script = ExtResource("act")
@@ -483,3 +498,4 @@ acts = Array[ExtResource("act")]([SubResource("A1"), SubResource("A2"), SubResou
 base_health = 20
 starting_gold = 9
 opening_shop = true
+expansion_wave_interval = 5

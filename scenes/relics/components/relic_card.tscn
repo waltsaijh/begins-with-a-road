@@ -22,7 +22,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
 [node name="RelicCard" type="Button" groups=["audio_card_hover"]]
-custom_minimum_size = Vector2(184, 272)
+custom_minimum_size = Vector2(232, 400)
 theme_override_styles/normal = SubResource("normal")
 theme_override_styles/hover = SubResource("hover")
 theme_override_styles/pressed = SubResource("hover")
@@ -47,7 +47,7 @@ stretch_mode = 5
 [node name="Heading" type="VBoxContainer" parent="Contents"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = 4
 [node name="Title" type="Label" parent="Contents/Heading"]
 layout_mode = 2
 mouse_filter = 2
@@ -65,4 +65,5 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.23,0.30,0.27,1)
 theme_override_font_sizes/font_size = 14
-autowrap_mode = 2
+theme_override_constants/line_spacing = 3
+autowrap_mode = 3

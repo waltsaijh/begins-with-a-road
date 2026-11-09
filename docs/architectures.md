@@ -10,7 +10,7 @@
 | `scenes/` | 遊戲入口及依功能分類的場景；各分類的 `components/` 保存共用範本 |
 | `scripts/` | 依功能分類的遊戲規則、流程協調與畫面控制 |
 | `native/` | C++ 道路圖、局部搜尋、路線池與編輯檢查核心；`godot-cpp/` 是固定版本 SDK |
-| `addons/` | Godot 編輯器工具，目前包含波次編輯器 |
+| `addons/` | Godot 編輯器工具，包含波次編輯器與遊戲文本主工作區 |
 | `tests/` | 依功能分類的 Godot／C++ 測試，以及共用測試資料 |
 | `tools/` | 原生建置、離線素材產生、Web 測試匯出與驗證工具 |
 | `reports/` | 精簡保留的歷史效能結論，不存例行測試產物 |
@@ -50,7 +50,7 @@ scripts/
 ├── camera/                  地圖鏡頭
 ├── cards/                   選牌、旋轉與放置意圖
 │   ├── definitions/         建造卡、地塊配置與候選權重
-│   ├── presentation/        卡面、手牌、商店畫面與世界預覽
+│   ├── presentation/        卡面、手牌、商店畫面、共用 hover 資訊紙條與世界預覽
 │   └── shop/                金幣、商品、購買與重刷
 ├── combat/                  戰鬥主迴圈與敵人格子索引
 │   ├── attacks/             攻擊策略與發射時的傷害快照
@@ -160,7 +160,7 @@ scripts/
 
 更細的操作入口見 [場景導覽](../scenes/README.md)、[測試說明](../tests/README.md)、[工具說明](../tools/README.md)與 [原生核心](../native/README.md)。
 
-Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。
+Phase 3 的 TowerGrowth 負責等級基礎倍率，TowerMap 辨識原地升級並保留道路提交邊界。RunRelics 是 TowerMap 的每局子節點；CombatSystem／AttackPayload／FriendlySoldier 消費實例效果，level_session 協調獎勵與擴張順序。RelicDefinition 為進度、選擇與持有詳情提供共用的資源數值描述格式化，EnemyAbility／Troop 提供玩家可讀的能力與路線行為文字；不把呈現格式化混入戰鬥或尋路。資料及 UI 範本分別在 assets/data/relics 與 scenes/relics，詳細規則見 [Phase 3](phase3.md)。
 
 Phase 4 沿用 `enemies/troops` 資料型別；`spawning` 將整群配額展開為個體。`navigation/routes` 保存每局物理路網歷史與硬性候選快取，原生核心提供最短格距及新通路查證；不把候選索引當作持久身份。`combat` 的敵軍能力協調器在塔／友軍前處理治療與癱瘓，共用敵人空間索引。`enemies/presentation` 管理首次提示與可重開情報，`enemies/rendering` 管理共用步態與能力環，詳細規則見 [Phase 4](phase4.md)。
 
@@ -169,3 +169,5 @@ Phase 5 的 `levels` 負責防線生命、終局與四次獎勵時序，`levels/
 2026-11-03：cards/definitions 的正式候選解析讀取 Tower Tile Editor 已標記的基礎組合，不複製幾何；towers/ 的塔體幾何提供實例、威脅與預覽一致的局部中心／方向，顯示組件依 footprint 快取並由塔實例控制三段外觀。cards/presentation 維持塔體、道路、射程三層顯示；多格細節與驗證見 [塔體與預覽](tower_visuals_and_preview.md)。
 
 UI Slice A：敵人 presentation 接實際出生訊號，持有每局已遭遇／未讀佇列，並共用模型預覽與圖鑑版面；HUD 管理詳情頁的暫停／鏡頭鎖定，interface 的 inspection_panel 僅隔離輸入。遺物圖示列仍消費 RunRelics；保存只由 LevelProgress 擴充 v1 ConfigFile 的 codex section。詳見 [UI Slice A](ui_slice_a.md)。
+
+文本編輯器的資料模型僅持有 CSV 字串草稿，處理多行解析、格式參數驗證、檔案衝突及文字欄儲存；主工作區負責分類搜尋、兩語編輯與原生 Undo／Redo。正式遊戲透過 interface/GameText 讀翻譯，不依賴 addons；遺物仍由原 Resource 提供數值，Troop／EnemyAbility 保留機制與傳入格式化參數的責任。

@@ -19,6 +19,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	# Keep the normal HUD pause control reachable; the pause menu owns its overlay.
 	visible = not get_tree().paused or $Collection.visible
+	if choosing: _layout_cards()
 
 func setup(manager: RunRelics) -> void:
 	relics = manager
@@ -56,9 +57,37 @@ func _rebuild_cards() -> void:
 		card.get_node("Contents/Icon").texture = relic.icon
 		card.get_node("Contents/Heading/Title").text = tr(relic.name_key)
 		card.get_node("Contents/Heading/Usage").text = relic.usage_text()
-		card.get_node("Contents/Description").text = tr(relic.description_key)
+		card.get_node("Contents/Description").text = relic.localized_description()
 		_color_card(card,relic)
 		card.pressed.connect(choose.bind(relic))
+	_layout_cards.call_deferred()
+
+func _refresh_card_text() -> void:
+	for i in mini(offers.size(),row.get_child_count()):
+		var card: Button = row.get_child(i)
+		card.get_node("Contents/Heading/Title").text = tr(offers[i].name_key)
+		card.get_node("Contents/Heading/Usage").text = offers[i].usage_text()
+		card.get_node("Contents/Description").text = offers[i].localized_description()
+	_layout_cards.call_deferred()
+
+func _layout_cards() -> void:
+	if not choosing or row.get_child_count() == 0: return
+	var viewport := get_viewport().get_visible_rect().size
+	var width := minf(232.0,(viewport.x-64.0-20.0*(row.get_child_count()-1))/row.get_child_count())
+	for card: Button in row.get_children():
+		card.custom_minimum_size = Vector2(width,400)
+		var description: Label = card.get_node("Contents/Description")
+		var font_size := 14
+		var font := description.get_theme_font("font")
+		var available := minf(400.0,viewport.y-150.0)-170.0
+		while font_size > 12:
+			var measured := font.get_multiline_string_size(description.text,HORIZONTAL_ALIGNMENT_LEFT,width-32,font_size,-1,TextServer.BREAK_MANDATORY|TextServer.BREAK_WORD_BOUND|TextServer.BREAK_ADAPTIVE)
+			if measured.y+description.text.count("\n")*3 <= available: break
+			font_size -= 1
+		if description.get_theme_font_size("font_size") != font_size: description.add_theme_font_size_override("font_size",font_size)
+	# Keep the debug action below the real card bottoms as text grows.
+	var bottom := row.get_global_rect().end.y
+	debug_reroll_button.position.y = minf(viewport.y-44,bottom+10)
 
 func _color_card(card: Button, relic: RelicDefinition) -> void:
 	var accent := relic.presentation_color()
@@ -116,7 +145,7 @@ func _refresh_collection() -> void:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(38,38)
 		button.set_meta("relic_id",id)
-		button.tooltip_text = "%s ×%d\n%s" % [tr(relic.name_key),relics.held[id],tr(relic.description_key)]
+		button.tooltip_text = "%s ×%d\n%s" % [tr(relic.name_key),relics.held[id],relic.localized_description()]
 		var normal := StyleBoxFlat.new()
 		normal.bg_color = Color(relic.presentation_color(),0.12)
 		normal.border_color = Color(relic.presentation_color().darkened(0.2),0.65)
@@ -171,15 +200,17 @@ func _show_relic() -> void:
 		material.shader = IconMask
 		icon.material = material
 		icon.self_modulate = _inspected.icon_color()
-	$Collection/Paper/Details/Description.text = _inspected.usage_text()+"\n\n"+tr(_inspected.description_key)
-	$Collection/Paper/Details/Close.text = "Close" if TranslationServer.get_locale().begins_with("en") else "關閉"
+	$Collection/Paper/Details/Description.text = _inspected.usage_text()+"\n\n"+_inspected.localized_description()
+	$Collection/Paper/Details/Close.text = GameText.text("text.relic_choice.global_1")
 
 func close_collection() -> void:
 	$Collection.hide()
 	if is_instance_valid(_inspection_hud): _inspection_hud.end_inspection(self)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and relics != null: _refresh_collection()
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready() and relics != null:
+		_refresh_collection()
+		if choosing: _refresh_card_text()
 
 func _exit_tree() -> void:
 	if is_instance_valid(_inspection_hud) and _inspection_hud.is_inside_tree(): _inspection_hud.end_inspection(self)

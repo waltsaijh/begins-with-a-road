@@ -304,6 +304,7 @@ func _finish_wave_transition() -> void:
 		return
 	if _is_act_boundary(current_wave) and (current_wave < _waves.size() or level.reward_final_act):
 		choosing_relic = true
+		timeline.set_reward_active(true)
 		_wave.start_allowed = false
 		get_node("CardPlacement").set_entry_selection(true)
 		_update_start_callout()
@@ -311,11 +312,13 @@ func _finish_wave_transition() -> void:
 		if relic_choice.begin(): return
 		# Custom catalogs may be exhausted. No duplicate reward or deadlocked run.
 		choosing_relic = false
+	timeline.set_reward_active(false)
 	_continue_after_reward()
 
 func _on_relic_selected(_relic: RelicDefinition) -> void:
 	if not choosing_relic or is_queued_for_deletion(): return
 	choosing_relic = false
+	timeline.set_reward_active(false)
 	_continue_after_reward()
 
 func _continue_after_reward() -> void:
@@ -328,6 +331,7 @@ func _continue_after_reward() -> void:
 		_prepare_wave()
 		if _should_expand_after(current_wave):
 			choosing_start = true
+			timeline.set_expansion_active(true)
 			_wave.start_allowed = false
 			get_node("CardPlacement").set_entry_selection(true)
 			_update_start_callout()
@@ -346,11 +350,7 @@ func _is_act_boundary(index: int) -> bool:
 	return false
 
 func _should_expand_after(index: int) -> bool:
-	var count := 0
-	for act in level.acts:
-		count += act.waves.size()
-		if count == index: return act.add_start_after_completion
-	return false
+	return level.expands_after(index)
 
 func restart_level() -> int:
 	LevelLaunch.select(level)

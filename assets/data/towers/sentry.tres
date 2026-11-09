@@ -1,6 +1,5 @@
 [gd_resource type="Resource" script_class="TowerDefinition" format=3 uid="uid://ctxkqyv56ojbu"]
 
-[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/sentry.tscn" id="art_slice_e"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://d267iu2yunnih" path="res://assets/sprites/towers/sentry.png" id="1_yfivi"]
 [ext_resource type="PackedScene" uid="uid://c3ps5lqrpn65o" path="res://assets/models/towers/sentry.tscn" id="2"]
@@ -8,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://cuw4f0ui2jsep" path="res://assets/data/towers/attacks/sentry_arrow.tres" id="3_attack"]
 [ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="4_candidate"]
 [ext_resource type="Resource" uid="uid://doxum7q1mrfsw" path="res://assets/data/towers/ranges/sentry_forward.tres" id="5_area"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/sentry.tscn" id="art_slice_e"]
 
 [sub_resource type="Resource" id="corner_candidate"]
 script = ExtResource("4_candidate")
@@ -27,11 +27,10 @@ preset_path = "res://assets/data/tile_presets/blasting.tres"
 
 [resource]
 script = ExtResource("1")
-visual_model = ExtResource("art_slice_e")
+card_price = 30
 name_key = "tower.sentry.name"
-preset_group = "base"
 model = ExtResource("2")
-card_price = 9
+visual_model = ExtResource("art_slice_e")
 icon = ExtResource("1_yfivi")
 accent_color = Color(0.52, 0.8, 0.83, 1)
 footprint = Array[Vector2i]([Vector2i(0, 0)])
@@ -41,4 +40,5 @@ attack_interval = 0.5
 attack = ExtResource("3_attack")
 aim_pivot_path = NodePath("AimPivot")
 muzzle_path = NodePath("AimPivot/ArrowRelease")
+preset_group = "base"
 tile_preset_candidates = Array[ExtResource("4_candidate")]([SubResource("corner_candidate"), SubResource("bridge_candidate"), SubResource("flank_candidate"), SubResource("blasting_candidate")])

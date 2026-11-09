@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/cards/card_placement.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/cards/card_hand.tscn" id="2"]
@@ -6,6 +6,8 @@
 
 [ext_resource type="PackedScene" path="res://scenes/cards/card_shop.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://scenes/cards/components/rotation_key_hint.tscn" id="9_hint"]
+
+[ext_resource type="PackedScene" path="res://scenes/cards/components/card_hover_note.tscn" id="10_note"]
 
 [node name="CardPlacement" type="Node3D"]
 script = ExtResource("1")
@@ -20,3 +22,5 @@ layer = 1
 [node name="Hand" parent="." instance=ExtResource("2")]
 
 [node name="Shop" parent="." instance=ExtResource("8")]
+
+[node name="CardHoverNote" parent="." instance=ExtResource("10_note")]

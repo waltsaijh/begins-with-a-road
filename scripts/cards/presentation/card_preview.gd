@@ -2,8 +2,9 @@ extends Node3D
 ## Placement and attack tiles share the definition used by real combat/threat.
 @export var valid_color := Color(0.35, 0.93, 0.75, 0.52)
 @export var invalid_color := Color(1.0, 0.3, 0.22, 0.56)
-@export var range_fill_color := Color(0.96, 0.68, 0.21, 0.18)
-@export var range_border_color := Color(0.85, 0.53, 0.12, 0.5)
+const RangeAppearance = preload("res://scripts/towers/range_appearance.gd")
+@export var range_fill_color := RangeAppearance.FILL
+@export var range_border_color := RangeAppearance.EDGE
 @onready var ground: MeshInstance3D = $Ground
 @onready var attack_area: MeshInstance3D = $AttackArea
 var range_cells: Array[Vector2i] = []
@@ -143,10 +144,10 @@ func _show_attack_area(map: GridMap, definition: Resource, cell: Vector3i, turns
 				var center := map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*0.12
 				_range_quad(mesh,center,-0.5,-0.5,0.5,0.5,range_fill_color)
 				var edge_center := center+Vector3.UP*0.001
-				if not covered.has(at+Vector2i.UP): _range_quad(mesh,edge_center,-0.5,-0.5,0.5,-0.47,range_border_color)
-				if not covered.has(at+Vector2i.DOWN): _range_quad(mesh,edge_center,-0.5,0.47,0.5,0.5,range_border_color)
-				if not covered.has(at+Vector2i.LEFT): _range_quad(mesh,edge_center,-0.5,-0.5,-0.47,0.5,range_border_color)
-				if not covered.has(at+Vector2i.RIGHT): _range_quad(mesh,edge_center,0.47,-0.5,0.5,0.5,range_border_color)
+				if not covered.has(at+Vector2i.UP): _range_quad(mesh,edge_center,-0.5,-0.5,0.5,-0.5+RangeAppearance.BORDER_WIDTH,range_border_color)
+				if not covered.has(at+Vector2i.DOWN): _range_quad(mesh,edge_center,-0.5,0.5-RangeAppearance.BORDER_WIDTH,0.5,0.5,range_border_color)
+				if not covered.has(at+Vector2i.LEFT): _range_quad(mesh,edge_center,-0.5,-0.5,-0.5+RangeAppearance.BORDER_WIDTH,0.5,range_border_color)
+				if not covered.has(at+Vector2i.RIGHT): _range_quad(mesh,edge_center,0.5-RangeAppearance.BORDER_WIDTH,-0.5,0.5,0.5,range_border_color)
 		mesh.surface_end()
 	attack_area.mesh = mesh
 
@@ -157,7 +158,7 @@ func _circle(mesh: ImmediateMesh, center: Vector3, radius: float) -> void:
 		mesh.surface_set_color(range_fill_color)
 		for point in [Vector3.ZERO,a*radius,b*radius]: mesh.surface_add_vertex(center+point)
 		mesh.surface_set_color(range_border_color)
-		for point in [a*radius,a*(radius-0.035),b*radius,b*radius,a*(radius-0.035),b*(radius-0.035)]: mesh.surface_add_vertex(center+point+Vector3.UP*0.001)
+		for point in [a*radius,a*(radius-RangeAppearance.BORDER_WIDTH),b*radius,b*radius,a*(radius-RangeAppearance.BORDER_WIDTH),b*(radius-RangeAppearance.BORDER_WIDTH)]: mesh.surface_add_vertex(center+point+Vector3.UP*0.001)
 
 func _range_quad(mesh: ImmediateMesh, center: Vector3, left: float, top: float, right: float, bottom: float, color: Color) -> void:
 	mesh.surface_set_color(color)
