@@ -43,6 +43,8 @@ func row(y: int, count := 4, start := 0) -> PackedVector2Array:
 	return result
 
 func _ready() -> void:
+	# Drifting cloud shadows are cosmetic and time-varying; keep pixel probes deterministic.
+	RenderingServer.global_shader_parameter_set("cloud_shadow_strength", 0.0)
 	automatic = "--verify" in OS.get_cmdline_user_args() or "--capture" in OS.get_cmdline_user_args()
 	viewport = SubViewport.new(); viewport.size = Vector2i(1440,900); viewport.own_world_3d = true; viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS; add_child(viewport)
 	var container := TextureRect.new(); container.texture = viewport.get_texture(); container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); container.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; add_child(container)

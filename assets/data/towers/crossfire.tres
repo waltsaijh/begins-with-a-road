@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/towers/crossfire.tscn" id="3_st668"]
 [ext_resource type="Script" uid="uid://doqrighfmg4d4" path="res://scripts/towers/tower_definition.gd" id="4_fbig6"]
 [ext_resource type="Script" uid="uid://baqwkxvo8w1fd" path="res://scripts/cards/definitions/tile_preset_candidate.gd" id="5_kljqr"]
-[ext_resource type="PackedScene" path="res://assets/models/towers/integrated/crossfire.tscn" id="art_slice_e"]
+[ext_resource type="PackedScene" path="res://assets/models/towers/art_slice_g/integrated/crossfire.tscn" id="art_slice_e"]
 
 [sub_resource type="Resource" id="Resource_klffx"]
 script = ExtResource("5_kljqr")

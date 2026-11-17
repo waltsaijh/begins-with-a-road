@@ -2,10 +2,21 @@ extends RefCounted
 ## Display-only meshes. Logical GridMap IDs, ports and routes remain untouched.
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
 const MATERIAL = preload("res://assets/materials/solid_color.tres")
-const ROAD := Color("bca77b")
-const INACTIVE := Color("929a98")
-const STONE := Color("d2c6aa")
-const SIDE := Color("60768a")
+## Art Slice G "sky island": grass tops, carved stone curbs, large weathered
+## flagstone roads and massive grey stone sides.
+const ROAD := Color("6f736d") # deep joints between slabs
+const INACTIVE := Color("6c7272")
+const STONE := Color("8fae5c") # grass on island tops
+const CURB := Color("b9bbb2")
+const SIDE := Color("8e928b")
+const SLABS := [Color("cfcdc3"), Color("c2c1b8"), Color("d8d5ca"), Color("b8b8b0"), Color("c9c4b6")]
+const SLAB_MOSS := Color("9fae7c")
+const SLABS_INACTIVE := [Color("9da3a2"), Color("8f9594"), Color("a8adac")]
+const SLAB_PITCH := 0.25
+const SLAB_GAP := 0.016
+const SLAB_HEIGHT := 0.018
+## Island side: grass lip, then two courses of massive grey stone.
+const SIDE_BANDS := [[-0.028, Color("6e8d43")], [-0.175, Color("9a9d95")], [-0.19, Color("666a65")], [-0.37, Color("8b8f88")]]
 const ROAD_HEIGHT := 0.0
 const BANK_HEIGHT := 0.065
 const BANK_SLOPE := 0.045
@@ -157,6 +168,47 @@ static func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector
 		st.set_color(colors[index] if colors.size() == 4 else color)
 		st.add_vertex(vertices[index])
 
+static func _courses(st: SurfaceTool, a: Vector3, b: Vector3) -> void:
+	var top_a := a.y; var top_b := b.y
+	for band: Array in SIDE_BANDS:
+		var bottom: float = band[0]
+		_quad(st,Vector3(a.x,top_a,a.z),Vector3(a.x,bottom,a.z),Vector3(b.x,bottom,b.z),Vector3(b.x,top_b,b.z),band[1])
+		top_a = bottom; top_b = bottom
+
+## Large running-bond flagstones on a cell-aligned grid (stones continue across
+## cells). Some slabs span two columns; each has a slightly tilted, worn top.
+static func _cobbles(st: SurfaceTool, rectangles: Array[Rect2], low: Array, valid: bool) -> void:
+	var palette: Array = SLABS if valid else SLABS_INACTIVE
+	for row in 4:
+		var z0 := -0.5+row*SLAB_PITCH
+		var shift := SLAB_PITCH*0.5 if row % 2 else 0.0
+		var column := -1
+		while column < 5:
+			var hash := absi(((row+3)*73856093) ^ ((column+11)*19349663))
+			var span := 2 if hash % 4 == 0 else 1
+			var x0 := -0.5+column*SLAB_PITCH+shift
+			var stone := Rect2(Vector2(x0,z0),Vector2(SLAB_PITCH*span,SLAB_PITCH))
+			column += span
+			for rect: Rect2 in rectangles:
+				var piece := stone.intersection(rect)
+				if piece.size.x < 0.035 or piece.size.y < 0.035: continue
+				var color: Color = palette[hash % palette.size()]
+				if valid and hash % 7 == 3: color = color.lerp(SLAB_MOSS,0.55)
+				color = color.darkened(CONTACT_SHADOW_STRENGTH*0.5*_contact_shadow(piece.get_center(),low))
+				var g := SLAB_GAP*0.5
+				var lo := piece.position+Vector2(g,g); var hi := piece.end-Vector2(g,g)
+				var base := SLAB_HEIGHT*(0.75+0.5*float(hash % 5)/4.0)
+				var bevel := minf(0.02,minf(hi.x-lo.x,hi.y-lo.y)*0.25)
+				var t0 := lo+Vector2(bevel,bevel); var t1 := hi-Vector2(bevel,bevel)
+				var tilt: float = [0.0,0.004,-0.003,0.002][hash % 4]
+				var b := [Vector3(lo.x,ROAD_HEIGHT,lo.y),Vector3(hi.x,ROAD_HEIGHT,lo.y),Vector3(hi.x,ROAD_HEIGHT,hi.y),Vector3(lo.x,ROAD_HEIGHT,hi.y)]
+				var t := [Vector3(t0.x,base+tilt,t0.y),Vector3(t1.x,base,t0.y),Vector3(t1.x,base-tilt,t1.y),Vector3(t0.x,base,t1.y)]
+				_quad(st,t[0],t[1],t[2],t[3],color)
+				var side := color.darkened(0.18)
+				for i in 4:
+					var j := (i+1)%4
+					_quad(st,b[i],b[j],t[j],t[i],side)
+
 static func _top(st: SurfaceTool, x0: float, z0: float, x1: float, z1: float, y: float, color: Color) -> void:
 	_quad(st,Vector3(x0,y,z0),Vector3(x1,y,z0),Vector3(x1,y,z1),Vector3(x0,y,z1),color)
 
@@ -212,6 +264,7 @@ static func _mesh(road: Vector2i, neighbors: int, valid: bool, low: Array = []) 
 			for rect: Rect2 in rectangles:
 				if rect.has_point(center): is_road = true; break
 			var color := (ROAD if valid else INACTIVE) if is_road else STONE
+			if not is_road and road.x >= 0 and _height(center,low) < BANK_HEIGHT-0.0001: color = CURB
 			var points := [Vector2(xs[x],zs[z]),Vector2(xs[x+1],zs[z]),Vector2(xs[x+1],zs[z+1]),Vector2(xs[x],zs[z+1])]
 			var vertices: Array[Vector3] = []
 			var colors := PackedColorArray()
@@ -223,8 +276,8 @@ static func _mesh(road: Vector2i, neighbors: int, valid: bool, low: Array = []) 
 					if is_road:
 						if not occlusion.has(point): occlusion[point] = _contact_shadow(point,low)
 						shade = color.darkened(CONTACT_SHADOW_STRENGTH*float(occlusion[point]))
-					else:
-						shade = color.darkened(BANK_SHADOW_STRENGTH*(1.0-height/BANK_HEIGHT))
+					elif color == CURB:
+						shade = color.darkened(BANK_SHADOW_STRENGTH*0.6*(1.0-height/BANK_HEIGHT))
 				colors.append(shade)
 			_quad(st,vertices[0],vertices[1],vertices[2],vertices[3],color,colors)
 	for d in 4:
@@ -249,7 +302,8 @@ static func _mesh(road: Vector2i, neighbors: int, valid: bool, low: Array = []) 
 				if is_equal_approx(point.y,z0): boundary.y = -0.5
 				if is_equal_approx(point.y,z1): boundary.y = 0.5
 				outside.append(Vector3(boundary.x,height*(1.0-0.035/BANK_HEIGHT),boundary.y))
-			_quad(st,inside[0],outside[0],outside[1],inside[1],STONE.darkened(0.06))
-			_quad(st,outside[0],Vector3(outside[0].x,-0.37,outside[0].z),Vector3(outside[1].x,-0.37,outside[1].z),outside[1],SIDE)
+			_quad(st,inside[0],outside[0],outside[1],inside[1],STONE.darkened(0.12))
+			_courses(st,outside[0],outside[1])
+	if road.x >= 0: _cobbles(st,rectangles,low,valid)
 	st.index()
 	return st.commit()

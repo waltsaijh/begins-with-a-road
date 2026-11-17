@@ -4,6 +4,7 @@
 [ext_resource type="Shader" uid="uid://bxji4fku757fk" path="res://assets/shaders/cloud_layer.gdshader" id="2"]
 [ext_resource type="Shader" uid="uid://cdwr6o5iwsbt4" path="res://assets/shaders/cloud_mist.gdshader" id="3"]
 [ext_resource type="Texture2D" uid="uid://brr4vnqu0hri4" path="res://assets/materials/cloud_noise.tres" id="4"]
+[ext_resource type="Script" path="res://scripts/environment/distant_islands.gd" id="5"]
 
 [sub_resource type="ShaderMaterial" id="Material"]
 render_priority = 0
@@ -44,3 +45,6 @@ cast_shadow = 0
 [node name="HighWisps" type="MeshInstance3D" parent="." unique_id=2003626770]
 material_override = SubResource("High")
 cast_shadow = 0
+
+[node name="DistantIslands" type="Node3D" parent="."]
+script = ExtResource("5")

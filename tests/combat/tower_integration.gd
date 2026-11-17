@@ -205,7 +205,7 @@ func events() -> void:
 			clear_enemies();combat.projectiles.clear()
 		if id=="broadside":
 			tower.relic_effects[&"departure"]={}
-			var initial:=tower.combat_origin();var base:Node3D=visual.get_node("BWAR_D_broadside_airship__FixedBase");var base_at:=base.global_position
+			var initial:=tower.combat_origin();var base:Node3D=visual.find_children("*__FixedBase","Node3D",false,false)[0];var base_at:=base.global_position
 			tower.set_patrol_offset(.3)
 			check(tower.combat_origin().distance_to(initial+tower.global_basis*Vector3(.3,0,0))<.0001 and base.global_position==base_at,"airship patrol origin/base changed")
 		towers.remove_tower(Vector3i(tower.grid_cell.x,0,tower.grid_cell.y));await get_tree().process_frame

@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_00.res" id="1_3sldw"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_01.res" id="2_tj3q4"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_02.res" id="3_5nnqt"]
+
+[sub_resource type="Animation" id="Animation_gb875"]
+step = 0.041666668
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0.0325, 0.25, 1, 0, 0, 0.065, 0.29166666, 1, 0, 0, 0.061875, 0.33333334, 1, 0, 0, 0.055, 0.375, 1, 0, 0, 0.048125, 0.41666666, 1, 0, 0, 0.045, 0.45833334, 1, 0, 0, 0.044344023, 0.5, 1, 0, 0, 0.042507287, 0.5416667, 1, 0, 0, 0.03968659, 0.5833333, 1, 0, 0, 0.036078718, 0.625, 1, 0, 0, 0.031880468, 0.6666667, 1, 0, 0, 0.02728863, 0.7083333, 1, 0, 0, 0.0225, 0.75, 1, 0, 0, 0.017711371, 0.7916667, 1, 0, 0, 0.013119534, 0.8333333, 1, 0, 0, 0.008921282, 0.875, 1, 0, 0, 0.005313411, 0.9166667, 1, 0, 0, 0.0024927114, 0.9583333, 1, 0, 0, 0.00065597665, 1, 1, 0, 0, 0)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_atwxl"]
+_data = {
+&"fire": SubResource("Animation_gb875")
+}
+
+[node name="sentry" type="Node3D" unique_id=229437742]
+
+[node name="BWAR_G_sentry__Model" type="Node3D" parent="." unique_id=821829968]
+
+[node name="BWAR_G_sentry__FixedBase" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=1656926793]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=1550748147]
+mesh = ExtResource("1_3sldw")
+
+[node name="BWAR_G_sentry__AimPivot" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=1826525999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
+[node name="BWAR_G_sentry__UpgradeSocket" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1257433541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+
+[node name="BWAR_G_sentry__RecoilAssembly" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=927367520]
+
+[node name="BWAR_G_sentry__ArrowRelease" type="Marker3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1304187674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23, -0.4)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1592471873]
+mesh = ExtResource("2_tj3q4")
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1901881968]
+mesh = ExtResource("3_5nnqt")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2118807576]
+libraries/ = SubResource("AnimationLibrary_atwxl")

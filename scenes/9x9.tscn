@@ -55,7 +55,13 @@ script = ExtResource("5_q5mfp")
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1504596655]
 transform = Transform3D(0.90630776, 0.34618863, -0.24240388, 0, 0.57357645, 0.81915206, 0.42261827, -0.74240386, 0.5198368, 0, 0, 0)
 light_color = Color(1, 0.9411765, 0.8470588, 1)
-light_energy = 1.12
+light_energy = 0.6
+shadow_enabled = true
+shadow_opacity = 0.62
+shadow_blur = 1.4
+shadow_normal_bias = 1.2
+directional_shadow_mode = 0
+directional_shadow_max_distance = 90.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=637674091]
 environment = SubResource("Environment")

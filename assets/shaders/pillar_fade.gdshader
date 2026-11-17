@@ -8,6 +8,7 @@ uniform float support_growth : hint_range(0.0, 1.0) = 1.0;
 varying vec3 world_position;
 varying float local_height;
 #include "res://assets/shaders/cloud_field.gdshaderinc"
+#include "res://assets/shaders/cloud_shadow.gdshaderinc"
 void vertex() {
 	// Extend/retract below the stationary attachment to the tile foundation.
 	VERTEX.y = -0.37 + (VERTEX.y + 0.37) * support_growth;
@@ -17,7 +18,7 @@ void vertex() {
 void fragment() {
 	float n = cloud_density(world_position.xz, TIME);
 	float fade = 1.0 - smoothstep(cloud_height, cloud_top, local_height + (n - 0.5) * 0.3);
-	ALBEDO = stone_color.rgb * COLOR.rgb * (1.0 - fade);
+	ALBEDO = stone_color.rgb * COLOR.rgb * (1.0 - fade) * (1.0 - cloud_shadow(world_position, TIME));
 	EMISSION = cloud_color(n) * fade;
 	ROUGHNESS = 1.0;
 }
