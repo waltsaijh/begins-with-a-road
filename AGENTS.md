@@ -1,5 +1,9 @@
 # Agent 工作共識
 
+- 2026-11-18 本次 Git 授權：使用者要求「更新git」，授權提交本聊天的 Special Events V1、九事件／五種特殊卡、時間軸圖示、中英文本、相關測試與文件；本次不 push。開始 HEAD=852bd5b、branch=experiment/routing-sandbox，工作目錄乾淨，已存在先前完成的 origin/main 快進。上述事件變更位於當日合併前的最新 stash 3ca45e0，本次以 apply 恢復，沒有衝突；三份 stash 全數保留，不操作其他 worktree、不再合併其他分支。恢復後 Windows Godot 4.7.2 事件回歸284 checks／failures=[]，import exit0；保留既有退出清理警告。先前未commit註記為實作快照，本次依授權提交；build／bin／.godot／匯出與日誌仍不提交。
+
+- 2026-11-17 Special Events V1：正式 LevelSession 每完成五波、且還有下一波時抽一次九事件二選一；15 波於 5／10 觸發、15 直接勝利。順序為在途攻擊收尾→ACT 遺物→新增入口→特殊事件→準備，過程共用鎖並防連點。事件及五張特殊牌資料在 assets/data/events/，Level 可指定 catalog；event.* 中英文本納入遊戲文本編輯器。沿用 BuildCard／手牌／TowerMap 驗證、預覽、旋轉、動畫及音效，特殊牌不進商店；特殊地塊占格獨立但與塔合併阻路。藥劑只於該次升級忽略上限；徵兵停火下一波、波後恢復。增援只加入下一波 WaveDefinition 複本、每入口分別追加 fixed_start 群組，仍由原排程／分流處理；原路線算法未改。新路先搜尋驗證相對獨立支線，再用原 ConstructionLayout 提交。寶石／碎石按同批卡牌實際放置達標，集中刷新塔與友軍真實傷害，小寶石走正常清波 reward。未指定的增援預設鼠群12、飛翼獸6、重裝兵5，皆從入口1、可編輯。說明與所有預設見 docs/special_events.md；人工入口 tests/events/playground.tscn。本輪不 commit／push。
+
 - 2026-11-09 本次 Git 授權：使用者要求「git更新 並推送到遠端」，授權提交本聊天自 d0704ad 後累積的五事件時間軸／每五波新增入口、卡片便利貼／射程呈現、遺物與敵人文本／集中編輯器、Inspector塔價、遺物池與熟客優惠、選圖施工提示／橋梁阻擋、Web匯出排除與音訊接線修正、相關資源／測試／文件，包含工作目錄內使用者手動調整的關卡／塔價／主題／教學與橋梁地形。fetch後本分支與origin/experiment/routing-sandbox同步；origin/main另有更新，本次不合併。下方未commit／push均為授權前實作快照；正常推送目前分支，不動兩份舊stash、不改其他worktree、不強制推送。build／bin／.godot／SDK與匯出ZIP維持忽略，不提交。
 
 - 2026-11-09 Web 無聲修正：Chrome 正常手勢解鎖後 AudioContext 已 running，但原 Web Sample 匯流排為 0→1→2→0 的閉環，實際輸出為0。GameAudio 建立 BGM／Combat 改用 bus_count 增長，避開 Godot Web add_bus(-1) 排列錯誤；不改音量、淡化、原音檔、單執行緒或 Sample 低延遲模式。修正後 Chrome 實測 sends=[null,0,0]，BGM、隔離後UI音效、BGM／Master靜音與恢復的實際輸出均通過；首次點擊前依Chrome政策保持suspended。新增tools/web/verify_release_audio.cjs，仍排除於遊戲PCK之外；已重新匯出有聲修正版，本輪未commit／push。

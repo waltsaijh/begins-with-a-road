@@ -1,5 +1,29 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-18 Special Events Git 交付
+
+使用者要求「更新git」，本次提交 Special Events V1 及相關資料、雙語文本、測試與文件，不 push。開始 HEAD=852bd5b、branch=experiment/routing-sandbox，工作目錄乾淨；事件變更保存在當日 main 快進前的新 stash 3ca45e0，已 apply 恢復且沒有衝突。全部三份 stash 保留，不動其他 worktree、不再合併其他分支；本輪未改既有 Art Slice G 資產。
+
+本次恢復後實際重驗：Godot 4.7.2 import exit0，事件回歸284 checks／failures=[]、exit0，沒有腳本錯誤；快速退出仍有 ObjectDB／Resource 清理警告，未當成無警告。`git diff --check` 通過。Web／畫面／其他功能驗證沿用下方11月17日結果，本次沒有重跑；build／bin／.godot／日誌與匯出不提交。
+
+## 2026-11-17 Special Events V1
+
+開始 HEAD=`6c13318`、`experiment/routing-sandbox`，起始工作目錄乾淨；本輪未 commit／push、不動 stash 或其他 worktree。九事件及五張特殊卡已接入正式關卡，並新增每五波特殊事件時間軸圖示。流程在遺物、入口擴張之後串接，最終波不觸發；使用原手牌、放置、塔數值刷新、遺物取得、波次排程與正常清波發獎。新路以獨立的建造搜尋產生，仍經原 ConstructionLayout／PortalMap 提交，未改路線分流核心。固定入口增援的計數與原群組隔離，不稀釋每入口追加數量，也不改原群組的入口分配。
+
+核心新增：scripts/events/、assets/data/events/、scenes/events/special_event_choice.tscn；核心接點：LevelSession、BuildCard／CardPlacement、TowerMap／DefenseTower、WaveSpawnGroup／WaveSpawnSchedule、WaveTimeline。event.* 共75個新中英詞條納入遊戲文本編輯器，兩份 translation 已重建；逐key核對既有詞條無變更，既有 assets/data 平衡 Resource 無變更。資料欄位、九事件明細與所有預設值見 [Special Events](special_events.md)。人工入口 `tests/events/playground.tscn`，提供九事件指定與補金幣；操作／命令見 [tests/events](../tests/events/README.md)。
+
+本次實際驗證：
+
+- PASS：Windows Godot 4.7.2 headless 事件回歸284 checks／failures=[]；最後版本無腳本錯誤。包含九事件兩選項、費用／生命限制、防重入、鼠群／飛翼獸／重裝兵及每入口追加、原群組入口配額隔離、實際出生／擊殺、真實新路與 native 多路分流、特殊卡預覽／旋轉／占格、藥劑一次超限、同批寶石／碎石條件、正常清波獎勵一次性、世界點選目標、5／10／最終波、同波遺物→實際入口提交→事件的順序。
+- PASS：Chrome release Web、原單執行緒／GDExtension preset，同一事件回歸284 checks／failures=[]，pageerror及console error均0。既有 rotation_pivot Web 對照1148 checks／failures=0。
+- PASS：既有 Windows ACT_SPAWN_EXPANSION_CHECK failures=0、ROTATION_PIVOT_CHECK 1148／0、REWARDS failures=[]。沒有執行不相關的大規模測試。
+- PASS：Windows Compatibility 真渲染繁中／英文、1280×800／800×600 的事件面板，已檢視長描述與兩欄文字；截圖 `.godot/test-results/events/`。`git diff --check` 通過，正式 project.godot／export_presets.cfg 已還原且無差異。
+- 保留限制：Chrome event測試有94條 WebGL INVALID_OPERATION buffer警告；沒有事件管理器的既有卡牌對照也有同類40條。現有交接已記錄此類渲染警告，本次未改引擎／渲染後端，功能通過不等同沒有警告。部分快速退出沿用 ObjectDB／Resource 清理警告；最終一次Windows284回歸的stderr為空。首次無手勢音訊仍受瀏覽器 autoplay 政策限制。
+- NOT RUN：十五波自然完整遊玩／平衡、所有事件的真人拖牌與觀感驗收、正式發行包重匯出。本輪的 Web 匯出為專用測試包，放在忽略目錄 `.godot/special_events_web`。
+
+證據：`.godot/special_final3.out`／`.err`、`.godot/verify_*`、`.godot/test-results/events/web-result.json`／`web.log`／`web-baseline.log`。先前失敗中間測試已修正，不把它們當成最終結果。
+
+
 ## 2026-11-09 Git 提交與推送授權
 
 使用者要求提交並推送本聊天累積成果。開始HEAD=d0704ad，branch=experiment/routing-sandbox；fetch後追蹤分支與本地0 ahead／0 behind。origin/main更新到591c7ae，本次不合併。提交包括時間軸／入口、卡牌資訊與射程、文案／文本編輯器、Inspector塔價、遺物池與熟客優惠、選圖施工提示、Web匯出與無聲修正，以及使用者工作目錄的關卡／塔價／主題／教學／橋梁地形修改、測試與文件。CSV一筆單空白文本改為引號表示，解析值不變，用以通過尾端空白檢查。下方未commit／push是授權前快照，匯出成品、原生輸出、SDK、日誌與截圖仍在忽略目錄；兩份歷史stash不動。

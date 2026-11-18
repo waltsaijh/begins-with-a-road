@@ -242,3 +242,10 @@ func _exit_tree() -> void:
 	if is_instance_valid(_wave):
 		if _wave.wave_started.is_connected(_on_wave_started): _wave.wave_started.disconnect(_on_wave_started)
 		if _wave.wave_finished.is_connected(_on_wave_finished): _wave.wave_finished.disconnect(_on_wave_finished)
+
+func spend_gold(amount: int,reason: String) -> bool:
+	if amount < 0 or coins < amount: return false
+	coins -= amount
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-amount,"balance":coins,"reason":reason},"shop")
+	_refresh()
+	return true

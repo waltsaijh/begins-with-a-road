@@ -4,6 +4,7 @@ const Waypoints = preload("res://scripts/enemies/spawning/route_waypoints.gd")
 ## Freeze routes/stats at wave start. Shuffle assignments only within each group.
 static func origins_for(group: WaveSpawnGroup, additional_starts: PackedInt32Array) -> PackedInt32Array:
 	var origins := PackedInt32Array([group.start_index])
+	if group.fixed_start: return origins
 	for index in additional_starts:
 		if not index in origins: origins.append(index)
 	return origins
@@ -115,12 +116,12 @@ static func _assigned_origins(definition: WaveDefinition, additional_starts: Pac
 	var source_totals := {}
 	var source_used := {}
 	for group in definition.groups:
-		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]
+		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]+(":fixed" if group.fixed_start else "")
 		source_totals[key] = int(source_totals.get(key,0))+ceili(float(group.enemy_count)/group.troop.cohort_size)
 		source_used[key] = 0
 	var assignments: Array[PackedInt32Array] = []
 	for group in definition.groups:
-		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]
+		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]+(":fixed" if group.fixed_start else "")
 		var origins := origins_for(group,additional_starts)
 		var assigned := PackedInt32Array()
 		for first in range(0, group.enemy_count, group.troop.cohort_size):

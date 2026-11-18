@@ -1,5 +1,6 @@
 extends Node3D
 signal cards_changed
+signal selection_changed(card: BuildCard)
 signal card_placed(card: BuildCard, tower: Node3D, cell: Vector3i, rotation_steps: int)
 signal traffic_preview_changed(effect: Dictionary)
 signal build_preview_changed(card: BuildCard, cell: Vector3i, rotation_steps: int, error: String)
@@ -111,6 +112,7 @@ func select_card(index: int, toggle := true) -> void:
 	_dirty = true
 	hand.show_selection(selected, turns)
 	set_process(selected >= 0)
+	selection_changed.emit(cards[selected] if selected >= 0 else null)
 
 func _on_card_drag_started(index: int) -> void:
 	if input_suspended:
@@ -304,6 +306,8 @@ func _process(delta: float) -> void:
 		preview_traffic_at(cards[selected], cell, turns, _preview_error.is_empty())
 		if cards[selected].configuration_error().is_empty():
 			var target: DefenseTower = towers.upgrade_target(cell, cards[selected])
+			if cards[selected].special != null and cards[selected].special.kind == SpecialCardDefinition.Kind.CONSUMABLE:
+				target = towers.occupied.get(Vector2i(cell.x,cell.z))
 			if target != null: preview.show_upgrade(placement.map, target, _preview_error)
 			else: preview.show_at(placement.map, cards[selected], cell, turns, _preview_error.is_empty())
 		else:

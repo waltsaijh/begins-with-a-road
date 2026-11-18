@@ -28,6 +28,8 @@ var troop: Troop:
 @export_range(1, 100, 1, "or_greater") var batch_size := 1
 @export_range(0, 240, 1, "or_greater") var interval_ticks := 1
 @export_range(0, 32, 1) var start_index := 0
+## Reinforcements address one entrance, without redistribution.
+@export var fixed_start := false
 
 @warning_ignore("integer_division")
 func spawn_tick(index: int) -> int:

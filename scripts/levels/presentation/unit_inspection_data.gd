@@ -32,6 +32,7 @@ static func tower(t: DefenseTower, catalog: RelicCatalog) -> Dictionary:
 		if relic != null: notes.append(TranslationServer.translate(relic.name_key))
 	if t.support_bonus > 0: notes.append((GameText.text("text.unit_inspection_data.14",{},en)) % number(t.support_bonus*100))
 	if t.geometry_damage_bonus > 0: notes.append((GameText.text("text.unit_inspection_data.15",{},en)) % number(t.geometry_damage_bonus*100))
+	if t.event_ceasefire: notes.append(TranslationServer.translate("event.tower.ceasefire"))
 	if t.is_disabled(): notes.append(GameText.text("text.unit_inspection_data.16",{},en))
 	return {"name":t.definition.localized_name()+"  ·  Lv.%d" % t.level,"kind":"","stats":stats,"notes":" · ".join(notes),"icon":t.definition.icon,"color":t.definition.accent_color.darkened(0.45),"health":-1.0}
 

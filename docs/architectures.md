@@ -171,3 +171,6 @@ Phase 5 的 `levels` 負責防線生命、終局與四次獎勵時序，`levels/
 UI Slice A：敵人 presentation 接實際出生訊號，持有每局已遭遇／未讀佇列，並共用模型預覽與圖鑑版面；HUD 管理詳情頁的暫停／鏡頭鎖定，interface 的 inspection_panel 僅隔離輸入。遺物圖示列仍消費 RunRelics；保存只由 LevelProgress 擴充 v1 ConfigFile 的 codex section。詳見 [UI Slice A](ui_slice_a.md)。
 
 文本編輯器的資料模型僅持有 CSV 字串草稿，處理多行解析、格式參數驗證、檔案衝突及文字欄儲存；主工作區負責分類搜尋、兩語編輯與原生 Undo／Redo。正式遊戲透過 interface/GameText 讀翻譯，不依賴 addons；遺物仍由原 Resource 提供數值，Troop／EnemyAbility 保留機制與傳入格式化參數的責任。
+
+
+Special Events V1：`scripts/events` 保存可編輯事件／特殊卡定義、本局抽取與效果、事件二選一／目標選取及建造新道路的搜尋器。`assets/data/events` 提供 catalog、九事件與五卡 Resource，Level 可改引用；`scenes/events` 是呈現宿主。LevelSession 負責跨波的序列與鎖，BuildCard／CardPlacement 負責原手牌及成功消耗，TowerMap 負責所有建造驗證／占格，DefenseTower 只增加事件倍率與停火狀態。增援仍交給 WaveSpawnSchedule，新路仍交給 ConstructionLayout／PortalMap；不複製路線分流或戰鬥系統。詳細契約見 [特殊事件](special_events.md)。

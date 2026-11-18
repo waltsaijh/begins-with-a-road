@@ -181,5 +181,6 @@ func _refresh() -> void:
 	gold.texture = coin_texture
 	number.text = str(price_override if price_override >= 0 else (card.price if card != null else 0))
 	number.add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
+	tooltip_text = tr("event.card.%s.description" % card.special.id) if card != null and card.special != null else ""
 	diagram.show_recipe(card, turns, accent)
 	disabled = card == null or (shop and not can_afford)

@@ -21,6 +21,9 @@ var choosing_start := false
 var _loading := false
 var _presentation_prepared := false
 var choosing_relic := false
+var choosing_event := false
+var special_events: SpecialEventManager
+var _event_completed_at := -1
 var _settling_wave := false
 var relic_choice: CanvasLayer
 var enemy_intelligence: CanvasLayer
@@ -140,6 +143,11 @@ func _ready() -> void:
 		# Formal levels own the opening transition; standalone maps start immediately.
 		_wave.controls.spawn_requested.disconnect(_wave.start_wave)
 		_wave.controls.spawn_requested.connect(_on_start_requested)
+	special_events = SpecialEventManager.new()
+	special_events.name = "SpecialEvents"
+	add_child(special_events)
+	special_events.setup(self)
+	special_events.resolved.connect(_on_event_resolved)
 	_prepare_wave()
 	if level.tutorial != null:
 		tutorial = preload("res://scripts/tutorial/tutorial_director.gd").new()
@@ -215,27 +223,27 @@ func _prepare_wave() -> void:
 	_wave_starting = false
 	_wave_start_elapsed = 0.0
 	if _wave.controls != null: _wave.controls.start_pending = false
-	_wave.apply_definition(_waves[current_wave])
-	get_node("CardPlacement/Shop").wave_reward = _waves[current_wave].reward
+	refresh_event_wave()
 	timeline.set_state(current_wave, 0.0, false)
 	_update_start_callout()
 	set_process(false)
 
 func _update_start_callout() -> void:
-	var available: bool = not _loading and not finished and not choosing_start and not choosing_relic and not _settling_wave and not _wave.active and not _wave_starting
+	var available: bool = not _loading and not finished and not choosing_start and not choosing_relic and not choosing_event and not _settling_wave and not _wave.active and not _wave_starting
 	if tutorial != null: available = available and tutorial.can_start_wave()
 	_hud.set_start_available(available)
 	preparation_changed.emit(available)
 
 func _on_start_requested() -> void:
-	if choosing_start or choosing_relic or get_tree().paused or _hud.pause_requested: return
+	if choosing_start or choosing_relic or choosing_event or get_tree().paused or _hud.pause_requested: return
 	_begin_wave_start()
 
 func _begin_wave_start() -> void:
 	if tutorial != null and not tutorial.can_start_wave(): return
-	if _loading or finished or choosing_start or choosing_relic or _wave.active or _wave_starting or not _wave.start_allowed: return
+	if _loading or finished or choosing_start or choosing_relic or choosing_event or _wave.active or _wave_starting or not _wave.start_allowed: return
 	var construction: Node = get_node("CardPlacement").construction
 	if is_instance_valid(construction) and not construction.commit().ok: return
+	refresh_event_wave()
 	if _owns_balance_trace: BalanceTrace.wave = current_wave+1
 	_wave_starting = true
 	GameAudio.begin_wave()
@@ -325,22 +333,49 @@ func _continue_after_reward() -> void:
 	if current_wave == _waves.size():
 		timeline.set_state(current_wave, 0.0, false)
 		_end_run(true)
-	else:
-		_wave.start_allowed = true
-		get_node("CardPlacement").set_entry_selection(false)
-		_prepare_wave()
-		if _should_expand_after(current_wave):
-			choosing_start = true
-			timeline.set_expansion_active(true)
-			_wave.start_allowed = false
-			get_node("CardPlacement").set_entry_selection(true)
-			_update_start_callout()
-			_wave._update_button()
-			set_process(false)
-			if not expansion.begin():
-				# A completely enclosed custom terrain may have no expandable frontier.
-				push_warning("No reachable frontier for a new entrance")
-				_on_start_added(-1)
+		return
+	if _should_expand_after(current_wave):
+		choosing_start = true
+		# Expansion timeline refers to the upcoming wave index.
+		timeline.set_state(current_wave,0.0,false)
+		timeline.set_expansion_active(true)
+		_wave.start_allowed = false
+		get_node("CardPlacement").set_entry_selection(true)
+		_update_start_callout()
+		_wave._update_button()
+		if not expansion.begin(): _on_start_added(-1)
+		return
+	_continue_after_expansion()
+
+func _continue_after_expansion() -> void:
+	if SpecialEventManager.due(current_wave,_waves.size()) and _event_completed_at != current_wave:
+		choosing_event = true
+		_wave.start_allowed = false
+		get_node("CardPlacement").set_entry_selection(true)
+		_update_start_callout()
+		_wave._update_button()
+		timeline.set_special_active(true,current_wave-1)
+		if special_events.begin(): return
+		# No executable options in a custom catalog: do not leave the session locked.
+		choosing_event = false
+		timeline.set_special_active(false)
+	_wave.start_allowed = true
+	get_node("CardPlacement").set_entry_selection(false)
+	_prepare_wave()
+	_wave._update_button()
+
+func _on_event_resolved() -> void:
+	if not choosing_event: return
+	_event_completed_at = current_wave
+	choosing_event = false
+	timeline.set_special_active(false)
+	_continue_after_expansion()
+
+func refresh_event_wave() -> void:
+	if current_wave >= _waves.size() or _wave.active: return
+	var definition := special_events.effective_wave(_waves[current_wave]) if special_events != null else _waves[current_wave]
+	_wave.apply_definition(definition)
+	get_node("CardPlacement/Shop").wave_reward = definition.reward
 
 func _is_act_boundary(index: int) -> bool:
 	var count := 0
@@ -363,11 +398,8 @@ func _on_start_added(index: int) -> void:
 		_wave.additional_start_indices.append(index)
 		_wave.routes_changed.emit()
 	choosing_start = false
-	_wave.start_allowed = true
-	get_node("CardPlacement").set_entry_selection(false)
-	_wave._update_button()
-	_update_start_callout()
-	set_process(false)
+	timeline.set_expansion_active(false)
+	_continue_after_expansion()
 
 func _on_enemy_leaked(enemy: Node3D) -> void:
 	if finished: return

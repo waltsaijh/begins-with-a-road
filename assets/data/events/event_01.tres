@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpecialEventDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/events/special_event_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"scouts"
+option_a = Array[Dictionary]([{"type": "road"}, {"type": "gold", "amount": 50}])
+option_b = Array[Dictionary]([{"type": "reinforce", "troop": "scout", "count": 10, "per_start": true}])

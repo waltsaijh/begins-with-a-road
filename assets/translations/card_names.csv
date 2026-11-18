@@ -610,3 +610,86 @@ ui.run.construction.challenge,This feature is still under construction (〒︿�
 ui.maps.construction.prefix,This level is ,關卡還
 ui.maps.construction.word,unfinished,未完成
 ui.maps.construction.suffix, because I bombed my midterms ( ºΔº ), 因為我期中考炸了( ºΔº )
+event.scouts.title,Enemy Scouts,敵人偵查兵
+event.scouts.description,Your troops have discovered enemy scouts.,你的手下發現了敵人的偵察部隊。
+event.scouts.a.name,Ambush on the Road,埋伏在道路上
+event.scouts.a.effect,Create a separate road to the base. Gain {a_amount} Gold on success.,生成一條相對獨立的新道路，成功後獲得 {a_amount} Gold。
+event.scouts.b.name,Drive Them Away,趕跑他們
+event.scouts.b.effect,Next wave: {b_count} extra scouts at each entrance.,下一波每個出生點額外出現 {b_count} 名偵查兵。
+event.supplies.title,Emergency Supplies,臨時補給
+event.supplies.description,Praise the cloud sea! The kingdom has sent more supplies.,讚美雲海，王國寄來了更多物資。
+event.supplies.a.name,Upgrade the Defenses,升級防線
+event.supplies.a.effect,"Upgrade up to {a_count} eligible random towers by one level, respecting normal limits.",隨機最多 {a_count} 座可升級的塔各升一級，遵守通常上限。
+event.supplies.b.name,Renovate the Defenses,翻新防線
+event.supplies.b.effect,"Remove a chosen tower, keeping its ground and roads. Gain {b_amount} Gold.",選擇一座塔拆除，保留地塊與道路，獲得 {b_amount} Gold。
+event.merchant.title,Wandering Merchant,雲遊商人
+event.merchant.description,A strange merchant asks whether you would like to trade.,奇怪的商人詢問你想不想要交易。
+event.merchant.a.name,Yellow Potion,黃色藥劑
+event.merchant.a.effect,"Pay {a_amount} Gold for a Yellow Potion card. Upgrade a chosen tower once, ignoring its level limit.",支付 {a_amount} Gold，獲得一張黃色藥劑。選塔升一級，本次無視上限。
+event.merchant.b.name,Tasty Cheese,好吃起司
+event.merchant.b.effect,Free sample. Next wave: {b_count} extra rats at entrance 1.,免費試吃。下一波額外出現 {b_count} 隻鼠群（入口 1）。
+event.conscription.title,Royal Conscription,王國徵兵令
+event.conscription.description,"The kingdom demands troops for a distant war. Apparently, the officials have not noticed that you are also fighting.",王國要求你抽調人力參與遠方的戰事。不過，上頭似乎不太清楚你也正在打仗。
+event.conscription.a.name,Obey the Order,服從命令
+event.conscription.a.effect,"Choose a tower to cease fire next wave, then recover. Gain {a_amount} Gold.",選擇一座塔，下一波停止攻擊，波後恢復。獲得 {a_amount} Gold。
+event.conscription.b.name,Refuse Conscription,拒絕徵召
+event.conscription.b.effect,Keep your defenses. Next wave: {b_count} extra soldiers at each entrance.,保留完整防線。下一波每個出生點增加 {b_count} 名士兵。
+event.storm.title,Storm Approaching,暴風將至
+event.storm.description,Thunder rolls deep in the cloud sea. Engineers warn that the roads ahead may not withstand the storm.,雲海深處傳來雷鳴。工兵警告，前方的道路恐怕承受不住這場風暴。
+event.storm.a.name,Reinforce the Road,加固道路
+event.storm.a.effect,Pay {a_amount} Gold for one 1×4 road construction card.,支付 {a_amount} Gold，獲得一張 1×4 道路建造卡。
+event.storm.b.name,Leave It to Fate,聽天由命
+event.storm.b.effect,"Gain {b_count} 1×1 rubble cards. If any remain unplaced at wave start, all towers deal {b_penalty_percent}% less damage that wave; repeats until all are placed.",獲得 {b_count} 張 1×1 碎石卡。開波時若未全部放置，該波全塔傷害 -{b_penalty_percent}%；直到放完。
+event.altar.title,Ancient Altar,古老祭壇
+event.altar.description,Engineers have found an ancient altar beneath the road. Its unreadable inscriptions still seem to hold power.,工兵在道路下方發現一座古老祭壇。上面刻著看不懂的文字，但似乎仍有力量。
+event.altar.a.name,Offer Blood,獻上鮮血
+event.altar.a.effect,Lose {a_amount} base health and gain a random relic. The base must survive.,失去 {a_amount} 點基地生命，獲得一個隨機遺物。必須保持存活。
+event.altar.b.name,Dismantle the Altar,拆除祭壇
+event.altar.b.effect,Gain {b_amount} Gold. Next wave: {b_count} extra winged beasts at entrance 1.,獲得 {b_amount} Gold。下一波額外出現 {b_count} 隻飛翼獸（入口 1）。
+event.strike.title,Engineers on Strike,工程師罷工
+event.strike.description,"The engineers demand higher wages, citing the increasingly unreasonable roads they have been asked to build.",工程師要求提高工資，理由是最近建造的道路實在太不合理。
+event.strike.a.name,Pay the Wages,支付薪資
+event.strike.a.effect,Pay {a_amount} Gold. Upgrade up to {a_count} eligible random towers by one level.,支付 {a_amount} Gold，隨機最多 {a_count} 座可升級的塔各升一級。
+event.strike.b.name,Reject the Demand,拒絕要求
+event.strike.b.effect,"Gain {b_amount} Gold. Downgrade one random tower by one level, never below Lv.1.",獲得 {b_amount} Gold，隨機一座塔降一級，不低於 Lv.1。
+event.payroll.title,Lost Payroll,遺失的軍餉
+event.payroll.description,"A wagon carrying military wages has gone missing. Fortunately, your soldiers seem to know where it is.",一輛運送軍餉的馬車失蹤了。幸運的是，你的士兵似乎知道它在哪裡。
+event.payroll.a.name,Requisition the Funds,收歸軍用
+event.payroll.a.effect,Gain {a_amount} Gold now. Next wave: {a_count} extra heavy infantry at entrance 1.,立即獲得 {a_amount} Gold。下一波額外出現 {a_count} 名重裝兵（入口 1）。
+event.payroll.b.name,Return to the Owner,物歸原主
+event.payroll.b.effect,Gain a free random tower card using the normal tower and ground recipe draw.,免費獲得一張隨機防禦塔卡，使用正常塔種與地塊抽取。
+event.gem.title,Mysterious Gem,神秘寶石
+event.gem.description,A mysterious gem has been seized from the enemy forces.,在敵人的隊伍中繳獲了一顆神秘的寶石。
+event.gem.a.name,Keep It Whole,完整獲得
+event.gem.a.effect,"Gain one 2×2 large gem card. After placement, all towers deal {a_damage_percent}% more damage.",獲得一張 2×2 大寶石卡。放置後，所有塔傷害 +{a_damage_percent}%。
+event.gem.b.name,Shatter It,將其打碎
+event.gem.b.effect,"Gain {b_count} 1×1 small gem cards. Once all are placed, gain {b_wave_gold} extra Gold per completed wave.",獲得 {b_count} 張 1×1 小寶石卡。全部放置後，每波額外獲得 {b_wave_gold} Gold。
+event.card.potion.name,Yellow Potion,黃色藥劑
+event.card.potion.description,"Upgrade a tower once
+ignoring its level limit","選擇一座塔升一級
+此次無視等級上限"
+event.card.road.name,Road Card,道路卡
+event.card.road.description,1×4 road; rotate to fit,1×4 道路，可旋轉
+event.card.rubble.name,Rubble,碎石
+event.card.rubble.description,"1×1 permanent tile
+Place both to remove the storm penalty in later waves","1×1 永久地塊
+放完本批兩張，後續波次解除 -10% 傷害"
+event.card.large_gem.name,Large Gem,大寶石
+event.card.large_gem.description,"2×2 permanent tile
+Place to grant +10% tower damage","2×2 永久地塊
+放置後全塔傷害 +10%"
+event.card.small_gem.name,Small Gem,小寶石
+event.card.small_gem.description,"1×1 permanent tile
+Place all three for +5 Gold per wave","1×1 永久地塊
+本批三張放完，每波 +5 Gold"
+event.ui.heading,Special Event,特殊事件
+event.ui.target,Choose a highlighted tower,請點選一座高亮的防禦塔
+event.unavailable.gold,Not enough Gold,Gold 不足
+event.unavailable.health,The base must survive the 5 HP cost,支付 5 點後基地必須存活
+event.unavailable.tower,No eligible tower,沒有符合條件的防禦塔
+event.unavailable.relic,No available relic,沒有可取得的遺物
+event.unavailable.road,No reasonable new road can be built,找不到合理且合法的新道路
+event.unavailable.card,No tower card available,沒有可抽取的防禦塔卡
+event.placement.invalid,"Choose a legal, unoccupied location",請選擇合法且未占用的位置
+event.tower.ceasefire,Conscription: cease fire next wave,徵兵：下一波停止攻擊
+event.timeline,Event,特殊事件

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpecialEventDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/events/special_event_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"altar"
+option_a = Array[Dictionary]([{"type": "health", "amount": 5}, {"type": "relic"}])
+option_b = Array[Dictionary]([{"type": "gold", "amount": 30}, {"type": "reinforce", "troop": "winged", "count": 6}])

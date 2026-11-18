@@ -13,6 +13,7 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var acts: Array[ActDefinition] = []
 ## Null runs the ordinary level rules without teaching restrictions.
 @export var tutorial: TutorialDefinition
+@export var special_event_catalog: SpecialEventCatalog = preload("res://assets/data/events/catalog.tres")
 ## Zero keeps independent mechanic fixtures without a loss condition.
 @export_range(0, 100, 1) var base_health := 0
 @export var reward_final_act := false

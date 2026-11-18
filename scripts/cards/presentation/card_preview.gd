@@ -76,10 +76,10 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 		_material.set_shader_parameter("rejection_flash", 0.0)
 		set_process(false)
 	var mesh := ImmediateMesh.new()
-	mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	var footprint := card.tower_cells(Vector2i(cell.x,cell.z),turns)
 	var towers := map.get_node_or_null("../TowerMap")
 	displayed_ground = towers.card_ground(card,Vector2i(cell.x,cell.z),turns) if towers != null and card.traffic == null else card.ground_cells(Vector2i(cell.x,cell.z),turns)
+	if not displayed_ground.is_empty(): mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	for pos in displayed_ground:
 		var center := map.map_to_local(Vector3i(pos.x,0,pos.y))+Vector3.UP*0.05
 		var existing := map.get_cell_item(Vector3i(pos.x,0,pos.y)) > 0
@@ -92,7 +92,7 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 		_range_quad(mesh,center,-0.46,0.43,0.46,0.46,outline)
 		_range_quad(mesh,center,-0.46,-0.43,-0.43,0.43,outline)
 		_range_quad(mesh,center,0.43,-0.43,0.46,0.43,outline)
-	mesh.surface_end()
+	if not displayed_ground.is_empty(): mesh.surface_end()
 	ground.mesh = mesh
 	var tower_at := card.tower_anchor(Vector2i(cell.x,cell.z),turns)
 	var tower_cell := Vector3i(tower_at.x,0,tower_at.y)
@@ -103,7 +103,10 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 		if ghost != null: ghost.free()
 		_definition = card.visual_definition(); _ghost_stamp = stamp
 		ghost = null
-		if _definition != null and _definition.model != null:
+		if _definition is SpecialCardDefinition:
+			ghost = _definition.create_visual()
+			add_child(ghost)
+		elif _definition != null and _definition.model != null:
 			if _definition is TowerDefinition:
 				ghost = preload("res://scripts/towers/body_visual.gd").create(_definition,body)
 			else: ghost = _definition.model.instantiate()
@@ -121,6 +124,10 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 
 func _show_attack_area(map: GridMap, definition: Resource, cell: Vector3i, turns: int, body: Array[Vector2i] = []) -> void:
 	var anchor := Vector2i(cell.x,cell.z)
+	if definition is SpecialCardDefinition:
+		attack_area.mesh = null
+		range_cells.clear()
+		return
 	if definition is TrafficStructureDefinition:
 		range_cells.assign(definition.effect_at(anchor,turns).cells.keys())
 	else:

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpecialCardDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/events/special_card_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interface/special_small_gem.svg" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"small_gem"
+kind = 1
+cells = Array[Vector2i]([Vector2i(0, 0)])
+accent_color = Color(0.54,0.58,0.77,1)
+icon = ExtResource("2")
+wave_gold = 5

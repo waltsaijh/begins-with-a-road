@@ -47,7 +47,7 @@ func refresh(timeline: WaveTimeline) -> void:
 		marker.get_node("Dot/Fill").color = Color("f3f8f7")
 		var icon: Sprite2D = marker.get_node("EventIcon")
 		icon.visible = event.kind != "wave"
-		icon.texture = WaveTimeline.RELIC_ICON if event.kind == "relic" else WaveTimeline.EXPANSION_ICON
+		icon.texture = WaveTimeline.SPECIAL_ICON if event.kind == "special" else (WaveTimeline.RELIC_ICON if event.kind == "relic" else WaveTimeline.EXPANSION_ICON)
 		var caption: Label = marker.get_node("Caption")
 		caption.text = timeline.event_caption(event)
 		caption.add_theme_color_override("font_color",timeline.muted_color)

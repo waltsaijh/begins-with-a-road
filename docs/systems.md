@@ -720,3 +720,12 @@ EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結�
 ### 2026-11-08 結算整合
 
 防線與 Boss 留在 layer 5，結算獨立 ResultLayer 為 layer 8。保留 Sandbox 勝利音效、碎紙與輕量結算；新增 main 返回主選單與普通關卡下一關操作。普通勝利直接載入下一張已解鎖地圖，教學完成則維持繼續至 Frontier 選圖頁；重複結算不重播，轉場失敗可重試。
+
+
+## 特殊事件 V1
+
+正式關卡每五個完成波次、排除最終波，依序在 ACT 遺物與入口擴張之後進入必選的九事件二選一；時間軸以特殊事件圖示佔獨立事件格。所有選項先驗證資源／塔目標／新路可行性，處理期間禁止一般建造、交易與開波，並由單一提交守衛防止連點重入。選塔完成後才恢復準備。
+
+事件效果使用本局狀態及可編輯 Resource。特殊牌共用原庫存與放置，永久地塊以 special_occupied 併入導航障礙；塔的數值刷新同時套用本局事件傷害倍率，藥劑只有該次忽略上限。增援追加於下一波的 WaveDefinition 深複本，fixed_start 群組逐入口生效，情報與實際出兵共用同一排程。小寶石獎勵加到正常波次 reward，碎石的當波傷害減成在開波時鎖定。獨立新路以建造用成本搜尋後經原 ConstructionLayout／Snapshot 提交，未改 CandidateRoutes／RouteDistribution。
+
+九事件、資料欄位、道路搜尋條件、重複事件效果及所有自行決定的預設值見 [special_events.md](special_events.md)；可指定事件的試驗場與 Windows／Web 回歸入口見 [驗收說明](../tests/events/README.md)。
