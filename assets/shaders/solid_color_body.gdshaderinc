@@ -1,3 +1,5 @@
+#include "res://assets/shaders/cloud_shadow.gdshaderinc"
+varying vec3 shadow_world;
 varying vec2 surface_response;
 // Darkening (0 = unchanged), e.g. a disabled tower using its own copy of the
 // shared material. A plain uniform: WebGL ignores instance uniforms here, and a
@@ -32,10 +34,11 @@ void vertex() {
 		NORMAL.xy = mat2(vec2(c, s), vec2(-s, c)) * NORMAL.xy;
 		VERTEX.y += abs(stride) * CUSTOM0.y;
 	}
+	shadow_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
 
 void fragment() {
-	ALBEDO = COLOR.rgb * (1.0 - dim);
+	ALBEDO = COLOR.rgb * (1.0 - dim) * (1.0 - cloud_shadow(shadow_world, TIME));
 	ROUGHNESS = surface_response.x;
 	SPECULAR = surface_response.y;
 }

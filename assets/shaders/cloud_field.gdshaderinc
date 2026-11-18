@@ -6,6 +6,9 @@ float cloud_density(vec2 world_xz, float clock) {
 	vec2 p = world_xz * cloud_scale + vec2(0.27, 0.72) + cloud_drift * clock * 0.195;
 	return smoothstep(0.25, 0.75, texture(cloud_noise_texture, p).r);
 }
+// Sky mood: Project Settings > Shader Globals > cloud_low (gaps/shadows) and cloud_high (cloud tops).
+global uniform vec4 cloud_low;
+global uniform vec4 cloud_high;
 vec3 cloud_color(float density) {
-	return mix(vec3(0.79, 0.84, 0.88), vec3(0.995, 0.997, 1.0), density);
+	return mix(cloud_low.rgb, cloud_high.rgb, density);
 }

@@ -52,3 +52,6 @@ func _resize() -> void:
 	global_transform = map.global_transform * Transform3D(Basis.IDENTITY, center)
 	$MidMist.position.y = map.cell_size.y
 	$HighWisps.position.y = 2.0 * map.cell_size.y
+	var islands := get_node_or_null("DistantIslands")
+	if islands != null and islands.has_method("layout"):
+		islands.layout(map.to_global(first), map.to_global(last), map.cell_size)

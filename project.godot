@@ -58,3 +58,32 @@ rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=4096
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+
+[shader_globals]
+
+cloud_low={
+"type": "color",
+"value": Color(0.79, 0.84, 0.88, 1)
+}
+cloud_high={
+"type": "color",
+"value": Color(0.995, 0.997, 1, 1)
+}
+cloud_shadow_noise={
+"type": "sampler2D",
+"value": "res://assets/materials/cloud_noise.tres"
+}
+cloud_shadow_strength={
+"type": "float",
+"value": 0.24
+}
+cloud_shadow_scale={
+"type": "float",
+"value": 0.045
+}
+cloud_shadow_wind={
+"type": "vec2",
+"value": Vector2(0.007, 0.003)
+}

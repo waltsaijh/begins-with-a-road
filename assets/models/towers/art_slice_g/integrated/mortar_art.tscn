@@ -1,0 +1,67 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_00.res" id="1_11irk"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_01.res" id="2_k4qrm"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_02.res" id="3_m1o6f"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_03.res" id="4_bc1ww"]
+
+[sub_resource type="Animation" id="Animation_xg57p"]
+length = 1.5
+step = 0.041666668
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.29166666, 1, 0, -0.031, 0.0275, 0.33333334, 1, 0, -0.062, 0.055, 0.375, 1, 0, -0.060388, 0.05357, 0.41666666, 1, 0, -0.056544, 0.05016, 0.45833334, 1, 0, -0.051955998, 0.04609, 0.5, 1, 0, -0.048112, 0.042680003, 0.5416667, 1, 0, -0.046499997, 0.041249998, 0.5833333, 1, 0, -0.04624394, 0.04102285, 0.625, 1, 0, -0.04550633, 0.040368516, 0.6666667, 1, 0, -0.044333033, 0.03932769, 0.7083333, 1, 0, -0.04276991, 0.03794105, 0.75, 1, 0, -0.040862825, 0.03624928, 0.7916667, 1, 0, -0.03865764, 0.034293067, 0.8333333, 1, 0, -0.036200214, 0.032113094, 0.875, 1, 0, -0.033536408, 0.02975004, 0.9166667, 1, 0, -0.03071209, 0.027244596, 0.9583333, 1, 0, -0.027773116, 0.024637442, 1, 1, 0, -0.02476535, 0.021969263, 1.0416666, 1, 0, -0.02173465, 0.019280737, 1.0833334, 1, 0, -0.018726883, 0.016612558, 1.125, 1, 0, -0.015787909, 0.014005404, 1.1666666, 1, 0, -0.012963589, 0.011499959, 1.2083334, 1, 0, -0.010299786, 0.009136907, 1.25, 1, 0, -0.00784236, 0.0069569326, 1.2916666, 1, 0, -0.0056371745, 0.0050007193, 1.3333334, 1, 0, -0.0037300894, 0.0033089505, 1.375, 1, 0, -0.002166968, 0.0019223104, 1.4166666, 1, 0, -0.0009936715, 0.00088148273, 1.4583334, 1, 0, -0.0002560615, 0.00022715132, 1.5, 1, 0, 0, 0)
+tracks/1/type = "position_3d"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BWAR_G_mortar__Model/BWAR_G_mortar__Suspension")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.29166666, 1, 0, -0.009, 0, 0.33333334, 1, 0, -0.018, 0, 0.375, 1, 0, -0.017531998, 0, 0.41666666, 1, 0, -0.016416, 0, 0.45833334, 1, 0, -0.015083999, 0, 0.5, 1, 0, -0.013968, 0, 0.5416667, 1, 0, -0.013499999, 0, 0.5833333, 1, 0, -0.013425659, 0, 0.625, 1, 0, -0.013211514, 0, 0.6666667, 1, 0, -0.01287088, 0, 0.7083333, 1, 0, -0.012417071, 0, 0.75, 1, 0, -0.0118634, 0, 0.7916667, 1, 0, -0.011223185, 0, 0.8333333, 1, 0, -0.010509739, 0, 0.875, 1, 0, -0.009736377, 0, 0.9166667, 1, 0, -0.0089164125, 0, 0.9583333, 1, 0, -0.008063163, 0, 1, 1, 0, -0.0071899397, 0, 1.0416666, 1, 0, -0.0063100597, 0, 1.0833334, 1, 0, -0.0054368367, 0, 1.125, 1, 0, -0.0045835865, 0, 1.1666666, 1, 0, -0.0037636226, 0, 1.2083334, 1, 0, -0.0029902603, 0, 1.25, 1, 0, -0.0022768143, 0, 1.2916666, 1, 0, -0.001636599, 0, 1.3333334, 1, 0, -0.0010829292, 0, 1.375, 1, 0, -0.00062911975, 0, 1.4166666, 1, 0, -0.00028848526, 0, 1.4583334, 1, 0, -7.434043e-05, 0, 1.5, 1, 0, 0, 0)
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_odemh"]
+_data = {
+&"fire": SubResource("Animation_xg57p")
+}
+
+[node name="mortar" type="Node3D" unique_id=568199544]
+
+[node name="BWAR_G_mortar__Model" type="Node3D" parent="." unique_id=2072670802]
+
+[node name="BWAR_G_mortar__LoadBearingBed" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=679441973]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.5)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=737437298]
+mesh = ExtResource("1_11irk")
+
+[node name="BWAR_G_mortar__Suspension" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=166882546]
+
+[node name="BWAR_G_mortar__FixedBase" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=772596873]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__FixedBase" unique_id=770147227]
+mesh = ExtResource("2_k4qrm")
+
+[node name="BWAR_G_mortar__AimPivot" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=104030823]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.96, 0.5)
+
+[node name="BWAR_G_mortar__Trunnion" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1174146691]
+mesh = ExtResource("3_m1o6f")
+
+[node name="BWAR_G_mortar__UpgradeSocket" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1021867297]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0.45)
+
+[node name="BWAR_G_mortar__RecoilAssembly" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1888846252]
+transform = Transform3D(1, 0, 0, 0, 0.66262007, -0.7489557, 0, 0.7489557, 0.66262007, 0, 0, 0)
+
+[node name="BWAR_G_mortar__Muzzle0" type="Marker3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=1818945582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.41)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=404325340]
+mesh = ExtResource("4_bc1ww")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=142300184]
+libraries/ = SubResource("AnimationLibrary_odemh")

@@ -3,6 +3,8 @@ extends "res://tests/road_refinement/depth_flow.gd"
 var measurements: Array = []
 
 func _ready() -> void:
+	# Drifting cloud shadows are cosmetic and time-varying; keep pixel probes deterministic.
+	RenderingServer.global_shader_parameter_set("cloud_shadow_strength", 0.0)
 	super._ready()
 	if not automatic: run.call_deferred()
 
