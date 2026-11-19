@@ -172,7 +172,7 @@ func _focus_target() -> Control:
 		for i in shop.offers.size():
 			if shop.offers[i].tower == wanted.tower and not shop.sold[i]: return shop.view.slots[i+1].get_node("Face/Card")
 	if stage == Stage.START:
-		return session.get_node("LevelHUD").early_start.get_node("Title")
+		return session.get_node("LevelHUD").early_start
 	return null
 
 func _update_text() -> void:

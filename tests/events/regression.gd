@@ -261,11 +261,13 @@ func run() -> void:
 	check(host.choosing_relic and not host.choosing_event and not host.choosing_start,"Relic opens before entrance and special event")
 	host.relic_choice.choose(host.relic_choice.offers[0])
 	await get_tree().create_timer(0.3).timeout
-	check(host.choosing_start and not host.choosing_event,"Entrance selection follows relic without overlapping event")
-	host.expansion.choose_direction(0)
-	var frontier: Vector2i = host.expansion.choices[0].paths.keys()[0]
-	check(host.expansion.commit(Vector3i(frontier.x,0,frontier.y)),"Real entrance expansion commits before event")
 	await wait_graph()
+	check(host.choosing_start and not host.choosing_event,"Player entrance placement waits before the event")
+	var region: Dictionary = host.expansion.choices[0]
+	var entrance: Vector2i = region.paths.keys()[0]
+	check(host.expansion.commit(Vector3i(entrance.x,0,entrance.y)),"Entrance commits directly without a direction selector")
+	await wait_graph()
+	check(host.get_node("PortalMap").start_paths.size() == 3,"Player entrance commits before event")
 	check(host.choosing_event and not host.choosing_relic and not host.choosing_start,"Special event follows entrance resolution")
 	var option := 0 if manager.option_error(manager.active,0).is_empty() else 1
 	manager.choose(option)

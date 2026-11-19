@@ -1,5 +1,13 @@
 # Agent 工作共識
 
+- 2026-11-19 本次 Git 授權：使用者要求「git更新並推送到遠端」，授權提交本聊天累積的敵人無血條／死亡資訊快照、驚嘆號與Hover兵種清單、未讀Badge／遺物收合、玩家直接放置入口／上次區域排除、共用建路／新舊路口銜接、第二關禁止基地東側入口，以及相關雙語資源、測試與文件；正常推送 origin/experiment/routing-sandbox，包含先前尚未推送的 Special Events 提交及既有 main／Art Slice G 整合歷史。開始HEAD=1f097a6，fetch後本分支領先追蹤分支5筆、沒有落後，本次不再合併其他分支、不操作其他worktree、不強制推送、不動三份stash。下方未commit／push為授權前實作快照，build／bin／.godot／匯出與日誌維持忽略。
+
+- 2026-11-19 道路銜接／第二關東側修正：生成道路的接口限制改為可由玩家後續施工開啟，普通塔牌、事件道路卡與地塊建造共用 ConstructionLayout 的雙向接點處理；不讓未施工的相鄰平行路自動合流、不繞過手動配方的封口或塔／特殊地塊障礙。port_overrides 的低四位仍是出口，bit4僅標記生成道路來源，不傳入 native 道路遮罩。LevelDefinition 新增 Expansion Blocked Goal Sides；第二關 frontier 只勾 East（2），基地以東半平面含東北／東南角落不提供入口候選，提交亦驗證。其他關卡預設0；保持玩家直接選落點、上次區域排除及原分流。本輪不 commit／push。
+
+- 2026-11-19 使用者修正入口放置：新入口必須由玩家自由選擇地圖候選格，系統不得自動選區或落點；只移除先選北／西／南等方向的步驟。一次顯示全部允許區域，Hover 預覽入口與自動建路，點擊才提交並記錄方位。上次放南方，下一次南方整區候選不提供；只排除上一次，較早區域會重新允許。沒有替代區域時仍沿用原防卡死回退。此修正取代11月18日自動落點實作與測試；其餘UI、獨立建路及Level／ACT時機保留。
+
+- 2026-11-18 UI/UX 與入口擴張：基於 HEAD=1f097a6，四項優化已接入正式關卡；本輪不 commit／push，不動 stash／其他 worktree。敵人頭頂不再提交生命值條，保留護盾／技能／效果；選中敵人死亡時解除 Node 參照並保留純數值快照、0 HP 與「已擊殺」，切換或空白取消。入口擴張仍依 Level／ACT 原時機，但取消方位按鈕，玩家直接在全部允許區域的候選格中自由點選落點；按目前地圖邊界分類四區，只排除上次成功擴張的區域，沒有替代才同區回退。共用 RoadConstructionSearch 決定幾何，供擴張與偵查兵事件使用，優先獨立通基地附近、受路長上限約束，必要才提早合流；經原 ConstructionLayout 驗證提交，未修改 native 導航／分流。每入口改為固定點擊區的鐘擺驚嘆號，Hover 顯示最終排程名稱×數量直列；情報單一圖示左上未讀 Badge，只讀真正顯示的敵人條目；遺物列可收合成圖示＋總件數，窄視窗於下方展開。此段取代舊的方位按鈕、常駐開波文字／兵種圖示、死亡即取消及遺物不可收合描述；完整規則／參數／驗證見 docs/ui_ux_expansion.md 與 docs/HANDOFF.md。
+
 - 2026-11-18 本次 Git 授權：使用者要求「更新git」，授權提交本聊天的 Special Events V1、九事件／五種特殊卡、時間軸圖示、中英文本、相關測試與文件；本次不 push。開始 HEAD=852bd5b、branch=experiment/routing-sandbox，工作目錄乾淨，已存在先前完成的 origin/main 快進。上述事件變更位於當日合併前的最新 stash 3ca45e0，本次以 apply 恢復，沒有衝突；三份 stash 全數保留，不操作其他 worktree、不再合併其他分支。恢復後 Windows Godot 4.7.2 事件回歸284 checks／failures=[]，import exit0；保留既有退出清理警告。先前未commit註記為實作快照，本次依授權提交；build／bin／.godot／匯出與日誌仍不提交。
 
 - 2026-11-17 Special Events V1：正式 LevelSession 每完成五波、且還有下一波時抽一次九事件二選一；15 波於 5／10 觸發、15 直接勝利。順序為在途攻擊收尾→ACT 遺物→新增入口→特殊事件→準備，過程共用鎖並防連點。事件及五張特殊牌資料在 assets/data/events/，Level 可指定 catalog；event.* 中英文本納入遊戲文本編輯器。沿用 BuildCard／手牌／TowerMap 驗證、預覽、旋轉、動畫及音效，特殊牌不進商店；特殊地塊占格獨立但與塔合併阻路。藥劑只於該次升級忽略上限；徵兵停火下一波、波後恢復。增援只加入下一波 WaveDefinition 複本、每入口分別追加 fixed_start 群組，仍由原排程／分流處理；原路線算法未改。新路先搜尋驗證相對獨立支線，再用原 ConstructionLayout 提交。寶石／碎石按同批卡牌實際放置達標，集中刷新塔與友軍真實傷害，小寶石走正常清波 reward。未指定的增援預設鼠群12、飛翼獸6、重裝兵5，皆從入口1、可編輯。說明與所有預設見 docs/special_events.md；人工入口 tests/events/playground.tscn。本輪不 commit／push。

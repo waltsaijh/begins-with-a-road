@@ -408,7 +408,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 	if wave != null and wave.reserves_cells(additions):
 		failure.error = "此處在敵軍已固定的路線上"
 		return failure
-	var layout := ConstructionLayout.build(map,ground,ports,placement.port_overrides,proposed)
+	var layout := ConstructionLayout.build(map,ground,ports,placement.port_overrides,proposed,true)
 	var reachable: Array[Vector2i] = terminals.duplicate()
 	for home: Vector2i in homes:
 		if proposed.has(home) or not layout.masks.has(home):
@@ -501,7 +501,7 @@ func _special_plan(card: BuildCard, cell: Vector3i, turns: int) -> Dictionary:
 	var requested := {}
 	if definition.kind == SpecialCardDefinition.Kind.TILE:
 		for at in ground: requested[at] = 0
-	var layout := ConstructionLayout.build(map,ground,requested,placement.port_overrides,proposed)
+	var layout := ConstructionLayout.build(map,ground,requested,placement.port_overrides,proposed,true)
 	var reachable: Array[Vector2i] = controller.terminal_cells()
 	for tower: DefenseTower in towers.values():
 		if tower.deployment != null: reachable.append(tower.garrison_cell())

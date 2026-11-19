@@ -499,3 +499,4 @@ base_health = 20
 starting_gold = 9
 opening_shop = true
 expansion_wave_interval = 5
+expansion_blocked_goal_sides = 2

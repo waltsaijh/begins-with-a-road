@@ -116,6 +116,10 @@ func setup() -> void:
 	relic_panel.add_child(picker)
 	relic_list = ItemList.new()
 	relic_list.custom_minimum_size.y = 160
+	# Leave room for descriptions and actions in the compact manual-review tool.
+	var tool_viewport: Viewport = render_viewport if render_viewport != null else get_viewport()
+	tool_viewport.size_changed.connect(func():
+		relic_list.custom_minimum_size.y = clampf(tool_viewport.get_visible_rect().size.y-472,96,160))
 	relic_list.add_theme_color_override("font_color",Color("34504e"))
 	relic_list.add_theme_color_override("font_selected_color",Color("173e3b"))
 	var selected_style := StyleBoxFlat.new()

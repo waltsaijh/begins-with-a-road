@@ -100,8 +100,8 @@ func verify() -> void:
 	units[4].skill_progress = 0.35
 	units[4].add_shield(40)
 	units[4].take_damage(20)
-	check(Overlay.health_fills(units[1]).is_equal_approx(Vector2(0.4, 0)), "Health fill ratio is incorrect")
-	check(Overlay.health_fills(units[2]).is_equal_approx(Vector2(0.625, 0.375)), "Health and shield do not share their capacity proportionally")
+	check(is_zero_approx(Overlay.shield_fill(units[1])), "Unshielded wounded unit has no bar")
+	check(is_equal_approx(Overlay.shield_fill(units[2]),1.0), "Shield uses its own remaining capacity")
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var batch_render := {}
@@ -117,7 +117,7 @@ func verify() -> void:
 				if color.is_equal_approx(EnemyStatusConstants.SHIELD): colors.shield += 1
 				if color.is_equal_approx(EnemyStatusConstants.SKILL): colors.skill += 1
 				if color.r > 0.65 and color.g > 0.8 and color.b > 0.9: colors.effect += 1
-		check(colors.health > 100 and colors.shield > 20 and colors.skill > 40 and colors.effect > 5, "Status colors or icon were missing from the rendered frame")
+		check(colors.health == 0 and colors.shield > 20 and colors.skill > 40 and colors.effect > 5, "Status colors or icon were missing from the rendered frame")
 		if not OS.has_feature("web"):
 			picture.save_png(Artifacts.path("enemies/enemy_status.png"))
 	var report := {"failures": failures, "shield_absorption": true, "effect_refresh_and_expiry": true, "strongest_effect_longest_remaining": true, "visual_offset_anchor": true, "slot_cleanup": true, "optional_skill": true, "shared_overlay": true, "batch_render": batch_render}
@@ -294,7 +294,7 @@ func verify_camera_reentry(renderer: MultiMeshInstance3D) -> void:
 				if color.is_equal_approx(EnemyStatusConstants.SHIELD): shield += 1
 				if color.is_equal_approx(EnemyStatusConstants.SKILL): skill += 1
 				if color.r > 0.65 and color.g > 0.8 and color.b > 0.9: effect += 1
-		check(health > 20 and shield > 5 and skill > 5 and effect > 5,"Status disappeared after camera pan/zoom from %s: health=%d shield=%d skill=%d effect=%d" % [edge,health,shield,skill,effect])
+		check(health == 0 and shield > 5 and skill > 5 and effect > 5,"Status disappeared after camera pan/zoom from %s: health=%d shield=%d skill=%d effect=%d" % [edge,health,shield,skill,effect])
 		if not OS.has_feature("web"): picture.save_png(Artifacts.path("enemies/status_reentry_%d.png" % edges.find(edge)))
 	camera.position = camera_position
 	camera.size = camera_size

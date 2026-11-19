@@ -148,11 +148,11 @@ func verify() -> void:
 	TranslationServer.set_locale("zh_TW")
 	await frames(1)
 	check(hud.resume_button.text == "繼續遊戲" and hud.home_button.text == "回到主畫面", "Pause menu Chinese labels are missing")
-	check(hud.early_start.get_node("Title").text == "開始下一波", "Chinese callout label is wrong")
+	check(hud.early_start.get_node("Title").text == "!", "Chinese callout label is wrong")
 	TranslationServer.set_locale("en")
 	await frames(1)
 	check(hud.resume_button.text == "Resume game" and hud.home_button.text == "Back to main menu", "Pause menu English labels are missing")
-	check(hud.early_start.get_node("Title").text == "Start next wave", "English callout label is wrong")
+	check(hud.early_start.get_node("Title").text == "!", "English callout label is wrong")
 	TranslationServer.set_locale(locale)
 	if DisplayServer.get_name() != "headless":
 		var selected: int = cards.selected

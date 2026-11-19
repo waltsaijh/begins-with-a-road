@@ -55,6 +55,7 @@ func _enter_tree() -> void:
 		get_node("EnemyWave").spawn_seed = _balance_seed+2000
 	get_node("EnemyWave").auto_start = false
 	if level == null: return
+	get_node("SpawnExpansion").blocked_goal_sides = level.expansion_blocked_goal_sides
 	var error := level.configuration_error()
 	if not error.is_empty():
 		push_error(error)
@@ -105,7 +106,8 @@ func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, 
 
 func _ready() -> void:
 	_wave = get_node("EnemyWave")
-	if _balance_seed >= 0: get_node("TowerMap").relics._rng.seed = _balance_seed+3000
+	if _balance_seed >= 0:
+		get_node("TowerMap").relics._rng.seed = _balance_seed+3000
 	if not _valid:
 		_wave.start_allowed = false
 		_wave._update_button()
@@ -335,6 +337,7 @@ func _continue_after_reward() -> void:
 		_end_run(true)
 		return
 	if _should_expand_after(current_wave):
+		get_node("PortalMap").route_history.wave = current_wave+1
 		choosing_start = true
 		# Expansion timeline refers to the upcoming wave index.
 		timeline.set_state(current_wave,0.0,false)
@@ -348,6 +351,7 @@ func _continue_after_reward() -> void:
 	_continue_after_expansion()
 
 func _continue_after_expansion() -> void:
+	get_node("PortalMap").route_history.wave = current_wave+1
 	if SpecialEventManager.due(current_wave,_waves.size()) and _event_completed_at != current_wave:
 		choosing_event = true
 		_wave.start_allowed = false

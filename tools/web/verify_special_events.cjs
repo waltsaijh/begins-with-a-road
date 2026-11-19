@@ -5,7 +5,10 @@ const cp = require('node:child_process');
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const directory = process.argv.find(v => v.startsWith('--directory='))?.slice(12) || '.godot/special_events_web';
-const output = path.resolve('.godot/test-results/events');
+// Reuse this runner for focused gameplay regressions; each scene prints JSON.
+const marker = process.argv.find(v => v.startsWith('--marker='))?.slice(9) || 'SPECIAL_EVENTS_RESULT ';
+const suite = process.argv.find(v => v.startsWith('--suite='))?.slice(8) || 'events';
+const output = path.resolve('.godot/test-results', suite);
 fs.mkdirSync(output, { recursive: true });
 (async () => {
   const log = fs.openSync(path.join(output, 'web-server.log'), 'w');
@@ -26,16 +29,19 @@ fs.mkdirSync(output, { recursive: true });
       messages.push(text);
       if (message.type() === 'error') errors.push(text);
       if (message.type() === 'warning') warnings.push(text);
-      const marker = 'SPECIAL_EVENTS_RESULT ';
       const index = text.indexOf(marker);
       if (index >= 0) result = JSON.parse(text.slice(index + marker.length));
     });
     await page.goto('http://127.0.0.1:8986/index.html');
+    // Use a real user gesture for the normal browser audio policy, including
+    // suites that otherwise drive native Godot input from their own scripts.
+    await page.waitForFunction(() => document.querySelector('canvas')?.width > 0);
+    await page.mouse.click(8,120);
     for (let i = 0; i < 900 && !result; i++) await page.waitForTimeout(100);
     fs.writeFileSync(path.join(output, 'web.log'), messages.join('\n'));
     fs.writeFileSync(path.join(output, 'web-result.json'), JSON.stringify({ result, errors, warnings }, null, 2));
-    assert.ok(result, 'Browser did not complete Special Events regression');
-    assert.deepEqual(result.failures, [], 'Special Events regression failed');
+    assert.ok(result, `Browser did not complete ${suite} regression`);
+    assert.ok(Array.isArray(result.failures) ? result.failures.length === 0 : result.failures === 0, `${suite} regression failed`);
     assert.deepEqual(errors, [], 'Browser reported runtime errors');
     console.log(JSON.stringify({ platform: 'Chrome Web', ...result }));
     if (process.argv.includes('--baseline')) {

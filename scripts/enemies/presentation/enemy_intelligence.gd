@@ -6,6 +6,7 @@ var seen := {}
 var read := {}
 var pending: Array[Troop] = []
 var _hud: Node
+var _last_read := ""
 @onready var toggle: Button = $Screen/Toggle
 
 func _ready() -> void:
@@ -14,6 +15,8 @@ func _ready() -> void:
 func setup(owner_session: Node) -> void:
 	session = owner_session
 	_hud = session.get_node("LevelHUD")
+	_hud.progress_page.entry_viewed.connect(_mark_read)
+	_refresh_notice()
 	session.get_node("EnemyWave").enemy_spawned.connect(_on_enemy_spawned)
 
 func _on_enemy_spawned(enemy: Node3D) -> void:
@@ -27,22 +30,27 @@ func _on_enemy_spawned(enemy: Node3D) -> void:
 
 func _refresh_notice() -> void:
 	var en := TranslationServer.get_locale().begins_with("en")
-	toggle.text = "!  %d" % pending.size()
-	toggle.icon = pending[0].icon if not pending.is_empty() else null
-	toggle.tooltip_text = (GameText.text("text.enemy_intelligence.1",{},en)) % pending.size()
-	# _process stops while paused, so an emptied queue hides the notice here.
-	if pending.is_empty(): toggle.hide()
+	toggle.text = ""
+	toggle.get_node("Badge").visible = not pending.is_empty()
+	toggle.get_node("Badge/Count").text = str(pending.size())
+	toggle.tooltip_text = (GameText.text("text.enemy_intelligence.1",{},en)) % pending.size() if not pending.is_empty() else tr("ui.intelligence.title")
 
-## Every new enemy is now listed there, so the whole notice counts as read.
 func open_notifications() -> void:
-	if pending.is_empty() or not _hud.open_progress(pending[0].troop_name): return
-	for profile in pending: read[profile.troop_name] = true
-	pending.clear()
+	var id := pending[0].troop_name if not pending.is_empty() else _last_read
+	if id.is_empty(): id = TroopCatalog.default_troop().troop_name
+	_hud.open_progress(id)
+
+func _mark_read(id: String) -> void:
+	for profile in pending.duplicate():
+		if profile.troop_name != id: continue
+		read[id] = true
+		_last_read = id
+		pending.erase(profile)
 	_refresh_notice()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh_notice()
 
 func _process(_delta: float) -> void:
-	toggle.visible = not pending.is_empty() and not get_tree().paused and session != null and not session.choosing_relic and not session.finished
+	toggle.visible = session != null and not get_tree().paused and not session.choosing_relic and not session.choosing_event and not session.choosing_start and not session.finished
 	if session != null and session.relic_choice.get_node("Collection").visible: toggle.hide()

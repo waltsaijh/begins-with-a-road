@@ -2,6 +2,7 @@ extends Node3D
 ## Ground edits and picking for card construction; no standalone mouse tool.
 
 signal cell_placed(cell: Vector3i)
+const Layout = preload("res://scripts/map/tile/construction_layout.gd")
 
 @onready var map: GridMap = $"../TileMap"
 @onready var camera: Camera3D = $"../Camera3D"
@@ -48,6 +49,9 @@ func add_cells(cells: Array[Vector3i], notify := true) -> Array[Vector3i]:
 		affected[cell] = true
 		for direction in TileConstants.DIRECTIONS:
 			affected[cell + direction] = true
+	var ground := {}
+	for cell in added: ground[Vector2i(cell.x,cell.z)] = true
+	Layout.open_generated_joins(map,ground,{},port_overrides,towers.blocked_occupancy() if towers != null else {})
 	for cell: Vector3i in affected:
 		refresh_cell(cell)
 	if notify:

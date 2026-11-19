@@ -14,6 +14,8 @@
 
 每個 ACT 另有 `Add Start After Completion`（預設勾選），決定該 ACT 結束後是否新增一個出生點；沒有下一個 ACT 時直接完成關卡。這個選項不再放在 Level。波次編輯器可新增／刪除 ACT 與波次，並透過「結束後新增出生點」checkbox 編輯，全部支援復原／重做與儲存重載。
 
+Level 的 `Expansion Blocked Goal Sides` 可勾選禁止基地哪一側放置新入口，使用 GridMap 的北／東／南／西座標方向；預設全不勾。第二關 `frontier.tres` 目前只勾 East（值2），因此基地格 X 以東的候選全部排除，包含東北／東南角落。限制在列出候選及提交時都會檢查，和只排除上次放置區域的規則一起生效。
+
 標題與描述的翻譯 key 直接由 ID 推導，不另存欄位：`ui.maps.title.<id>`、`ui.maps.description.<id>`。例如 `frontier` 使用 `ui.maps.title.frontier` 與 `ui.maps.description.frontier`；在 `assets/translations/card_names.csv` 填入英語／繁體中文翻譯即可。子目錄衍生的 ID 保留斜線，例如 `chapter2/bridge`。改 ID 時也要同步改前置條件與翻譯 key。
 
 例如：

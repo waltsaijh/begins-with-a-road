@@ -1,5 +1,46 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-19 Git 提交與推送
+
+使用者要求提交並推送本聊天累積的 UI／敵人資訊、玩家入口放置、共用建路與新舊路口銜接、第二關東側限制、資源／測試／文件。開始HEAD=`1f097a6`，分支`experiment/routing-sandbox`；fetch後領先`origin/experiment/routing-sandbox`五筆、沒有落後，正常推送會包含先前尚未推送的Special Events及既有美術整合歷史。本次不進行新的merge／rebase、不動三份stash或其他worktree、不強制推送；下方未commit／push為此次授權前快照。
+
+提交前核對本聊天已完成的最新驗證：Windows／Chrome Web入口及銜接各497項、事件285項、塔牌規則458項、十五波加速流程與道路預測全通過；其他UI／教學／護盾像素結果見各階段。本次Git操作不重跑未修改的遊戲測試。既有WebGL／快速退出警告與未執行真人自然十五波／正式重匯出的限制保留。`git diff --check`通過，正式project.godot／export_presets.cfg及native未修改；成品、SDK與日誌未納入提交。
+
+## 2026-11-19 新舊路銜接與第二關東側限制
+
+已修正生成道路的出口被永久鎖定，導致後續卡牌雖能放下，卻無法接通新、舊道路的問題。ConstructionLayout 記錄生成來源，只有玩家實際施工接觸的接點才補雙向出口；普通塔牌、事件道路卡及普通地塊共用，預覽與提交一致。不讓未施工的平行路自動合流，手動配方封口、塔／特殊地塊等障礙仍保護。未改 native 導航、候選池或分流。
+
+LevelDefinition 新增 `expansion_blocked_goal_sides`，第二關 frontier 設2（East），列候選與提交都排除基地以東半平面，包含北／南區的東側角落；其他關卡預設0。仍由玩家直接選落點，保留只排除上次區域的規則。只修改此項指定關卡設定，其餘平衡資料保留，未 commit／push。
+
+Windows Godot 4.7.2：497項入口／銜接／東側限制檢查全通過；原接口契約的重現距離20格、修正後4格。另已完成真渲染493項版本、道路預測／實際行程／像素回歸、十五波流程及兩次東側篩選、事件285項、塔牌編輯規則458項，全通過；最後腳本測試stderr無腳本錯誤。Chrome release Web 同一497項通過，pageerror／console error皆0；仍有92條既有WebGL buffer警告，結果 `.godot/test-results/junction/web-result.json`。`git diff --check` 通過；證據 `.godot/junction_*`，原生與正式匯出設定未修改。快速退出／匯出仍可能有原有ObjectDB／Resource警告；未執行真人十五波自然遊玩或正式發行包重匯出。
+
+## 2026-11-19 入口改回玩家直接放置
+
+使用者修正：移除的是北／西／南等方位按鈕，並非玩家選擇落點。已取消11月18日的系統自動選區／隨機落點，改成一次顯示全部允許區域的候選格，玩家 Hover 預覽入口與道路、左鍵點格才提交。只排除上次成功放置區域；先選南方，下次沒有南方候選，也不能直接呼叫提交繞過限制。較早區域會重新允許，原無替代候選時的防卡死回退保留。
+
+沿用原相機 click／drag 仲裁，拖曳不放置；暫停隱藏候選並拒絕提交；等待、非法點擊不修改路網或方位記錄。建路仍使用11月18日的共用獨立路搜尋，保留原先時機、遺物→入口放置→特殊事件→準備的流程鎖、真正出兵及流量預測。無關UI與平衡資料保留，未 commit／push。
+
+本次 Windows Godot 4.7.2 真實繪製入口476 checks／failures=[]（含直接滑鼠點擊、拖曳不誤放、南→北／上次區域排除、預覽／暫停／非法／重複點擊、真正出兵）；十五波加速清波流程 failures=0；事件285 checks／failures=[]；真實繪製道路預測與重開生命週期 failures=0。截圖 `entrance_place_south.png`／`entrance_place_north.png`、日誌 `.godot/placement_*`。Chrome release Web 同一476項通過、pageerror／console error皆0（仍有86條既有 WebGL buffer警告），證據 `.godot/test-results/placement/web-result.json`；下方11月18日自動落點的452項結果為已取代版本的歷史，不能作為這次玩家操作驗證。本次 git diff --check 通過，正式入口／匯出設定已還原；未執行十五波自然遊玩、真人觀感及正式發行包重匯出。
+
+## 2026-11-18 UI/UX 與自動入口擴張
+
+開始 HEAD=`1f097a6`、branch=`experiment/routing-sandbox`，起始工作目錄乾淨。本輪不 commit／push，不動三份 stash 或其他 worktree。完成護盾獨立顯示、死亡敵人資訊快照、自動方位與獨立建路、驚嘆號／Hover 文字情報、逐筆未讀 Badge、可收合遺物列與窄視窗下拉原圖示列。沿用現有 UI／文本／排程／原生導航，未改平衡 Resource；Art Slice G 素材保持原樣。規則、預設值、核心責任及測試命令見 [UI/UX 與入口](ui_ux_expansion.md)。
+
+核心檔案：`scripts/map/tile/road_construction_search.gd`、`scripts/levels/expansion/`、`scripts/events/event_road_builder.gd`、`scripts/levels/presentation/`、`scripts/enemies/presentation/`、`scripts/relics/relic_choice.gd`、`scripts/progress/progress_page.gd` 與對應場景／雙語 CSV。SpecialEventManager 複製可變波次／群組但保留 Troop 身分，讓 inline 兵種的預測統計與實際行程一致。道路年代在擴張提交前設為下一波。
+
+本次實際驗證（下方11月17日及更早結果為歷史）：
+
+- PASS：Windows Compatibility 單位檢視101 checks，死亡後解除 Node 並保留快照／已擊殺／0 HP、翻譯及空白取消；護盾／無血條像素對照2,048,000像素、0差異，四邊相機重新進場與技能／效果保留。
+- PASS：UI_SLICE_A 108 checks，Windows 真實繪製及 headless、Chrome release Web 均 failures=[]；涵蓋逐筆 Badge、只點擊才暫停、遺物總件數／收合／新取得不展開、800×600 原圖示列於標頭下方展開。Chrome pageerror／console error皆0，既有 WebGL buffer警告仍有52條，未宣稱沒有警告。
+- PASS：Windows 自動入口452 checks，四區／只排上次／同區回退、獨立方案與受阻早合流、路長／占格／舊路保護、端點高度、原生真實出兵與配額；十五波加速清波流程、最終勝利及原始資料不變。
+- PASS：Chrome release Web 自動入口同一452檢查、failures=[]，原生 WASM 真實出兵正常，pageerror／console error皆0；仍有68條既有 WebGL buffer警告。測試如既有 enemy_status 在 Web 印出 JSON 後由瀏覽器關頁，不強制呼叫引擎 quit；曾在強制 quit 後出現的 AudioContext currentTime 清理回呼不屬正常遊玩流程，本次未修改音訊引擎。
+- PASS：Windows 真實繪製道路預測／Hover／固定點擊區／±10°鐘擺停頓與暫停／預測及實際行程一致／重開生命週期，failures=0；像素測試固定 Art Slice G 雲影輸入及驚嘆號動畫再比對，道路著色器未改。
+- PASS：本次重跑 Special Events 284 checks；五步教學真渲染；遺物真實拖牌／獎勵點擊及800×600試驗工具；LevelHUD回歸。修正遺物試驗工具小視窗展開後底部超出8px，清單高度隨視窗縮減，正式遊戲資料不變。
+- PASS：Godot import exit0、git diff --check；正式入口及匯出設定於測試匯出後還原。部分自動快速退出保留 ObjectDB／Resource 清理警告，不能當成無錯誤輸出。
+- NOT RUN：十五波自然完整遊玩／平衡、真人主觀觀感驗收、正式發行包重匯出；本輪 Web 是忽略目錄中的專用測試包。未測其他不相關系統。
+
+證據：`.godot/ux_complete_*`、`.godot/ux_verify_*`、`.godot/ux_inspection_render_final.*`、`.godot/ux_render_enemies_enemy_status.*`、`.godot/ux_latest_*`、`.godot/test-results/ux_hud/web-result.json`、`ux_expansion/web-result.json`；畫面在 `.godot/test-results/levels/` 與 `ui_slice_a/`。初期失敗已修正並重驗，不列為最終通過證據。
+
 ## 2026-11-18 Special Events Git 交付
 
 使用者要求「更新git」，本次提交 Special Events V1 及相關資料、雙語文本、測試與文件，不 push。開始 HEAD=852bd5b、branch=experiment/routing-sandbox，工作目錄乾淨；事件變更保存在當日 main 快進前的新 stash 3ca45e0，已 apply 恢復且沒有衝突。全部三份 stash 保留，不動其他 worktree、不再合併其他分支；本輪未改既有 Art Slice G 資產。

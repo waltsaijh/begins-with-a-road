@@ -135,7 +135,7 @@ func verify() -> void:
 	await frames()
 	check(grant_button.get_global_rect().end.x <= 800 and grant_button.get_global_rect().position.x >= 0, "Manual relic tool remains visible at 800px viewport width")
 	await click_control(picker)
-	check(relic_list.visible and remove_button.get_global_rect().end.y <= 600, "Expanded list and removal button fit 800x600 viewport")
+	check(relic_list.visible and remove_button.get_global_rect().end.y <= 600, "Expanded list and removal button fit 800x600 viewport: visible=%s bottom=%s" % [relic_list.visible,remove_button.get_global_rect().end.y])
 	await snapshot("manual_relic_tool")
 	await click_control(picker)
 	render_viewport.size = Vector2i(1280,800)
@@ -211,7 +211,7 @@ func verify() -> void:
 	await get_tree().create_timer(0.4).timeout
 	check(session.get_node("TowerMap").relics.held.has(selected.id) and not session.choosing_relic and not cards.input_suspended, "Real reward card click acquires and resumes preparation")
 	var relic_bar: Control = choice.get_node("RelicBar")
-	var icons: HBoxContainer = relic_bar.get_node("Items")
+	var icons: HBoxContainer = relic_bar.get_node("Scroll/Items")
 	await frames()
 	check(relic_bar.visible and icons.get_child_count() == manager.held.size(),"Each owned relic type has a count-aware icon")
 	for icon in icons.get_children():
@@ -231,7 +231,7 @@ func verify() -> void:
 	check(relic_bar.visible and relic_bar.global_position.is_equal_approx(fixed_position),"Stowing hand moved or hid the relic row")
 	cards.hand.set_stowed(false)
 	cards.hand.finish_animation()
-	choice.get_node("RelicBar/Items").get_child(0).pressed.emit()
+	choice.get_node("RelicBar/Scroll/Items").get_child(0).pressed.emit()
 	check(choice.get_node("Collection").visible, "Acquired collection can be inspected")
 	await snapshot("collection")
 	var weak: WeakRef = weakref(session.get_node("TowerMap").relics)

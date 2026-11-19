@@ -219,7 +219,11 @@ func _on_wave_finished() -> void:
 	_ceasefire.clear()
 
 func effective_wave(source: WaveDefinition) -> WaveDefinition:
-	var result: WaveDefinition = source.duplicate(true)
+	# Copy mutable wave/group values, retaining canonical immutable troop resources.
+	# Preview and combat must key the same troop, including inline custom profiles.
+	var result: WaveDefinition = source.duplicate(false)
+	result.groups = []
+	for group in source.groups: result.groups.append(group.duplicate(false))
 	result.reward += wave_gold_bonus
 	var origin_count: int = towers.controller.start_paths.size()
 	for effect in pending_reinforcements:

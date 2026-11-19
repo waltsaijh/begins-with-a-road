@@ -211,9 +211,9 @@ F3 舊除錯流量圖層已移除；Routing Sandbox 的準備期玩家中心線�
 
 ### Routing Sandbox：下一波敵軍與道路流量
 
-正式關卡的 `LevelHUD/WorldActions/EarlyStart/NextWaveIntel` 使用 `scenes/levels/components/next_wave_intel.tscn`，依 WaveSpawnSchedule 不洗牌排程中的 start_index 與 Troop Resource 加總各入口實際分配的數量；圖示取自資源，不列舉固定兵種。準備期常駐顯示上方置中的「開始下一波」與下方單列、由左至右的兵種圖示，不再使用菱形或整體 hover 展開面板。整個標題與圖示列包在淡色、青灰描邊、切角及下方置中尖角的共用對話框內。標題 16px、圖示框 34×34px、圖示 24×24px、框距 6px，整列置中；hover 單一框時以 0.15 秒拓寬並淡入 14px 的 ×數量，其餘框只顯示圖示，離開收回。超過 480px 時水平捲動。標題與空白選取該入口全兵種，圖示再篩選該兵種的既有流量預測；以實際 GUI 命中與 viewport 座標核對，不因子控制項或圖示展開改變而丟失入口。暫停、失焦或離窗清除 hover。
+正式關卡各入口只常駐固定點擊區的 `!`，字形以實際時間 ±10° 鐘擺搖晃，暫停凍結。Hover 才展開無圖示的「本地化兵種 × 數量」直列，直接依最終 WaveSpawnSchedule 的 start_index 與 Troop Resource 加總，包含事件增援；最多 300×234、垂直捲動。驚嘆號、間隙與清單共用 Hover 區，避免移入內容即收回；切換行仍篩選原入口／兵種流量，離開整組恢復全體。暫停、失焦、戰鬥或流程鎖清除提示。
 
-每個入口都使用相同的開波命令，點擊上方標題會開始整波，不是只啟動該入口；圖示只供 hover 篩選，點擊不開波、不開啟其他頁面。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示標題及 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
+每個入口都使用相同的開波命令，點擊驚嘆號會開始整波，不是只啟動該入口；清單文字只供 hover 篩選，點擊不開波、不開啟其他頁面。HUD 保留 EarlyStart 作為既有波次 controls 的唯一開波入口，其餘 EarlyStart2、EarlyStart3… 轉送至同一命令；共用開場動畫進度，同步鎖定／收回，重複點擊不會重啟計時或重複生怪。清波、ACT 新增入口、暫停及重開會同步更新全部按鈕；各按鈕獨立投影與裁切。零配額入口仍顯示驚嘆號，展開後顯示 ×0。若路線暫時無效，使用與正式排程共用的入口分配 helper 顯示正確原定數量，不假造流量，也不誤顯示全波總量或零人。
 
 `wave_flow_preview.gd` 監聽 LevelSession.preparation_changed、EnemyWave.routes_changed、PortalMap.graph_changed／plan_changed 與 tile_parameters.costs_changed（包含非目前選取兵種）。失效先清除舊 mesh，待導航不在 computing 時合併重算一次。直接呼叫 `WaveSpawnSchedule.build(definition, controller, first_id, false, additional_starts)`；與開波共用跨群組、跨入口的完整配額流程，僅略過出發洗牌，不使用 global RNG，也不修改 pending／committed routes。預測是當前有限候選池的分配結果，不是所有可能道路的機率。
 
@@ -272,18 +272,18 @@ Uniform 忽略 temperature，對通過門檻的有限完整候選給予相同機
 
 頭頂狀態使用 `scripts/enemies/presentation/enemy_status_overlay.gd`，整批敵人共用一個 CanvasLayer／Control 及單一 MultiMeshInstance2D，沒有逐隻 UI 節點；位置跟隨模型 MultiMesh 的避讓後位置，不讀回 GPU buffer。每幀依原先逐隻、背景到填色到圖示的順序，將可見矩形寫入可重用 PackedFloat32Array，整批提交一次；容量按倍數成長，以 visible_instance_count 排除舊資料。每幀成本仍為 O(敵人數＋效果圖示數)，不代表位置投影與資料填寫已移到 GPU。敵人全數離場後立即清空可見 instance、釋放圖示快取並停止更新；同幀多次移除只排程一次顯示刷新，避免逐次重建整批。
 
-- 綠色血量＋右側淺藍護盾共用一條狀態條，依 `max_health + max_shield` 比例顯示，未填部分保留深色底。兵種設定 `max_shield`（預設 0），出生時複製護盾上限與目前值；傷害先扣護盾，再扣血。執行時 `enemy.add_shield(amount)` 可增加護盾與必要的上限。
+- 一般、受傷及 Boss 均不提交頭頂生命值條。護盾大於 0 時才顯示淺藍護盾條，以 `shield / max_shield` 表示剩餘量；護盾傷害／增加機制、技能與效果圖示不變。
 - `enemy.skill_progress` 預設 -1，隱藏下方黃色技能條；設為 0～1 顯示進度，設回 -1 隱藏。僅提供顯示資料，沒有額外實作敵人技能。
 - `enemy.set_effect_icon(id, texture)` 新增／更新頭頂效果圖示；同 id 不重複、依加入順序橫向排列，傳入 null 移除。SlowEffect 的 `icon` 使用 `assets/sprites/effects/slowness.png`，圖示跟隨合併後的最強減速，較弱命中只延長時間、不覆寫圖示，合併狀態到期移除；可在資源中換成自製 PNG。自訂效果負責在自身開始／結束時更新圖示。
-- 尺寸、顏色與邊框集中在 `scenes/enemies/components/enemy_status_appearance.tscn` 的節點與樣式；批次 renderer 讀取單一範本，維持共用 overlay。條與圖示使用固定螢幕像素尺寸，跟隨攝影機縮放／平移後的頭頂座標；overlay 在暫停時仍重新投影凍結的頭頂世界座標，因此鏡頭移動不會讓血條、護盾、技能與圖示留在舊位置。不接收滑鼠事件，不影響卡片放置。
+- 尺寸、顏色與邊框集中在 `scenes/enemies/components/enemy_status_appearance.tscn` 的節點與樣式；批次 renderer 讀取單一範本，維持共用 overlay。條與圖示使用固定螢幕像素尺寸，跟隨攝影機縮放／平移後的頭頂座標；overlay 在暫停時仍重新投影凍結的頭頂世界座標，因此鏡頭移動不會讓護盾、技能與圖示留在舊位置。不接收滑鼠事件，不影響卡片放置。
 
-圖集與 instance 提交分別位於同目錄的 enemy_status_atlas／enemy_status_batch 模組。材質使用 `assets/shaders/enemy_status.gdshader`，每個 instance 保存顏色及圖集像素範圍；血量、護盾、技能填色共用白色像素，效果圖示共用帶邊緣延伸的動態圖集。圖集擴大保留既有像素座標，僅新增圖片時上傳。靜態 Texture2D 首次使用時快取；不逐幀擷取動畫、ViewportTexture 或同一圖片物件的內容更新。
+圖集與 instance 提交分別位於同目錄的 enemy_status_atlas／enemy_status_batch 模組。材質使用 `assets/shaders/enemy_status.gdshader`，每個 instance 保存顏色及圖集像素範圍；護盾、技能填色共用白色像素，效果圖示共用帶邊緣延伸的動態圖集。圖集擴大保留既有像素座標，僅新增圖片時上傳。靜態 Texture2D 首次使用時快取；不逐幀擷取動畫、ViewportTexture 或同一圖片物件的內容更新。
 
 非空批次提交 `MultiMesh.buffer` 後必須對 MultiMeshInstance2D 呼叫 `queue_redraw()`，刷新 canvas 繪製命令的裁切範圍；只更新 instance buffer 可能沿用舊範圍，造成最初在畫面邊緣外、仍落在 64px 預留區的狀態，於相機平移／縮放回畫面內後持續被裁掉。仍維持單一批次與一次 buffer 上傳，不以逐隻 UI 或切換整層可見性修復。
 
 外觀範本在顯示層建立時讀取，執行期間變更需重建顯示層。目前的無圓角／陰影／斜切 StyleBoxFlat 由 shader 解析繪製，避免分數縮放下的二次過濾；其他 StyleBox 由暫時 SubViewport 一次烘焙，之後釋放該 viewport。烘焙樣式縮放時可能產生紋理過濾差異，headless 不驗證其像素。
 
-驗證場景 `tests/enemies/enemy_status.tscn` 同時展示血量、護盾、技能與效果圖示；對照 tests/fixtures 的舊版繪製，檢查分散／重疊像素、不同圖示、圖集及 buffer 成長、移除與空批次重用。另將整批狀態分別置於左／右／上／下畫面外的預留區，再平移相機並縮放回中央，以實際像素確認四類狀態重新顯示。畫面寫入 `.godot/test-results/enemies/enemy_status.png` 與 `status_reentry_0～3.png`，Web 驗證使用 `tools/web/verify_enemy_web.cjs --status`。一次性效能場景已清除，過去的量測結論見 [歷史摘要](../reports/performance_2026-10-20.md)。
+驗證場景 `tests/enemies/enemy_status.tscn` 同時驗證沒有血條且護盾、技能與效果圖示保留；對照 tests/fixtures 的舊版繪製，檢查分散／重疊像素、不同圖示、圖集及 buffer 成長、移除與空批次重用。另將整批狀態分別置於左／右／上／下畫面外的預留區，再平移相機並縮放回中央，以實際像素確認四類狀態重新顯示。畫面寫入 `.godot/test-results/enemies/enemy_status.png` 與 `status_reentry_0～3.png`，Web 驗證使用 `tools/web/verify_enemy_web.cjs --status`。一次性效能場景已清除，過去的量測結論見 [歷史摘要](../reports/performance_2026-10-20.md)。
 
 ## 防禦塔與地塊參數
 
@@ -310,7 +310,7 @@ soldier 的 evaluation(tile) 仍回傳 1；塔的威脅資料與實際攻擊互�
 
 ### 戰場單位檢視
 
-正式關卡共用 `scenes/levels/unit_inspection.tscn`。LevelSession 持有一個 UnitInspection，分離 unit_pick（只在點擊掃描模型）、unit_inspection_data（即時實例數值的純呈現）及 unit_range（單個選取 mesh）。左鍵點塔／敵人直接切換，點空白取消；有選取時第一個 Esc 先取消，沒有選取才進入原暫停。鏡頭拖曳不觸發選取，按鈕、卡牌與資訊面板由 GUI 先消耗事件；持牌、拖牌、開店、入口／遺物選擇、載入／轉場與教學 PRACTICE 前停用，避免干擾原教學及放置。戰鬥中可選敵人，不暫停、不改路線／攻擊。暫停時隱藏面板／標記，恢復顯示；結算、死亡、抵達及 tree_exiting 清除。
+正式關卡共用 `scenes/levels/unit_inspection.tscn`。LevelSession 持有一個 UnitInspection，分離 unit_pick（只在點擊掃描模型）、unit_inspection_data（即時實例數值的純呈現）及 unit_range（單個選取 mesh）。左鍵點塔／敵人直接切換，點空白取消；有選取時第一個 Esc 先取消，沒有選取才進入原暫停。鏡頭拖曳不觸發選取，按鈕、卡牌與資訊面板由 GUI 先消耗事件；持牌、拖牌、開店、入口／遺物選擇、載入／轉場與教學 PRACTICE 前停用，避免干擾原教學及放置。戰鬥中可選敵人，不暫停、不改路線／攻擊。暫停時隱藏面板／標記，恢復顯示；結算、塔死亡、抵達及非死亡 tree_exiting 清除；選中敵人死亡則保存兵種及純數值快照、解除 Node 參照，在原面板保留 0 HP 與「已擊殺」，直到切換或取消選取。
 
 既有單位沒有 PhysicsBody，因此以相機 ray 與可見 MeshInstance3D 的局部 AABB 交點求最近正向深度，跨塔與敵人統一比較；不按字典順序、不加碰撞或逐幀人口掃描。EnemyMultiMesh.inspection_parts 提供與 GPU／場景顯示一致的 pose yaw、避讓偏移、模型 adjustment／imported transform 與 mesh bounds；純 CPU 查詢，不回讀 GPU buffer。這是模型包圍盒拾取，沒有逐三角形／逐像素精確遮擋判定。
 
@@ -729,3 +729,9 @@ EnemyAbilities 在敵人移動後、友軍／塔攻擊前共用空間索引結�
 事件效果使用本局狀態及可編輯 Resource。特殊牌共用原庫存與放置，永久地塊以 special_occupied 併入導航障礙；塔的數值刷新同時套用本局事件傷害倍率，藥劑只有該次忽略上限。增援追加於下一波的 WaveDefinition 深複本，fixed_start 群組逐入口生效，情報與實際出兵共用同一排程。小寶石獎勵加到正常波次 reward，碎石的當波傷害減成在開波時鎖定。獨立新路以建造用成本搜尋後經原 ConstructionLayout／Snapshot 提交，未改 CandidateRoutes／RouteDistribution。
 
 九事件、資料欄位、道路搜尋條件、重複事件效果及所有自行決定的預設值見 [special_events.md](special_events.md)；可指定事件的試驗場與 Windows／Web 回歸入口見 [驗收說明](../tests/events/README.md)。
+
+## UI/UX 與入口自由放置（2026-11-19修正）
+
+第二關禁止基地東側半平面入口，由 LevelDefinition.expansion_blocked_goal_sides=2 保存，候選及提交都檢查。生成道路保留初始路形但允許玩家後續施工接路：ConstructionLayout 的可選 join_generated 流程只開啟實際施工處的雙向出口，普通塔牌／道路卡／地塊共用；未施工平行路與手動封口不受影響。完整規則見下方現行說明。
+
+入口擴張沿用 Level／ACT 的時機，不再顯示方向選擇按鈕，直接提供全部允許區域的候選格，由玩家 Hover 預覽並點擊放置；只排除上一次成功擴張的區域，沒有替代才回退。共用幾何搜尋只追加合法道路、優先近基地才合流；不修改敵人導航。完整參數、護盾／死亡快照、驚嘆號 Hover、逐筆未讀 Badge 與可收合遺物列見 [現行說明](ui_ux_expansion.md)，此規則取代舊方位按鈕及系統自動落點／常駐兵種圖示／死亡即關閉面板的描述。

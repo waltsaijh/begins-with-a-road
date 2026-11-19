@@ -21,6 +21,8 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var opening_shop := false
 ## Positive values replace ACT expansion flags with a global completed-wave cadence.
 @export_range(0, 100, 1) var expansion_wave_interval := 0
+## Exclude candidates beyond the base along these map-local axes, including corners.
+@export_flags("North", "East", "South", "West") var expansion_blocked_goal_sides := 0
 
 func expands_after(completed_waves: int) -> bool:
 	if completed_waves <= 0 or completed_waves >= wave_count(): return false

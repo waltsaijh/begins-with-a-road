@@ -20,7 +20,7 @@ func display(value: Dictionary) -> void:
 	if profiles.is_empty():
 		var empty := Label.new()
 		empty.text = "×0"
-		empty.custom_minimum_size = Vector2(34,34)
+		empty.custom_minimum_size = Vector2(34,26)
 		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -36,11 +36,10 @@ func display(value: Dictionary) -> void:
 	_update_layout()
 
 func _update_layout() -> void:
-	var width: float = $Scroll/Items.get_combined_minimum_size().x
-	var height := maxf(34,$Scroll/Items.get_combined_minimum_size().y)
-	if width > 480: height += $Scroll.get_h_scroll_bar().get_combined_minimum_size().y
-	$Scroll.custom_minimum_size.y = height
-	get_parent().set_intel_size(Vector2(minf(width,480),height))
+	var content: Vector2 = $Scroll/Items.get_combined_minimum_size()
+	var height := minf(234,maxf(26,content.y))
+	$Scroll.custom_minimum_size = Vector2(minf(300,maxf(100,content.x+12)),height)
+	get_parent().set_intel_size($Scroll.custom_minimum_size)
 
 func set_interactive(enabled: bool) -> void:
 	for item in $Scroll/Items.get_children():

@@ -693,3 +693,7 @@ event.unavailable.card,No tower card available,沒有可抽取的防禦塔卡
 event.placement.invalid,"Choose a legal, unoccupied location",請選擇合法且未占用的位置
 event.tower.ceasefire,Conscription: cease fire next wave,徵兵：下一波停止攻擊
 event.timeline,Event,特殊事件
+ui.inspection.killed,Defeated,已擊殺
+ui.intelligence.title,Enemy intelligence,敵軍情報
+ui.relics.expand,Expand relics,展開遺物
+ui.relics.collapse,Collapse relics,收合遺物
