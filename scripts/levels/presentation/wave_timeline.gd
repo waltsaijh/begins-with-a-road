@@ -22,6 +22,10 @@ const RELIC_ICON = preload("res://assets/sprites/interface/relic_choice.svg")
 @export var label_color := Color("244c52")
 @export var muted_color := Color("6b8588")
 @export var progress_color := Color("218f9b")
+## Filled dot of the current event.
+@export var current_color := Color("202c2d")
+## Inner fill of the other (hollow-looking) wave dots.
+@export var dot_fill_color := Color("f3f8f7")
 var _act_labels: Array[Label] = []
 var reward_active := false
 var expansion_active := false
@@ -228,6 +232,14 @@ func _get_tooltip(at_position: Vector2) -> String:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh()
+
+## Recolours text, track and markers in place (e.g. light text over night clouds).
+func set_palette(text: Color, muted: Color, current: Color, dot_fill: Color) -> void:
+	label_color = text
+	muted_color = muted
+	current_color = current
+	dot_fill_color = dot_fill
+	_refresh()
 
 func configure(value: LevelDefinition) -> void:
 	if _event_motion != null: _event_motion.kill()

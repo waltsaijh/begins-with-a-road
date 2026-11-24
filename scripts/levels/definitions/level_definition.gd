@@ -20,6 +20,10 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var opening_shop := false
 ## Positive values replace ACT expansion flags with a global completed-wave cadence.
 @export_range(0, 100, 1) var expansion_wave_interval := 0
+@export_group("Presentation")
+## Fixed sun for the whole run (assets/data/rendering/time_of_day/). Null keeps
+## the Sun as authored in main.tscn (noon).
+@export var time_of_day: TimeOfDayPreset
 
 func expands_after(completed_waves: int) -> bool:
 	if completed_waves <= 0 or completed_waves >= wave_count(): return false

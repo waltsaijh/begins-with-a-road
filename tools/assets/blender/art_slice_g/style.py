@@ -329,13 +329,80 @@ def voussoirs(radius, spring, count=7, depth=.06, size=(.085, .07)):
     return parts
 
 
-def wall_side(m, parent, prefix, theta, apothem, length, courses, thick=.08, opening=None,
-              bevel=.018, light=.65, centre=(0, 0), index=0):
-    """One straight wall of stone block courses. Local tangent t runs along the wall.
-    opening = (half_width, top_z): a doorway kept clear of blocks."""
-    rng = m.rng
-    usable = length - .06
+def ring_prism(outer, inner, z0, z1, b=0.0):
+    """Closed annulus between two convex polygons with the same vertex count and
+    matching order (e.g. two octagons). Corners are true mitres, so a coping ring
+    is one continuous piece instead of overlapping straight beams. b chamfers the
+    outer top edge."""
+    o, n_ = ccw(outer), ccw(inner)
+    n = len(o)
+    assert len(n_) == n
+    b = min(b, (z1 - z0) * .45)
+    inset = []
+    for i in range(n):
+        x, y = o[i]
+        ix, iy = n_[i]
+        d = math.hypot(x - ix, y - iy)
+        k = min(b, d * .45) / d if d > 0 else 0
+        inset.append((x + (ix - x) * k, y + (iy - y) * k))
+    v = [(x, y, z0) for x, y in n_]                     # IB  inner bottom
+    v += [(x, y, z0) for x, y in o]                     # OB  outer bottom
+    v += [(x, y, z1 - b) for x, y in o]                 # OM  outer below chamfer
+    v += [(x, y, z1) for x, y in inset]                 # OT  outer top (inset)
+    v += [(x, y, z1) for x, y in n_]                    # IT  inner top
+    IB, OB, OM, OT, IT = 0, n, 2 * n, 3 * n, 4 * n
+    f = []
+    for i in range(n):
+        j = (i + 1) % n
+        f.append((OB + i, OB + j, OM + j, OM + i))       # outer wall (faces out)
+        f.append((OM + i, OM + j, OT + j, OT + i))       # chamfer
+        f.append((OT + i, OT + j, IT + j, IT + i))       # top
+        f.append((IT + i, IT + j, IB + j, IB + i))       # inner wall (faces in)
+        f.append((IB + i, IB + j, OB + j, OB + i))       # bottom
+    return v, f
+
+
+def _shell_piece(theta, centre, r0, r1, z0, z1, lo, hi):
+    """Convex wall segment between radii r0..r1 in the local frame of a polygon
+    side; lo/hi give the tangent limit at radius r."""
     c, sn = math.cos(theta), math.sin(theta)
+    pts = [(r0, lo(r0)), (r1, lo(r1)), (r1, hi(r1)), (r0, hi(r0))]
+    poly = [(centre[0] + r * c - sn * t, centre[1] + r * sn + c * t) for r, t in pts]
+    return cprism(poly, z0, z1)
+
+
+def wall_side(m, parent, prefix, theta, apothem, length, courses, thick=.08, opening=None,
+              bevel=.012, light=.65, centre=(0, 0), index=0, end=None, shell=None):
+    """One straight wall: a continuous shell segment (mitred into its neighbours at
+    the corners) plus shallow stone blocks set into it, square to the wall.
+    Local tangent t runs along the wall. end = (e0, k): the corner mitre reaches
+    tangent e0 + k*(r - apothem) at radius r. opening = (half_width, top_z): a
+    doorway kept clear of shell and blocks. Shell pieces are appended to `shell`."""
+    rng = m.rng
+    c, sn = math.cos(theta), math.sin(theta)
+    e0, k = end if end else (length / 2 - thick / 2, 0.0)
+    r_in = apothem
+    r_shell = apothem + thick - .018            # mortar face, between the blocks
+    r_front = apothem + thick - .006            # block face (= old average block face)
+    r_back = r_shell - .012                     # blocks sink into the shell
+
+    def reach(r):
+        return e0 + k * (r - apothem)
+
+    def neg(r):
+        return -reach(r)
+    z_lo, z_hi = courses[0][0], courses[-1][1]
+    if shell is not None:
+        if opening:
+            half, top = opening
+            zc = min(top, z_hi)
+            shell.append(_shell_piece(theta, centre, r_in, r_shell, z_lo, zc, neg, lambda r: -half))
+            shell.append(_shell_piece(theta, centre, r_in, r_shell, z_lo, zc, lambda r: half, reach))
+            if zc < z_hi - 1e-6:
+                shell.append(_shell_piece(theta, centre, r_in, r_shell, zc, z_hi, neg, reach))
+        else:
+            shell.append(_shell_piece(theta, centre, r_in, r_shell, z_lo, z_hi, neg, reach))
+    usable = 2 * reach(r_shell) - .03           # blocks stop just short of the mitre
     for j, (z0, z1) in enumerate(courses):
         fracs = [.5, .5] if (index + j) % 2 == 0 else [.28, .44, .28]
         if usable < .45:
@@ -355,37 +422,41 @@ def wall_side(m, parent, prefix, theta, apothem, length, courses, thick=.08, ope
                     if hi - lo > .05:
                         clipped.append((lo, hi))
             spans = clipped
-        for k, (a, b) in enumerate(spans):
-            mid_t = (a + b) / 2
-            blen = (b - a) - .022 - rng.uniform(0, .02)
-            th = thick + rng.uniform(-.01, .014)
-            height = (z1 - z0) - .022 - rng.uniform(0, .014)
-            ap = apothem + th / 2 - .006
-            loc = (centre[0] + ap * c - sn * mid_t, centre[1] + ap * sn + c * mid_t,
-                   (z0 + z1) / 2 + rng.uniform(-.004, .004))
-            rot = (math.radians(rng.uniform(-1.5, 1.5)), math.radians(rng.uniform(-1.5, 1.5)),
-                   theta - math.pi / 2 + math.radians(rng.uniform(-1.5, 1.5)))
+        for kk, (a, b) in enumerate(spans):
+            # Same random draws as before so every later part of the model stays
+            # identical; only the colour pick is still used.
+            for lo_hi in ((0, .02), (-.01, .014), (0, .014), (-.004, .004), (-1.5, 1.5), (-1.5, 1.5), (-1.5, 1.5)):
+                rng.uniform(*lo_hi)
             col = 'stone_light' if rng.random() < light else 'stone_mid'
-            m.mesh(f'{prefix}_{j}_{k}', box(blen, th, height, bevel), col, parent, loc, rot)
+            mid_t = (a + b) / 2
+            ap = (r_back + r_front) / 2
+            loc = (centre[0] + ap * c - sn * mid_t, centre[1] + ap * sn + c * mid_t, (z0 + z1) / 2)
+            m.mesh(f'{prefix}_{j}_{kk}', box((b - a) - .022, r_front - r_back, (z1 - z0) - .022, bevel), col,
+                   parent, loc, (0, 0, theta - math.pi / 2))
 
 
 def wall_ring(m, parent, prefix, apothem, sides, courses, thick=.08, openings=None, phase=0.0, **kw):
     """Block courses around a regular polygon; side k faces phase + k*360/sides.
     openings = {side_index: (half_width, top_z)}"""
     step = 2 * math.pi / sides
-    length = 2 * (apothem + thick * .5) * math.tan(math.pi / sides)
+    tn = math.tan(math.pi / sides)
+    length = 2 * (apothem + thick * .5) * tn
+    shell = []
     for i in range(sides):
         wall_side(m, parent, f'{prefix}{i}', phase + i * step, apothem, length, courses, thick,
-                  (openings or {}).get(i), index=i, **kw)
+                  (openings or {}).get(i), index=i, end=(apothem * tn, tn), shell=shell, **kw)
+    m.mesh(prefix + 'Shell', merge(*shell), 'grout', parent)
 
 
 def wall_rect(m, parent, prefix, centre, half_x, half_y, courses, thick=.08, openings=None, **kw):
     """Block courses around a rectangle. Sides: 0=+X, 1=+Y (front), 2=-X, 3=-Y."""
-    dims = [(0.0, half_x, 2 * half_y + thick), (math.pi / 2, half_y, 2 * half_x + thick),
-            (math.pi, half_x, 2 * half_y + thick), (3 * math.pi / 2, half_y, 2 * half_x + thick)]
-    for i, (theta, ap, length) in enumerate(dims):
+    dims = [(0.0, half_x, 2 * half_y + thick, half_y), (math.pi / 2, half_y, 2 * half_x + thick, half_x),
+            (math.pi, half_x, 2 * half_y + thick, half_y), (3 * math.pi / 2, half_y, 2 * half_x + thick, half_x)]
+    shell = []
+    for i, (theta, ap, length, other) in enumerate(dims):
         wall_side(m, parent, f'{prefix}{i}', theta, ap, length, courses, thick,
-                  (openings or {}).get(i), centre=centre, index=i, **kw)
+                  (openings or {}).get(i), centre=centre, index=i, end=(other, 1.0), shell=shell, **kw)
+    m.mesh(prefix + 'Shell', merge(*shell), 'grout', parent)
 
 
 def side_frame(theta, apothem, z=0.0, t=0.0):

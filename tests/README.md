@@ -1,5 +1,7 @@
 # 測試
 
+時段光源：`godot --path . --script res://tests/levels/time_of_day.gd`（實際渲染；`--headless` 只驗資料）。以 Frontier 套用早上／中午／黃昏／夜晚，驗證 Sun 顏色／強度／角度、複製後的 Environment、雲色全域參數、陰影與預熱 key 不變、離場與交疊換場的雲色還原、頂列沒有底色、夜晚切換淡色文字與圖示、其他時段維持原深色字、中午等於原設定及四時段畫面不同；截圖 `.godot/test-results/levels/time_of_day/`。
+
 單位檢視：`godot --path . --script res://tests/levels/unit_inspection.gd`（可加 `--headless`）。驗證真實滑鼠／鏡頭 click 仲裁、六塔與方向／多格原點、升級／加成即時數值、選取不暫停、敵人血量／護盾／主堡傷害、正常移動、UI 不穿透、持牌優先、Esc 與暫停、空白／死亡／離場清除、重疊的深度優先、固定資料不重建、準備期避讓手牌及 800×600 英文。截圖 `.godot/test-results/levels/inspection_*.png`。
 
 擊殺金幣回饋：`godot --path . --script res://tests/levels/coin_feedback.gd`（可加 `--headless`）。涵蓋時間／空間合併、不延長生命、六個重用節點、滿池省略／合併、鏡頭投影／縮放、畫面邊界、暫停與四倍速、二十隻真實死亡完整入帳及清波獎勵、重複傷害、HUD 限頻／恢復、音效分流／單聲道／限頻／暫停、離場清除。實際渲染截圖在 `.godot/test-results/levels/coin_popup.png`。
