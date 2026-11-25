@@ -187,6 +187,16 @@ func verify_gestures(scene: Node3D, batch: Node3D, wave: Node) -> void:
 	cast.clock = 0
 	await frames(2)
 	check(b.active,"Second throw starts")
+	var tower_parent := tower.get_parent()
+	tower_parent.remove_child(tower)
+	batch.update_enemy(bomber)
+	check(not b.active and not b.airborne.visible, "A detached target releases the throw pose before the next ability tick")
+	cast.update(host, 0.0)
+	check(not cast.is_casting() and cast.clock == cast.interval, "Detaching a live target cancels the windup and restarts its cooldown")
+	tower_parent.add_child(tower)
+	cast.clock = 0
+	await frames(2)
+	check(b.active, "A new throw can target a tower back on the battlefield")
 	tower.health = 0
 	await frames(2)
 	check(not b.active and not b.airborne.visible and not cast.is_casting(),"Losing the target cancels the throw and releases the walk slot")

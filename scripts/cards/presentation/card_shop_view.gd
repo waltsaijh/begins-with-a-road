@@ -123,11 +123,8 @@ func show_offers(offers: Array[BuildCard], prices: PackedInt32Array, sold: Packe
 		else:
 			var card: Button = slot.get_node("Face/Card")
 			card.price_override = price
-			card.can_afford = coins >= price
 			card.card = offers[i-1] if i-1 < offers.size() else null
-			var bought := i-1 < sold.size() and sold[i-1] != 0
-			card.disabled = card.card == null or bought or coins < price
-			card.modulate = Color(1, 1, 1, 0.6 if coins < price else 1.0)
+			_update_offer_affordability(i)
 		_show_face(i, opened)
 		if insert_offers and i > 0 and _in_stock(i):
 			_fresh[i] = true
@@ -136,6 +133,24 @@ func show_offers(offers: Array[BuildCard], prices: PackedInt32Array, sold: Packe
 		_layout(true, false, false)
 		# A second click must not buy/reroll a card moving into the sold slot.
 		_animating = true
+
+func update_balance(coins: int, reroll_price: int) -> void:
+	_coins = coins
+	_reroll_price = reroll_price
+	if opened and not $BasePage.visible:
+		_update_purchase_controls()
+
+func _update_purchase_controls() -> void:
+	for i in range(1, slots.size()):
+		_update_offer_affordability(i)
+	price_view(0).get_node("Number").text = str(_reroll_price)
+	_update_reroll_state(slots[0].get_node("Face/Back"), true)
+
+func _update_offer_affordability(index: int) -> void:
+	var card: Button = slots[index].get_node("Face/Card")
+	card.can_afford = _coins >= card.price_override
+	card.disabled = not _in_stock(index) or not card.can_afford
+	card.modulate = Color(1, 1, 1, 1.0 if card.can_afford else 0.6)
 
 func animate_reroll() -> void:
 	_stop_reroll_animation()
@@ -160,7 +175,8 @@ func set_open(value: bool) -> void:
 	if value == opened or (value and not available): return
 	opened = value
 	_hovered = -1
-	if not opened: _stop_reroll_animation()
+	if opened: _update_purchase_controls()
+	else: _stop_reroll_animation()
 	_refresh_entry()
 	_layout(true, value)
 
@@ -187,8 +203,11 @@ func _show_face(index: int, face_up: bool) -> void:
 	var back: Button = slot.get_node("Face/Back")
 	back.get_node("Icon").visible = index == 0
 	back.get_node("Icon").texture = RerollIcon if face_up else ShopIcon
-	var unaffordable := face_up and index == 0 and _coins < _reroll_price
-	back.disabled = face_up and index == 0 and (unaffordable or rerolling)
+	if index == 0: _update_reroll_state(back, face_up)
+
+func _update_reroll_state(back: Button, face_up: bool) -> void:
+	var unaffordable := face_up and _coins < _reroll_price
+	back.disabled = face_up and (unaffordable or rerolling)
 	back.modulate = Color(1, 1, 1, 0.6 if unaffordable else 1.0)
 
 func _in_stock(index: int) -> bool:

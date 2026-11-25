@@ -11,12 +11,16 @@ const DeploymentFrame = preload("res://assets/sprites/cards/deployment_frame.svg
 ## -1 previews the resource price; the shop supplies its actual offer price.
 @export_range(-1, 100, 1, "or_greater") var price_override := -1:
 	set(value):
+		if price_override == value: return
 		price_override = value
 		_refresh()
 @export var can_afford := true:
 	set(value):
+		if can_afford == value: return
 		can_afford = value
-		_refresh()
+		if is_node_ready():
+			var number := get_node_or_null("%Price/Number") as Label
+			if number != null: _refresh_affordability(number)
 @export var coin_texture: Texture2D:
 	set(value):
 		coin_texture = value
@@ -242,7 +246,7 @@ func _refresh() -> void:
 	price.visible = shop and card != null
 	gold.texture = coin_texture
 	number.text = str(price_override if price_override >= 0 else (card.price if card != null else 0))
-	number.add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
+	_refresh_affordability(number)
 	tooltip_text = tr("event.card.%s.description" % card.special.id) if card != null and card.special != null else ""
 	diagram.show_recipe(card, turns, accent)
 	if card != null and card.spell != null:
@@ -251,6 +255,9 @@ func _refresh() -> void:
 			&"rally": tooltip_text = tr("spell.target_defense")
 			&"double": tooltip_text = tr("spell.target_pair")
 			_: tooltip_text = tr("spell.combat_only")
-	disabled = card == null or not phase_enabled or (shop and not can_afford)
 	if not shop and visuals != null:
 		visuals.modulate = Color.WHITE if phase_enabled else Color(0.72, 0.72, 0.72, 0.65)
+
+func _refresh_affordability(number: Label) -> void:
+	number.add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
+	disabled = card == null or not phase_enabled or (presentation == Presentation.SHOP and not can_afford)

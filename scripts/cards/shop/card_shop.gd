@@ -297,10 +297,14 @@ func _refresh(insert_offers := false) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_instance_valid(_placement) and is_node_ready(): _refresh_upgrades()
 
+func _refresh_balance() -> void:
+	view.update_balance(coins, current_reroll_price())
+	balance_changed.emit(coins)
+
 func grant_gold(amount: int, reason: String, world_position: Variant = null) -> void:
 	coins += maxi(0,amount)
 	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":maxi(0,amount),"balance":coins,"reason":reason},"shop")
-	_refresh()
+	_refresh_balance()
 	if amount > 0: gold_granted.emit(amount, reason, world_position)
 
 func _exit_tree() -> void:
@@ -312,5 +316,5 @@ func spend_gold(amount: int,reason: String) -> bool:
 	if amount < 0 or coins < amount: return false
 	coins -= amount
 	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-amount,"balance":coins,"reason":reason},"shop")
-	_refresh()
+	_refresh_balance()
 	return true

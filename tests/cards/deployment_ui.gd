@@ -58,6 +58,20 @@ func run() -> void:
 	var pause_position: Vector2 = hud.pause_button.global_position
 	var timeline_position: Vector2 = session.timeline.global_position
 	check(cards.hand.views.front().rotation < 0 and cards.hand.views.back().rotation > 0,"Hand fans to both sides")
+	var middle: Control = cards.hand.views[1]
+	var rest := middle.position
+	var art: Control = middle.get_node("Visuals")
+	check(cards.hand.views.front().position.y > rest.y and cards.hand.views.back().position.y > rest.y, "Outside cards sit lower than the middle of the fan")
+	await move(middle.get_global_transform() * (middle.size * 0.5))
+	settle()
+	var deadline := Time.get_ticks_msec() + 750
+	while art.scale.x <= 1.01 and Time.get_ticks_msec() < deadline: await frames(1)
+	check(middle.position.y < rest.y and middle.z_index > cards.hand.views.back().z_index and art.scale.x > 1.01, "Hover raises the card above its neighbours and enlarges the artwork")
+	await move(Vector2(400,200))
+	settle()
+	deadline = Time.get_ticks_msec() + 750
+	while absf(art.scale.x - 1.0) > 0.005 and Time.get_ticks_msec() < deadline: await frames(1)
+	check(middle.position.is_equal_approx(rest) and middle.z_index < cards.hand.views.back().z_index and absf(art.scale.x - 1.0) <= 0.005, "Leaving restores the resting position, artwork size and draw order")
 	for hand_card in cards.hand.views:
 		check(hand_card.get_node("Visuals/Accent").self_modulate.a < 0.8,"Hand module has a subdued outline")
 	await capture("closed_zh")

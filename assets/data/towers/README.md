@@ -35,7 +35,7 @@ BarracksSystem 在敵人移動後、塔攻擊前更新友軍，沿可行道路�
 
 ## 資產
 
-`tools/assets/restore_towers.gd` 只讀原型，將五塔模型、原配色、砲口、後座組件及友軍剛體關節烘焙進專案場景，並從原 synth_audio 合成四種射擊 PCM 音效；不改 Sentry。重建前檢查手動變更，重建會覆寫這五塔的產生資源。
+`tools/assets/restore_towers.gd` 只讀原型，將五塔模型、原配色、砲口、後座組件及友軍剛體關節烘焙進專案場景，並從原 synth_audio 合成四種射擊 PCM 音效；不改 Sentry。重建結果位於 `.godot/tower-restoration/<run>/assets/`，採用時應逐項比對現行塔價、配置池與外觀設定。
 
 `restored_tower_visual.gd` 保留各塔後座，`restored_bursts.gd` 移植原視覺爆散曲線與迫擊砲落地呈現；其小型美術 helper 與原協調系統分離。音效共用六聲道播放器、同種最短 25 ms 間隔，使用實際時間；兵營原本沒有專屬射擊音，不新增音效設定。
 

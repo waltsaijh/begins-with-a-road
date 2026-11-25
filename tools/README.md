@@ -20,9 +20,9 @@ godot --headless --path . --script res://tools/assets/build_sentry_shot.gd
 
 `build_sentry_shot.gd` 以固定亂數種子合成哨塔弓弦與箭矢破風聲，輸出 `assets/audio/towers/sentry_shot.wav`（0.22 秒、48 kHz、16-bit mono，無外部取樣）。重新產生後讓 editor 匯入 WAV；正式關卡只讀取音檔，不執行合成器。
 
-五塔離線轉換為 `godot --headless --path . --script res://tools/assets/restore_towers.gd -- --prototype=D:/games/card-tower-defense`；只讀來源，會覆寫 Sandbox 內產生的五塔資源／模型／音效，不處理 Sentry。圖示使用實際渲染命令 `godot --path . --script res://tools/assets/render_restored_tower_icons.gd`，完成後讓 editor 匯入圖片，再重跑轉換器即可綁定新圖示。重建前檢查人工修改，來源與參數語意見 [塔資料](../assets/data/towers/README.md)。
+五塔離線轉換為 `godot --headless --path . --script res://tools/assets/restore_towers.gd -- --prototype=D:/games/card-tower-defense`；產物寫入當次 `.godot/tower-restoration/<run>/assets/`。候選檔案內的相依路徑指向正式資源位置，採用前逐項比對人工調整。圖示使用實際渲染命令 `godot --path . --script res://tools/assets/render_restored_tower_icons.gd`，完成後讓 editor 匯入圖片，再重跑轉換器即可綁定新圖示。圖示工具會寫入正式圖片目錄，來源與參數語意見 [塔資料](../assets/data/towers/README.md)。
 
-Web 功能驗證可使用 `web/export_test.ps1 -Godot <Godot執行檔>`，預設將 `tests/enemies/enemies.tscn` 匯出至 `.godot/enemy_web/index.html`。`-Scene` 與 `-OutputDirectory` 可指定其他測試；工具在結束時還原主場景與匯出設定，正式匯出仍排除測試。
+Web 功能驗證可使用 `web/export_test.ps1 -Godot <Godot執行檔>`，預設將 `tests/enemies/enemies.tscn` 匯出至 `.godot/enemy_web/index.html`。`-Scene` 與 `-OutputDirectory` 可指定其他測試；工具在 `.godot/web-test-runs/` 的獨立副本中修改主場景、匯入並匯出，分次保存日誌，正式匯出仍排除測試。
 
 正式 Web 輸出可附上 `web/start_game.ps1`（複製為輸出目錄的 `StartGame.ps1`），以 Windows PowerShell 提供本機 HTTP、wasm MIME 與跨來源隔離標頭，自動在 Chrome 開啟。不依賴 Python／Node；`-NoBrowser` 供測試、`-Port` 可改連接埠。它是輸出目錄的啟動輔助工具，不會放入遊戲 PCK；不得直接用本機 file:// 開啟匯出的 HTML。
 

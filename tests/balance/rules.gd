@@ -1,6 +1,5 @@
 extends Node
 const Fixture = preload("res://tests/synergy/fixture.gd")
-const Driver = preload("res://tests/balance/laboratory.gd")
 var failures: Array[String] = []
 var checks := 0
 const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
@@ -17,6 +16,9 @@ func session(count: int, boss := false) -> Node:
 	level.base_health = 20 if boss else 1
 	level.starting_gold = 9
 	level.opening_shop = true
+	# Exercise both five-wave event boundaries with a deterministic, non-targeted choice.
+	level.special_event_catalog = SpecialEventCatalog.new()
+	level.special_event_catalog.entries.assign([preload("res://assets/data/events/event_05.tres")])
 	level.acts.clear()
 	for a in ceili(count/3.0):
 		var act := ActDefinition.new()
@@ -28,6 +30,10 @@ func session(count: int, boss := false) -> Node:
 			group.troop = TroopCatalog.find("ravager" if boss else "soldier")
 			group.enemy_count = 1
 			recipe.groups = [group]
+			if count == 3 and a == 0 and w == 0:
+				var later := group.duplicate(true) as WaveSpawnGroup
+				later.start_tick = 100
+				recipe.groups.append(later)
 			act.waves.append(recipe)
 		level.acts.append(act)
 	var scene: Node = load("res://scenes/level.tscn").instantiate()
@@ -53,11 +59,21 @@ func verify() -> void:
 		for wave in act.waves:
 			for group in wave.groups: names[group.troop.troop_name] = true
 	check(names.size() == 10 and names.has("ravager"),"Nine ordinary troops and one boss are authored")
-	var prices := {"sentry":9,"ballista":8,"broadside":8,"crossfire":10,"mortar":9,"barracks":8}
-	for name in prices:
-		check(load("res://assets/data/towers/"+name+".tres").card_price == prices[name],"Loaded price, not serialized text: "+name)
 	var scene: Node = await session(15)
 	var shop: Node = scene.get_node("CardPlacement/Shop")
+	var priced := {}
+	for card: BuildCard in shop.roll_cards(shop.catalog.size()):
+		check(card.price == card.tower.card_price, "Dealt card uses the price of " + card.tower.resource_path)
+		priced[card.tower] = true
+	check(priced.size() == shop.catalog.size(), "Every tower in the shop catalog has a priced offer")
+	shop.open_shop()
+	var offer: BuildCard = shop.offers[0]
+	var shown: Label = shop.view.price_view(1).get_node("Number")
+	check(offer.price == offer.tower.card_price and shown.text == str(offer.price), "Displayed offer reads the authored tower price")
+	shop.grant_gold(offer.price, "test")
+	var before: int = shop.coins
+	check(shop.buy(0) and shop.coins == before - offer.price and shop.sold[0] == 1, "Buying charges the displayed amount once")
+	shop.close_shop()
 	var choices := 0
 	for i in 15:
 		check(scene.current_wave == i and not scene.finished,"Correct preparation index")
@@ -73,6 +89,8 @@ func verify() -> void:
 			check(scene.relic_choice.choose(relic),"Choice commits once")
 			check(not scene.relic_choice.choose(relic),"Repeated click cannot duplicate reward")
 			await get_tree().create_timer(0.3).timeout
+		if i+1 in [5,10]:
+			check(scene.choosing_event and scene.special_events.choose(1), "Resolve the five-wave event before starting the next wave")
 	check(scene.finished and scene.victory and choices == 4,"Fifteenth completion wins with exactly four rewards")
 	check(not scene.get_node("EnemyWave").start_allowed and not shop.available,"Terminal state locks start and shop")
 	check(LevelProgress.snapshot().has("merge_victory"),"Victory records the completed Level ID")
@@ -86,10 +104,6 @@ func verify() -> void:
 		scene = await session(3,boss)
 		shop = scene.get_node("CardPlacement/Shop")
 		var wave: Node = scene.get_node("EnemyWave")
-		# A pending later group must be cancelled, not paid as a completed wave.
-		var later: WaveSpawnGroup = wave.definition.groups[0].duplicate(true)
-		later.start_tick = 100
-		wave.definition.groups.append(later)
 		start(scene)
 		check(wave._pending.size() == 1,"Future batch remains pending")
 		var enemy: Node3D = wave.living_enemies()[0]

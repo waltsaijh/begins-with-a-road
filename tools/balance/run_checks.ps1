@@ -7,12 +7,12 @@ if ($Only.Count -gt 0) { $cases=$Only }
 foreach ($case in $cases) {
     $label=$case.Replace('/','-')
     $log=Join-Path $Output ($label+'.log')
-    $arguments=@('--path',(Get-Location).Path,("res://tests/$case.tscn"),'--log-file',$log)
+    $arguments=@('--path',('"'+(Get-Location).Path+'"'),('"res://tests/'+$case+'.tscn"'),'--log-file',('"'+$log+'"'))
     if (-not $Rendered) { $arguments=@('--headless')+$arguments }
     $process=Start-Process -FilePath $Godot -ArgumentList $arguments -WindowStyle Hidden -PassThru
     $complete=$process.WaitForExit(180000)
     if (-not $complete) { $process.Kill();$process.WaitForExit() }
-    $content=Get-Content -LiteralPath $log -Raw
+    $content=if (Test-Path -LiteralPath $log) { [string](Get-Content -LiteralPath $log -Raw) } else { '' }
     $errors=@([regex]::Matches($content,'(?m)^SCRIPT ERROR:.*|^ERROR:.*') | ForEach-Object Value)
     $applicationErrors=@($errors | Where-Object { $_ -notmatch 'shader cache' })
     $marker=$content -match '(?im)(CHECK|PASS|failures|checks|assertions|regression)'
@@ -21,3 +21,5 @@ foreach ($case in $cases) {
     $results | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $Output 'results.json')
     Write-Output "$status $case exit=$($process.ExitCode)"
 }
+if (@($results | Where-Object { $_.status -eq 'Current FAIL' }).Count -gt 0) { exit 1 }
+exit 0
