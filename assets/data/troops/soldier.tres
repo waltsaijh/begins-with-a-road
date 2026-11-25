@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://b2l13a2jxbna3" path="res://assets/sprites/enemies/soldier.png" id="1_87ixf"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/grunt.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/soldier.glb" id="3"]
+[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/soldier_gpu.res" id="Gpu"]
 
 [resource]
 script = ExtResource("1")
@@ -15,3 +16,4 @@ icon = ExtResource("1_87ixf")
 melee_damage = 5.0
 route_selection = 0
 model = ExtResource("3")
+gpu_model = ExtResource("Gpu")

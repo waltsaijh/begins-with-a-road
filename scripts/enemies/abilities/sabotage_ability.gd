@@ -12,6 +12,7 @@ extends EnemyAbility
 const BEAM_COLOR := Color("e0ac63")
 var clock := 0.0
 var remaining := 0.0
+@export var plant_feet := false
 var marked: Array[WeakRef] = []
 
 func start() -> void:
@@ -21,6 +22,9 @@ func start() -> void:
 
 func is_casting() -> bool:
 	return remaining > 0
+
+func movement_hold_remaining() -> float:
+	return remaining if plant_feet else 0.0
 
 func update(host: Node, delta: float) -> void:
 	if radius <= 0: return

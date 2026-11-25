@@ -1,5 +1,7 @@
 # 測試
 
+底部部署UI：`godot --path . res://tests/cards/deployment_ui.tscn`。檢查平行輕量手牌、無常駐商店牌堆、HUD補給按鈕／基地模型點擊、相機拖曳與持牌／單位優先、階段鎖、Esc收回、反覆開關不交易、書籤及繁中／英文兩種尺寸。截圖在`.godot/test-results/deployment/`。原`cards/card_shop`保留購買／刷新／庫存回歸，`tutorial/intro`的開店焦點改為小型補給按鈕。
+
 單位檢視：`godot --path . --script res://tests/levels/unit_inspection.gd`（可加 `--headless`）。驗證真實滑鼠／鏡頭 click 仲裁、六塔與方向／多格原點、升級／加成即時數值、選取不暫停、敵人血量／護盾／主堡傷害、正常移動、UI 不穿透、持牌優先、Esc 與暫停、空白／離場清除及死亡敵人的無 Node 快照、重疊的深度優先、固定資料不重建、準備期避讓手牌及 800×600 英文。截圖 `.godot/test-results/levels/inspection_*.png`。
 
 擊殺金幣回饋：`godot --path . --script res://tests/levels/coin_feedback.gd`（可加 `--headless`）。涵蓋時間／空間合併、不延長生命、六個重用節點、滿池省略／合併、鏡頭投影／縮放、畫面邊界、暫停與四倍速、二十隻真實死亡完整入帳及清波獎勵、重複傷害、HUD 限頻／恢復、音效分流／單聲道／限頻／暫停、離場清除。實際渲染截圖在 `.godot/test-results/levels/coin_popup.png`。

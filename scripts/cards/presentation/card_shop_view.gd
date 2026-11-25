@@ -33,11 +33,16 @@ var _reroll_price := 0
 var _hovered := -1
 var _fresh := {}
 var _entering := {}
+var _entry_locked := false
+@onready var entry: Button = $Entry
 
 func _ready() -> void:
 	_refresh_artwork()
 	if Engine.is_editor_hint(): return
 	layer = 4
+	entry.pressed.connect(func():
+		if opened: close_requested.emit()
+		else: open_requested.emit())
 	for i in $Root/Slots.get_child_count():
 		var slot: Control = $Root/Slots.get_child(i)
 		slots.append(slot)
@@ -46,6 +51,21 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_layout.bind(false, false))
 	get_viewport().mouse_exited.connect(_set_hover.bind(-1))
 	$Root.hide()
+	_refresh_entry()
+
+func set_entry_locked(value: bool) -> void:
+	if value and $BasePage.visible: close_requested.emit()
+	_entry_locked = value
+	_refresh_entry()
+
+func _refresh_entry() -> void:
+	if not is_node_ready(): return
+	entry.visible = available and not _entry_locked and not get_tree().paused
+	entry.set_pressed_no_signal(opened)
+	entry.tooltip_text = tr("ui.shop.close") if opened else tr("ui.shop.open")
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_TRANSLATION_CHANGED,NOTIFICATION_PAUSED,NOTIFICATION_UNPAUSED] and is_node_ready(): _refresh_entry()
 
 func _refresh_artwork() -> void:
 	if not is_node_ready(): return
@@ -59,7 +79,7 @@ func price_view(index: int) -> HBoxContainer:
 	return slot.get_node("Face/Back/Price") if index == 0 else slot.get_node("Face/Card").get_node("%Price")
 
 func _input(event: InputEvent) -> void:
-	if opened and not _animating and event is InputEventMouseMotion:
+	if opened and not $BasePage.visible and not _animating and event is InputEventMouseMotion:
 		_set_hover(CardFanLayout.pick(slots, event.position, 0, _hovered))
 
 func _set_hover(index: int) -> void:
@@ -136,43 +156,30 @@ func _stop_reroll_animation() -> void:
 	if not slots.is_empty(): slots[0].get_node("Face/Back/Icon").rotation = 0.0
 
 func set_open(value: bool) -> void:
+	if not value: $BasePage.hide()
 	if value == opened or (value and not available): return
 	opened = value
 	_hovered = -1
 	if not opened: _stop_reroll_animation()
-	_layout(true, false)
+	_refresh_entry()
+	_layout(true, value)
 
 func set_available(value: bool) -> void:
 	if available == value: return
 	available = value
+	$BasePage.hide()
+	opened = false
 	_hovered = -1
 	_fresh.clear()
 	_entering.clear()
-	if value:
-		opened = false
-		$Root.show()
-		_layout(true, true)
-	else:
-		_stop_reroll_animation()
-		if _motion != null: _motion.kill()
-		opened = false
-		_animating = true
-		_motion = create_tween().set_parallel(true).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		var viewport := get_viewport().get_visible_rect().size
-		var scale_factor := CardFanLayout.CARD_SCALE
-		var exit := Vector2(viewport.x-ShopConstants.MARGIN-ShopConstants.CARD_SIZE.x*scale_factor, viewport.y+32)
-		for i in slots.size():
-			_show_face(i, false)
-			price_view(i).hide()
-			_motion.tween_property(slots[i], "position", exit+ShopConstants.STACK_OFFSET*i*scale_factor+slots[i].pivot_offset*(scale_factor-1), 0.2)
-			_motion.tween_property(slots[i], "rotation", 0.0, 0.2)
-			_motion.tween_property(slots[i], "scale", Vector2.ONE*scale_factor, 0.2)
-		_motion.finished.connect(func():
-			_animating = false
-			if not available: $Root.hide())
+	_stop_reroll_animation()
+	if _motion != null: _motion.kill()
+	_refresh_entry()
+	_close_presentation(not value)
 
 func _show_face(index: int, face_up: bool) -> void:
 	var slot := slots[index]
+	for face in ["Face/Card","Face/Back"]: slot.get_node(face).mouse_filter = Control.MOUSE_FILTER_STOP if opened else Control.MOUSE_FILTER_IGNORE
 	slot.visible = not face_up or _in_stock(index)
 	price_view(index).visible = face_up and _in_stock(index)
 	slot.get_node("Face/Card").visible = face_up and index > 0
@@ -206,6 +213,11 @@ func row_indices(upper: bool) -> PackedInt32Array:
 func _layout(animate: bool, entering: bool, flip := true) -> void:
 	if not available or not is_inside_tree(): return
 	if _motion != null: _motion.kill()
+	if not opened:
+		_close_presentation(animate)
+		return
+	$Root.visible = not $BasePage.visible
+	$Root/ShopArea.mouse_filter = Control.MOUSE_FILTER_STOP
 	if not animate:
 		_fresh.clear()
 		_entering.clear()
@@ -218,11 +230,18 @@ func _layout(animate: bool, entering: bool, flip := true) -> void:
 	var base := Vector2(viewport.x-ShopConstants.MARGIN-(width if opened else card.x)*scale_factor, viewport.y-24-card.y*scale_factor+vertical_offset)
 	if opened: base.y -= CardFanLayout.drop_for(slots.size(), step)*scale_factor
 	$Root/ShopArea.position = base-Vector2(16, 60)
+	var upgrade: Button = $Root/BaseUpgrade
+	upgrade.reset_size()
+	upgrade.position = Vector2(viewport.x - ShopConstants.MARGIN - upgrade.size.x, base.y - 64 - upgrade.size.y)
 	$Root/ShopArea.size = Vector2((width if opened else card.x)*scale_factor+32, card.y*scale_factor+68)
 	_animating = animate and (flip or not _entering.is_empty())
 	var duration := CardFanLayout.INSERT_TIME if not _entering.is_empty() else (ShopConstants.ANIMATION_TIME if flip else CardFanLayout.SHIFT_TIME)
 	if animate:
 		_motion = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		if entering:
+			$Root.modulate.a = 0.0
+			_motion.tween_property($Root,"modulate:a",1.0,0.18)
+	else: $Root.modulate.a = 1.0
 	for i in slots.size():
 		var slot := slots[i]
 		var rank := active.find(i)
@@ -251,7 +270,7 @@ func _layout(animate: bool, entering: bool, flip := true) -> void:
 		slot.get_node("Face/Back").hover_lift = lift
 		slot.z_index = (7 if i == 0 else i) if opened else slots.size()-i
 		if entering or _fresh.erase(i):
-			slot.position = Vector2(target.x, viewport.y+32+i*4)
+			slot.position = target+Vector2(0,10) if entering else Vector2(target.x, viewport.y+32+i*4)
 			slot.scale = Vector2.ONE*scale_factor
 			slot.rotation = 0.0
 		if animate:
@@ -281,3 +300,19 @@ func finish_animation() -> void:
 	_entering.clear()
 	if available: _layout(false, false)
 	else: $Root.hide()
+
+func _close_presentation(animate: bool) -> void:
+	$Root/ShopArea.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for slot in slots:
+		for face in ["Face/Card","Face/Back"]: slot.get_node(face).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if not animate or not $Root.visible:
+		$Root.hide()
+		_animating = false
+		return
+	_animating = true
+	_motion = create_tween().set_ignore_time_scale(true)
+	_motion.tween_property($Root,"modulate:a",0.0,0.14)
+	_motion.tween_callback(func():
+		if not opened:
+			$Root.hide()
+			_animating = false)

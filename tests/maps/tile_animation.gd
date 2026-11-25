@@ -75,7 +75,7 @@ func verify() -> void:
 	check(map.get_cell_item(added) == 3 and visual.static_tiles.get_cell_item(added) == -1, "Animation masked logical data instead of only rendering")
 	check(is_equal_approx(visual.duration, TileAppearanceConstants.ANIMATION_DURATION), "Animation duration must use the shared default")
 	check(is_equal_approx(visual.rise_depth, TileAppearanceConstants.RISE_DEPTH), "Animation depth must use the shared default")
-	check(is_equal_approx(visual.jobs[added].model.position.y, -visual.rise_depth), "New tile must start at the configured depth")
+	check(is_equal_approx(visual.jobs[added].model.position.y, visual.rise_depth), "New tile must start at the configured depth")
 	var snapshot := Snapshot.capture(map)
 	visual._process(visual.duration * 0.25)
 	var age: float = visual.jobs[added].age
@@ -87,7 +87,9 @@ func verify() -> void:
 	check(old_body.get_parent() == null, "Replaced model remained in the scene")
 	var before_rise: float = visual.jobs[added].model.position.y
 	visual._process(visual.duration * 0.43)
-	check(visual.jobs[added].model.position.y <= 0.0 and visual.jobs[added].model.position.y > before_rise, "Tile must rise toward its target")
+	check(visual.jobs[added].model.position.y >= 0.0 and visual.jobs[added].model.position.y < before_rise, "Tile must fall toward its target")
+	var bounce: float = TileAppearanceConstants.drop_offset(0.86,visual.rise_depth)
+	check(is_zero_approx(TileAppearanceConstants.drop_offset(0.72,visual.rise_depth)) and bounce > 0.0 and bounce < 0.15*visual.rise_depth and is_zero_approx(TileAppearanceConstants.drop_offset(1.0,visual.rise_depth)), "Drop touches ground, rebounds slightly and settles")
 	visual.finish()
 	check(visual.jobs.is_empty() and not visual.is_processing() and visual.static_tiles.get_cell_item(added) == visual._display_items[added], "Settling did not return tiles to the batched grid")
 	# Find a normal straight tile for independently checking the transformation.
@@ -148,7 +150,7 @@ func verify_tower_rise() -> void:
 		return
 	var model: Node3D = tower.get_node("Visual")
 	var logical_pose := tower.global_transform
-	check(is_equal_approx(model.position.y, -visual.rise_depth), "New tower flashed at its final height before the ground rose")
+	check(is_equal_approx(model.position.y, visual.rise_depth), "New tower flashed at its final height before the ground rose")
 	visual.set_process(false)
 	while controller.computing: await get_tree().process_frame
 	visual.sync()

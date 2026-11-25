@@ -3,6 +3,7 @@ const Regression = preload("res://tests/events/regression.gd")
 var picker: OptionButton
 var tools: CanvasLayer
 var host: Node3D
+var screenshot_failures: Array[String] = []
 
 func _enter_tree() -> void:
 	LevelLaunch.select(Regression.definition())
@@ -57,21 +58,109 @@ func open_event() -> void:
 func screenshots() -> void:
 	var folder := "res://.godot/test-results/events"
 	DirAccess.make_dir_recursive_absolute(folder)
+	tools.hide()
 	for language in ["zh_TW","en"]:
 		TranslationServer.set_locale(language)
-		for dimensions in [Vector2i(1280,800),Vector2i(800,600)]:
+		for dimensions in [Vector2i(1280,800),Vector2i(800,600),Vector2i(640,480)]:
 			DisplayServer.window_set_size(dimensions)
 			for i in 3: await get_tree().process_frame
-			for event_index in [2,3,8]:
+			var event_indices := range(9) if dimensions.x == 1280 else [2, 3, 4, 8]
+			for event_index in event_indices:
 				picker.select(event_index)
 				open_event()
-				for i in 3: await get_tree().process_frame
-				RenderingServer.force_draw()
-				var image := get_viewport().get_texture().get_image()
-				image.save_png(folder+"/%s_%d_event%d.png" % [language,dimensions.x,event_index+1])
+				await get_tree().create_timer(0.38, true, false, true).timeout
+				var path := folder+"/%s_%d_event%d" % [language,dimensions.x,event_index+1]
+				_save_event_image(path)
+				var choice: CanvasLayer = host.special_events.choice
+				var first: Button = choice.buttons[0]
+				var second: Button = choice.buttons[1]
+				_expect(first.size.is_equal_approx(second.size), path + ": equal card dimensions")
+				_expect(get_viewport().get_visible_rect().encloses(choice.scroll.get_global_rect()), path + ": dialog remains within the viewport")
+				if event_index == 2 and dimensions.x == 1280:
+					await _capture_merchant_states(path)
+				if event_index == 8 and dimensions.x == 1280:
+					await _capture_three_cards(path)
 				host.special_events.active = null
 				host.special_events.choice.dismiss()
 				host.choosing_event = false
 				host.get_node("CardPlacement").set_entry_selection(false)
-	print("EVENT_VISUALS_SAVED")
-	get_tree().quit()
+	print("EVENT_VISUALS_SAVED ", JSON.stringify(screenshot_failures))
+	get_tree().quit(0 if screenshot_failures.is_empty() else 1)
+
+func _capture_merchant_states(path: String) -> void:
+	var choice: CanvasLayer = host.special_events.choice
+	var card: Button = choice.buttons[0]
+	var motion := InputEventMouseMotion.new()
+	motion.position = Vector2(8, 8)
+	get_viewport().push_input(motion, true)
+	await get_tree().process_frame
+	motion.position = card.get_global_rect().get_center()
+	get_viewport().push_input(motion, true)
+	await get_tree().create_timer(0.18, true, false, true).timeout
+	for i in 6:
+		if card.visuals.position.y < -8.0 and card.visuals.scale.x > 1.02:
+			break
+		await get_tree().create_timer(0.04, true, false, true).timeout
+	_expect(card.visuals.position.y < -8.0 and card.visuals.scale.x > 1.02, path + ": pointer lifts and scales the card")
+	_save_event_image(path + "_hover")
+	var shop: Node = host.get_node("CardPlacement/Shop")
+	var gold: int = shop.coins
+	shop.spend_gold(gold, "screenshot")
+	await get_tree().create_timer(0.18, true, false, true).timeout
+	_save_event_image(path + "_unavailable")
+	await _click_card(card)
+	_expect(host.special_events.active != null and shop.coins == 0, path + ": genuine pointer press cannot buy the disabled potion")
+	shop.grant_gold(gold, "screenshot")
+	var cheese: Button = choice.buttons[1]
+	motion.position = cheese.get_global_rect().get_center()
+	get_viewport().push_input(motion, true)
+	await _click_card(cheese, path)
+	_expect(host.special_events.active == null and choice.center.visible, path + ": genuine pointer click resolves and starts the exit")
+	await get_tree().create_timer(0.07, true, false, true).timeout
+	_save_event_image(path + "_exit")
+	for i in 12:
+		if not choice.root.visible:
+			break
+		await get_tree().create_timer(0.04, true, false, true).timeout
+	_expect(not choice.root.visible, path + ": exit has finished")
+	motion.position = Vector2(8, 8)
+	get_viewport().push_input(motion, true)
+
+func _capture_three_cards(path: String) -> void:
+	# Presentation fixture only. The actual event manager still exposes two choices.
+	var choice: CanvasLayer = host.special_events.choice
+	choice._set_card_count(3)
+	var third: Button = choice.buttons[2]
+	var art = choice.Art
+	third.show_option("Preview", "Third card layout with fallback illustration.", art.illustration(&"unknown", 2), "Free", third.INK, art.mat_color(&"unknown", 2))
+	third.set_availability("Preview only")
+	choice._layout()
+	await get_tree().create_timer(0.16, true, false, true).timeout
+	_expect(is_equal_approx(third.position.y, choice.buttons[0].position.y), path + ": three cards fit on one row")
+	_expect(third.size.is_equal_approx(choice.buttons[0].size), path + ": third card matches the others")
+	_save_event_image(path + "_three_cards")
+
+func _click_card(card: Button, press_test := "") -> void:
+	var click := InputEventMouseButton.new()
+	click.position = card.get_global_rect().get_center()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.button_mask = MOUSE_BUTTON_MASK_LEFT
+	click.pressed = true
+	get_viewport().push_input(click, true)
+	await get_tree().process_frame
+	if not press_test.is_empty():
+		await get_tree().create_timer(0.09, true, false, true).timeout
+		_expect(card.button_pressed and is_equal_approx(card.visuals.scale.x, 1.01), press_test + ": card compresses while the pointer is held")
+	click.button_mask = 0
+	click.pressed = false
+	get_viewport().push_input(click, true)
+	await get_tree().process_frame
+
+func _expect(condition: bool, message: String) -> void:
+	if not condition:
+		screenshot_failures.append(message)
+		push_error(message)
+
+func _save_event_image(path: String) -> void:
+	RenderingServer.force_draw()
+	get_viewport().get_texture().get_image().save_png(path + ".png")

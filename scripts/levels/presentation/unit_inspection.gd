@@ -37,7 +37,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_mask & (MOUSE_BUTTON_MASK_RIGHT|MOUSE_BUTTON_MASK_MIDDLE): return
 		var camera := get_viewport().get_camera_3d()
 		if camera == null: return
-		select_unit(Picker.pick(camera,event.position,session.get_node("TowerMap"),session.get_node("EnemyWave").visuals))
+		var unit := Picker.pick(camera,event.position,session.get_node("TowerMap"),session.get_node("EnemyWave").visuals)
+		if unit == null and session.get_node("CardPlacement/Shop").try_open_from_world(camera,event.position):
+			cancel_selection()
+		else: select_unit(unit)
 		get_viewport().set_input_as_handled()
 
 func select_unit(unit: Node3D) -> void:
@@ -165,7 +168,7 @@ func _layout() -> void:
 				var at: Vector2 = transform*point
 				hand_right = maxf(hand_right,at.x)
 				hand_top = minf(hand_top,at.y)
-		var right_limit: float = viewport_size.x-(180 if cards.get_node("Shop").available else 16)
+		var right_limit: float = viewport_size.x-16
 		if hand_right+12+width <= right_limit: left = maxf(left,hand_right+12)
 		else: bottom = minf(bottom,hand_top-12)
 	var minimum_height := panel.get_combined_minimum_size().y

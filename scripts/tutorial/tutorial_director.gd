@@ -166,7 +166,7 @@ func _focus_target() -> Control:
 				return cards.hand.views[i] if cards.selected != i and cards.hand._entering.is_empty() else null
 	if stage in [Stage.BUY_SENTRY,Stage.REROLL,Stage.BUY_NEW]:
 		if not shop.available: return null
-		if not shop.view.opened: return shop.view.slots.back().get_node("Face/Back")
+		if not shop.view.opened: return shop.view.entry
 		if stage == Stage.REROLL: return shop.view.slots[0].get_node("Face/Back")
 		var wanted: BuildCard = definition.new_card if stage == Stage.BUY_NEW else definition.upgrade_card
 		for i in shop.offers.size():

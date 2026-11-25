@@ -53,9 +53,13 @@ var rapid_next := 0.0
 var mortar_shots := 0
 var _gun_ready := {}
 var _disables := {}
+var disable_immunity := 0.0
 var _disable_icon: Sprite3D
+var _disable_bob: Tween
+var _upgrade_fx: CPUParticles3D
 
 func apply_disable(source: Node3D, seconds: float) -> void:
+	if disable_immunity > 0: return
 	if not is_instance_valid(source) or not source.can_be_targeted() or not is_finite(seconds) or seconds <= 0: return
 	var key := source.get_instance_id()
 	_disables[key] = {"source":weakref(source),"remaining":maxf(seconds,float(_disables.get(key,{}).get("remaining",0.0)))}
@@ -70,10 +74,12 @@ func is_disabled() -> bool:
 	return not _disables.is_empty()
 
 func advance_disable(delta: float) -> void:
+	disable_immunity = maxf(0.0, disable_immunity-delta)
 	for state: Dictionary in _disables.values(): state.remaining -= delta
 	_refresh_disable_visual()
 
 func clear_disable() -> void:
+	disable_immunity = 0.0
 	_disables.clear()
 	_refresh_disable_visual()
 
@@ -83,11 +89,20 @@ func _refresh_disable_visual() -> void:
 		_disable_icon = Sprite3D.new()
 		_disable_icon.texture = preload("res://assets/sprites/effects/disabled.svg")
 		_disable_icon.pixel_size = 0.009
-		_disable_icon.position.y = 1.4
 		_disable_icon.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		_disable_icon.no_depth_test = true
+		_disable_icon.hide()
 		add_child(_disable_icon)
-	if is_instance_valid(_disable_icon): _disable_icon.visible = disabled
+	if is_instance_valid(_disable_icon) and _disable_icon.visible != disabled:
+		_disable_icon.visible = disabled
+		if _disable_bob != null: _disable_bob.kill()
+		if disabled:
+			var bounds := preload("res://scripts/towers/body_visual.gd").visible_bounds(_visual,self) if _visual != null else AABB()
+			_disable_icon.position = Vector3(bounds.get_center().x, maxf(1.4, bounds.end.y + .46), bounds.get_center().z)
+			var base_y := _disable_icon.position.y
+			_disable_bob = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			_disable_bob.tween_property(_disable_icon, "position:y", base_y + .055, .8)
+			_disable_bob.tween_property(_disable_icon, "position:y", base_y, .8)
 	if disabled != _dimmed: _fade_dim(disabled)
 
 const DISABLED_DIM := 0.45
@@ -228,7 +243,12 @@ func growth_values(at_level: int) -> Array[float]:
 func upgrade(ignore_limit := false) -> bool:
 	if not upgrade_error(ignore_limit).is_empty(): return false
 	level += 1
-	if _visual != null: preload("res://scripts/towers/body_visual.gd").set_level(_visual,level)
+	if _visual != null:
+		preload("res://scripts/towers/body_visual.gd").set_level(_visual,level)
+		if not is_instance_valid(_upgrade_fx) or _upgrade_fx.is_queued_for_deletion():
+			_upgrade_fx = preload("res://scenes/towers/components/upgrade_feedback.tscn").instantiate()
+			add_child(_upgrade_fx)
+		_upgrade_fx.play(_visual)
 	refresh_stats()
 	return true
 

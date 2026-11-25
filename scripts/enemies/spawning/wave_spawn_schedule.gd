@@ -31,8 +31,18 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 	var batches := {}
 	# Troops that weigh traffic plan second, against the first pass's routes.
 	var followers: Array[Troop] = []
+	var boss_approach := {}
 	for key: String in quotas:
 		var profile: Troop = sources[key].profile
+		if profile.has_tag(&"boss"):
+			if boss_approach.is_empty(): boss_approach = preload("res://scripts/enemies/spawning/boss_approach.gd").plan(controller)
+			if boss_approach.is_empty(): return {}
+			var trips: Array[Dictionary] = []
+			trips.resize(quotas[key])
+			trips.fill(boss_approach)
+			batches[key] = trips
+			pool_size += 1
+			continue
 		if profile.road_traffic_weight != 0:
 			if not profile in followers: followers.append(profile)
 			continue

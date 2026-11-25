@@ -4,7 +4,6 @@ extends Control
 var renderer: MultiMeshInstance3D
 @onready var appearance: Control = $Appearance
 @onready var _frame: StyleBox = $Appearance/Background.get_theme_stylebox("panel")
-@onready var _icon_frame: StyleBox = $Appearance/Icon/Background.get_theme_stylebox("panel")
 
 func _ready() -> void:
 	process_priority = 110
@@ -59,6 +58,5 @@ func _draw() -> void:
 		var icon_origin := Vector2(roundf(center.x-width*0.5), origin.y+icon_view.position.y)
 		for id: StringName in enemy.effect_icons:
 			var icon: Texture2D = enemy.effect_icons[id]
-			draw_style_box(_icon_frame, Rect2(icon_origin, icon_view.size))
 			draw_texture_rect(icon, Rect2(icon_origin, icon_view.size), false)
 			icon_origin.x += icon_view.size.x+icon_gap

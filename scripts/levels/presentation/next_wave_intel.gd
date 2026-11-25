@@ -31,6 +31,7 @@ func display(value: Dictionary) -> void:
 		var item := Item.instantiate()
 		$Scroll/Items.add_child(item)
 		item.configure(profile, counts[profile])
+		item.body.pressed.connect(get_parent().start_from_list)
 		item.filter_entered.connect(_enter_filter)
 		item.filter_exited.connect(_exit_filter)
 	_update_layout()

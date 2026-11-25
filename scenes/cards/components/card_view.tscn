@@ -45,6 +45,7 @@ default_frame = ExtResource("5")
 default_icon = ExtResource("6")
 
 [node name="Visuals" type="Control" parent="."]
+mouse_behavior_recursive = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -134,6 +135,12 @@ theme_override_font_sizes/font_size = 16
 text = "1"
 vertical_alignment = 1
 
+[node name="StackCount" type="Label" parent="Visuals/Content/Layout/Header"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+
 [node name="CardTitle" parent="Visuals/Content/Layout/Header" unique_id=2029611028 instance=ExtResource("12")]
 unique_name_in_owner = true
 layout_mode = 2
@@ -170,3 +177,16 @@ layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 script = ExtResource("2")
+
+[node name="SpellShortcut" type="Label" parent="Visuals"]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -32.0
+offset_top = -27.0
+offset_right = -10.0
+offset_bottom = -5.0
+horizontal_alignment = 2
+mouse_filter = 2

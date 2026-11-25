@@ -71,6 +71,9 @@ func _refresh() -> void:
 				ports.add_point(midpoint)
 
 func _draw() -> void:
+	if card != null and card.spell != null:
+		draw_multiline_string(get_theme_font("font", "Label"), Vector2(0, 20), card.spell.description(), HORIZONTAL_ALIGNMENT_CENTER, size.x, 13, 4, Color("36443c"))
+		return
 	if card != null and card.special != null and card.special.kind == SpecialCardDefinition.Kind.CONSUMABLE:
 		var font := get_theme_font("font", "Label")
 		draw_multiline_string(font,Vector2(0,24),tr("event.card.potion.description"),HORIZONTAL_ALIGNMENT_CENTER,size.x,13,4,Color("36443c"))

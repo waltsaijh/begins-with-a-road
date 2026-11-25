@@ -1,6 +1,12 @@
 @tool
 class_name BuildCard
 extends Resource
+@export var spell: CommanderSpell
+## Runtime inventory count. Each spell stack owns its BuildCard.
+var quantity := 1:
+	set(value):
+		quantity = maxi(1, value)
+		emit_changed()
 @export var special: SpecialCardDefinition
 ## Per-acquisition identity: repeated events have independent placement goals.
 var event_batch := 0
@@ -55,6 +61,7 @@ static func from_traffic(definition: TrafficStructureDefinition) -> BuildCard:
 	return result
 
 func visual_definition() -> Resource:
+	if spell != null: return spell
 	if special != null: return special
 	return traffic if traffic != null else tower
 
@@ -62,6 +69,7 @@ func localized_prefix() -> String:
 	return tile_preset.localized_prefix() if tile_preset != null else ""
 
 func localized_name() -> String:
+	if spell != null: return spell.localized_name()
 	if special != null: return special.localized_name()
 	if traffic != null: return traffic.localized_name()
 	if tower == null: return tr("card.unassigned")
@@ -142,6 +150,9 @@ func ground_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 	return result
 
 func configuration_error() -> String:
+	if spell != null:
+		if tower != null or special != null or tile_preset != null or traffic != null: return "Invalid spell card"
+		return "" if spell.damage >= 0 and spell.radius > 0 else "Invalid spell damage or radius"
 	if special != null:
 		if tower != null or traffic != null: return "Special card cannot also contain a tower"
 		return special.configuration_error()

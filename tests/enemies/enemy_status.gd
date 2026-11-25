@@ -186,6 +186,9 @@ func frame_image() -> Image:
 
 func verify_batch_rendering(renderer: MultiMeshInstance3D) -> Dictionary:
 	var overlay: Control = renderer.status_overlay
+	# Compare the same pose in two separately captured frames.
+	var original_bob: float = overlay.icon_bob_pixels
+	overlay.icon_bob_pixels = 0.0
 	check(overlay.batch is MultiMeshInstance2D and overlay._atlas_ready, "Status batch or appearance atlas was not initialized")
 	var example: Node3D = renderer.units[-1]
 	var textures: Array[Texture2D] = []
@@ -228,17 +231,18 @@ func verify_batch_rendering(renderer: MultiMeshInstance3D) -> Dictionary:
 				if error > 2.0/255.0: mismatched += 1
 		compared += after.get_width()*after.get_height()
 	check(mismatched == 0, "Batched status differs from reference pixels: %d (max %.4f)" % [mismatched, worst])
+	overlay.icon_bob_pixels = original_bob
 	check(overlay._atlas.image.get_width() > 128, "Distinct icon test did not exercise atlas growth")
 	# Capacity growth must preserve previous quads and effect removal must shrink it.
 	var previous_count: int = overlay.batch.count
 	for i in 64: example.set_effect_icon(StringName("extra_%d" % i), textures[i%2])
 	overlay._process(0.0)
-	check(overlay.batch.count == previous_count+128 and overlay.batch.multimesh.instance_count >= overlay.batch.count, "Status capacity growth lost quads")
+	check(overlay.batch.count == previous_count+64 and overlay.batch.multimesh.instance_count >= overlay.batch.count, "Each effect adds exactly one symbol quad")
 	for i in 64: example.set_effect_icon(StringName("extra_%d" % i), null)
 	example.set_effect_icon(&"red", null)
 	example.set_effect_icon(&"blue", null)
 	overlay._process(0.0)
-	check(overlay.batch.count == previous_count-4, "Removed effect left stale quads")
+	check(overlay.batch.count == previous_count-2, "Removed effect left stale quads")
 	renderer.hide()
 	overlay._process(0.0)
 	check(overlay.batch.multimesh.visible_instance_count == 0, "Hidden renderer retained visible status instances")
@@ -248,7 +252,7 @@ func verify_batch_rendering(renderer: MultiMeshInstance3D) -> Dictionary:
 	overlay.clear()
 	check(overlay._atlas._icons.is_empty() and overlay.batch.count == 0, "Clearing status retained icon resources or instances")
 	overlay._process(0.0)
-	check(overlay.batch.count == previous_count-4 and overlay._atlas._icons.size() == 1, "Reusing the batch after clearing did not restore active effects")
+	check(overlay.batch.count == previous_count-2 and overlay._atlas._icons.size() == 1, "Reusing the batch after clearing did not restore active effects")
 	reference_layer.queue_free()
 	await verify_camera_reentry(renderer)
 	await verify_baked_appearance(renderer)
@@ -320,7 +324,7 @@ func verify_baked_appearance(renderer: MultiMeshInstance3D) -> void:
 	overlay.set_process(true)
 	var picture := await frame_image()
 	if not OS.has_feature("web"): picture.save_png("res://.godot/status_baked_style.png")
-	check(overlay._atlas_ready and overlay._frames.size() == 3 and not overlay._flat[0], "Rounded appearance did not finish baking")
+	check(overlay._atlas_ready and overlay._frames.size() == 2 and not overlay._flat[0], "Rounded bar appearance did not finish baking")
 	var red := 0
 	var blue := 0
 	for y in picture.get_height():

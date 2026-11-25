@@ -127,7 +127,7 @@ func verify() -> void:
 	check(not scene.get_node("PortalOverlay")._panel.visible and wave.controls.spawn_button.text.is_empty(), "Non-card HUD text remains visible by default")
 	check(not shop.available and not view.get_node("Root").visible and cards.cards.size() == 3, "Shop appeared before a wave ended")
 	check(view.get_node_or_null("Root/Dimmer") == null and view.get_node_or_null("Root/Header") == null, "Shop still has a modal overlay/header")
-	check(cards.hand.views[0].position.y < cards.hand.views[1].position.y and cards.hand.views[1].position.y < cards.hand.views[2].position.y, "Hand does not curve down from the outside left")
+	check(is_equal_approx(cards.hand.views[0].position.y,cards.hand.views[1].position.y) and is_equal_approx(cards.hand.views[1].position.y,cards.hand.views[2].position.y), "Hand modules are not parallel")
 	check(cards.hand.views[1].position.x-cards.hand.views[0].position.x < ShopConstants.CARD_SIZE.x, "Hand cards do not overlap")
 	check(cards.hand.views[0].scale.x < 1.0, "Hand cards did not shrink")
 	check(top_edge_gap(cards.hand.views) < 1.0, "Hand top edges form visible steps")
@@ -159,19 +159,16 @@ func verify() -> void:
 	check(wave.start_wave(), "Initial shop wave failed to start")
 	wave._process(0)
 	wave.living_enemies()[0]._process(10000)
-	var below: float = view.slots[0].position.y
-	check(below > get_viewport().get_visible_rect().size.y, "Shop deck did not start below the screen")
-	view._motion.custom_step(0.13)
-	check(view.slots[0].position.y < below, "Shop deck did not rise during its entry animation")
+	check(not view.get_node("Root").visible and view.entry.visible,"Wave reward exposes only the small shop entry")
 	await get_tree().process_frame
 	settle(cards, shop)
 	check(shop.available and not view.opened and view.slots.size() == 5 and shop.coins == ShopConstants.WAVE_REWARD, "Wave completion raises four offers and the reroll card")
 	for i in view.slots.size():
 		var slot: Control = view.slots[i]
-		check(slot.get_node("Face/Back").visible and not slot.get_node("Face/Card").visible and not view.price_view(i).is_visible_in_tree(), "Collapsed shop exposed card fronts or prices")
-	check(view.slots[0].z_index > view.slots[4].z_index, "Shop icon is not on the top card")
+		check(not slot.is_visible_in_tree() and not view.price_view(i).is_visible_in_tree(), "Closed shop exposed card fronts or prices")
+	check(view.entry.visible,"Shop entry is reachable without a deck")
 	await screenshot(Artifacts.path("cards/shop_closed.png"))
-	await click_button(view.slots[0].get_node("Face/Back"))
+	await click_button(view.entry)
 	settle(cards, shop)
 	check(view.opened and cards.hand.collapsed and cards.input_suspended, "Deck click did not open the shop and fold the hand")
 	check(not cards.placement.is_processing_unhandled_input() and not cards.towers.input_enabled and not wave.controls.visible, "Open shop leaked construction/spawn input")
@@ -385,7 +382,7 @@ func verify() -> void:
 	view.finish_animation()
 	await screenshot(Artifacts.path("cards/shop_hover.png"))
 	for control: Control in scene.find_children("*", "Control", true, false):
-		check(control.tooltip_text.is_empty(), "Gameplay UI still has a hover tooltip")
+		if control != view.entry: check(control.tooltip_text.is_empty(), "Card faces added a redundant hover tooltip")
 	var report := {"failures": failures, "four_offers_and_reroll_back_cards": true, "four_towers_and_reroll": true, "prices": true, "purchase_and_reroll": true, "outside_click_no_world_edit": true, "hand_fold_restore": true, "successful_placement_consumes": true, "wave_start_hides": true, "arrival_and_kill_rewards": true, "duplicate_reward_guard": true, "animation_reversal": true, "no_modal_overlay": true, "shallow_overlapping_fan": true, "gold_icons": true, "sold_card_hidden": true, "smaller_cards": true, "mirrored_outer_arc": true, "hover_focus": true, "stable_hover": true, "hover_keeps_neighbours": true, "hover_lift_only": true, "continuous_top_edge": true, "hand_insert_from_below": true, "persistent_hand_views": true, "compact_shop": true, "reroll_insert_from_below": true, "minimal_hud": true}
 	print("CARD_SHOP_CHECK:"+JSON.stringify(report))
 	if not OS.has_feature("web"):

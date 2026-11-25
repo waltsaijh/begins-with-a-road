@@ -32,7 +32,12 @@ func advance(delta: float) -> void:
 	for tower: DefenseTower in combat.tower_map.towers.values(): tower.advance_disable(delta)
 	if not combat.wave.active: return
 	for enemy in combat.wave.living_enemies():
-		for ability: EnemyAbility in enemy.abilities: ability.update(self,delta)
+		var active_delta := maxf(0.0, delta - enemy.stun_remaining)
+		if enemy.stun_remaining > 0:
+			enemy.stun_remaining = maxf(0.0, enemy.stun_remaining-delta)
+			if enemy.stun_remaining == 0: enemy.set_effect_icon(&"stun", null)
+		if active_delta > 0:
+			for ability: EnemyAbility in enemy.abilities: ability.update(self,active_delta)
 	for service in _services.values():
 		if is_instance_valid(service): service.update(delta)
 

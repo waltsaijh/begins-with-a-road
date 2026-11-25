@@ -106,6 +106,7 @@ func place_tower(cell: Vector3i, scene: PackedScene = null) -> DefenseTower:
 
 ## Preview is read-only. Commit always validates again against current world state.
 func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
+	if card != null and card.spell != null: return tr("spell.combat_only")
 	if card_filter.is_valid():
 		var denied: String = card_filter.call(card)
 		if not denied.is_empty(): return denied
@@ -340,6 +341,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		var turns: int = entry.get("turns",0)
 		if card == null: failure.error = "缺少預擺卡牌"
 		elif not card.configuration_error().is_empty(): failure.error = card.configuration_error()
+		elif card.spell != null: failure.error = tr("spell.combat_only")
 		elif card.special != null: failure.error = "Special cards use direct placement"
 		elif card.traffic != null: failure.error = "輔助設施請在確認預擺後單獨放置"
 		elif cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767: failure.error = "超出可建造範圍"

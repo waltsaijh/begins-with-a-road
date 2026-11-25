@@ -16,7 +16,8 @@
 - `assets/data/events/event_01.tres`～`event_09.tres`：二選一的效果列表與數值。type 支援 road、gold、spend、health、upgrade、downgrade、remove、ceasefire、reinforce、card、random_card、relic。reinforce 的 count、troop、per_start、start、interval_ticks 可編輯。
 - `assets/data/events/cards/`：五張特殊牌的種類、格子、識別色、圖示、選用模型及放置效果。大寶石 Damage Bonus=0.1、小寶石 Wave Gold=5、碎石 Incomplete Damage Multiplier=0.9。
 - `assets/translations/card_names.csv`：`event.*` 的繁中／英文標題、背景、選項與說明，已加入「遊戲文本」編輯器的「特殊事件」分類。事件效果的金幣、人數、傷害百分比與獎勵由 Resource 填入模板。
-- `scenes/events/special_event_choice.tscn` 與 `scripts/events/special_event_choice.gd`：面板、兩個並排選項、停用原因、高亮選塔與 hover 資訊。
+- `scenes/events/special_event_choice.tscn` 與 `scripts/events/special_event_choice.gd`：事件標題、背景遮罩、卡牌容器與高亮選塔。每個選項使用 `scenes/events/components/event_option_card.tscn`，顯示插畫、完整效果、從效果資料讀取的代價／收益及停用原因。
+- `assets/sprites/events/option_art.svg` 是九事件 18 個選項及共用備援的插畫圖集。`scripts/events/presentation/event_option_art.gd` 以事件 ID 和選項順序對應圖塊及底色；新增事件可以直接沿用備援圖塊。
 
 ## 九事件與實際效果
 
@@ -50,7 +51,12 @@ TowerMap 保存獨立 special_occupied；它與塔占格的聯集才是導航障
 - 增援預設從第 0 刻度開始，每 2 個四分之一秒刻度出一個（0.5 秒）；鼠群仍遵守原 cohort 排程。以上皆在事件 effect 字典調整。
 - 道路搜尋由有效入口嘗試到基地，包圍範圍外擴 8 格，最大 12,000 候選格；兩者在 catalog 可編輯。與自動入口擴張共用四向加權 Dijkstra，步成本 1，鄰接舊路 +8、相隔兩格 +2；路長上限為 ceil(曼哈頓距離 × 1.75) +6。起終點曼哈頓距離 2 格內允許合流；中段不走舊路。至少新增 4 格、至少 max(2, 新格數/3) 格不鄰接舊路才接受。
 - 提交前以原 ConstructionLayout／Snapshot 驗證雙向接口與全部端點，原道路不移除；新路的明確接口避免相鄰平行路自動變成寬路。成功才 +50 Gold，並更新地圖顯示、route history、原生圖及下一波預測。無合理路徑就停用 A。
-- 面板最多約 820 邏輯像素，選項 hover／focus 使用同色系背景與邊框；無外部美術依賴，地塊為 BoxMesh／PrismMesh，圖示為小型 SVG。
+
+## 桌遊事件牌
+
+兩張卡牌在 526 邏輯 px 的視窗內並排，單卡寬至 224 px。同列採共同高度，長文案自動換行，短視窗可垂直捲動。容器也支援並排三張卡，正式事件仍由管理器提供兩選項。字體和卡框沿用部署介面的 Noto Sans TC 與細角飾。
+
+標題先淡入，卡牌間隔 75 ms、上滑 16 px。Hover 在 150 ms 內抬升 9 px 並放大至 1.03 倍，按壓有回縮，變形只作用於卡面，按鈕命中區固定。已選卡面在其他卡淡出時突出，視窗在 190 ms 內退場。Tween 使用實際時間，Esc 暫停選單仍有優先權。按下可用選項時直接由事件管理器驗證並執行；若原事件需要選塔，接續既有高亮與選取，結算及準備期解鎖也由原流程處理。
 
 ## 驗證
 

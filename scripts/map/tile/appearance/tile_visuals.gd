@@ -12,6 +12,7 @@ var _states := {}
 var _new_cells := {}
 var _riders := {}
 var _queued := false
+var opening_drop := false
 var _initial_layout := true
 var _map_was_visible := true
 var _controller: Node
@@ -48,7 +49,7 @@ func _ready() -> void:
 	if placement != null:
 		placement.cell_placed.connect(_on_cell_placed)
 	sync()
-	set_process(false)
+	set_process(not jobs.is_empty())
 
 func _on_layout_changed() -> void:
 	# Initial supports/bridges appear settled, even though the first graph is deferred.
@@ -75,7 +76,7 @@ func follow_new_cell(cell: Vector3i, visual: Node3D) -> void:
 		return
 	_restore_rider(cell)
 	_riders[cell] = {"visual": visual, "position": visual.position}
-	_set_rider_offset(cell, jobs[cell].model.position.y if jobs.has(cell) else -rise_depth)
+	_set_rider_offset(cell, jobs[cell].model.position.y if jobs.has(cell) else rise_depth)
 
 func _set_rider_offset(cell: Vector3i, offset: float) -> void:
 	if not _riders.has(cell):
@@ -100,7 +101,19 @@ func sync() -> void:
 	global_transform = map.global_transform
 	var present := {}
 	surface.prepare(map,_controller.blocked_cells if _controller != null else {},_controller.terminal_cells() if _controller != null else [])
-	for cell in map.get_used_cells():
+	var delays := {}
+	var cells := map.get_used_cells()
+	if animate and opening_drop and not cells.is_empty():
+		var goal: Node3D = get_node("../Goal")
+		var origin := map.local_to_map(map.to_local(goal.global_position))
+		delays = _opening_delays(cells,origin)
+		opening_drop = false
+	else:
+		var index := 0
+		for added_cell in _new_cells:
+			delays[added_cell] = index*minf(0.065,0.85/maxi(1,_new_cells.size()-1))
+			index += 1
+	for cell in cells:
 		var target := Vector2i(map.get_cell_item(cell), map.get_cell_item_orientation(cell))
 		var display: int = surface.item(map,cell,target.x)
 		_display_items[cell] = display
@@ -110,10 +123,10 @@ func sync() -> void:
 			continue
 		_display_states[cell] = display
 		_states[cell] = target
-		var added := _new_cells.has(cell)
+		var added := delays.has(cell)
 		var changed_appearance := previous.x >= 0 and TileConstants.appearance_of(previous.x) != TileConstants.appearance_of(target.x)
 		if animate and (added or changed_appearance or jobs.has(cell)):
-			_transition(cell, previous, target, added)
+			_transition(cell, previous, target, added, float(delays.get(cell,0.0)))
 		else:
 			_settle(cell)
 	for cell: Vector3i in _states.keys():
@@ -128,8 +141,30 @@ func sync() -> void:
 			_restore_rider(cell)
 	_new_cells.clear()
 
-func _transition(cell: Vector3i, previous: Vector2i, target: Vector2i, added: bool) -> void:
-	var age := 0.0
+func _opening_delays(cells: Array[Vector3i], origin: Vector3i) -> Dictionary:
+	var present := {}
+	for cell in cells: present[cell] = true
+	var frontier: Array[Vector3i] = [origin]
+	var distance := {origin:0}
+	var head := 0
+	var farthest := 0
+	while head < frontier.size():
+		var cell := frontier[head]
+		head += 1
+		for direction: Vector3i in TileConstants.DIRECTIONS:
+			var next := cell+direction
+			if present.has(next) and not distance.has(next):
+				distance[next] = int(distance[cell])+1
+				frontier.append(next)
+	for cell in cells:
+		if not distance.has(cell): distance[cell] = absi(cell.x-origin.x)+absi(cell.z-origin.z)
+		farthest = maxi(farthest,distance[cell])
+	var step := minf(0.075,1.6/maxi(1,farthest))
+	for cell in cells: distance[cell] *= step
+	return distance
+
+func _transition(cell: Vector3i, previous: Vector2i, target: Vector2i, added: bool, delay: float) -> void:
+	var age := -delay
 	if jobs.has(cell):
 		var old: Dictionary = jobs[cell]
 		age = old.age
@@ -148,11 +183,13 @@ func _transition(cell: Vector3i, previous: Vector2i, target: Vector2i, added: bo
 	var job := {"cell": cell, "body": body, "age": age, "target": target, "previous": previous, "added": added, "fixed_top": fixed_top}
 	# Split only the pillar support; ordinary replacements use one shared mesh.
 	var display_mesh: Mesh = surface.library.get_item_mesh(_display_items[cell])
-	var top := SurfaceTool.new()
-	top.begin(Mesh.PRIMITIVE_TRIANGLES)
-	top.append_from(display_mesh,0,Transform3D.IDENTITY)
-	top.set_material(display_mesh.surface_get_material(0))
-	job.model = _mesh(body,top.commit(),0)
+	if display_mesh.get_surface_count() > 1:
+		var top := SurfaceTool.new()
+		top.begin(Mesh.PRIMITIVE_TRIANGLES)
+		top.append_from(display_mesh,0,Transform3D.IDENTITY)
+		top.set_material(display_mesh.surface_get_material(0))
+		display_mesh = top.commit()
+	job.model = _mesh(body,display_mesh,0)
 	if has_pillar:
 		if _support_mesh == null:
 			var source: Node3D = load("res://assets/models/tiles/variants/pillar_support.tscn").instantiate()
@@ -179,7 +216,9 @@ static func rise_offset(progress: float, depth := TileAppearanceConstants.RISE_D
 
 func _pose(job: Dictionary) -> void:
 	var t := clampf(job.age / duration, 0.0, 1.0)
-	job.model.position.y = 0.0 if job.fixed_top else rise_offset(t, rise_depth)
+	job.body.visible = job.age >= 0.0
+	if job.added: job.model.position.y = TileAppearanceConstants.drop_offset(t,rise_depth)
+	else: job.model.position.y = 0.0 if job.fixed_top else rise_offset(t, rise_depth)
 	_set_rider_offset(job.cell, job.model.position.y)
 	if job.has("support"):
 		var growth := smoothstep(0.0, 1.0, t)
@@ -189,6 +228,7 @@ func _pose(job: Dictionary) -> void:
 		job.support.visible = growth > 0.001
 
 func _process(delta: float) -> void:
+	if ScreenTransition.active: return
 	for cell: Vector3i in jobs.keys():
 		var job: Dictionary = jobs[cell]
 		job.age += maxf(delta, 0.0)

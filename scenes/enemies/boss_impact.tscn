@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Stone"]
+albedo_color = Color(0.72,0.66,0.52,1)
+[sub_resource type="BoxMesh" id="Chip"]
+material = SubResource("Stone")
+size = Vector3(0.09,0.065,0.08)
+[node name="ImpactDebris" type="CPUParticles3D"]
+emitting = false
+one_shot = true
+amount = 48
+lifetime = 0.6
+explosiveness = 1.0
+emission_shape = 6
+emission_ring_axis = Vector3(0,1,0)
+emission_ring_height = 0.08
+emission_ring_radius = 0.98
+emission_ring_inner_radius = 0.62
+direction = Vector3(0,1,0)
+spread = 78.0
+gravity = Vector3(0,-8,0)
+initial_velocity_min = 1.8
+initial_velocity_max = 3.8
+angular_velocity_max = 200.0
+scale_amount_min = 0.5
+scale_amount_max = 1.4
+mesh = SubResource("Chip")

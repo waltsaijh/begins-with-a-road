@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/levels/presentation/next_wave_intel.gd" id="1"]
 
 [node name="NextWaveIntel" type="VBoxContainer"]
-mouse_filter = 0
+mouse_filter = 1
 theme_override_constants/separation = 2
 script = ExtResource("1")
 

@@ -1,5 +1,37 @@
 # Routing Sandbox — Phase 5 交接
 
+## 2026-11-24 Event UI Art Slice A
+
+特殊事件改為置中暖白視窗與共用桌遊牌，保留戰場背景。九事件的 18 個選項各有幾何 SVG 插畫，未知事件有備援圖。卡牌高度隨文案調整，窄視窗可捲動；測試範例也確認三卡並排。事件結算仍由原管理器即時執行，世界選塔、付款、後續效果及所有觸發和機率沿用原資料與流程。介面結構見 [特殊事件](special_events.md)。
+
+Windows Godot 4.7.2 特殊事件 295 項、HUD 與拖牌回歸均通過。繁中／英文渲染批次涵蓋 1280×800、800×600、640×480，包含商人按壓、hover、金幣不足、離場及三卡版面。驗證入口在 [tests/events](../tests/events/README.md)。本輪未重匯出 Web，未跑十五波完整遊玩，未 commit／push。
+
+## 2026-11-20 Enemy Art Slice A 第二輪
+
+以 Blender MCP 更新七份來源與 GLB。盾衛兵改寬厚身形與城門紋大盾，重裝兵改羽飾板甲與雙手鎚，士兵和爆破手改為矛旗步兵與負罐的兜帽煉金工兵。獵犬拉長並穿上軍團披布。每名鼠群成員對應一隻模型，沿用同路排程、個別生命與選取。尺寸與重建入口見[模型規格](../tools/assets/blender/enemy_slice_a/model-spec.md)。
+
+血法師成功治療後以 0.55 遊戲秒播放 Cast，爆破手以原有兩秒前搖播放 Throw。兩者在此期間停下路點推進，結束或取消後接回原路。行走用 GPU 批次，施展時按技能時鐘採樣 GLB。Windows Godot 4.7.2 Compatibility 正式場景混兵測試、九兵 27 組 GLB／GPU 姿勢比對與 101 項單位檢視均通過。截圖位於 `.godot/test-results/enemies/slice_a/`。
+
+## 2026-11-20 Enemy Art Slice A 第一版
+
+九種普通敵人的 Blender 來源、GLB、GPU 衍生資產、動作週期與重建步驟見[模型規格](../tools/assets/blender/enemy_slice_a/model-spec.md)。在 [enemy_art_gallery.tscn](../tests/enemies/enemy_art_gallery.tscn) 按 F6 可同時比較。沿用 quickfeet ID 對應獵犬、原波次、尋路、模型射線拾取及共用暫停／倍速。初始工作樹已有部署 UI、商店與畫質修改；本輪未提交或推送。
+
+Windows Godot 4.7.2 Compatibility 混兵測試在正式關卡載入測試波次、哨塔及道路，九種均生成且通過 1／2／4 倍速、暫停、朝向、高度、拾取資料與死亡清場。九種各三姿勢的 GLB／GPU 像素比對通過，單位檢視 101 項通過，258 隻混兵批次、兵種匯入與共用材質檢查通過。截圖在 `.godot/test-results/enemies/slice_a/`。最遠鏡頭沿道路縱向觀看時，小兵與狀態圖示容易互相遮擋。未跑 Web、完整十五波或效能測量。
+
+另外執行的 startup_loading 與 scene_loading 分別有 3／2 項失敗。將九種 Troop 在測試程序中切回原外觀、用原測試重跑，得到相同的五個失敗項。前者預期開機與關卡共用預熱環境，兩場景的陰影設定不同；後者預期第一關開場可直接開波，現有教學流程在此階段鎖住開波。
+
+## 2026-11-19 底部部署模組與雙商店入口
+
+開始HEAD=`bc668e8`，分支`experiment/routing-sandbox`。起始只有使用者對`project.godot`的畫質設定修改，本輪保存原始bytes並核對保留，不commit／push、不動stash。改動限於手牌樣式／排列、商店入口、基地點擊的輸入分流及必要的教學／文字／測試；未改戰場美術、經濟、抽牌、建造或導航。
+
+手牌採平行排列、原144×208／82%顯示比例及少量重疊，預設讀`deployment_background.svg`／`deployment_frame.svg`細線淺紙與輕角飾；選中強化外框，微晃縮至±0.15°。傷害／攻速／描述書籤仍用原資料與0.18秒展開，只柔化紙色及陰影，商店最右商品仍向左展開；SHOP卡面沿用原素材。
+
+`CardShopView/Entry`為32px補給箱入口，無常駐底板；LevelHUD放在既有操作群後方，不移動時間軸、倍速、暫停，獨立main／工具場景預設右上。關閉時商品Root隱藏，不再疊牌；開啟原四商品＋刷新內容，0.18秒淡入／10px位移，關閉0.14秒淡出。Entry沿用CardButton的相機／拖放命中契約。基地由UnitInspection及CardPlacement轉給Shop.try_open_from_world，重用UnitPick的模型AABB、GPU敵人拾取及相機click／drag仲裁，單位、持牌、拖曳與階段鎖優先。所有入口共用can_open及原交易；教學焦點改到Entry，Esc在正式關卡先收回已開商店。
+
+本次Windows Compatibility：實際繪製28項部署UI檢查通過（雙入口、同一庫存、拖曳不誤開、持牌／單位優先、暫停與事件／入口鎖、開波封鎖、連續開關不花錢／不重抽、書籤、800×600英文與1280×800繁中）；購買／刷新／售出／插牌／快速收合、拖牌、Hover書籤、相機、LevelHUD、UI Slice A108項、單位檢視101項及五步教學皆通過。截圖`.godot/test-results/deployment/`，日誌`.godot/supply_*`。Chrome release Web 同一28項通過，pageerror／console error皆0，仍有28條既有WebGL buffer警告；證據`.godot/test-results/deployment/web-result.json`。沒有執行無關大規模測試、真人自然十五波或正式發行包重匯出。
+
+素材匯入時，editor回報無法拷貝`bin/~road_graph...dll`；沒有改DLL／安全設定，直接runtime及專用Web匯出另行驗證。部分測試快速退出仍有既有ObjectDB／Resource警告，未視為無警告。主要檔案：cards/presentation的card_view／card_hand／card_shop_view、cards/shop/card_shop、level_hud／unit_inspection、CardPlacement、TutorialDirector、卡牌場景／SVG及中英CSV。`project.godot`原調整與正式匯出設定維持原樣。
+
 ## 2026-11-19 Git 提交與推送
 
 使用者要求提交並推送本聊天累積的 UI／敵人資訊、玩家入口放置、共用建路與新舊路口銜接、第二關東側限制、資源／測試／文件。開始HEAD=`1f097a6`，分支`experiment/routing-sandbox`；fetch後領先`origin/experiment/routing-sandbox`五筆、沒有落後，正常推送會包含先前尚未推送的Special Events及既有美術整合歷史。本次不進行新的merge／rebase、不動三份stash或其他worktree、不強制推送；下方未commit／push為此次授權前快照。

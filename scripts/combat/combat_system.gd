@@ -62,7 +62,9 @@ func _process(delta: float) -> void:
 			continue
 		shot.age += step
 		if shot.age >= shot.duration:
-			if shot.get("mortar",false):
+			if shot.has("spell"):
+				shot.spell.hit_enemies(self,shot.cell)
+			elif shot.get("mortar",false):
 				_impact_mortar(shot)
 			elif not shot.get("visual_only",false):
 				for target in _index.targets_in(shot.cell, shot.radius):

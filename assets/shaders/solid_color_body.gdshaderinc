@@ -11,6 +11,16 @@ uniform float dim = 0.0;
 // INSTANCE_CUSTOM.xy: phase and movement blend (only animated MultiMeshes).
 void vertex() {
 	surface_response = CUSTOM1.xy;
+#ifdef ENEMY_RIGID_CLIP
+	int count = textureSize(joint_frames, 0).x;
+	float frame = fract(INSTANCE_CUSTOM.x / TAU) * float(count);
+	int index = int(frame);
+	int part = int(CUSTOM0.x);
+	mat4 first = joint_pose(index, part);
+	mat4 next = joint_pose((index + 1) % count, part);
+	VERTEX = mix((first * vec4(VERTEX, 1.)).xyz, (next * vec4(VERTEX, 1.)).xyz, fract(frame));
+	NORMAL = normalize(mix(mat3(first) * NORMAL, mat3(next) * NORMAL, fract(frame)));
+#else
 	if (CUSTOM0.w > 0.0) {
 		float stride = sin(INSTANCE_CUSTOM.x) * INSTANCE_CUSTOM.y;
 		float intervals = CUSTOM0.w - 1.0;
@@ -34,6 +44,7 @@ void vertex() {
 		NORMAL.xy = mat2(vec2(c, s), vec2(-s, c)) * NORMAL.xy;
 		VERTEX.y += abs(stride) * CUSTOM0.y;
 	}
+#endif
 	shadow_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
 

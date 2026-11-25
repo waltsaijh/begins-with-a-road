@@ -39,8 +39,10 @@ func verify() -> void:
 	var selected: Array[Troop] = service.representatives(profiles, boot.renderer)
 	check(selected.has(soldier) and not selected.has(quick) and not selected.has(heavy), "Startup did not select one shared GPU representative")
 	for profile in profiles:
-		if profile not in [soldier, quick, heavy]:
+		if profile.gpu_model == null:
 			check(selected.has(profile), "Startup dropped a distinct scripted model")
+		else:
+			check(selected.has(profile) == (profile == soldier), "Duplicate rigid clip shader warmup")
 	var samples := {}
 	var finished := 0
 	var total := 0

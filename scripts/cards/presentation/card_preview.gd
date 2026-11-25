@@ -13,10 +13,23 @@ var _definition: Resource
 var _ghost_stamp := ""
 var _material: ShaderMaterial
 var _flash_started := -1
+var _rejection_tint := StandardMaterial3D.new()
+var _flashed_meshes: Array[MeshInstance3D] = []
+var _ghost_rest := Vector3.ZERO
 var _preview_key := ""
 
 func flash_invalid() -> void:
+	_clear_rejection()
 	_flash_started = Time.get_ticks_usec()
+	if is_instance_valid(ghost):
+		_ghost_rest = ghost.position
+		var meshes := ghost.find_children("*","MeshInstance3D",true,false)
+		if ghost is MeshInstance3D: meshes.append(ghost)
+		for piece: MeshInstance3D in meshes:
+			if piece.material_overlay == null:
+				piece.material_overlay = _rejection_tint
+				_flashed_meshes.append(piece)
+	_rejection_tint.albedo_color = Color(1,0.07,0.035,0.75)
 	_material.set_shader_parameter("rejection_flash", 1.0)
 	set_process(true)
 
@@ -24,7 +37,19 @@ func _process(_delta: float) -> void:
 	var age := (Time.get_ticks_usec()-_flash_started)/1000000.0
 	var strength := 1.0-smoothstep(0.0, 0.4, age)
 	_material.set_shader_parameter("rejection_flash", strength)
-	if strength <= 0.0: set_process(false)
+	_rejection_tint.albedo_color.a = 0.75*strength
+	if is_instance_valid(ghost):
+		ghost.position = _ghost_rest+Vector3.RIGHT*0.17*strength*sin(age*TAU*12.0)
+	if strength <= 0.0: _clear_rejection()
+
+func _clear_rejection() -> void:
+	if _flash_started >= 0 and is_instance_valid(ghost): ghost.position = _ghost_rest
+	for piece in _flashed_meshes:
+		if is_instance_valid(piece) and piece.material_overlay == _rejection_tint: piece.material_overlay = null
+	_flashed_meshes.clear()
+	_flash_started = -1
+	set_process(false)
+
 var hint_anchor := Vector3.ZERO
 var upgrade_mode := false
 var upgrade_label: Label3D
@@ -39,6 +64,8 @@ var displayed_ground: Array[Vector2i] = []
 func _ready() -> void:
 	_material = ground.material_override.duplicate()
 	ground.material_override = _material
+	_rejection_tint.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_rejection_tint.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	set_process(false)
 	upgrade_label = Label3D.new()
 	upgrade_label.font = preload("res://assets/fonts/NotoSansTC-Light.ttf")
@@ -70,11 +97,11 @@ func show_at(map: GridMap, card: BuildCard, cell: Vector3i, turns: int, valid: b
 	upgrade_label.hide()
 	visible = true
 	global_transform = map.global_transform
-	var key := str([card,cell,turns,valid])
+	var key := str([card.visual_definition(),card.tile_preset,cell,turns,valid])
 	if key != _preview_key:
 		_preview_key = key
 		_material.set_shader_parameter("rejection_flash", 0.0)
-		set_process(false)
+		_clear_rejection()
 	var mesh := ImmediateMesh.new()
 	var footprint := card.tower_cells(Vector2i(cell.x,cell.z),turns)
 	var towers := map.get_node_or_null("../TowerMap")

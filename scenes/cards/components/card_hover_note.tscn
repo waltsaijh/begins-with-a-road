@@ -3,19 +3,19 @@
 [ext_resource type="Script" path="res://scripts/cards/presentation/card_hover_note.gd" id="1"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Light.ttf" id="2"]
 [sub_resource type="StyleBoxFlat" id="StatPaper"]
-bg_color = Color(0.985, 0.955, 0.78, 0.99)
+bg_color = Color(0.985, 0.975, 0.85, 0.98)
 border_width_bottom = 1
 border_color = Color(0.66, 0.6, 0.37, 0.25)
-shadow_color = Color(0.12, 0.19, 0.19, 0.10)
-shadow_size = 2
-shadow_offset = Vector2(0, 2)
+shadow_color = Color(0.12, 0.19, 0.19, 0.04)
+shadow_size = 1
+shadow_offset = Vector2(0, 1)
 [sub_resource type="StyleBoxFlat" id="DescriptionPaper"]
-bg_color = Color(0.98, 0.97, 0.87, 0.99)
+bg_color = Color(0.985, 0.98, 0.91, 0.98)
 border_width_bottom = 1
 border_color = Color(0.66, 0.6, 0.37, 0.25)
-shadow_color = Color(0.12, 0.19, 0.19, 0.10)
-shadow_size = 2
-shadow_offset = Vector2(0, 2)
+shadow_color = Color(0.12, 0.19, 0.19, 0.04)
+shadow_size = 1
+shadow_offset = Vector2(0, 1)
 [node name="CardHoverNote" type="CanvasLayer"]
 layer = 5
 process_mode = 3

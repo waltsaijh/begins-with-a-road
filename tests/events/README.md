@@ -20,7 +20,7 @@
 & 'C:/tools/Godot.exe' --headless --path 'D:/games/begins-with-a-road-routing' res://tests/events/regression.tscn
 ```
 
-輸出 `SPECIAL_EVENTS_RESULT {"checks":...,"failures":[]}`。錯誤 log 也須核對，不以引擎 exit code 單獨判定。視覺批次以 `res://tests/events/playground.tscn -- --events-screenshots` 執行，截圖在 `.godot/test-results/events/`，涵蓋繁中／英文、1280×800／800×600。
+輸出 `SPECIAL_EVENTS_RESULT {"checks":...,"failures":[]}`。錯誤 log 也須核對，不以引擎 exit code 單獨判定。視覺批次以 `res://tests/events/playground.tscn -- --events-screenshots` 執行，截圖在 `.godot/test-results/events/`。繁中／英文皆擷取 1280×800 的九個事件，並以代表事件檢查 800×600 和 640×480。商人另外擷取 hover、金幣不足及離場，並用滑鼠事件驗證按壓與點擊；神秘寶石附第三張卡與備援插畫的版面測試。批次結束輸出 `EVENT_VISUALS_SAVED []`。
 
 Web：
 

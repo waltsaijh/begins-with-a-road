@@ -119,7 +119,37 @@ func run() -> void:
 	shop.coins = 0
 	check(not manager.option_error(manager.catalog[2],0).is_empty() and not manager.option_error(manager.catalog[4],0).is_empty(),"Insufficient funds disable paid options")
 	check(begin(3) and manager.choice.buttons[0].disabled and not manager.choice.buttons[1].disabled,"UI disables only the unaffordable option")
-	check(not manager.choose(0) and manager.choose(1),"Unaffordable merchant still forces a valid choice")
+	var choice_ui: CanvasLayer = manager.choice
+	var potion: Button = choice_ui.buttons[0]
+	var cheese: Button = choice_ui.buttons[1]
+	check(potion.summary.text == "70 Gold" and cheese.summary.text == "免費","Merchant footer reads resource cost and localizes the free choice")
+	check(potion.art.texture.region != cheese.art.texture.region and potion.effect.text.contains("70"),"Merchant cards have distinct illustrations and retain the full effect")
+	potion.pressed.emit()
+	check(shop.coins == 0 and manager.active != null and get_viewport().gui_get_focus_owner() == cheese,"Disabled card ignores selection and skips focus")
+	shop.grant_gold(70,"test")
+	check(not potion.disabled and not potion.reason.visible,"Balance changes refresh a presented option")
+	potion.grab_focus()
+	shop.spend_gold(70,"test")
+	check(potion.disabled and potion.reason.visible and not potion.has_focus() and cheese.has_focus(),"Becoming unavailable moves keyboard focus to a valid card")
+	host._hud.set_paused(true)
+	await get_tree().process_frame
+	cheese.pressed.emit()
+	check(not choice_ui.root.visible and manager.active != null and not host._wave.start_allowed,"Manual pause hides the event and keeps its lock")
+	await get_tree().create_timer(0.34, true, false, true).timeout
+	check(is_equal_approx(cheese.modulate.a,1.0),"Card entrance advances in real time even while paused")
+	host._hud.set_paused(false)
+	for i in 2:
+		await get_tree().process_frame
+	check(choice_ui.root.visible and cheese.has_focus(),"Resume restores the pending choice and its focus")
+	check(not manager.choose(0),"Unaffordable merchant still requires a valid choice")
+	cheese.pressed.emit()
+	cheese.pressed.emit()
+	check(manager.active == null and host._wave.start_allowed and choice_ui.center.visible,"Choice releases the phase lock immediately while the exit animates")
+	for i in 12:
+		if not choice_ui.root.visible:
+			break
+		await get_tree().create_timer(0.04, true, false, true).timeout
+	check(not choice_ui.root.visible,"Completed event fades out and relinquishes its overlay")
 	check(host._wave.definition.total_count() == 13,"Cheese adds editable 12 rats")
 	shop.grant_gold(300,"test")
 	resolve(3,0)

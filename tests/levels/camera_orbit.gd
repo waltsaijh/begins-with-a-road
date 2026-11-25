@@ -313,7 +313,7 @@ func verify() -> void:
 	shop._on_wave_started()
 	shop._on_wave_finished()
 	shop.view.finish_animation()
-	var back: Button = shop.view.slots.back().get_node("Face/Back")
+	var back: Button = shop.view.entry
 	var back_point := back.get_global_transform_with_canvas()*(back.size*0.5)
 	check(back.is_visible_in_tree() and camera._over_card(back_point), "Shop deck back is not excluded from left panning")
 	click(back)

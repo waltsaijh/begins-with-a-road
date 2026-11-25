@@ -12,6 +12,11 @@ const View = preload("res://scenes/cards/components/card_view.tscn")
 @export_range(2.0, 24.0, 1.0) var drag_threshold := 8.0
 var views: Array[Button] = []
 var collapsed := false
+## A player-folded hand can be reopened, unlike the locked shop presentation.
+var folded := false
+var _combat_hand := false
+var _idle_since := 0
+@export_range(0.4, 5.0, 0.1) var idle_fold_seconds := 1.4
 var stowed := false
 @onready var _canvas: Control = $Cards
 var _motion: Tween
@@ -23,6 +28,7 @@ var _entering := {}
 var _interaction_enabled := true
 var _drag_candidate: Button
 var _drag_start := Vector2.ZERO
+var _pointer := Vector2(-10000,-10000)
 var _dragging := false
 var _consume_release := false
 
@@ -34,6 +40,7 @@ func setup(cards: Array[BuildCard]) -> void:
 	set_cards(cards)
 
 func set_cards(cards: Array[BuildCard]) -> void:
+	folded = false
 	cancel_drag()
 	if _motion != null: _motion.kill()
 	_hovered = -1
@@ -101,6 +108,7 @@ func remove_card(index: int) -> void:
 	_layout(true)
 
 func set_collapsed(value: bool) -> void:
+	if value != collapsed: folded = false
 	if value: cancel_drag()
 	collapsed = value
 	_hovered = -1
@@ -111,6 +119,8 @@ func set_stowed(value: bool) -> void:
 	if value: cancel_drag()
 	if stowed == value: return
 	stowed = value
+	folded = false
+	_idle_since = Time.get_ticks_msec()
 	_hovered = -1
 	_layout(true)
 
@@ -118,11 +128,34 @@ func set_interaction_enabled(value: bool) -> void:
 	_interaction_enabled = value
 	if not value: cancel_drag()
 
+func set_combat_hand(value: bool) -> void:
+	_combat_hand = value
+	folded = false
+	_idle_since = Time.get_ticks_msec()
+
+func _fold(value: bool) -> void:
+	if folded == value or collapsed or stowed: return
+	folded = value
+	_hovered = -1
+	_idle_since = Time.get_ticks_msec()
+	if not value:
+		for view in views: _entering[view] = true
+	_layout(true, false, not value)
+
+func _process(_delta: float) -> void:
+	if not _combat_hand or folded or collapsed or stowed or not _interaction_enabled: return
+	if _selected >= 0 or _drag_candidate != null or _hovered >= 0:
+		_idle_since = Time.get_ticks_msec()
+	elif Time.get_ticks_msec()-_idle_since >= idle_fold_seconds*1000.0:
+		_fold(true)
+
 func is_dragging() -> bool:
 	return _dragging
 
 func cancel_drag() -> void:
-	if _drag_candidate != null: _consume_release = true
+	if _drag_candidate != null:
+		_consume_release = true
+		_drag_candidate.release_press()
 	_drag_candidate = null
 	_dragging = false
 
@@ -130,14 +163,24 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT: cancel_drag()
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouse: _pointer = event.position
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			_consume_release = false
 			if not _interaction_enabled or collapsed or stowed or event.button_mask & MOUSE_BUTTON_MASK_RIGHT: return
 			var index := CardFanLayout.pick(views, event.position, 0, _hovered)
+			if index < 0:
+				if _selected < 0: _fold(true)
+				return
+			if folded:
+				_fold(false)
+				_consume_release = true
+				get_viewport().set_input_as_handled()
+				return
 			if index < 0 or views[index].disabled or views[index].mouse_filter == Control.MOUSE_FILTER_IGNORE: return
 			_drag_candidate = views[index]
 			_drag_start = event.position
+			_drag_candidate.press_at(event.position)
 			# Own the press before GUI, so dropping never also emits Button.pressed.
 			get_viewport().set_input_as_handled()
 		elif _drag_candidate != null or _consume_release:
@@ -158,10 +201,16 @@ func _input(event: InputEvent) -> void:
 			elif not _dragging and event.position.distance_to(_drag_start) >= drag_threshold:
 				_dragging = true
 				card_drag_started.emit(views.find(_drag_candidate))
+			if _dragging and _drag_candidate != null:
+				_drag_candidate.drag_to(event.position)
 			# Let pointer motion reach GUI so world previews can detect UI hover.
 			return
 		if _interaction_enabled and not collapsed and not stowed:
-			_set_hover(CardFanLayout.pick(views, event.position, 0, _hovered))
+			var index := CardFanLayout.pick(views, event.position, 0, _hovered)
+			if folded and index >= 0:
+				_fold(false)
+				return
+			_set_hover(index)
 
 func _set_hover(index: int) -> void:
 	if collapsed or stowed or not _entering.is_empty() or index == _hovered: return
@@ -177,7 +226,7 @@ func finish_animation() -> void:
 	for view in views: view.modulate.a = 1.0
 	_layout(false)
 
-func _layout(animate: bool, selection_changed := false) -> void:
+func _layout(animate: bool, selection_changed := false, reveal := false) -> void:
 	if _canvas == null or not is_inside_tree(): return
 	if _motion != null: _motion.kill()
 	_motion = null
@@ -193,35 +242,48 @@ func _layout(animate: bool, selection_changed := false) -> void:
 	var card_size := ShopConstants.CARD_SIZE
 	if not views.is_empty(): card_size = views[0].get_combined_minimum_size()
 	var scale_factor := CardFanLayout.CARD_SCALE
-	var available := maxf(card_size.x, (viewport.x-480)/scale_factor)
-	var step := CardFanLayout.step_for(card_size.x, views.size(), available)
-	var base := Vector2(16, viewport.y-card_size.y*scale_factor-24-CardFanLayout.drop_for(views.size(), step)*scale_factor)
+	var available := maxf(card_size.x, (viewport.x-84)/scale_factor)
+	var step := minf(card_size.x*0.79, CardFanLayout.step_for(card_size.x, views.size(), available))
+	var base := Vector2(40, viewport.y-card_size.y*scale_factor-22)
 	if collapsed: base.y = viewport.y-card_size.y*scale_factor-16
 	base.y += vertical_offset
 	if stowed: base.y = viewport.y+24
+	if folded: base = Vector2(17,viewport.y-56)
 	var duration := CardFanLayout.INSERT_TIME if not _entering.is_empty() else (selection_seconds if selection_changed else CardFanLayout.HOVER_TIME)
 	if animate:
 		_motion = create_tween().set_ignore_time_scale(true).set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	for i in views.size():
-		var target := base+CardFanLayout.offset(i, views.size(), step, -1, card_size)*scale_factor
-		var angle := CardFanLayout.angle(i, views.size(), -1)
-		if collapsed or stowed: target = base+Vector2(mini(i, 4)*5, -mini(i, 4)*3)*scale_factor
-		if collapsed or stowed: angle = 0.0
+		var target := base+Vector2(i*step,0)*scale_factor
+		var t := (2.0*i/(views.size()-1)-1.0) if views.size()>1 else 0.0
+		var angle := deg_to_rad(4.0*t)
+		target.y += 8.0*t*t
+		if _selected >= 0 and i != _selected:
+			target.x += signi(i-_selected)*minf(16,step*0.35)/absi(i-_selected)
+		var compact := collapsed or stowed or folded
+		if compact:
+			target = base+Vector2(mini(i, 4)*5, -mini(i, 4)*3)*scale_factor
+			angle = 0.0
 		views[i].pivot_offset = Vector2(card_size.x*0.5, card_size.y)
 		target += views[i].pivot_offset*(scale_factor-1)
 		var lift := selected_lift if i == _selected else (CardFanLayout.HOVER_LIFT if i == _hovered else 0.0)
-		if collapsed or stowed: lift = 0.0
+		if compact: lift = 0.0
 		target += Vector2.UP.rotated(angle)*lift*scale_factor
 		# New acquisitions enter on top of the folded hand and keep that order.
+		var focus := not compact and i == _hovered and not views[i].disabled
+		views[i].set_hand_focus(focus)
 		views[i].z_index = i
+		if not compact and i == _selected: views[i].z_index = views.size()
+		if focus: views[i].z_index = views.size()+1
+		if views[i] == _drag_candidate: views[i].z_index = views.size()+2
 		views[i].mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or stowed or _entering.has(views[i]) else Control.MOUSE_FILTER_STOP
 		if _fresh.erase(views[i]):
 			views[i].position = Vector2(target.x, viewport.y+16)
 			views[i].rotation = angle
 			views[i].scale = Vector2.ONE*scale_factor
 		if animate:
-			_motion.tween_property(views[i], "position", target, duration)
-			_motion.tween_property(views[i], "rotation", angle, duration)
+			var delay := minf(0.2,i*0.032) if reveal or _entering.has(views[i]) else 0.0
+			_motion.tween_property(views[i], "position", target, duration).set_delay(delay)
+			_motion.tween_property(views[i], "rotation", angle, duration).set_delay(delay)
 			_motion.tween_property(views[i], "scale", Vector2.ONE*scale_factor, duration)
 			_motion.tween_property(views[i], "hover_lift", lift, duration)
 			_motion.tween_property(views[i], "modulate:a", 1.0, duration)
@@ -234,9 +296,12 @@ func _layout(animate: bool, selection_changed := false) -> void:
 	if animate:
 		_motion.finished.connect(func():
 			_entering.clear()
-			for view in views: view.mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or stowed else Control.MOUSE_FILTER_STOP)
+			for view in views: view.mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or stowed else Control.MOUSE_FILTER_STOP
+			if reveal and _interaction_enabled and not folded:
+				_set_hover(CardFanLayout.pick(views, _pointer)))
 
 func show_selection(index: int, turns: int) -> void:
+	if index >= 0 and folded: _fold(false)
 	var changed := index != _selected
 	_selected = index
 	_turns = turns

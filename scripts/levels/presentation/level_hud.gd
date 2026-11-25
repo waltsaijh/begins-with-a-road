@@ -171,6 +171,11 @@ func _layout_status_row() -> void:
 		widths.append(38.0)
 	items.append($Header/Actions)
 	widths.append(72.0)
+	if _cards != null:
+		var entry: Button = _cards.get_node("Shop/View/Entry")
+		if entry.visible:
+			items.append(entry)
+			widths.append(32.0)
 	var remaining := gap*(items.size()-1)
 	for width in widths: remaining += width
 	timeline.manage_header_width(viewport_width-remaining-40.0)
@@ -351,7 +356,9 @@ func _input(event: InputEvent) -> void:
 			if event.pressed and not event.echo:
 				if shortcut == KEY_ESCAPE:
 					var units: Node = get_parent().get("unit_inspection")
-					if not pause_requested and is_instance_valid(units) and units.has_selection(): units.cancel_selection()
+					if not pause_requested and _cards != null and _cards._shop_open: _cards.get_node("Shop").close_shop()
+					elif not pause_requested and _cards != null and _cards.selected >= 0 and _cards.cards[_cards.selected].spell != null: _cards.select_card(-1)
+					elif not pause_requested and is_instance_valid(units) and units.has_selection(): units.cancel_selection()
 					else: set_paused(not pause_requested)
 				else: cycle_speed()
 			get_viewport().set_input_as_handled()

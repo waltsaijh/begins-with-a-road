@@ -14,7 +14,7 @@ construction.preset.pocket,Wide Pocket,大環繞
 card.name_format,{prefix} {tower},{prefix}{tower}
 card.unassigned,Unassigned card,未設定卡片
 troop.soldier.name,Soldier,士兵
-troop.quickfeet.name,Quickfeet,疾行兵
+troop.quickfeet.name,Hound,獵犬
 troop.heavy.name,Heavy,重裝兵
 ui.pause.resume,Resume game,繼續遊戲
 ui.menu.subtitle,A bridge above the clouds,開局一座橋
@@ -493,7 +493,7 @@ card.info.range.around,Surrounding area,周圍範圍
 card.info.range.guns,Ahead of each gun,各砲口前方
 card.info.range.garrison,Around road garrisons,道路駐點周圍
 enemy.story.soldier,"Frontline infantry, the backbone of the advancing force.",沿道路推進的前線步兵，是敵軍隊伍的中堅。
-enemy.story.quickfeet,A lightly equipped runner that slips through gaps in the defense.,輕裝斥候善於穿過防線空隙，迅速向終點推進。
+enemy.story.quickfeet,A lean hound that slips through gaps in the defense.,精瘦的獵犬穿過防線空隙，迅速向終點奔去。
 enemy.story.heavy,An armored warrior that advances slowly toward the goal.,沉重裝甲掩護著緩慢推進的戰士。
 enemy.story.rats,Small creatures that surge down the same road in packs.,成群奔竄的小型敵人，沿同一條道路湧向防線。
 enemy.story.rook,A shield bearer that draws fire away from nearby allies.,舉盾前行的守衛，以自身掩護周圍的隊伍。
@@ -501,6 +501,7 @@ enemy.story.bloodmage,A marching spellcaster that restores nearby wounded allies
 enemy.story.winged,A winged creature that follows the attack road from above.,盤旋於道路上方的飛獸，仍沿進攻路線接近終點。
 enemy.story.scout,A scout that takes advantage of newly completed roads.,尋找新通路的偵查兵，會利用最近接通的道路。
 enemy.story.bomber,A saboteur that briefly disables nearby defenses.,潛入火線的破壞者，會讓附近的防禦塔短暫失去作用。
+enemy.route.boss,Lands in a clearing beside a heavily defended road and follows that road to the base.,降落在密集防線旁的空地，接上道路後向基地推進。
 enemy.story.ravager,A siege beast whose arrival at the goal breaks the defense.,向終點緩慢逼近的攻城巨獸，足以撕開整條防線。
 enemy.story.generic,An enemy advancing along the road.,沿道路接近防線的敵軍。
 enemy.intelligence.bloodmage,Heals allies within 2.5 tiles for 18 every 3 seconds,每 3 秒治療 2.5 格內友軍 18 生命。
@@ -684,6 +685,14 @@ Place all three for +5 Gold per wave","1×1 永久地塊
 本批三張放完，每波 +5 Gold"
 event.ui.heading,Special Event,特殊事件
 event.ui.target,Choose a highlighted tower,請點選一座高亮的防禦塔
+event.ui.free,Free,免費
+event.ui.gold_cost,{amount} Gold,{amount} Gold
+event.ui.gold_reward,+{amount} Gold,+{amount} Gold
+event.ui.health_cost,−{amount} base HP,−{amount} 基地生命
+event.ui.tower_pause,Tower ceases fire,塔停止攻擊
+event.ui.tower_remove,Remove a tower,拆除一座塔
+event.ui.tower_downgrade,Tower loses one level,塔降低一級
+event.ui.rubble_risk,Unplaced rubble lowers damage,未放完碎石會降低傷害
 event.unavailable.gold,Not enough Gold,Gold 不足
 event.unavailable.health,The base must survive the 5 HP cost,支付 5 點後基地必須存活
 event.unavailable.tower,No eligible tower,沒有符合條件的防禦塔
@@ -697,3 +706,67 @@ ui.inspection.killed,Defeated,已擊殺
 ui.intelligence.title,Enemy intelligence,敵軍情報
 ui.relics.expand,Expand relics,展開遺物
 ui.relics.collapse,Collapse relics,收合遺物
+ui.shop.open,Open shop (or click the base),開啟商店（也可點擊基地）
+ui.shop.close,Close shop,關閉商店
+spell.shot.name,Shot,射擊
+spell.area_damage,"{damage} damage
+Radius {radius} tile(s)","範圍傷害 {damage}
+半徑 {radius} 格"
+spell.combat_only,Cast during combat on a road tile.,戰鬥中選擇道路格施放。
+spell.target_barracks,Select a barracks during combat.,戰鬥中點選兵營施放。
+spell.target_defense,Select a road tile or a tower during combat.,戰鬥中點選道路格或防禦塔施放。
+spell.target_pair,Select two different road tiles during combat.,戰鬥中依序點選兩個不同道路格。
+spell.base_upgrade,Base Lv.{level} · {count}/{need} towers,基地 Lv.{level} · 已部署 {count}/{need} 座塔
+spell.base_locked,Options locked when the tower threshold was reached. Choose one.,已依達標時的塔種鎖定選項。請選擇一項升級。
+spell.base_threshold,Options lock when you first reach {need} towers.,首次達到 {need} 座塔時，依當下塔種鎖定選項。
+spell.base_page,Base upgrades,基地升級
+spell.base_max,Base Lv.4,基地 Lv.4
+upgrade.heavy,Heavy Artillery,重火力防線
+upgrade.heavy.detail,2 mortar/crossfire | Replace Shot with Heavy Shell,迫擊砲＋交叉火力 ≥ 2｜每波以重砲取代射擊
+spell.cannon.name,Heavy Shell,重砲
+upgrade.wizard,Wizard Tower,巫師之塔
+upgrade.wizard.detail,5 tower types | Extra lightning and 1s stun,5 種塔｜每波加發閃電，癱瘓 1 秒
+spell.lightning.name,Lightning Strike,閃電打擊
+upgrade.marksman,Marksman Lodge,神射手之家
+upgrade.marksman.detail,4 ballistas/sentries | Two 90-damage Shots per wave,弩砲＋哨塔 ≥ 4｜每波 2 張射擊，各 90 傷害
+upgrade.station,Frontline Depot,前線兵站
+upgrade.station.detail,2 barracks | Extra Reinforcements each wave,兵營 ≥ 2｜每波加發援軍，召喚 2 名士兵
+spell.reinforce.name,Reinforcements,援軍
+upgrade.supply,Emergency Supply,緊急補給
+upgrade.supply.detail,Any build | Extra 60-damage Covering Fire,通用｜每波加發援護射擊，60 傷害
+spell.support.name,Covering Fire,援護射擊
+upgrade.mixed,Mixed Battery,交錯砲陣
+upgrade.mixed.detail,2 mortars and 2 crossfires | Extra delayed shell,迫擊砲及交叉火力各 ≥ 2｜加發延時砲擊
+spell.delayed.name,Delayed Shell,延時砲擊
+upgrade.flank,Flank Air Defense,側翼防空
+upgrade.flank.detail,2 broadsides + 2 sentries/ballistas | Extra all-target volley,舷炮 ≥ 2、哨塔＋弩砲 ≥ 2｜加發對空地齊射
+spell.volley.name,Volley,齊射
+upgrade.garrison,Garrison Relief,接力防守
+upgrade.garrison.detail,3 barracks | Extra Hold Fast for soldier shields,兵營 ≥ 3｜加發固守，守軍獲得護盾
+spell.fortify.name,Hold Fast,固守命令
+upgrade.united,Joint Command,聯合施法
+upgrade.united.detail,5 types with 3 pairs | Extra area slow,5 種塔、其中 3 種各 ≥ 2｜加發範圍減速
+spell.bind.name,Bind,束縛
+upgrade.response,Rapid Response,快速應變
+upgrade.response.detail,Any build | Extra Reinforcements each wave,通用｜每波加發援軍，召喚 2 名士兵
+upgrade.double,Twin Barrage,雙區轟擊
+upgrade.double.detail,6 mortar/crossfire with 2 each | One twin barrage,迫擊砲＋交叉火力 ≥ 6、各 ≥ 2｜一次雙區轟擊
+spell.double.name,Twin Barrage,雙區轟擊
+upgrade.rally,Battle Stations,全線備戰
+upgrade.rally.detail,6 types | One area cleanse and 4s immunity,6 種塔｜一次區域解癱，免疫 4 秒
+spell.rally.name,Battle Stations,全線備戰
+upgrade.snipe,Sharpshooter,定點狙擊
+upgrade.snipe.detail,7 sentries/ballistas with 2 each | One 400-damage snipe,哨塔＋弩砲 ≥ 7、各 ≥ 2｜一次單體 400 傷害
+spell.snipe.name,Snipe,定點狙擊
+upgrade.last,Last Stand,最後防線
+upgrade.last.detail,Any build | One 2s area stun,通用｜一次區域癱瘓 2 秒
+spell.last.name,Last Stand,最後防線
+spell.lightning.effect,70 damage · stun 1s,70 傷害 · 癱瘓 1 秒
+spell.reinforce.effect,Summon 2 soldiers until wave end,召喚 2 名士兵至波末
+spell.delayed.effect,160 damage after 0.8s,0.8 秒後造成 160 傷害
+spell.fortify.effect,Barracks soldiers: 30 shield for 6s,兵營守軍獲 30 護盾 6 秒
+spell.bind.effect,Slow by 30% for 3s,減速 30% 持續 3 秒
+spell.double.effect,Choose two areas · 220 damage each,指定兩區 · 各 220 傷害
+spell.rally.effect,Cleanse towers · immune for 4s,解除塔癱瘓 · 免疫 4 秒
+spell.snipe.effect,400 damage to nearest enemy,對最近敵人造成 400 傷害
+spell.last.effect,Stun enemies for 2s,癱瘓敵人 2 秒

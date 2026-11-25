@@ -203,7 +203,7 @@ func verify() -> void:
 	var second_panel: Control = hud.start_callouts[1].get_node("NextWaveIntel")
 	for action: Button in hud.start_callouts:
 		var intel: Control = action.get_node("NextWaveIntel")
-		check(intel.position.y >= action.get_node("Title").get_rect().end.y, "Troop row overlaps the start title after export: intel=%s title=%s" % [intel.get_rect(),action.get_node("Title").get_rect()])
+		check(not intel.get_rect().intersects(Rect2(Vector2.ZERO,action.size)) and intel.position.y < action.size.y, "Troop row overlaps the start title after export: intel=%s title=%s" % [intel.get_rect(),action.get_node("Title").get_rect()])
 		check(action.get_node("Title").pivot_offset.is_equal_approx(action.get_node("Title").size*0.5) and is_zero_approx(action.rotation),"Start label is not centered above its icons")
 	check(panel.counts[soldier] == 10 and panel.counts.size() == 2, "First entrance shows global rather than allocated counts")
 	check(second_panel.counts[soldier] == 6 and second_panel.counts.size() == 2, "Second entrance troop counts incorrect")

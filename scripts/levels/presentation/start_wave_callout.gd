@@ -36,6 +36,14 @@ func _input(event: InputEvent) -> void:
 		_pointer_position = event.position
 		_pointer_known = true
 
+func _has_point(point: Vector2) -> bool:
+	if Rect2(Vector2.ZERO,size).has_point(point): return true
+	return is_node_ready() and _hovered and $Popup.visible and $Popup.get_rect().has_point(point)
+
+func start_from_list() -> void:
+	if _hovered and _intel_available and is_visible_in_tree() and not disabled and not get_tree().paused:
+		pressed.emit()
+
 func clear_hover() -> void:
 	if Engine.is_editor_hint(): return
 	_animate_hover(false)
@@ -65,12 +73,16 @@ func set_intel_size(value: Vector2) -> void:
 func _layout_popup() -> void:
 	if not is_node_ready(): return
 	var extent := _intel_size+Vector2(20,16)
-	var at := Vector2((size.x-extent.x)*0.5,size.y+4)
+	var at := Vector2((size.x-extent.x)*0.5,-extent.y-4)
 	# Include the gap in the hover rectangle; keep the list inside the viewport.
 	var area := get_viewport_rect().grow(-8)
 	var global_at := get_global_transform_with_canvas()*at
 	global_at.x = clampf(global_at.x,area.position.x,maxf(area.position.x,area.end.x-extent.x))
-	if global_at.y+extent.y > area.end.y: global_at.y = get_global_rect().position.y-extent.y-4
+	if global_at.y < area.position.y:
+		var marker := get_global_rect()
+		var side := marker.end.x+4 if marker.end.x+4+extent.x <= area.end.x else marker.position.x-extent.x-4
+		global_at.x = clampf(side,area.position.x,maxf(area.position.x,area.end.x-extent.x))
+		global_at.y = area.position.y
 	at = get_global_transform_with_canvas().affine_inverse()*global_at
 	$Popup.position = at
 	$Popup.size = extent
@@ -97,7 +109,7 @@ func _animate_hover(hovered: bool) -> void:
 func _update_visuals() -> void:
 	if not is_node_ready(): return
 	$Title.visible = _intel_available or Engine.is_editor_hint()
-	$Shape.visible = $Title.visible
+	$Diamond.visible = $Title.visible
 	$Title.modulate = Color.WHITE.lerp(Color(0.45,0.62,0.62),hover_amount)
 	var reveal := hover_amount > 0.001 and _intel_available and not disabled and not get_tree().paused
 	$Popup.visible = reveal

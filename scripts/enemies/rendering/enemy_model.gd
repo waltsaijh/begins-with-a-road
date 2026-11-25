@@ -13,12 +13,18 @@ var adjustment := Transform3D.IDENTITY
 var imported_transform := Transform3D.IDENTITY
 var head := Vector3(0, DefaultMesh.get_aabb().end.y+EnemyStatusConstants.HEAD_MARGIN, 0)
 var animation_speed := 1.0
+var minimum_clip_blend := 0.0
+var action: RefCounted
 
-func _init(profile: Troop, parent: Node3D) -> void:
+func _init(profile: Troop, parent: Node3D, initial_phase := 0.0) -> void:
+	clip_phase = initial_phase
 	gpu_model = gpu_for(profile)
 	if profile == null: return
 	adjustment = Transform3D(Basis.from_euler(profile.model_rotation_degrees*PI/180.0).scaled(profile.model_scale), profile.model_offset)
+	if profile.troop_name == "rats":
+		adjustment.basis = adjustment.basis.scaled(Vector3.ONE * (1.0 + .09*sin(initial_phase)))
 	animation_speed = profile.animation_speed
+	if profile.flight_height > 0.0: minimum_clip_blend = 0.4
 	batched = gpu_model != null
 	if batched:
 		imported_transform = gpu_model.root_transform
@@ -48,6 +54,9 @@ func _init(profile: Troop, parent: Node3D) -> void:
 				animation.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 				animation.play(selected)
 				animation.advance(0)
+				var clip := animation.get_animation(selected)
+				if clip.loop_mode != Animation.LOOP_NONE:
+					animation.seek(clip.length * initial_phase / TAU, true)
 				break
 	if profile.head_height > 0: head.y = profile.head_height+EnemyStatusConstants.HEAD_MARGIN
 
@@ -68,15 +77,16 @@ func _model_height() -> float:
 	return height
 
 func advance(delta: float, walk_blend: float) -> void:
+	var clip_blend := maxf(walk_blend, minimum_clip_blend)
 	if gpu_model != null and gpu_model.clip_length > 0:
 		# The authored clips are time-driven and freeze at their current pose
 		# when stationary; Soldier retains its distance-driven pose state.
-		clip_phase = fposmod(clip_phase+maxf(0.0,delta)*animation_speed*walk_blend*TAU/gpu_model.clip_length,TAU)
+		clip_phase = fposmod(clip_phase+maxf(0.0,delta)*animation_speed*clip_blend*TAU/gpu_model.clip_length,TAU)
 	if is_instance_valid(instance) and instance.has_method("advance_motion"): instance.advance_motion(maxf(0,delta),walk_blend)
-	if animation != null and walk_blend > 0:
+	if animation != null and clip_blend > 0:
 		# Imported clips need not be marked looping in their import settings.
 		if not animation.is_playing(): animation.play(animation.assigned_animation)
-		animation.advance(maxf(0.0, delta)*animation_speed*walk_blend)
+		animation.advance(maxf(0.0, delta)*animation_speed*clip_blend)
 
 func custom_data(pose: RefCounted) -> Color:
 	return Color(clip_phase,1,0,0) if gpu_model != null and gpu_model.clip_length > 0 else Color(pose.walk_phase,pose.walk_blend,0,0)
@@ -87,6 +97,7 @@ func transform_for(display: Transform3D) -> Transform3D:
 	return result
 
 func dispose() -> void:
+	if action != null: action.dispose()
 	if is_instance_valid(instance):
 		instance.hide()
 		instance.queue_free()

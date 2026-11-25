@@ -24,8 +24,8 @@ func verify():
 		counts.append({"id":id,"surfaces":mesh.get_surface_count()})
 	for path in ["sentry_base","sentry_weapon"]:
 		check(load("res://assets/models/towers/"+path+"_mesh.res").surface_get_material(0)==Baker.MATERIAL,"Tower does not use shared material")
-	for id in ["soldier","quickfeet","heavy"]:
-		var gpu = preload("res://scripts/enemies/rendering/enemy_model.gd").gpu_for(TroopCatalog.find(id))
+	for id in ["grunt","runner","brute"]:
+		var gpu: EnemyGpuModel = load("res://assets/models/enemies/"+id+"_gpu.tres")
 		check(gpu.material()==Baker.MATERIAL and gpu.mesh.surface_get_material(0)==Baker.MATERIAL,"Enemy material is not shared")
 		check(Baker.gait(gpu.mesh,gpu)==gpu.mesh,"Unchanged gait was needlessly repacked")
 		var arrays: Array = gpu.mesh.surface_get_arrays(0)

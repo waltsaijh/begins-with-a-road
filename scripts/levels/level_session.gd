@@ -86,11 +86,13 @@ func _enter_tree() -> void:
 		var marker := _install_endpoint(source, layout.starts[i], marker_name, map)
 		paths.append(NodePath("../"+str(marker.name)))
 	_install_endpoint(source, layout.goal, "Goal", map)
+	get_node("TileVisuals").opening_drop = true
 	source.free()
 	get_node("PortalMap").start_paths = paths
 	for act in level.acts:
 		_waves.append_array(act.waves)
 	_valid = true
+	get_node("CardPlacement").commander_enabled = true
 	if level.opening_shop or level.starting_gold > 0: get_node("CardPlacement/Shop").initial_coins = level.starting_gold
 
 func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, map: GridMap) -> Node3D:
@@ -257,6 +259,7 @@ func _begin_wave_start() -> void:
 	set_process(true)
 
 func _on_wave_started() -> void:
+	get_node("CardPlacement").deal_commander_spells(current_wave)
 	GameAudio.begin_wave()
 	_wave_starting = false
 	if _wave.controls != null: _wave.controls.start_pending = false

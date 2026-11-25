@@ -38,7 +38,7 @@ func verify() -> void:
 	batch.set_process(false)
 	batch.status_overlay.hide()
 	var results := []
-	for id in ["quickfeet","heavy"]:
+	for id in ["soldier","rook","scout","bomber","bloodmage","winged","rats","quickfeet","heavy"]:
 		var profile := TroopCatalog.find(id)
 		var center := Vector3(0,profile.gpu_model.rest_height*0.5,0)
 		camera.size = maxf(0.7,profile.gpu_model.rest_height*1.6)
@@ -55,6 +55,8 @@ func verify() -> void:
 		enemy.follow(0,{},PackedVector3Array([Vector3.ZERO,Vector3.FORWARD]))
 		enemy.set_process(false)
 		batch.add_enemy(enemy)
+		# add_enemy enables processing. Freeze the requested pose during both captures.
+		batch.set_process(false)
 		var appearance: RefCounted = batch._appearances[0]
 		var view: MultiMeshInstance3D = appearance.batch.view
 		for fraction in [0.0,0.173,0.647]:

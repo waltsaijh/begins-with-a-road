@@ -2,6 +2,8 @@
 extends CardButton
 ## Scene-authored artwork, layout and tile recipe cells.
 enum Presentation { HAND, SHOP }
+const DeploymentBackground = preload("res://assets/sprites/cards/deployment_background.svg")
+const DeploymentFrame = preload("res://assets/sprites/cards/deployment_frame.svg")
 @export var presentation: Presentation = Presentation.HAND:
 	set(value):
 		presentation = value
@@ -60,13 +62,52 @@ enum Presentation { HAND, SHOP }
 		icon_darkening = value
 		_refresh()
 var hovered := false
+var hand_focus := false
+var held_down := false
+var following := false
+var _pointer := Vector2.ZERO
+var _grab := Vector2.ZERO
+var _tilt := 0.0
+var _zoom := 1.0
+var _return: Tween
+
+func set_hand_focus(value: bool) -> void:
+	if hand_focus == value: return
+	hand_focus = value
+	_refresh()
+
+func press_at(point: Vector2) -> void:
+	if _return != null: _return.kill()
+	held_down = true
+	_zoom = 0.95
+	$Visuals.scale = Vector2.ONE*_zoom
+	_pointer = point
+	_grab = get_global_transform_with_canvas().affine_inverse() * point - $Visuals.position
+	_refresh()
+
+func drag_to(point: Vector2) -> void:
+	following = true
+	_pointer = point
+	set_process(true)
+
+func release_press() -> void:
+	held_down = false
+	following = false
+	if _return != null: _return.kill()
+	_return = create_tween().set_ignore_time_scale(true)
+	_return.tween_property($Visuals,"position",Vector2.ZERO,0.46).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	_refresh()
+var phase_enabled := true:
+	set(value):
+		phase_enabled = value
+		_refresh()
 @export var show_shortcut := true:
 	set(value):
 		show_shortcut = value
 		_refresh()
 var _tower: Resource
 @export_group("Selection Motion")
-@export_range(0.0, 2.0, 0.05) var selected_sway_degrees := 0.6
+@export_range(0.0, 2.0, 0.05) var selected_sway_degrees := 0.15
 @export_range(1.0, 8.0, 0.1) var selected_sway_period := 3.6
 @export_range(0.05, 0.6, 0.01) var selected_sway_blend_seconds := 0.22
 var _sway_phase := 0.0
@@ -90,14 +131,26 @@ func _process(_delta: float) -> void:
 		set_process(false)
 		return
 	var now := Time.get_ticks_usec()
-	var real_delta := (now-_sway_last_usec)/1000000.0
+	var real_delta := minf(0.08,(now-_sway_last_usec)/1000000.0)
 	_sway_last_usec = now
 	_sway_amount = move_toward(_sway_amount, 1.0 if selected else 0.0, real_delta/maxf(0.01, selected_sway_blend_seconds))
 	_sway_phase = fmod(_sway_phase+TAU*real_delta/maxf(0.1, selected_sway_period), TAU)
 	# Artwork moves inside a stable button, independent of fan/lift tweens.
 	visuals.pivot_offset = Vector2(size.x*0.5, size.y)
-	visuals.rotation_degrees = sin(_sway_phase)*selected_sway_degrees*_sway_amount
-	if not selected and is_zero_approx(_sway_amount):
+	var target_tilt := 0.0
+	if following:
+		var target := get_global_transform_with_canvas().affine_inverse()*_pointer - _grab
+		target_tilt = clampf((target.x-visuals.position.x)*0.12,-13,13)
+		visuals.position = visuals.position.lerp(target,1.0-exp(-23.0*real_delta))
+	_tilt = lerpf(_tilt,target_tilt,1.0-exp(-18.0*real_delta))
+	visuals.rotation_degrees = _tilt + sin(_sway_phase)*selected_sway_degrees*_sway_amount
+	var target_zoom := 1.08 if hand_focus else 1.0
+	if held_down: target_zoom = 1.12 if following else 0.95
+	_zoom = lerpf(_zoom,target_zoom,1.0-exp(-28.0*real_delta))
+	visuals.scale = Vector2.ONE*(_zoom+0.014*_sway_amount*sin(_sway_phase*2))
+	if not selected and not held_down and is_zero_approx(_sway_amount) and absf(_tilt)<0.01 and absf(_zoom-target_zoom)<0.001:
+		_zoom = target_zoom
+		visuals.scale = Vector2.ONE*_zoom
 		visuals.rotation = 0.0
 		_sway_phase = 0.0
 		set_process(false)
@@ -151,7 +204,7 @@ func _refresh() -> void:
 	var gold := price.get_node_or_null("Gold") as TextureRect
 	var number := price.get_node_or_null("Number") as Label
 	if gold == null or number == null: return
-	var animate := not Engine.is_editor_hint() and visuals != null and (selected or _sway_amount > 0.0)
+	var animate := not Engine.is_editor_hint() and visuals != null and (selected or _sway_amount > 0.0 or held_down or hand_focus or absf(_zoom-1.0)>0.0001 or absf(_tilt)>0.001)
 	if animate and not is_processing(): _sway_last_usec = Time.get_ticks_usec()
 	set_process(animate)
 	var definition := card.visual_definition() if card != null else null
@@ -162,18 +215,27 @@ func _refresh() -> void:
 		if _tower != null:
 			_tower.changed.connect(_refresh)
 	var accent: Color = _tower.accent_color if _tower != null else Color.WHITE
-	background.texture = card.background_texture if card != null and card.background_texture != null else default_background
-	frame.texture = card.frame_texture if card != null and card.frame_texture != null else default_frame
-	frame.self_modulate = accent.lightened(0.15) if hovered else accent
+	var shop := presentation == Presentation.SHOP
+	background.texture = card.background_texture if card != null and card.background_texture != null else (default_background if shop else DeploymentBackground)
+	frame.texture = card.frame_texture if card != null and card.frame_texture != null else (default_frame if shop else DeploymentFrame)
+	var outline := accent if shop else accent.lerp(Color("8e9b95"),0.55)
+	var highlighted := hovered if shop else hand_focus
+	frame.self_modulate = outline.lightened(0.22) if highlighted else outline
+	if not shop: frame.self_modulate.a = 1.0 if highlighted else 0.48
 	selection.texture = frame.texture
 	selection.self_modulate = accent.lightened(0.3)
 	selection.visible = selected
 	icon.texture = _tower.icon if _tower != null and _tower.icon != null else default_icon
 	icon.self_modulate = accent.darkened(icon_darkening)
-	divider.color = accent
+	divider.color = accent if shop else Color(accent.lerp(Color("aeb8b2"),0.65),0.45)
 	shortcut.text = str(key_number)
-	var shop := presentation == Presentation.SHOP
-	shortcut.visible = not shop and show_shortcut
+	var stack := not shop and card != null and card.spell != null
+	var count: Label = $Visuals/Content/Layout/Header/StackCount
+	count.visible = stack
+	if stack: count.text = "×%d" % card.quantity
+	$Visuals/SpellShortcut.visible = stack and show_shortcut
+	$Visuals/SpellShortcut.text = str(key_number)
+	shortcut.visible = not shop and show_shortcut and not stack
 	var prefix := card.localized_prefix() if card != null and not shop else ""
 	var tower_name: String = _tower.localized_name() if _tower != null else tr("card.unassigned")
 	title.show_name_parts(prefix, tower_name, TranslationServer.get_locale().get_slice("_", 0) == "en", shop)
@@ -183,4 +245,12 @@ func _refresh() -> void:
 	number.add_theme_color_override("font_color", Color("244c52") if can_afford else Color("c44738"))
 	tooltip_text = tr("event.card.%s.description" % card.special.id) if card != null and card.special != null else ""
 	diagram.show_recipe(card, turns, accent)
-	disabled = card == null or (shop and not can_afford)
+	if card != null and card.spell != null:
+		match card.spell.kind:
+			&"fortify": tooltip_text = tr("spell.target_barracks")
+			&"rally": tooltip_text = tr("spell.target_defense")
+			&"double": tooltip_text = tr("spell.target_pair")
+			_: tooltip_text = tr("spell.combat_only")
+	disabled = card == null or not phase_enabled or (shop and not can_afford)
+	if not shop and visuals != null:
+		visuals.modulate = Color.WHITE if phase_enabled else Color(0.72, 0.72, 0.72, 0.65)

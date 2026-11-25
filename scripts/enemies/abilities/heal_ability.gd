@@ -7,11 +7,15 @@ extends EnemyAbility
 @export_range(0.1, 20.0, 0.1, "or_greater") var interval := 3.0
 @export_range(0.0, 10.0, 0.1, "or_greater") var radius := 2.5
 var clock := 0.0
+@export_range(0.0, 2.0, 0.01) var cast_seconds := 0.0
+var cast_remaining := 0.0
 
 func start() -> void:
 	clock = interval
+	cast_remaining = 0.0
 
 func update(host: Node, delta: float) -> void:
+	cast_remaining = maxf(0.0, cast_remaining-delta)
 	if amount <= 0: return
 	clock -= delta
 	if clock > 0: return
@@ -21,8 +25,15 @@ func update(host: Node, delta: float) -> void:
 	for ally in host.enemies_near(enemy.global_position, radius):
 		restored += ally.heal(amount)
 	if restored > 0:
+		cast_remaining = cast_seconds
 		host.heals += 1
 		host.visual(enemy).heal_pulse()
+
+func movement_hold_remaining() -> float:
+	return cast_remaining
+
+func stop() -> void:
+	cast_remaining = 0.0
 
 func describe(english: bool) -> String:
 	return (GameText.text("text.heal_ability.1",{},english)) % ([str(snappedf(interval,0.01)),str(snappedf(amount,0.01)),str(snappedf(radius,0.01))] if english else [str(snappedf(interval,0.01)),str(snappedf(radius,0.01)),str(snappedf(amount,0.01))])
