@@ -21,7 +21,7 @@ func context_key(renderer: Node3D) -> String:
 		if light is DirectionalLight3D: key += ":"+str(light.directional_shadow_mode)+":"+str(light.directional_shadow_blend_splits)
 		lights.append(key)
 	lights.sort()
-	return str(viewport.get_instance_id())+":"+str(viewport.msaa_3d)+":"+Signatures.resource_key(environment)+":"+str(lights)
+	return str(viewport.get_instance_id())+":"+str(viewport.msaa_3d)+":"+Signatures.environment_key(environment)+":"+str(lights)
 
 func representatives(profiles: Array[Troop], renderer: Node3D) -> Array[Troop]:
 	var known: Dictionary = _prepared.get(context_key(renderer), {}).duplicate()
