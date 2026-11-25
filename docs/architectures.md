@@ -130,7 +130,7 @@ scripts/
 | `combat/rendering/` | 把已存在的飛行／命中資料轉成軌跡、箭矢、AOE 與死亡爆散，管理特效回收及動畫 |
 | `enemies/rendering/` | 把邏輯位置轉成模型姿態、GPU 步態、側向避讓與各網格獨立的 MultiMesh instance 資料；離線 GPU 模型 Resource 保存網格與步態參數，共用同一 shader。外部模型在此管理骨架／動畫及顯示轉換 |
 | `enemies/presentation/` | 依 renderer 提供的頭頂世界座標投影護盾、技能與效果圖示；管理共用圖集、可重用 instance buffer 與單一 2D MultiMesh 提交。另提供獨立場景的開波按鈕。螢幕投影與 3D 模型渲染各自維護 |
-| `camera/`、`environment/` | 分別管理平移／縮放／環形拖曳旋轉／鏡頭邊界，以及雲海材質和範圍；維持獨立的小型功能目錄 |
+| `camera/`、`environment/` | 分別管理平移／縮放／環形拖曳旋轉／鏡頭邊界，以及雲海材質和範圍、關卡時段光源／環境光／雲色預設（TimeOfDayPreset）；維持獨立的小型功能目錄 |
 
 `presentation/` 集中螢幕介面與玩家操作回饋；`rendering/` 集中模型、幾何、姿態與世界特效。敵人的狀態顯示會讀取模型層提供的避讓後座標，因此兩者透過顯示資料協作。
 

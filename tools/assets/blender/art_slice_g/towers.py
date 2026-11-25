@@ -8,7 +8,7 @@ Blender axes: Z up, +Y = front / firing direction. Footprints match Art Slice D.
 import math
 from style import (Model, PALETTE, box, cprism, cyl_x, cyl_y, cyl_z, cone_z, ico, move, rot_z, rot_x, rot_y,
                    merge, prism_xz, prism_yz, rect, octagon, ngon, arch, beam, voussoirs, pyramid,
-                   wall_ring, wall_rect, side_frame, moss, pennant, world, apply, T8)
+                   wall_ring, wall_rect, ring_prism, side_frame, moss, pennant, world, apply, T8)
 
 R90 = math.pi / 2
 
@@ -202,11 +202,10 @@ def mortar():
     arched_door(m, bed, 'Door', theta, .855, .135, .08, .32)
     for i in (1, 5, 7):
         slit(m, bed, f'Slit{i}', i * math.pi / 4, .86, .32)
-    sc = 2 * .92 * T8
+    # one mitred coping ring (was eight straight beams crossing at the corners)
+    m.mesh('Cornice', ring_prism(octagon(.92), octagon(.76), .56, .64, .02), 'stone_light', bed)
     for i in range(8):
         th = i * math.pi / 4
-        loc, rot = side_frame(th, .84, .60)
-        m.mesh(f'Cornice{i}', box(sc, .16, .08, .02), 'stone_light', bed, loc, rot)
         h = .16 + m.rng.uniform(-.01, .02)
         loc, rot = side_frame(th, .855, .64 + h / 2)
         m.mesh(f'Merlon{i}', box(.27, .14, h, .022), 'stone_light' if i % 3 else 'stone_mid', bed, loc,
@@ -265,10 +264,7 @@ def crossfire():
     m.mesh('Core', cprism(octagon(.62), .08, .36), 'grout', base)
     wall_ring(m, base, 'Wall', .62, 8, [(.08, .22), (.22, .36)], openings={2: (.12, .36)}, phase=0)
     arched_door(m, base, 'Door', R90, .68, .09, .08, .20)
-    for i in range(8):
-        th = i * math.pi / 4
-        loc, rot = side_frame(th, .655, .39)
-        m.mesh(f'Cornice{i}', box(2 * .74 * T8, .17, .06, .018), 'stone_light', base, loc, rot)
+    m.mesh('Cornice', ring_prism(octagon(.74), octagon(.57), .36, .42, .018), 'stone_light', base)
     for i in (1, 3, 5, 7):
         a = i * math.pi / 4
         m.mesh(f'Buttress{i}', box(.16, .22, .26, .02), 'stone_mid', base, (.80 * math.cos(a), .80 * math.sin(a), .21),
@@ -352,13 +348,16 @@ def ballista():
     m.mesh('Sled', box(.13, .14, .06, .012, (0, ny - .08, .69)), 'wood_light', slider)
     m.mesh('Claw', box(.07, .05, .05, .008, (0, ny - .015, .72)), 'iron', slider)
     m.empty('Nock', slider, (nx, ny, nz))
-    # bow strings: unit-length bars along +Y, scaled/rotated to run from tip to nock
+    # bow strings: StringAim sits on the limb tip and turns toward the nock; its
+    # child BowString is a unit bar along +Y that is only stretched along its own
+    # axis. Keeping rotation and non-uniform scale on separate nodes stops the
+    # animation mixer from applying the stretch on the wrong axis.
     for sgn in (-1, 1):
         tip = (sgn * (px + tx), py + ty, pz)
         d = (nx - tip[0], ny - tip[1])
         L = math.hypot(*d)
-        m.mesh(f'BowString{sgn}', box(.014, 1.0, .014, 0, (0, .5, 0)), 'rope', mount, tip,
-               (0, 0, math.atan2(-d[0], d[1])), (1, L, 1))
+        aim = m.empty(f'StringAim{sgn}', mount, tip, (0, 0, math.atan2(-d[0], d[1])))
+        m.mesh(f'BowString{sgn}', box(.014, 1.0, .014, 0, (0, .5, 0)), 'rope', aim, (0, 0, 0), (0, 0, 0), (1, L, 1))
     bolt = m.empty('BoltCarrier', mount)
     m.mesh('BoltShaft', cyl_y(.022, ny - .02, .40, 6), 'wood_light', bolt, (0, 0, .725))
     m.mesh('BoltHead', cone_z(.045, 0, 0, .085, 4), 'iron', bolt, (0, .40, .725), (-R90, 0, 0))

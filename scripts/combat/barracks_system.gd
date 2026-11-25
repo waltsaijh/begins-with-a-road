@@ -14,7 +14,9 @@ func _ready() -> void:
 	process_priority = 45
 	map = combat.map
 func cell(point: Vector3) -> Vector2i: return combat._index.cell_for(point)
-func world(at: Vector2i) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y)))
+## Standing point on a road cell: same ground offset as enemies, so friendly
+## soldiers stand on the road pavers instead of sinking into them.
+func world(at: Vector2i) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*EnemyConstants.GROUND_OFFSET)
 func distance(a: Vector3,b: Vector3) -> float:
 	var d := map.to_local(a)-map.to_local(b)
 	return Vector2(d.x/map.cell_size.x,d.z/map.cell_size.z).length()

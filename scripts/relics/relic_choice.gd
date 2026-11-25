@@ -2,6 +2,8 @@ extends CanvasLayer
 signal selected(relic: RelicDefinition)
 const Card = preload("res://scenes/relics/components/relic_card.tscn")
 const IconMask = preload("res://assets/shaders/ui_icon_mask.gdshader")
+## Held-relic stack count text; HudTextPalette switches it for night skies.
+var count_color := Color("244c52")
 var relics: RunRelics
 var offers: Array[RelicDefinition] = []
 var choosing := false
@@ -183,7 +185,7 @@ func _refresh_collection() -> void:
 			count.text = "×%d" % relics.held[id]
 			count.position = Vector2(18,20)
 			count.add_theme_font_size_override("font_size",12)
-			count.add_theme_color_override("font_color",Color("244c52"))
+			count.add_theme_color_override("font_color",count_color)
 			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			button.add_child(count)
 		button.pressed.connect(open_collection.bind(relic))

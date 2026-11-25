@@ -93,6 +93,7 @@ func _enter_tree() -> void:
 		_waves.append_array(act.waves)
 	_valid = true
 	get_node("CardPlacement").commander_enabled = true
+	TimeOfDayPreset.claim(self, level.time_of_day, get_node_or_null("Sun") as DirectionalLight3D, get_node_or_null("WorldEnvironment") as WorldEnvironment)
 	if level.opening_shop or level.starting_gold > 0: get_node("CardPlacement/Shop").initial_coins = level.starting_gold
 
 func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, map: GridMap) -> Node3D:
@@ -130,6 +131,7 @@ func _ready() -> void:
 	enemy_intelligence.setup(self)
 	timeline = get_node("LevelHUD/Header/WaveTimeline")
 	timeline.configure(level)
+	if level.time_of_day != null and level.time_of_day.hud_light_text: HudTextPalette.apply_light(self)
 	var shop: Node = get_node("CardPlacement/Shop")
 	_balance = get_node("LevelHUD/Header/Balance/Amount")
 	shop.balance_changed.connect(_on_balance_changed)
@@ -445,5 +447,7 @@ func _end_run(won: bool) -> void:
 
 func _exit_tree() -> void:
 	GameAudio.play_default()
+	# Cloud colours are project globals; menus and map previews keep the defaults.
+	TimeOfDayPreset.release(self)
 	if _owns_balance_trace and BalanceTrace.enabled:
 		BalanceTrace.end({"gold":get_node("CardPlacement/Shop").coins,"total_killed":total_kills,"outcome":"interrupted","completed_waves":current_wave})

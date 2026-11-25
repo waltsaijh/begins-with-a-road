@@ -1,5 +1,7 @@
 # Agent 工作共識
 
+- 2026-11-25 整合 origin/main 的固定時段光源、色階著色與場景美術。Frontier 使用黃昏光源並保留基地東側入口限制。夜間 HUD 配色支援現行可收合遺物列與敵情圖示。已用 headless 驗證時段、材質資料、平衡流程、指揮官法術、首領登場與特殊事件；實際 GPU 畫面尚待核對。
+
 - 爆破手投擲時，目標塔一旦離開場景樹或已排入刪除，立即停止顯示投擲動作，技能依既有取消規則重算冷卻。金幣按筆入帳並通知 HUD，商店關閉期間只記錄餘額與刷新價，開店時同步購買狀態。
 
 - 首領從可達基地且防線密集的道路延伸段登場。單格接道與 3×3 空地只在該波顯示，邊角可重疊，地面震動、碎屑與首領落地同步。開場地塊由基地向外依序落下，新放置地塊亦錯開落下並輕彈；非法放塔時預覽塔身泛紅、短暫晃動。
@@ -31,6 +33,26 @@
 - 2026-11-18 本次 Git 授權：使用者要求「更新git」，授權提交本聊天的 Special Events V1、九事件／五種特殊卡、時間軸圖示、中英文本、相關測試與文件；本次不 push。開始 HEAD=852bd5b、branch=experiment/routing-sandbox，工作目錄乾淨，已存在先前完成的 origin/main 快進。上述事件變更位於當日合併前的最新 stash 3ca45e0，本次以 apply 恢復，沒有衝突；三份 stash 全數保留，不操作其他 worktree、不再合併其他分支。恢復後 Windows Godot 4.7.2 事件回歸284 checks／failures=[]，import exit0；保留既有退出清理警告。先前未commit註記為實作快照，本次依授權提交；build／bin／.godot／匯出與日誌仍不提交。
 
 - 2026-11-17 Special Events V1：正式 LevelSession 每完成五波、且還有下一波時抽一次九事件二選一；15 波於 5／10 觸發、15 直接勝利。順序為在途攻擊收尾→ACT 遺物→新增入口→特殊事件→準備，過程共用鎖並防連點。事件及五張特殊牌資料在 assets/data/events/，Level 可指定 catalog；event.* 中英文本納入遊戲文本編輯器。沿用 BuildCard／手牌／TowerMap 驗證、預覽、旋轉、動畫及音效，特殊牌不進商店；特殊地塊占格獨立但與塔合併阻路。藥劑只於該次升級忽略上限；徵兵停火下一波、波後恢復。增援只加入下一波 WaveDefinition 複本、每入口分別追加 fixed_start 群組，仍由原排程／分流處理；原路線算法未改。新路先搜尋驗證相對獨立支線，再用原 ConstructionLayout 提交。寶石／碎石按同批卡牌實際放置達標，集中刷新塔與友軍真實傷害，小寶石走正常清波 reward。未指定的增援預設鼠群12、飛翼獸6、重裝兵5，皆從入口1、可編輯。說明與所有預設見 docs/special_events.md；人工入口 tests/events/playground.tscn。本輪不 commit／push。
+
+- 2026-11-24 本次 Git 授權：使用者要求「commit」，指定從 main（852bd5b）開新分支 feat/life-quality-changes 提交本聊天累積的時段光源／雲色／環境光／夜晚淡色 HUD、遠方島嶼閃爍修正、色塊式明暗、路面石英色與橋頭、塔模型接縫、弩砲弓弦及相關資源／測試／文件；未追蹤的 scenes/maps/splitline.tscn 依使用者要求捨棄。不 push；.claude/、tests/_tmp/ 為本機檔不提交。下方「本輪未 commit／push」為授權前快照。
+
+- 2026-11-24 時段雲色與環境光（天氣效果第二步）：TimeOfDayPreset 增加 background_color／ambient_color／ambient_energy 與 cloud_low／cloud_high，沿用 Art Slice G 的 project shader globals cloud_low／cloud_high（雲海、柱底、遠方島嶼霧化共用 cloud_color），不改 shader、不新增材質組合。LevelSession 以 TimeOfDayPreset.claim() 套用並複製 Environment（不改寫共用 level_environment.tres），_exit_tree 以 release() 還原雲色為 Project Settings 預設，只有最後 claim 的關卡可還原；主選單與選圖預覽維持預設。DisplayWarmup 改用 environment_key()，忽略 background_color／ambient_light_color／ambient_light_energy。noon 必須等於 project 預設與 level_environment.tres。頂列 HUD 對比：使用者要求移除頂列白色漸層，改為黑夜時把文字換成淡色；TimeOfDayPreset.hud_light_text（只有 night 為 true）時 LevelSession 呼叫 HudTextPalette.apply_light()，只加顏色覆寫（時間軸 set_palette、金幣、防線、倍速／暫停圖示、Boss、遺物數量 count_color、新敵人通知），防線 integrity.svg 用大於 1 的圖示倍率；不加底色、不換主題，暫停選單／手牌／對話框維持原配色。dusk 配色依使用者要求改為橙紅為主（雲 (0.86,0.46,0.34)→(1,0.78,0.56)、光 (1,0.55,0.32)、環境光 (0.78,0.52,0.42)），不帶紫色。morning 依使用者要求改為杏色帶一點藍（雲隙淡藍 (0.74,0.76,0.88)→雲頂杏色 (1,0.9,0.8)、光 (1,0.86,0.72)、環境光 (0.68,0.7,0.82)）。level_teardown 的「Normal completion lost or duplicated its reward」在改動前的 main 同樣失敗（既有）。詳見 docs/systems.md「時段光源與雲色」。本輪未 commit／push。
+
+- 2026-11-24 時段光源（天氣效果第一步）：使用者選擇「關卡固定時段、立即切換、加上光色」。LevelDefinition.time_of_day 引用 assets/data/rendering/time_of_day/ 的 morning／noon／dusk／night（TimeOfDayPreset），LevelSession 改關卡 Sun 的顏色、強度與 rotation_degrees；陰影設定、主選單與選圖預覽不變，不新增 shader 變體或預熱組合（Environment 與雲色見下一步的時段雲色條目）。空白等於 main.tscn 原 Sun（noon.tres 相同）。dusk／morning 仰角依使用者要求分別由 -18°／-25° 提高到 -40°：色塊明暗的全亮門檻 NdotL>0.6 對平地約等於仰角 37°，低於此地面只到中階。依使用者要求指定 tutorial=morning、frontier=dusk、bridge=night（bridge 地形 Start2 不在道路上，目前無法載入）。詳見 docs/systems.md「時段光源」。本輪未 commit／push。
+
+- 2026-11-24 路面石英色（取代同日「路面磚縫」）：依使用者要求移除路面地磚，road_surface.gd 不再產生 flagstone（刪除 _cobbles 與 SLAB_* 常數），路面為單一平整淺石英灰 ROAD=d6d7d3，只用頂點色＋既有 solid_color 材質、不加貼圖／shader／高光（正交鏡頭下平面高光會整片同時亮暗）；不可通行的灰化路面 INACTIVE 改為 a3a8a7（原灰石板的平均亮度），路肩斜面改為每 quad 一個平色的硬邊色塊；路面上靠路肩的接觸暗帶依使用者要求移除（bank_contact 回歸改驗證路肩旁無暗帶）。路面再抬高：ROAD_HEIGHT 0→0.025、BANK_SLOPE 0.045→0.028，路肩頂 0.065 不變，地基 GROUND_HEIGHT 同為 0.025。road_refinement depth_flow／bank_contact --verify、combat/tower_integration 通過。本輪未 commit／push。
+
+- 2026-11-24 橋頭修正：依使用者指出的三項（高度沒接平、橋頭露縫、路端綠色草條），road_surface.gd 橋頭楔形改為「路面底→斜邊升到地磚頂→近水平接橋面 0.051」，補兩側與背面側壁（深 0.06）封住路肩轉角的天空縫；路面盡頭的島緣唇邊改用路面底色。新增 `_face()` 依外向量自動決定繞向。depth_flow／bank_contact 通過。本輪未 commit／push。
+
+- 2026-11-24 弩砲弓弦動畫：弓弦交叉／超出 nock 的原因是 BowString 靜止姿勢帶旋轉又有不等比縮放，混合器把縮放軌道套到錯軸。towers.py 新增 StringAim±1 父節點承接位置／旋轉，BowString 只播縮放；build_art_slice_g.gd 同步改軌道。只重寫 ballista.glb、ballista_art.tscn 與重建網格，其他塔 tscn 的 unique_id 雜訊已還原；72 格弦端誤差 1.5e-7，tower_integration 通過。本輪未 commit／push。
+
+- 2026-11-24 路面地磚：依使用者要求在石英灰路面上鋪低矮斜邊地磚，road_surface.gd 的 `_pavers` 依格座標挑固定種子產生的 16 種隨機版型（0.5×1／0.5×0.5／0.25×0.5 與錯縫 0.25＋0.5＋0.25，無十字縫、相鄰格不重複，對齊地圖格線、被路肩裁切），底退 0.025、頂退 0.05（0.5 磚為底 0.45／頂 0.4，頂面間距 0.1），高 0.015，亮度 ±3%；磚縫露出的路面底色暗 2%（FLOOR_DARKEN）。敵人 GROUND_OFFSET 0.025→0.04、兵營友軍站位同步加偏移，塔偏移不變。bank_contact 依實際版型找同一塊磚頂面取樣。depth_flow／bank_contact／route_batch／tower_integration 通過；combat.tscn 的 4 個塔節點錯誤在 HEAD 同樣存在（既有）。本輪未 commit／push。
+
+- 2026-11-24 塔模型接縫：使用者要求修正 Art Slice G 塔的牆磚與八角牆頂接縫。style.py 的 wall_ring／wall_rect 改為連續斜接牆殼＋方正淺嵌石磚（取代隨機旋轉的獨立浮磚），迫擊砲／十字火力牆頂改為單一 ring_prism 八角環；牆磚亂數消耗不變，其他零件與 broadside 位元組相同。遊戲 GLB 用 gltf_writer.py 重寫，build_art_slice_g.gd 重建 integrated part .res，*_art.tscn 只有 unique_id 雜訊已還原。前後特寫在 .godot/test-results/modeling/art_slice_g_seams/。詳見 docs/systems.md「Art Slice G 塔模型的牆面與牆頂」。本輪未 commit／push。
+
+- 2026-11-24 色塊式明暗：依使用者選擇，全部世界物件（solid_color 道路／木橋／塔／端點／敵人、柱底 pillar_fade、遠方島嶼 distant_island）共用 assets/shaders/cel_light.gdshaderinc 的 light()，把 NdotL 量化為三階（>0.6 全亮、>0.2 中階 0.5、其餘暗），方向光投影陰影另以 ATTENUATION<0.7 硬邊判定、只壓到中階（不可再把 NdotL×ATTENUATION 一起門檻化，shadow acne 會在側面畫出鋸齒磚紋）；環境光、emission 與雲影不量化，高光改硬邊且只在 ROUGHNESS<1。只改既有 shader 內容，不新增材質組合或 program；調階數改 include 常數。solid_material 回歸改用 tests/enemies/cel_reference.gdshader 為像素參考並加三階球體檢查。tests/menus/startup_loading.gd 的三項 Level 重用失敗與 tests/tower_visuals/input.tscn 的「Base group starts actual wave and locks editing」在移除本修改後同樣出現，屬既有問題。詳見 docs/systems.md「色塊式明暗」。本輪未 commit／push。
+
+- 2026-11-24 遠方島嶼閃爍修正：build_distant_islands 的 face() 翻轉法線時一併反轉繞向（原本約 7～8 成三角形內外顛倒），並讓草地／土層／岩石／石柱／樹幹以 SINK=0.02 互相嵌入、不共用平面，已用 4.7.2 重建 distant_island_0～2.res。只改網格，不改擺放、材質、shader 或數量；詳見 docs/systems.md「外觀變種與雲海」。本輪未 commit／push。
 
 - 2026-11-09 本次 Git 授權：使用者要求「git更新 並推送到遠端」，授權提交本聊天自 d0704ad 後累積的五事件時間軸／每五波新增入口、卡片便利貼／射程呈現、遺物與敵人文本／集中編輯器、Inspector塔價、遺物池與熟客優惠、選圖施工提示／橋梁阻擋、Web匯出排除與音訊接線修正、相關資源／測試／文件，包含工作目錄內使用者手動調整的關卡／塔價／主題／教學與橋梁地形。fetch後本分支與origin/experiment/routing-sandbox同步；origin/main另有更新，本次不合併。下方未commit／push均為授權前實作快照；正常推送目前分支，不動兩份舊stash、不改其他worktree、不強制推送。build／bin／.godot／SDK與匯出ZIP維持忽略，不提交。
 
@@ -301,9 +323,9 @@
 
 ## Tower Tile Editor：獨立多格塔編輯與即時測試
 
-- 路肩受光面也要有深度提示：RoadSurface在實際路肩根部的路面內側，以頂點色產生0.06格寬、0.46強度的漸淡接觸暗部，坡面亦使用逐頂點漸層；不只加深背光面，不沿內部格界描線。雙向相機驗證場景為 tests/road_refinement/bank_contact.tscn，世界光源固定，確保兩側均有對比。
+- （2026-11-24 取代）路肩根部的路面內側不再烘焙接觸暗部，坡面改為每 quad 平色的色塊；路面整片同色，邊界只靠斜面的色塊明暗。tests/road_refinement/bank_contact.tscn 改為驗證兩個相反視角下路肩旁路面與路中央亮度一致。原本「0.06格寬、0.46強度漸淡接觸暗部」的規則已停用。
 
-- 2026-11-03 後續視覺修正：道路行走面Y=0、路肩Y=0.065，外界0.045格斜面形成凹槽；塔／石地基礎保持0。開放木橋與實心鄰格分開計算邊界，橋頭接合面在同一網格內，側面已有地面則使用連續石路，正常鏤空保留。WideRoadFlow依完整雙向道路臂及共用交會區，把原完整行程投影到寬路中央，反向及所有到達相位獨立，換道保留原時間作停留，候選預覽傳原proposal.snapshot；不改導航、戰鬥、模型或數值。十案例、四向橋頭／凹角、GPU像素及真實三兵種配額驗證見 [道路修正](docs/road_visual_and_placement_refinement.md)。
+- 2026-11-03 後續視覺修正：道路行走面Y=0.025（2026-11-24 由0抬高，等於敵人／塔 GROUND_OFFSET）、路肩Y=0.065，外界0.028格斜面形成較淺凹槽；塔／石地基礎與路面同為0.025（GROUND_HEIGHT），島緣唇邊下斜量相對地基計算，避免凹角露縫。開放木橋與實心鄰格分開計算邊界，橋頭接合面在同一網格內，側面已有地面則使用連續石路，正常鏤空保留。WideRoadFlow依完整雙向道路臂及共用交會區，把原完整行程投影到寬路中央，反向及所有到達相位獨立，換道保留原時間作停留，候選預覽傳原proposal.snapshot；不改導航、戰鬥、模型或數值。十案例、四向橋頭／凹角、GPU像素及真實三兵種配額驗證見 [道路修正](docs/road_visual_and_placement_refinement.md)。
 
 
 - 2026-11-03 道路修正：TileVisuals 以獨立顯示 MeshLibrary 繪製同層雙向接口的連續路面，四格角落只在四邊皆連通時補滿；外側倒角、柱子／合法窄木橋與浮起動畫保留，塔體方向沒有出口。塔下逐格重複木板與兵營補塊已移除，原武器基座保留並貼地。RoadEditGuard 的 block-cut 聯集新增 route_cells 作結構性灰化，僅基地至啟用入口的完整 simple paths 有效，不以候選池／配額判色；死路新增即使不重建導航亦刷新。詳細規則、人工場景、Windows native重建與本輪測試見 [道路與放置修正](docs/road_visual_and_placement_refinement.md)。本輪依新任務明確不 commit／merge／push；之前 Git 授權只屬已完成的上一輪。

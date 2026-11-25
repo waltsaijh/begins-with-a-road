@@ -1,4 +1,5 @@
 #include "res://assets/shaders/cloud_shadow.gdshaderinc"
+#include "res://assets/shaders/cel_light.gdshaderinc"
 varying vec3 shadow_world;
 varying vec2 surface_response;
 // Darkening (0 = unchanged), e.g. a disabled tower using its own copy of the

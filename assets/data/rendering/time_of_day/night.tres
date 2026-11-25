@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TimeOfDayPreset" format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/time_of_day_preset.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+resource_name = "night"
+sun_color = Color(0.6, 0.7, 1, 1)
+sun_energy = 0.25
+sun_rotation_degrees = Vector3(-45, 150, 0)
+background_color = Color(0.12, 0.16, 0.26, 1)
+ambient_color = Color(0.32, 0.4, 0.62, 1)
+ambient_energy = 0.4
+cloud_low = Color(0.16, 0.2, 0.32, 1)
+cloud_high = Color(0.38, 0.44, 0.6, 1)
+hud_light_text = true

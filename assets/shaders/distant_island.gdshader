@@ -3,6 +3,7 @@ shader_type spatial;
 // cloud colour with depth so they read as silhouettes, and gently bobbing.
 render_mode diffuse_lambert, specular_disabled, fog_disabled;
 #include "res://assets/shaders/cloud_field.gdshaderinc"
+#include "res://assets/shaders/cel_light.gdshaderinc"
 uniform float haze = 0.42;
 uniform float bob = 0.07;
 varying vec3 world_pos;

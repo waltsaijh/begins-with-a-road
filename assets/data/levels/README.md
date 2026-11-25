@@ -11,6 +11,7 @@
 | Terrain | 實際 GridMap `.tscn`，必須包含道路、至少一個 Start 與剛好一個 Goal；選圖預覽與遊戲都使用它 |
 | Acts | 既有 ACT／Wave／SpawnGroup 設定 |
 | Tutorial | 可選的 TutorialDefinition；留空沿用一般關卡規則，教學資料在 `assets/data/tutorial/` |
+| Time Of Day | Presentation 群組；可選 `assets/data/rendering/time_of_day/` 的 morning／noon／dusk／night，整局固定方向光、環境光與雲色；留空為原本的中午外觀 |
 
 每個 ACT 另有 `Add Start After Completion`（預設勾選），決定該 ACT 結束後是否新增一個出生點；沒有下一個 ACT 時直接完成關卡。這個選項不再放在 Level。波次編輯器可新增／刪除 ACT 與波次，並透過「結束後新增出生點」checkbox 編輯，全部支援復原／重做與儲存重載。
 

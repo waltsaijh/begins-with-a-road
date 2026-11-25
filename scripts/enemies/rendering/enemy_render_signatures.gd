@@ -50,6 +50,17 @@ static func profile_keys(profile: Troop) -> Array[String]:
 	keys.sort()
 	return keys
 
+## Uniform-only colours/energies (TimeOfDayPreset) never select another shader,
+## so a recoloured level reuses the Boot warmup instead of re-preparing.
+const ENVIRONMENT_UNIFORM_ONLY := ["background_color", "ambient_light_color", "ambient_light_energy"]
+
+static func environment_key(environment: Environment) -> String:
+	if environment == null: return "none"
+	var neutral := environment.duplicate() as Environment
+	var defaults := Environment.new()
+	for name in ENVIRONMENT_UNIFORM_ONLY: neutral.set(name, defaults.get(name))
+	return resource_key(neutral)
+
 static func resource_key(resource: Resource) -> String:
 	if resource == null: return "none"
 	if resource.get_script() != null: return "scripted:"+str(resource.get_instance_id())

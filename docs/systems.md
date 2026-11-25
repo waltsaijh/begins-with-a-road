@@ -111,6 +111,8 @@ MeshLibrary ID：石地 0、直路 1、轉角 2、獨立道路地塊 3、道路�
 
 tests/maps/tile_variants.gd 包含配置、接口不變、起終點、模型高度、動態刷新與雲海高度驗證。
 
+遠方裝飾島嶼（Art Slice G）由 `scripts/environment/distant_islands.gd` 依地圖邊界在 CloudLayer 下環狀擺放，網格是 `tools/assets/build_distant_islands.gd` 離線產生的 `assets/models/environment/distant_island_0～2.res`。建模工具的 `face()` 翻轉朝外法線時必須同時反轉頂點順序：Godot 依繞向（順時針為正面）剔除，只改法線會讓面內外顛倒，原本會被剔除的背面就露出來。疊放的部件不可共用平面，草地與土層、土層與第一塊岩石、石柱／石塊／樹幹與草地之間一律互相嵌入 `SINK`（0.02），避免島嶼上下浮動時兩面搶深度而閃爍。修改工具後用 Godot 4.7.2 執行 `godot --headless --path . --script res://tools/assets/build_distant_islands.gd` 重建三個 .res。
+
 ## 操作
 
 - 點卡片或 1～9：選擇對應手牌；再次選同卡取消。也可按住手牌拖到地圖後放開放置，拖曳過程沿用位置 hologram 與旋轉提示。
@@ -568,6 +570,49 @@ Web 匯出引用 `assets/web/shell.html`，白底只顯示內嵌 Godot／團隊 
 道路、木橋、塔、端點非發光零件及正式三兵種共用 `assets/materials/solid_color.tres`。純色與原頂點色相乘後寫入 COLOR；CUSTOM1 保存原本粗糙度／反光，包含亮木板的差異。CUSTOM0 保存帶方向的四肢擺幅、起伏、側擺及關鍵影格間隔數 + 1；w=0 的靜態模型不執行步態。每幀相位與 blend 提交方式不變，不為材質整合新增節點、逐模型材質或移動時計算。來源 CPU 動畫仍保留，GPU Model 擺幅變更需重新烘焙。詳見 [材質格式與工具](../assets/materials/README.md)。
 
 轉換工具直接處理目前保存的場景與 MeshLibrary，不重生原型或改路網；保留變換、動畫、項目編號及特殊材質。每格純色面合為一個 surface，柱底另列。雲、柱底漸變／生長、端點發光、透明戰鬥特效與 2D UI 不套用共用不透明材質。啟動仍明確繪製普通 MeshInstance 與敵人 MultiMesh，因為同一材質的不同繪製路徑可能有不同引擎 program。
+
+### 時段光源與雲色（早上／中午／黃昏／夜晚）
+
+LevelDefinition 的 Presentation 群組有 `time_of_day`，可引用 `assets/data/rendering/time_of_day/` 的 morning／noon／dusk／night（TimeOfDayPreset）。整局固定、立即套用，沒有漸變；空白維持 `main.tscn` 的 Sun 原設定，noon.tres 與原設定相同。LevelSession 在 `_enter_tree` 載入地形後呼叫 `TimeOfDayPreset.claim()`，一次套用三組設定：
+
+- **方向光**：關卡 `Sun` 的顏色、強度與 rotation_degrees（X 為仰角，越負越高；Y 為方位）。陰影開關、透明度、模糊與模式保持場景設定，不增加 shader 變體，光源 key 不變。色塊式明暗依實際光向量量化，換方向會讓明暗分界跟著移動。
+- **環境**：複製一份 Environment 後改背景色、環境光顏色與強度，不改寫 Boot 共用的 `level_environment.tres`。DisplayWarmup 的 context key 改用 `environment_key()`，忽略這三個只影響 uniform 的欄位，所以換時段的關卡沿用 Boot 預熱，不重複準備。
+- **雲色**：Art Slice G 的 project shader globals `cloud_low`（雲隙／稀薄處）與 `cloud_high`（雲頂），由 `cloud_field.gdshaderinc` 的 `cloud_color()` 讀取，因此雲海三層、柱底漸變與遠方島嶼的霧化同時變色；全域參數只是 uniform 值，不新增材質組合或 WebGL program。
+
+雲色是全程序共用的全域值：關卡 `_exit_tree` 以 `release()` 還原成 Project Settings 的預設值，主選單與選圖預覽因此維持原外觀。換場景時新關卡可能先加入、舊關卡才移除，所以只有最後 claim 的關卡能還原。`tools/assets/review/sky_moods` 會直接改寫同一組全域值，只供美術比較。
+
+| 時段 | 光色 | 強度 | rotation_degrees | 環境光（強度） | cloud_low → cloud_high |
+| --- | --- | --- | --- | --- | --- |
+| morning | (1, 0.86, 0.72) 杏色 | 0.55 | (-40, 60, 0) 偏低、東側 | (0.68, 0.7, 0.82)（0.25） | (0.74, 0.76, 0.88) 淡藍 → (1, 0.9, 0.8) 杏色 |
+| noon | (1, 0.941, 0.847) 原設定 | 0.6 | (-55, -25, 0) | 原設定（0.23） | 原預設 (0.79, 0.84, 0.88) → (0.995, 0.997, 1) |
+| dusk | (1, 0.55, 0.32) 橙紅 | 0.5 | (-40, -120, 0) 偏低、西側 | (0.78, 0.52, 0.42)（0.28） | (0.86, 0.46, 0.34) → (1, 0.78, 0.56) 橙紅 |
+| night | (0.6, 0.7, 1) 冷藍月光 | 0.25 | (-45, 150, 0) | (0.32, 0.4, 0.62)（0.4） | (0.16, 0.2, 0.32) → (0.38, 0.44, 0.6) 深藍 |
+
+背景色在 noon 為原 (0.9, 0.925, 0.94)，其餘接近各自的雲色。dusk 依使用者要求以橙紅為主，不帶紫色；morning 依使用者要求為杏色帶一點藍：雲頂杏色、雲隙淡藍。noon 的雲色、背景與環境光須等於 project 預設與 `level_environment.tres`（回歸檢查）。頂列 HUD 是透明的，不加任何底色或漸層。夜晚雲色太暗時，預設的 `hud_light_text`（目前只有 night 為 true）讓 LevelSession 在建立 HUD 後呼叫 `HudTextPalette.apply_light()`（`scripts/levels/presentation/hud_text_palette.gd`），只對既有控制項加顏色覆寫：時間軸以 `WaveTimeline.set_palette()` 改 ACT 名稱／波次標籤／軌道為淡色，目前波次為淡色實心點、其他波次改深色填心成為空心環；金幣數字、防線數字、倍速／暫停圖示、Boss 標籤、遺物疊加數量（RelicChoice.count_color）與新敵人通知文字都改成淡色。`integrity.svg` 本身以 #527b7d 描邊，Button 的圖示顏色是相乘，所以防線圖示使用大於 1 的倍率換算回同一淡色。暫停選單、手牌、商店、對話框與結算都有自己的底板，維持原配色。
+
+色塊式明暗以 NdotL>0.6 為全亮，平地 NdotL＝sin(仰角)，所以仰角低於約 37° 時地面只到中階、整體偏暗；dusk 原為 -18° 偏暗，依使用者要求提高到 -40°；morning 也同樣由 -25° 提高到 -40°。正式關卡指定為：tutorial 早上、frontier 黃昏、bridge 夜晚。bridge 的地形目前有「Endpoints/Start2 必須放在道路地塊上」設定錯誤、無法載入，時段要等地形修好才會生效。回歸：`godot --path . --script res://tests/levels/time_of_day.gd`（實際渲染；`--headless` 只驗資料），驗證四份預設的光源／環境／雲色、陰影設定與共用 Environment 不變、預熱 key 不變、離場還原雲色、新舊關卡交疊時不誤還原、中午等於原設定與未設定時的畫面，頂列沒有底色、只有 hud_light_text 的時段改用淡色文字與圖示、其他時段維持原深色字，以及四時段兩兩畫面不同；截圖在 `.godot/test-results/levels/time_of_day/`。
+
+### 色塊式明暗（Cel shading）
+
+世界物件的直接光以 `assets/shaders/cel_light.gdshaderinc` 的共用 `light()` 量化為三階平塊，而不是平滑漸層；solid_color（道路、木橋、塔、端點、敵人，含 enemy_walk 相容入口）、柱底 pillar_fade 與遠方島嶼 distant_island 都 include 同一份。表面朝向 `NdotL` 大於 CEL_LIT（0.6）為全亮、大於 CEL_MID（0.2）為中階（CEL_MID_LEVEL 0.5）、其餘為暗階；邊界以 CEL_EDGE（±0.015）做窄 smoothstep 反鋸齒。方向光投影陰影另以 ATTENUATION（已含 shadow_opacity，正式 Sun 陰影內約 0.38）低於 CEL_SHADOW（0.7）判定為硬邊陰影，只能把該面壓到中階、不會再壓到暗階。不可改回把 `NdotL × ATTENUATION` 一起門檻化：陰影貼圖的自我遮擋（shadow acne）會讓側面在門檻上下翻階，畫出鋸齒狀磚紋。正式 Sun 下頂面為全亮，受光側面與落在陰影中的頂面為中階，背光面為暗階。環境光、emission（柱底雲色、島嶼霧化）與 Art Slice G 雲影（乘在 ALBEDO）不量化，因此雲影仍是柔和漂移；高光改為硬邊亮點，只在 ROUGHNESS<1 的面出現，柱底／島嶼／粗糙石面沒有高光。寫了 `light()` 後 render_mode 的 diffuse_burley／specular_schlick_ggx 不再生效。
+
+### 路面外觀
+
+`scripts/map/tile/appearance/road_surface.gd` 的路面是單一平整淺石英灰（`ROAD` d6d7d3），不再鋪石板；不可通行的灰化路面為 `INACTIVE` a3a8a7。只寫頂點色到共用 solid_color 材質，沒有貼圖、額外 shader 或高光：正交鏡頭下整片平面的視線方向相同，加高光會讓整條路同時亮或暗。路肩斜面配合色塊光照改成硬邊：每個網格 quad 以中心點取一個平色，不再逐頂點漸層。原本烘焙在路面上、靠近路肩的接觸暗帶（CONTACT_SHADOW_*）已依使用者要求移除，路面整片同色，邊界只靠斜面自己的色塊明暗；`tests/road_refinement/bank_contact.gd` 改為驗證兩個相反視角下路肩旁路面與路中央亮度一致（比值差 <3%），取樣高度使用 `ROAD_HEIGHT`。路面高度 `ROAD_HEIGHT` 為 0.025（原本 0，使路面不再顯得陷太深；數值等於敵人／塔的 GROUND_OFFSET，腳與塔基剛好貼地），路肩頂 `BANK_HEIGHT` 仍為 0.065，斜面寬 `BANK_SLOPE` 0.028。塔／石地的地基格 `GROUND_HEIGHT` 與路面同高，否則路面接到塔地基處會出現露空的縫；島緣草皮唇邊的下斜量相對地基高度計算，平地唇邊保持水平，避免島嶼凹角露出小三角縫。
+
+路面上鋪一層低矮地磚（`_pavers`）：`paver_layouts()` 以固定種子 `PAVER_SEED` 產生 `PAVER_VARIANTS`（16）種版型，每次執行都相同。每格先隨機選方向切成兩條 0.5 寬的長條，每條是整塊 0.5×1、對半兩塊 0.5×0.5，或錯縫 0.25＋0.5＋0.25；0.5×0.5 再以 35% 機率切成兩塊 0.25×0.5（方向隨機）。第二條的接縫一定避開第一條，所以不會出現四塊磚交會的「十」字縫。`paver_layout()` 依地圖座標挑版型，並避開左方與上方鄰格的版型。超出路面的部分被路肩裁掉；一塊磚跨越路面的多個矩形時，各部分共用同一頂面而無縫相接。地磚是斜邊梯台：底邊從半格線退 `PAVER_FOOT`（0.025），頂面退 `PAVER_TOP`（0.05），所以 0.5 格的磚是底 0.45、頂 0.4，相鄰兩磚頂面間距 0.1；只有磚塊自己的外框做斜邊，被路肩或路面矩形切開的邊保持垂直。高度 `PAVER_HEIGHT` 0.015，每塊亮度在路面色 ±`PAVER_SHADE`（3%）內變化；磚縫露出的路面底色比路面色暗 `FLOOR_DARKEN`（2%），木橋接頭的路面也用同一底色。版型索引會加入 MeshLibrary 快取鍵，最多多出 16 倍路面網格變體。敵人貼地高度 `EnemyConstants.GROUND_OFFSET` 因此改為 0.04（路面 0.025＋地磚 0.015），兵營友軍的站位 `barracks_system.world()` 也加上同一偏移；塔的 `TowerConstants.GROUND_OFFSET` 仍為 0.025（塔建在地基格上）。
+
+木橋橋頭（`item()` 的 wood 分支）在橋格內補一段閉合楔形：先從路面底 `ROAD_HEIGHT` 以地磚斜邊的比例（`PAVER_FOOT` 內爬到 `PAVER_HEIGHT`）升到地磚頂，再幾乎水平接到橋面 `BRIDGE_DECK_HEIGHT`（0.051）；兩側與背面的側壁向下延伸 `BRIDGE_HEAD_DEPTH`（0.06），避免從路肩轉角旁看到天空。島緣唇邊落在路面上的那段（例如路面通往橋的盡頭）改用路面底色，不再畫成一條草皮。
+
+### Art Slice G 塔模型的牆面與牆頂
+
+六塔幾何由 `tools/assets/blender/art_slice_g/towers.py`／`style.py` 以純 Python 產生，Blender 與遊戲共用同一份資料。`wall_ring`／`wall_rect` 先建一圈連續牆殼（`<prefix>Shell`，grout 色，每邊在角落以斜接面和鄰邊密合，門洞處切開），石磚只是淺浮雕：與牆面方正對齊、不再隨機旋轉／位移，背面埋入牆殼 0.012、正面凸出 0.012，磚面位置等於舊版平均磚面，所以苔蘚、門框、射孔的半徑不必調整。迫擊砲與十字火力的八角牆頂改為 `ring_prism` 產生的單一斜接八角環（外上緣倒角），不再是八條直方塊在角落互相穿插。為了讓其他零件不變，牆磚仍消耗與舊版相同的亂數。
+
+重建流程：改 `towers.py`／`style.py` 後執行 `python tools/assets/blender/art_slice_g/gltf_writer.py <暫存目錄>` 產生 GLB（遊戲用的 GLB 由這個寫入器產生，未改動的塔會逐位元組相同），複製到 `assets/models/towers/art_slice_g/`，再以 Godot 4.7.2 `--headless --import` 及 `--headless --script res://tools/assets/build_art_slice_g.gd` 重建 `integrated/<塔>_part_*.res`。建置工具每次都會重編 `*_art.tscn` 的 unique_id，若結構沒變就還原那些 tscn，只保留真正改變的網格。可編輯 `.blend` 與預覽由 `"D:/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup --python tools/assets/blender/art_slice_g/build_blender.py` 產生（blend／previews 不進版控）；不要用它的 `--export` 覆蓋遊戲 GLB，Blender 匯出器輸出的節點順序與舊檔不同。
+
+弩砲弓弦（`BowString±1`）掛在各自的 `StringAim±1` 父節點下：`StringAim` 放在弓臂尖端並朝向 nock，承接動畫的位置／旋轉軌道；`BowString` 的靜止旋轉為單位矩陣，只播沿弦方向的縮放軌道。不要把旋轉和不等比縮放的軌道放回同一個節點：節點靜止姿勢帶旋轉時，動畫混合器會把縮放套到錯的軸，弦長固定為 1、超出 nock，造成兩條弦交叉。
+
+調整階數或門檻只改 include 的常數，三個 shader 同步生效；include 是同一 shader 內容的一部分，不新增材質組合、Resource 或 WebGL program（AGENTS.md 的兩組 StandardMaterial3D 限制不受影響）。透明特效、UI、雲層與 SolidMaterials 的 StandardMaterial3D 未量化。回歸 `tests/enemies/solid_material.gd` 的像素比對改以 `tests/enemies/cel_reference.gdshader`（同一 include＋uniform 顏色）為參考，並另畫一顆平滑球體驗證 ≥90% 像素落在三個主要亮度階；測試期間把 cloud_shadow_strength 設 0 以隔離雲影。修改前後畫面在 `.godot/test-results/rendering/cel_shading/`。
 
 ## 開始選單
 

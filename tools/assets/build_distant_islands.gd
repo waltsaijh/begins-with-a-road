@@ -8,6 +8,9 @@ const GRASS := [Color("8fae5c"), Color("83a253")]
 const EARTH := [Color("8c6a48"), Color("7b5c3f")]
 const ROCK := [Color("b0b7b1"), Color("a2a9a3"), Color("bcc1bb")]
 const STONE := [Color("cbcac2"), Color("b3b2aa")]
+## Pieces resting on each other overlap by this much instead of sharing a plane,
+## so no two faces sit at the same depth (z-fighting while the island bobs).
+const SINK := 0.02
 var st: SurfaceTool
 var rng := RandomNumberGenerator.new()
 
@@ -17,7 +20,12 @@ func face(points: Array, color: Color, centre: Vector3) -> void:
 	var n: Vector3 = (points[2]-points[0]).cross(points[1]-points[0]).normalized()
 	var mid := Vector3.ZERO
 	for p in points: mid += p
-	if n.dot(mid/points.size()-centre) < 0.0: n = -n
+	if n.dot(mid/points.size()-centre) < 0.0:
+		# Flip the winding together with the normal: Godot culls by winding
+		# (clockwise front), so an outward normal alone leaves the face inside-out.
+		n = -n
+		points = points.duplicate()
+		points.reverse()
 	for i in range(1, points.size()-1):
 		for v in [points[0], points[i], points[i+1]]:
 			st.set_color(color); st.set_normal(n); st.add_vertex(v)
@@ -48,7 +56,7 @@ func box(c: Vector3, half: Vector3, yaw: float, color: Array) -> void:
 	prism(poly, c.y-half.y, c.y+half.y, color[0], color, Vector3(c.x, 0, c.z))
 
 func tree(at: Vector3, height: float) -> void:
-	box(at+Vector3(0, height*.18, 0), Vector3(.05, height*.18, .05), 0.3, [Color("6f3e2a")])
+	box(at+Vector3(0, height*.18-SINK*0.5, 0), Vector3(.05, height*.18+SINK*0.5, .05), 0.3, [Color("6f3e2a")])
 	for k in 2:
 		var r := height*(.32-.08*k); var y0 := at.y+height*(.30+.28*k)
 		var poly := blob(r, 7); var centre := at+Vector3(0, y0+height*.2, 0)
@@ -63,8 +71,8 @@ func build() -> void:
 		st = SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
 		var top := blob(1.0, 9)
 		prism(top, -0.06, 0.06, GRASS[0], [GRASS[1]])
-		prism(top, -0.32, -0.06, EARTH[0], EARTH, Vector3.ZERO, 0.92)
-		var y := -0.32; var r := 0.85; var drift := Vector3.ZERO
+		prism(top, -0.32, -0.06+SINK, EARTH[0], EARTH, Vector3.ZERO, 0.92)
+		var y := -0.32+SINK; var r := 0.85; var drift := Vector3.ZERO
 		while r > 0.12:
 			var h := rng.randf_range(.35, .55)
 			drift += Vector3(rng.randf_range(-.08,.08), 0, rng.randf_range(-.08,.08))
@@ -74,12 +82,13 @@ func build() -> void:
 			0:
 				for k in 3:
 					var a := TAU*k/3.0+0.4
-					box(Vector3(cos(a)*.5, 0.06+[.42,.28,.18][k], sin(a)*.5), Vector3(.09, [.42,.28,.18][k], .09), a, STONE)
-				box(Vector3(-.1, .11, .2), Vector3(.22, .05, .1), .5, STONE)
+					var h: float = [.42,.28,.18][k]
+					box(Vector3(cos(a)*.5, 0.06+h-SINK*0.5, sin(a)*.5), Vector3(.09, h+SINK*0.5, .09), a, STONE)
+				box(Vector3(-.1, .11-SINK*0.5, .2), Vector3(.22, .05+SINK*0.5, .1), .5, STONE)
 			1:
 				tree(Vector3(.25, .06, -.2), 1.0); tree(Vector3(-.35, .06, .25), .75)
 			2:
-				box(Vector3(-.15, .32, 0), Vector3(.07, .26, .07), 0, STONE); box(Vector3(.25, .32, 0), Vector3(.07, .26, .07), 0, STONE)
+				box(Vector3(-.15, .32-SINK*0.5, 0), Vector3(.07, .26+SINK*0.5, .07), 0, STONE); box(Vector3(.25, .32-SINK*0.5, 0), Vector3(.07, .26+SINK*0.5, .07), 0, STONE)
 				box(Vector3(.05, .62, 0), Vector3(.28, .05, .09), 0, STONE); tree(Vector3(.45, .06, .45), .6)
 		st.set_material(MATERIAL)
 		assert(ResourceSaver.save(st.commit(), OUT % variant) == OK)

@@ -111,12 +111,16 @@ func ballista_clip() -> Animation:
 		[link, "rotation", func(f): return l0*Quaternion(Vector3.RIGHT, -TAU*draw.call(f))]]
 	for sgn in [-1, 1]:
 		var pivot := part("LimbPivot"+str(sgn)); var tip := part("LimbTip"+str(sgn)); var string := part("BowString"+str(sgn))
+		var aim := part("StringAim"+str(sgn))
 		var q0 := pivot.quaternion
 		tracks.append([pivot, "rotation", func(f): return q0*limb.call(f, sgn)])
 		var tip_point := func(f): return pivot.position+(Basis(q0*limb.call(f, sgn))*tip.position)
 		var nock_point := func(f): return s0+G(0, -DRAW*draw.call(f), 0)+nock.position
-		tracks.append([string, "position", func(f): return tip_point.call(f)])
-		tracks.append([string, "rotation", func(f): return Quaternion(Basis.looking_at((nock_point.call(f)-tip_point.call(f)).normalized(), Vector3.UP))])
+		# Aim (rest rotation) and stretch (string, identity rest rotation) are separate
+		# nodes: a non-uniform scale track on a node whose rest pose is rotated was
+		# applied on the wrong axis, so the strings overshot and crossed.
+		tracks.append([aim, "position", func(f): return tip_point.call(f)])
+		tracks.append([aim, "rotation", func(f): return Quaternion(Basis.looking_at((nock_point.call(f)-tip_point.call(f)).normalized(), Vector3.UP))])
 		tracks.append([string, "scale", func(f): return Vector3(1, 1, (nock_point.call(f)-tip_point.call(f)).length())])
 	return clip(72, tracks)
 
