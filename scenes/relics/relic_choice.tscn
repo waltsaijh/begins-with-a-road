@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://scripts/relics/relic_choice.gd" id="script"]
 [ext_resource type="Script" path="res://scripts/interface/inspection_panel.gd" id="inspection"]
 [ext_resource type="Theme" path="res://assets/themes/inspection_controls.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interface/relic_choice.svg" id="bar_icon"]
 [sub_resource type="StyleBoxFlat" id="collection_style"]
 bg_color = Color(0.94,0.91,0.82,1)
 border_width_left = 2
@@ -21,16 +22,28 @@ content_margin_bottom = 16.0
 process_mode = 3
 layer = 7
 script = ExtResource("script")
-[node name="RelicBar" type="ScrollContainer" parent="."]
+[node name="RelicBar" type="Control" parent="."]
 theme = ExtResource("theme")
 visible = false
 offset_left = 176.0
 offset_top = 34.0
 offset_right = 352.0
 offset_bottom = 72.0
-horizontal_scroll_mode = 1
+mouse_filter = 2
+[node name="Toggle" type="Button" parent="RelicBar"]
+offset_right = 24.0
+offset_bottom = 38.0
+focus_mode = 0
+text = "‹"
+theme_override_font_sizes/font_size = 18
+theme_override_constants/icon_max_width = 24
+[node name="Scroll" type="ScrollContainer" parent="RelicBar"]
+offset_left = 30.0
+offset_right = 176.0
+offset_bottom = 38.0
+horizontal_scroll_mode = 3
 vertical_scroll_mode = 0
-[node name="Items" type="HBoxContainer" parent="RelicBar"]
+[node name="Items" type="HBoxContainer" parent="RelicBar/Scroll"]
 layout_mode = 2
 theme_override_constants/separation = 6
 [node name="Modal" type="Control" parent="."]

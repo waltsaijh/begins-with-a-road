@@ -10,23 +10,24 @@
 | 主畫面／選圖／遊戲切換 | `interface/screen_transition.tscn` | 根節點 Duration 預設 0.5 實際秒；`WhiteVeil` 全畫面變白後切換，再淡出；過渡期間攔截輸入 |
 | 世界提示的共用對話框外觀 | `interface/components/speech_bubble_frame.tscn` | `Background` 的淡色底、`Border` 的青灰邊框；Frame Size／Tail Height 控制框體與置中尖角，開波與塔 hover 共用 |
 | 防禦塔 hover 與升級回饋 | `towers/components/tower_hover.tscn` | 根 CanvasLayer 7 高於開波提示的 Layer 6；`TowerHover/Margin/Content/TowerName` 靠左、`Level` 靠右；Text Theme 與開波標題統一為 16px 青灰色細字、無描邊，Content 的 Separation 為 12px，框寬依內容貼合 |
-| 開波提示 | `levels/components/start_wave_callout.tscn` | `Shape/Background`／`Shape/Border` 保存共用對話框底色與邊框，`Title` 的置中開波文字、`NextWaveIntel/Scroll/Items` 的橫排圖示；34px 單框、24px 圖示與 hover 數量樣式在 `troop_intel_item.tscn` |
-| 已持有遺物圖示 | `relics/relic_choice.tscn` | RelicBar/Items 依持有種類建立按鈕與疊加數字，HUD 集中置中；點擊 Collection 詳情。獨立 `relic_inventory.tscn` 保留供工具使用 |
+| 開波提示 | `levels/components/start_wave_callout.tscn` | 固定40×44 Button、只顯示透明底的 Title 驚嘆號，字形繞中心鐘擺；Hover 的 Popup 與 NextWaveIntel/Scroll/Items 使用 troop_intel_item.tscn 的兵種名稱×數量文字直列 |
+| 已持有遺物圖示 | `relics/relic_choice.tscn` | RelicBar/Scroll/Items 依持有種類建立按鈕與疊加數字，Toggle 可收合為圖示＋總件數；窄視窗在下方展開原圖示列，點擊開 Collection 詳情。獨立 `relic_inventory.tscn` 保留供工具使用 |
 | ACT 遺物三選一 | `relics/relic_choice.tscn` | Modal/Backdrop 全畫面變暗，Blocker 獨立保留頂部 80px 點擊；Center/Layout 置中三張 184×272px、間距 20px 的卡牌，單卡使用 `relics/components/relic_card.tscn`；保留 Collection 詳情，與圖鑑共用 HUD 暫停擁有權 |
-| ACT 結束後選擇新入口 | `levels/spawn_expansion.tscn` | `Interface/Root/Panel` 的標題、說明、三個方向按鈕與重選按鈕；`World` 的候選格、路徑與入口預覽；根節點可調搜尋距離與候選帶寬 |
+| 特殊事件桌遊牌 | `events/special_event_choice.tscn` | Root/Shade 保留戰場輪廓；Scroll/Panel 容納標題與卡牌列，單卡使用 `events/components/event_option_card.tscn`。卡面獨立於固定 Button 命中區，既有選塔提示仍在 Root/TargetHint |
+| 直接放置新入口 | `levels/spawn_expansion.tscn` | 根節點 Search Depth／Frontier Band；依 Level／ACT 原時機分類四區並只排除上次區域，一次顯示候選格／Hover路徑與入口預覽，玩家直接點擊落點才建路，沒有方位按鈕 |
 | 新入口模型 | `levels/components/expansion_start.tscn` | `Visual` 的起點模型；邏輯根節點固定，只有模型跟地塊浮起 |
 | 時間線整體 | `levels/wave_timeline.tscn` | 根節點的 Preview／Appearance；`Progress` 用 `clip_contents` 水平裁切填色 |
 | 時間線軌道 | `levels/components/wave_timeline_track.tscn` | `Line` 的線寬與高度、`StartDivider` |
 | 波次圓點與 ACT 分隔線 | `levels/components/wave_timeline_marker.tscn` | `Dot/Fill`、`Dot/Outline`、`Divider` |
 | ACT 文字 | `levels/components/wave_timeline_act.tscn` | Label 的高度、對齊；目前 ACT 的字型與整體字級／顏色由時間線根節點指定 |
 | 放置旋轉提示 | `cards/components/rotation_key_hint.tscn` | `Key` 底框、`Key/Letter`、`ClockwiseArrow/Curve`、`Head`；根節點可調 0.5 秒停留、淡入時間與浮起距離 |
-| 手牌容器 | `cards/card_hand.tscn` | `Cards`；根節點 `vertical_offset` 調整手牌高度，扇形布局由 CardFanLayout 計算；暫停時手牌與商店隨 LevelHUD 的 `pause_seconds` 滑出，白色遮罩由 `levels/level_hud.tscn` 的 `PauseBlocker/WhiteVeil` 調整 |
+| 手牌容器 | `cards/card_hand.tscn` | `Cards`；根節點 `vertical_offset` 調整手牌高度，平行排列由 CardHand 計算，沿用 CardFanLayout 間距及命中；暫停時手牌與商店隨 LevelHUD 的 `pause_seconds` 滑出，白色遮罩由 `levels/level_hud.tscn` 的 `PauseBlocker/WhiteVeil` 調整 |
 | 正面卡牌 | `cards/components/card_view.tscn` | 背景、外框、捷徑、塔圖示、標題、價格與地塊圖容器 |
 | 卡名、價格、牌背 | `cards/components/card_title.tscn`、`cards/components/card_price.tscn`、`cards/components/card_back.tscn` | 各子節點 |
 | 地塊圖的一格 | `cards/components/card_diagram_cell.tscn` | 根 ColorRect 是道路顏色；`Tower` 是塔格顏色，`Tower/Accent` 是塔色圓點 |
-| 商店與商品槽位 | `cards/card_shop_view.tscn`、`cards/components/shop_slot.tscn` | `Root/Slots` 與商品槽位內的正面／背面 |
+| 商店與商品槽位 | `cards/card_shop_view.tscn`、`cards/components/shop_slot.tscn` | `Entry` 小型補給按鈕與 `Root/Slots` 商品槽位；關閉時Root隱藏。HAND外觀讀deployment SVG，SHOP沿用原圖 |
 | 獨立測試地圖的開始按鈕 | `enemies/components/enemy_wave_controls.tscn` | `Root/Start`；正式關卡使用起點對話框 |
-| 敵人血條、護盾、技能條與狀態圖示 | `enemies/components/enemy_status_appearance.tscn` | 根尺寸是整條容量；`Background` 樣式、`Health`／`Shield` 顏色、`Skill` 位置／尺寸／顏色、`Icon` 尺寸／高度與邊框 |
+| 敵人護盾、技能條與狀態圖示 | `enemies/components/enemy_status_appearance.tscn` | Background／Shield、Skill、Icon 外觀仍由單一範本管理；不再提交 Health 或其他頭頂生命值條 |
 | 敵人狀態顯示層 | `enemies/components/enemy_status_overlay.tscn` | `EnemyStatusOverlay` 的 `icon_gap`；`Appearance` 是外觀範本，遊戲中會隱藏 |
 | F1 vertex 標記 | `navigation/components/vertex_marker.tscn` | Point 的圓點與 ID 的字級／外框／高度；F1 同時顯示目前圖的 vertex 與編號 |
 | F1／F2 除錯面板 | `navigation/route_debug_panel.tscn` | 按鈕、圖例、地塊資訊與錯誤訊息 |

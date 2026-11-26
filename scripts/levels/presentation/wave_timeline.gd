@@ -5,6 +5,7 @@ extends Control
 const NODE_RADIUS := 4.0
 const NODE_OUTLINE_WIDTH := 1.5
 const EXPANSION_ICON = preload("res://assets/sprites/interface/spawn_expansion.svg")
+const SPECIAL_ICON = preload("res://assets/sprites/interface/special_event.svg")
 const RELIC_ICON = preload("res://assets/sprites/interface/relic_choice.svg")
 @export var act_label_scene: PackedScene = preload("res://scenes/levels/components/wave_timeline_act.tscn")
 @export var level: LevelDefinition:
@@ -22,9 +23,14 @@ const RELIC_ICON = preload("res://assets/sprites/interface/relic_choice.svg")
 @export var label_color := Color("244c52")
 @export var muted_color := Color("6b8588")
 @export var progress_color := Color("218f9b")
+## Filled dot of the current event.
+@export var current_color := Color("202c2d")
+## Inner fill of the other (hollow-looking) wave dots.
+@export var dot_fill_color := Color("f3f8f7")
 var _act_labels: Array[Label] = []
 var reward_active := false
 var expansion_active := false
+var special_active := false
 var _header_managed := false
 var _header_width_limit := 360.0
 const VISIBLE_EVENTS := 5
@@ -44,6 +50,7 @@ func events() -> Array[Dictionary]:
 		result.append({"kind":"wave", "wave":i})
 		if i in rewards: result.append({"kind":"relic", "wave":i})
 		if i in expansions: result.append({"kind":"entrance", "wave":i})
+		if i in special_indices(): result.append({"kind":"special", "wave":i})
 	return result
 
 func event_index(kind: String, index: int) -> int:
@@ -70,6 +77,7 @@ func act_boundaries() -> PackedInt32Array:
 func event_caption(event: Dictionary) -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
 	match event.kind:
+		"special": return tr("event.timeline")
 		"relic": return GameText.text("text.wave_timeline.1",{},english)
 		"entrance": return GameText.text("text.wave_timeline.2",{},english)
 	return (GameText.text("text.wave_timeline.3",{},english)) % (event.wave+1)
@@ -157,13 +165,15 @@ func expansion_indices() -> PackedInt32Array:
 	return result
 
 func _slot_count() -> int:
-	return level.wave_count()+reward_indices().size()+expansion_indices().size()
+	return events().size()
 
 func _events_through(index: int) -> int:
 	var count := 0
 	for i in reward_indices():
 		if i <= index: count += 1
 	for i in expansion_indices():
+		if i <= index: count += 1
+	for i in special_indices():
 		if i <= index: count += 1
 	return count
 
@@ -198,6 +208,7 @@ func _summary() -> String:
 	var english := TranslationServer.get_locale().begins_with("en")
 	var text := "ACT %d / %d · %s %d / %d" % [act.index+1,level.acts.size(),GameText.text("text.wave_timeline.4",{},english),index+1,level.wave_count()]
 	if expansion_active: return GameText.text("text.wave_timeline.5",{},english)
+	if special_active: return tr("event.ui.heading")
 	if reward_active: text = "ACT %d / %d · %s" % [act.index+1,level.acts.size(),GameText.text("text.wave_timeline.6",{},english)]
 	return text
 
@@ -221,6 +232,7 @@ func _get_tooltip(at_position: Vector2) -> String:
 		var point := event_position(event.kind,event.wave)
 		if point.x < 0 or point.x > size.x: continue
 		if absf(at_position.x-point.x) > 14 or at_position.y < 13 or at_position.y > 56: continue
+		if event.kind == "special": return tr("event.ui.heading")+" · "+str(event.wave+1)
 		if event.kind == "entrance":
 			return (GameText.text("text.wave_timeline.global_1")) % (event.wave+1)
 		return milestone_tooltip(event.wave,event.kind == "relic")
@@ -228,6 +240,14 @@ func _get_tooltip(at_position: Vector2) -> String:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh()
+
+## Recolours text, track and markers in place (e.g. light text over night clouds).
+func set_palette(text: Color, muted: Color, current: Color, dot_fill: Color) -> void:
+	label_color = text
+	muted_color = muted
+	current_color = current
+	dot_fill_color = dot_fill
+	_refresh()
 
 func configure(value: LevelDefinition) -> void:
 	if _event_motion != null: _event_motion.kill()
@@ -309,3 +329,14 @@ func _refresh_labels() -> void:
 	label.add_theme_color_override("font_color",label_color)
 	var font := current_act_font if current_act_font != null else act_font
 	if font != null: label.add_theme_font_override("font",font)
+
+func special_indices() -> PackedInt32Array:
+	var result := PackedInt32Array()
+	if level != null:
+		for completed in range(5,level.wave_count(),5): result.append(completed-1)
+	return result
+
+func set_special_active(value: bool, completed_index := -1) -> void:
+	special_active = value
+	if value: _animate_event(event_index("special",completed_index))
+	_refresh()

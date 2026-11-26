@@ -54,6 +54,8 @@ var spawn_rng := RandomNumberGenerator.new()
 var damage_received := 0.0
 var _committed_routes: Array[Dictionary] = []
 var visuals: MultiMeshInstance3D
+var _boss_ground: Node3D
+var _boss_tiles := {}
 
 func _ready() -> void:
 	spawn_rng.seed = spawn_seed
@@ -127,7 +129,7 @@ func start_wave() -> bool:
 func _prepare_legacy_wave() -> bool:
 	var profile: Troop = troop if troop != null else controller.troop
 	var origin: int = controller.active_start if start_index < 0 else start_index
-	if profile.cohort_size > 1:
+	if profile.cohort_size > 1 or profile.has_tag(&"boss"):
 		var recipe := _legacy_cohort_definition(profile,origin)
 		var schedule := WaveSpawnSchedule.build(recipe,controller,_next_enemy_id,true)
 		if schedule.is_empty(): return false
@@ -184,7 +186,7 @@ func routes_for_display() -> Array[Dictionary]:
 	else:
 		var profile: Troop = troop if troop != null else controller.troop
 		var origin: int = controller.active_start if start_index < 0 else start_index
-		if profile.cohort_size > 1:
+		if profile.cohort_size > 1 or profile.has_tag(&"boss"):
 			var schedule := WaveSpawnSchedule.build(_legacy_cohort_definition(profile,origin),controller,_next_enemy_id,false)
 			for data: Dictionary in schedule.get("pending",[]):
 				result.append({"troop":profile.troop_name,"color":profile.debug_color,"cells":data.route.cells})
@@ -245,11 +247,56 @@ func _spawn_entry(data: Dictionary) -> void:
 	add_child(enemy)
 	_living[enemy] = true
 	enemy.follow(data.id, data.route, data.points, true)
+	if data.route.has("connector"):
+		_show_boss_ground(data.route)
+		enemy.landed.connect(_boss_impact, CONNECT_ONE_SHOT)
+		enemy.begin_descent()
 	visuals.add_enemy(enemy)
 	spawned += 1
 	alive += 1
 	enemy_spawned.emit(enemy)
 	if BalanceTrace.enabled: BalanceTrace.event("spawn",str(enemy.enemy_id),{"troop":enemy.troop.troop_name,"hp":enemy.health,"shield":enemy.shield,"route":str(data.route.cells),"start":data.get("start_index",0)},"spawn")
+
+func _show_boss_ground(route: Dictionary) -> void:
+	var map: GridMap = controller.map
+	if not is_instance_valid(_boss_ground):
+		_boss_ground = Node3D.new()
+		_boss_ground.name = "BossClearing"
+		add_child(_boss_ground)
+		_boss_ground.global_transform = map.global_transform
+	var center: Vector2i = route.center
+	var cells: Array[Vector2i] = [route.connector]
+	for x in range(-1,2):
+		for z in range(-1,2): cells.append(center+Vector2i(x,z))
+	for at in cells:
+		var cell := Vector3i(at.x,0,at.y)
+		if _boss_tiles.has(at) or map.get_cell_item(cell) >= 0: continue
+		_boss_tiles[at] = true
+		var slab := MeshInstance3D.new()
+		slab.mesh = map.mesh_library.get_item_mesh(0)
+		_boss_ground.add_child(slab)
+		var rest := map.map_to_local(cell)
+		slab.position = rest+Vector3.UP*1.2
+		slab.hide()
+		var drop := slab.create_tween()
+		drop.tween_interval(at.distance_to(route.connector)*0.045)
+		drop.tween_callback(slab.show)
+		drop.tween_method(func(t: float): slab.position = rest+Vector3.UP*TileAppearanceConstants.drop_offset(t,1.2),0.0,1.0,0.34)
+
+func _boss_impact(point: Vector3) -> void:
+	var dust := preload("res://scenes/enemies/boss_impact.tscn").instantiate() as CPUParticles3D
+	add_child(dust)
+	dust.global_position = point
+	dust.finished.connect(dust.queue_free)
+	dust.restart()
+	dust.emitting = true
+	var camera := get_viewport().get_camera_3d()
+	if camera != null and camera.has_method("shake_landing"): camera.shake_landing()
+
+func _clear_boss_ground() -> void:
+	if is_instance_valid(_boss_ground): _boss_ground.queue_free()
+	_boss_ground = null
+	_boss_tiles.clear()
 
 func _on_arrived(enemy: Node3D) -> void:
 	if BalanceTrace.enabled: BalanceTrace.event("leak",str(enemy.enemy_id),{"troop":enemy.troop.troop_name,"remaining":enemy.health+enemy.shield})
@@ -281,6 +328,7 @@ func _release_enemy(enemy: Node3D, reached_goal: bool) -> void:
 	if active and _pending.is_empty() and alive == 0:
 		active = false
 		if BalanceTrace.enabled: BalanceTrace.event("wave_end","wave",{"spawned":spawned,"killed":killed,"leaked":completed})
+		_clear_boss_ground()
 		wave_finished.emit()
 	_update_button()
 
@@ -288,6 +336,7 @@ func abort_wave() -> void:
 	# Set inactive before clearing children; teardown must never finish a wave.
 	active = false
 	start_allowed = false
+	_clear_boss_ground()
 	_pending.clear()
 	for enemy in _living.keys():
 		if is_instance_valid(enemy):

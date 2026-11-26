@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1056" height="424" viewBox="0 0 1056 424">
+  <defs>
+    <g id="ground">
+      <ellipse cx="88" cy="82" rx="47" ry="10" fill="#344d4d" opacity=".11" stroke="none"/>
+      <path d="M39 77h10m78-3h10m-87 15h13m54 1h9" fill="none" stroke="#738982" opacity=".34"/>
+    </g>
+    <g id="tower">
+      <path d="m50 73 40 13 35-17-38-13Z" fill="#9fab9c"/>
+      <path d="m63 68 28 9V45l-28-9Z" fill="#bbc2ad"/>
+      <path d="m91 77 23-13V33L91 45Z" fill="#869e96"/>
+      <path d="m60 35 30 10 27-14v-9l-8 4v-7l-8 4v7l-10 5v-8l-8-3v8l-10-3v-7l-9-3v9l-4-1Z" fill="#d5d8c2"/>
+      <path d="M73 65V53q5-6 10 3v12Z" fill="#49635f" stroke="none"/>
+    </g>
+    <g id="flag">
+      <path d="M65 78V23m0 3q15-9 43-4l-10 12 12 9q-24-8-45 2" fill="#9eb2a6"/>
+      <path d="m81 25 5 5-5 6-5-3Z" fill="#e7e4ca" stroke="none"/>
+      <path d="m53 80 12-7 15 4-10 6Z" fill="#7c938a"/>
+    </g>
+    <g id="road">
+      <path d="m41 69 79-39 16 10-79 40Z" fill="#a7b7ac"/>
+      <path d="m41 69 16 11 79-40v8L57 88l-16-11Z" fill="#829b93"/>
+      <path d="m60 60 16 10m4-20 16 10m4-20 16 10M57 80v8" fill="none"/>
+      <path d="m58 68 62-31" stroke="#e4e5cc" stroke-dasharray="5 6"/>
+    </g>
+    <g id="chest">
+      <path d="m53 49 43 12 29-16v25L97 86 53 74Z" fill="#9e8568"/>
+      <path d="m97 61 28-16v25L97 86Z" fill="#867961"/>
+      <path d="M53 49V38l26-15 46 12v10L96 61Z" fill="#c2a379"/>
+      <path d="m53 38 43 12 29-15M96 50v11m-21-7v14l10 3V57" fill="none"/>
+      <path d="m73 56 11 3v8l-11-3Z" fill="#e0c991"/>
+    </g>
+    <g id="gem">
+      <path d="m0-25 21 14 5 16L0 30-26 5l5-16Z" fill="#9dbfb6"/>
+      <path d="M0-25v19l21-5m-42 0L0-6l26 11L0 30l-8-22Z" fill="#c4d9c9"/>
+      <path d="M0-6 26 5 0 30Z" fill="#739a92"/>
+    </g>
+    <g id="spark" fill="#a69365" stroke="none">
+      <path d="M0-7 2-2 7 0 2 2 0 7-2 2-7 0-2-2Z"/>
+    </g>
+  </defs>
+  <g stroke="#4d6763" stroke-width="1.45" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Scouts -->
+    <g><use href="#ground"/><use href="#road"/><path d="M73 59V22m0 2 30 4-12 8 12 8-30-3Z" fill="#789f98"/><path d="M68 59h10" fill="none"/></g>
+    <g transform="translate(176)"><use href="#ground"/><path d="M53 64q5-22 23-22t23 22Zm43-8q6-15 16-15t17 15Z" fill="#839f96"/><path d="M54 59q-4-27 22-31 22 0 26 22l-14 4-9 9Zm44-7q-1-19 15-22 15 0 17 19l-13-2Z" fill="#bdc7ad"/><path d="m60 52 16-5 13 3m-14-7 3-13" fill="none"/></g>
+    <!-- Supplies -->
+    <g transform="translate(352)"><use href="#ground"/><use href="#tower"/><path d="M120 51h-7l12-13 12 13h-7v15h-10Z" fill="#bdd1b4"/></g>
+    <g transform="translate(528)"><use href="#ground"/><use href="#tower"/><path d="m95 77 14-7 14 6-13 8Zm18 7 12-5 9 5-11 6Z" fill="#d2c3a6"/><path d="m109 38 20-15 6 8-17 13m-1-22 7-6 13 14-6 6Z" fill="#a78d72"/></g>
+    <!-- Merchant -->
+    <g transform="translate(704)">
+      <use href="#ground"/>
+      <path d="M78 26v15c0 6-21 16-21 29 0 10 13 16 31 16s31-6 31-16c0-13-21-23-21-29V26Z" fill="#e3e9d9"/>
+      <path d="M64 64q11-5 25 0t23 0c9 10-4 17-24 17s-32-7-24-17Z" fill="#dabe72" stroke="#a58a4d"/>
+      <path d="M78 39q10 4 20 0" fill="none"/>
+      <path d="m77 20 21-1 3 10q-13 4-26 0Z" fill="#aa8b63"/>
+      <path d="M72 53q-6 5-8 10m8 12 5 2" fill="none" stroke="#fbf6df" stroke-width="2"/>
+      <circle cx="93" cy="72" r="2.3" fill="#f0db9c" stroke="none"/>
+      <use href="#spark" x="119" y="37"/>
+    </g>
+    <g transform="translate(880)">
+      <use href="#ground"/>
+      <path d="m50 61 52-32q19 6 28 23v19q-9 12-45 14l-35-10Z" fill="#bd9856" stroke="#846b46"/>
+      <path d="m50 61 52-32q19 6 28 23-11 16-45 21Z" fill="#e2c67d" stroke="#846b46"/>
+      <path d="M85 73v12m45-33q-13 15-45 21" fill="none" stroke="#846b46"/>
+      <g fill="#b79656" stroke="#a08249">
+        <ellipse cx="96" cy="48" rx="7" ry="3.4" transform="rotate(-17 96 48)"/>
+        <ellipse cx="78" cy="59" rx="4" ry="2.1" transform="rotate(-16 78 59)"/>
+        <ellipse cx="107" cy="57" rx="4" ry="2.2" transform="rotate(-18 107 57)"/>
+        <path d="M102 72q6-5 8-1l-1 4q-5 4-7 2Z"/>
+      </g>
+      <use href="#spark" x="62" y="37"/>
+    </g>
+    <!-- Conscription -->
+    <g transform="translate(0 106)"><use href="#ground"/><use href="#flag"/><path d="m89 61 14-10 20 1-2 18q-4 10-17 13-11-4-15-11Z" fill="#688e87"/><path d="m102 60 2 16m-8-8 16-5" stroke="#e7e4ca"/></g>
+    <g transform="translate(176 106)"><use href="#ground"/><use href="#flag"/><path d="m72 78 46-28m-8-4 19-3-9 16Z" fill="#c7cbb4"/><path d="m79 66 8 13" stroke="#9d715f" stroke-width="4"/></g>
+    <!-- Storm -->
+    <g transform="translate(352 106)"><use href="#ground"/><use href="#road"/><path d="m50 47 20 10v15L50 62Zm47-24 21 10v16L97 39Z" fill="#bbbb9f"/><path d="m70 57 48-24v7L70 65Z" fill="#d7d5bb"/></g>
+    <g transform="translate(528 106)"><use href="#ground"/><path d="m48 71 15-16 24 4 7 17-23 11-23-6Z" fill="#adbaae"/><path d="m48 71 23 6 16-18m-16 18v10" fill="none"/><path d="m82 59 16-18 25 7 6 19-21 12-18-8Z" fill="#92a8a0"/><path d="m82 59 26 7 15-18m-15 18v13" fill="none"/><path d="m99 32 13-15h8l-9 11h10l-15 12 4-8Z" fill="#c2a46b" stroke="none"/></g>
+    <!-- Altar -->
+    <g transform="translate(704 106)"><use href="#ground"/><path d="m51 65 39 11 35-17v11L90 87 51 76Z" fill="#9cac9d"/><path d="m51 65 35-17 39 11-35 17Z" fill="#c4ccb5"/><path d="m63 53 26 7 24-11v13L89 74l-26-8Z" fill="#849f98"/><path d="m63 53 24-12 26 8-24 11Z" fill="#b2c2ad"/><path d="M91 21c3 8 10 14 10 20a10 10 0 1 1-20 0c0-6 7-12 10-20Z" fill="#b48375" stroke="#8a6057"/></g>
+    <g transform="translate(880 106)"><use href="#ground"/><path d="m51 66 37 10 35-17v11L88 87 51 77Z" fill="#9cac9d"/><path d="m51 66 35-17 37 10-35 17Z" fill="#c4ccb5"/><path d="m65 57 16-24 13 6 3 17-13 10Zm33 5 11-14 11 4 6 12-13 7Z" fill="#839e97"/><ellipse cx="91" cy="71" rx="10" ry="5" fill="#d7bb75" stroke="#9c8352"/><use href="#spark" x="120" y="33"/></g>
+    <!-- Strike -->
+    <g transform="translate(0 212)"><use href="#ground"/><path d="m59 63 42-40 11 11-42 40Z" fill="#b1997b"/><path d="m91 22 11-10 22 21-10 11Z" fill="#99ada5"/><path d="m57 73 29-10 24 8-30 14-23-4Z" fill="#788e87"/><ellipse cx="113" cy="71" rx="12" ry="7" fill="#ddc58a" stroke="#92794d"/></g>
+    <g transform="translate(176 212)"><use href="#ground"/><path d="M55 72q8-31 33-37 28 4 33 28l6 7-35 13-43-7Z" fill="#b3b99f"/><path d="M88 35q-10 11-7 31l12 3q-1-19 7-29m-51 36 43-7 35 1" fill="none"/><path d="M50 44h24m-18 5-6-5 6-5" fill="none" stroke="#a27a65" stroke-width="2"/></g>
+    <!-- Payroll -->
+    <g transform="translate(352 212)"><use href="#ground"/><use href="#chest"/><g fill="#d9c28a" stroke="#907b52"><ellipse cx="108" cy="77" rx="11" ry="5"/><ellipse cx="108" cy="73" rx="11" ry="5"/><ellipse cx="124" cy="79" rx="10" ry="5"/></g></g>
+    <g transform="translate(528 212)"><use href="#ground"/><path d="m64 35 16-10 34 20-4 34-22 5-28-19Z" fill="#ab9b7d"/><path d="m59 32 31-7 26 27-6 31-30 4-25-25Z" fill="#dedec2"/><path d="m71 62 13-6 1-11 12 9 8-2v10l-15 9Z" fill="#8baaa0"/><path d="m61 37 9 1m31 35 6-1" fill="none"/></g>
+    <!-- Gems and the generic tile -->
+    <g transform="translate(704 212)"><use href="#ground"/><use href="#gem" transform="translate(88 53)"/><use href="#spark" x="125" y="39"/></g>
+    <g transform="translate(880 212)"><use href="#ground"/><use href="#gem" transform="translate(64 62) scale(.58)"/><use href="#gem" transform="translate(91 51) scale(.72)"/><use href="#gem" transform="translate(115 70) scale(.46)"/></g>
+    <g transform="translate(0 318)"><use href="#ground"/><path d="m45 62 44-25 43 19v10L88 89 45 72Z" fill="#819e95"/><path d="m45 62 44-25 43 19-44 23Z" fill="#b4c3b1"/><path d="m62 61 27-15 26 11-27 14Z" fill="#d2d9bf"/><path d="m88 50 6 5 8 3-8 2-6 6-5-6-8-3 8-2Z" fill="#809e93" stroke="none"/></g>
+  </g>
+</svg>

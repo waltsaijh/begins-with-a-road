@@ -44,10 +44,10 @@ func refresh(timeline: WaveTimeline) -> void:
 		marker.get_node("Divider").hide()
 		marker.get_node("Dot").visible = event.kind == "wave"
 		marker.get_node("Dot/Outline").default_color = timeline.muted_color
-		marker.get_node("Dot/Fill").color = Color("f3f8f7")
+		marker.get_node("Dot/Fill").color = timeline.dot_fill_color
 		var icon: Sprite2D = marker.get_node("EventIcon")
 		icon.visible = event.kind != "wave"
-		icon.texture = WaveTimeline.RELIC_ICON if event.kind == "relic" else WaveTimeline.EXPANSION_ICON
+		icon.texture = WaveTimeline.SPECIAL_ICON if event.kind == "special" else (WaveTimeline.RELIC_ICON if event.kind == "relic" else WaveTimeline.EXPANSION_ICON)
 		var caption: Label = marker.get_node("Caption")
 		caption.text = timeline.event_caption(event)
 		caption.add_theme_color_override("font_color",timeline.muted_color)
@@ -69,8 +69,8 @@ func refresh(timeline: WaveTimeline) -> void:
 		_current.name = "Current"
 		add_child(_current)
 		_current.get_node("Divider").hide()
-		_current.get_node("Dot/Fill").color = Color("202c2d")
-		_current.get_node("Dot/Outline").default_color = Color("202c2d")
+	_current.get_node("Dot/Fill").color = timeline.current_color
+	_current.get_node("Dot/Outline").default_color = timeline.current_color
 	_current.visible = not schedule.is_empty()
 	_current.position = Vector2(size.x/WaveTimeline.VISIBLE_EVENTS*(0.5+WaveTimeline.PAST_EVENTS),43)
 	_current.scale = Vector2.ONE*(1.0+timeline.marker_pulse)

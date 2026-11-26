@@ -72,7 +72,7 @@ func run() -> void:
 	var header_y: float = hud.speed_button.get_global_rect().get_center().y
 	for control: Control in [integrity,hud.get_node("Header/Balance"),guide.toggle,choice.get_node("RelicBar")]:
 		check(absf(control.get_global_rect().get_center().y-header_y) <= 3,"status control shares the top row: "+str(control.name))
-	check(absf(timeline.global_position.y+43-header_y) <= 3,"timeline markers share the status row")
+	check(absf(timeline.global_position.y+43-header_y) <= 3,"timeline markers share the status row: marker=%s status=%s" % [timeline.global_position.y+43,header_y])
 	check(is_equal_approx(hud.status_row_rect.get_center().x,get_viewport().get_visible_rect().size.x*0.5),"compact status group is centered")
 	check(not hud.get_node("Header/Balance").tooltip_text.is_empty() and not hud.speed_button.tooltip_text.is_empty() and not hud.pause_button.tooltip_text.is_empty(),"gold/speed/pause expose hover explanations")
 	check(timeline.reward_indices() == PackedInt32Array([2,5,8,11]),"formal timeline marks exactly four relic choices")
@@ -97,9 +97,43 @@ func run() -> void:
 	var relic: RelicDefinition = relics.catalog.find(&"global_damage")
 	var state: int = relics._rng.state
 	check(relics.acquire(relic) and relics.acquire(relic),"repeatable relic can stack")
-	check(relics.held[relic.id] == 2 and choice.get_node("RelicBar/Items").get_child_count() == 1,"one icon reflects stacked count")
-	check(choice.get_node("RelicBar/Items").get_child(0).tooltip_text.contains(relic.localized_description()),"tooltip includes effect")
+	check(relics.held[relic.id] == 2 and choice.get_node("RelicBar/Scroll/Items").get_child_count() == 1,"one icon reflects stacked count")
+	check(choice.get_node("RelicBar/Scroll/Items").get_child(0).tooltip_text.contains(relic.localized_description()),"tooltip includes effect")
 	check(relics._rng.state == state,"relic UI consumes no reward RNG")
+	var held_before := relics.held.duplicate()
+	choice.set_collapsed(true)
+	await choice._bar_motion.finished
+	await frames(2)
+	check(choice.collapsed and not choice.get_node("RelicBar/Scroll").visible and choice.get_node("RelicBar/Toggle").text == "2","Collapsed relics show one icon and total stacks: p=%s count=%s" % [choice._bar_progress,choice.get_node("RelicBar/Toggle").text])
+	check(relics.held == held_before and is_equal_approx(choice.bar_width(),56),"Collapsing releases header width without affecting relics: width=%s" % choice.bar_width())
+	await capture("relics_collapsed")
+	check(relics.acquire(relic) and choice.collapsed and choice.get_node("RelicBar/Toggle").text == "3","New relic updates collapsed count without forcing expansion")
+	# Restore the gameplay fixture, then exercise the real narrow header layout.
+	relics.held = held_before.duplicate()
+	choice._refresh_collection()
+	var window := get_tree().root
+	var original_size := window.size
+	var original_scale := window.content_scale_size
+	window.content_scale_size = Vector2i(800,600)
+	window.size = Vector2i(800,600)
+	await frames(8)
+	check(choice._bar_limit < 98 and is_equal_approx(choice.bar_width(),56),"Narrow header keeps the compact relic control")
+	choice.get_node("RelicBar/Toggle").pressed.emit()
+	await choice._bar_motion.finished
+	await frames(2)
+	check(choice.get_node("RelicBar/Scroll").visible and choice._narrow_open,"Narrow header expands the original relic row")
+	check(choice.get_node("RelicBar/Scroll").get_global_rect().position.y >= choice.get_node("RelicBar/Toggle").get_global_rect().end.y,"Narrow relic row opens below the header")
+	await capture("relics_narrow_expanded")
+	choice.get_node("RelicBar/Toggle").pressed.emit()
+	await choice._bar_motion.finished
+	check(not choice.get_node("RelicBar/Scroll").visible,"Narrow relic row closes again")
+	window.content_scale_size = original_scale
+	window.size = original_size
+	await frames(8)
+	choice.set_collapsed(false)
+	await choice._bar_motion.finished
+	await frames(2)
+	check(choice.get_node("RelicBar/Scroll").visible,"Relic icons expand again")
 	shop.open_shop()
 	shop.view.finish_animation()
 	await wait_real(0.4)
@@ -114,7 +148,7 @@ func run() -> void:
 	shop.close_shop()
 	check(timeline.size.x > 300 and timeline.get_node("Track").visible and timeline.get_node("Acts").visible,"timeline retains its ACT label")
 	check(is_equal_approx(hud.status_row_rect.get_center().x,get_viewport().get_visible_rect().size.x*0.5),"status group remains centered")
-	check(absf(hud.get_node("Header/Actions").position.x-timeline.get_global_rect().end.x-16.0) < 0.1,"actions keep their gap beside the timeline")
+	check(absf(hud.get_node("Header/Actions").position.x-timeline.get_global_rect().end.x-(70.0 if guide.toggle.visible else 16.0)) < 0.1,"actions keep their gap beside the timeline")
 	check(timeline.reward_indices().size() == 4 and timeline._get_tooltip(timeline.event_position("relic",2)).contains("ACT I"),"timeline has four relic icons with hover details")
 	await capture("timeline")
 	var width: float = timeline.size.x
@@ -179,6 +213,8 @@ func run() -> void:
 		var points: PackedVector3Array = preload("res://scripts/enemies/spawning/route_waypoints.gd").for_route(route,scene.get_node("TileMap"),{},0)
 		wave._spawn_entry({"id":10000+wave.spawned,"profile":profile,"route":route,"points":points,"health":profile.max_health,"shield":profile.max_shield,"speed":0.1})
 	check(guide.pending.size() == 3 and guide.read.is_empty(),"multiple actual enemy types queue separately from read state")
+	check(guide.toggle.text.is_empty() and guide.toggle.icon != null and guide.toggle.get_node("Badge/Count").text == "3","One icon carries the unread count without permanent text")
+	check(guide.toggle.get_node("Badge").position.x < 0 and guide.toggle.get_node("Badge").position.y < 0,"Unread badge sits at the top left of the icon")
 	await frames(4)
 	await capture("discovery_notice")
 	if DisplayServer.get_name() == "headless": guide.open_notifications()
@@ -187,7 +223,11 @@ func run() -> void:
 	check(page.visible and get_tree().paused and page.selected_section == 1,"clicking the notice opens the progress page on enemies")
 	var shown := TroopCatalog.find("quickfeet").localized_name()
 	check(page.column.get_node("Name").text == shown and page.preview.model != null,"the first discovered enemy is shown in detail")
-	check(guide.pending.is_empty() and guide.read.size() == 3 and not guide.toggle.visible,"opening the page reads every notice")
+	check(guide.pending.size() == 2 and guide.read.size() == 1 and guide.toggle.get_node("Badge/Count").text == "2","Only the displayed enemy entry becomes read")
+	page.focus_entry("soldier")
+	check(guide.pending.size() == 1 and guide.toggle.get_node("Badge/Count").text == "1","Reading another entry decrements the badge")
+	page.focus_entry("heavy")
+	check(guide.pending.is_empty() and guide.read.size() == 3 and not guide.toggle.get_node("Badge").visible,"Badge disappears when all entries are read")
 	await capture("new_enemy_detail")
 	page.close()
 	hud.set_paused(false)
@@ -236,4 +276,4 @@ func run() -> void:
 	var result := {"checks":checks,"failures":failures,"rendered":DisplayServer.get_name() != "headless"}
 	FileAccess.open(Artifacts.path("ui_slice_a/results.json"),FileAccess.WRITE).store_string(JSON.stringify(result,"  "))
 	print("UI_SLICE_A ",JSON.stringify(result))
-	get_tree().quit(0 if failures.is_empty() else 1)
+	if not OS.has_feature("web"): get_tree().quit(0 if failures.is_empty() else 1)

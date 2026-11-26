@@ -1,0 +1,44 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/towers/upgrade_feedback.gd" id="Feedback"]
+
+[sub_resource type="StandardMaterial3D" id="Spark"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+transparency = 1
+
+[sub_resource type="PrismMesh" id="Fleck"]
+material = SubResource("Spark")
+size = Vector3(0.055, 0.12, 0.045)
+
+[sub_resource type="Gradient" id="Colors"]
+offsets = PackedFloat32Array(0, 0.22, 0.68, 1)
+colors = PackedColorArray(1, 0.74, 0.32, 0, 1, 0.86, 0.54, 1, 1, 0.93, 0.72, 1, 1, 0.85, 0.50, 0)
+
+[sub_resource type="StandardMaterial3D" id="Glow"]
+resource_local_to_scene = true
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 0.78, 0.38, 0)
+
+[node name="UpgradeFeedback" type="CPUParticles3D"]
+cast_shadow = 0
+emitting = false
+one_shot = true
+amount = 24
+lifetime = 0.95
+explosiveness = 0.64
+mesh = SubResource("Fleck")
+emission_shape = 3
+emission_box_extents = Vector3(0.42, 0.32, 0.42)
+direction = Vector3(0, 1, 0)
+spread = 12.0
+gravity = Vector3(0, 0.35, 0)
+initial_velocity_min = 0.95
+initial_velocity_max = 1.65
+scale_amount_min = 0.7
+scale_amount_max = 1.25
+color_ramp = SubResource("Colors")
+script = ExtResource("Feedback")
+glow = SubResource("Glow")

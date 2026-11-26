@@ -1,10 +1,10 @@
 shader_type canvas_item;
 render_mode unshaded;
 
-uniform vec4 frame_backgrounds[3] : source_color;
-uniform vec4 frame_borders[3] : source_color;
-uniform vec4 frame_rects[3];
-uniform vec4 frame_widths[3];
+uniform vec4 frame_backgrounds[2] : source_color;
+uniform vec4 frame_borders[2] : source_color;
+uniform vec4 frame_rects[2];
+uniform vec4 frame_widths[2];
 // Whole status overlay fades so bars never hide the road under them.
 uniform float opacity = 1.0;
 
@@ -26,7 +26,9 @@ void fragment() {
 		bool border = point.x < rect.x + widths.x || point.y < rect.y + widths.y || point.x >= rect.z - widths.z || point.y >= rect.w - widths.w;
 		COLOR = tint * (inside ? (border ? frame_borders[index] : frame_backgrounds[index]) : vec4(0.0));
 	} else {
-		vec2 atlas_uv = (atlas_rect.xy + UV * atlas_rect.zw) / vec2(textureSize(TEXTURE, 0));
+		// A QuadMesh in canvas coordinates has its first UV row at the bottom.
+		vec2 icon_uv = vec2(UV.x, 1.0 - UV.y);
+		vec2 atlas_uv = (atlas_rect.xy + icon_uv * atlas_rect.zw) / vec2(textureSize(TEXTURE, 0));
 		COLOR = tint * texture(TEXTURE, atlas_uv);
 	}
 	COLOR.a *= opacity;

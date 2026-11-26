@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/definitions/level_definition.gd" id="4_86rb2"]
 [ext_resource type="PackedScene" path="res://scenes/maps/tutorial.tscn" id="5_d3556"]
 [ext_resource type="Resource" uid="uid://ceu6i5u20vcxt" path="res://assets/data/tutorial/intro.tres" id="6_5bysg"]
+[ext_resource type="Resource" path="res://assets/data/rendering/time_of_day/morning.tres" id="time_of_day"]
 
 [sub_resource type="Resource" id="Resource_c88qf"]
 script = ExtResource("3_l2lal")
@@ -66,3 +67,4 @@ required_to_complete_levels = PackedStringArray()
 terrain = ExtResource("5_d3556")
 acts = Array[ExtResource("1_hpbpm")]([SubResource("Resource_cto5j")])
 tutorial = ExtResource("6_5bysg")
+time_of_day = ExtResource("time_of_day")

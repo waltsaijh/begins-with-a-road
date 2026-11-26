@@ -1,6 +1,7 @@
 extends SceneTree
 const Baker = preload("res://tools/assets/solid_mesh_baker.gd")
 const Artifacts = preload("res://tests/fixtures/test_artifacts.gd")
+const CEL_REFERENCE = preload("res://tests/enemies/cel_reference.gdshader")
 var failures := 0
 func _initialize(): verify.call_deferred()
 func check(value: bool, message: String):
@@ -24,8 +25,8 @@ func verify():
 		counts.append({"id":id,"surfaces":mesh.get_surface_count()})
 	for path in ["sentry_base","sentry_weapon"]:
 		check(load("res://assets/models/towers/"+path+"_mesh.res").surface_get_material(0)==Baker.MATERIAL,"Tower does not use shared material")
-	for id in ["soldier","quickfeet","heavy"]:
-		var gpu = preload("res://scripts/enemies/rendering/enemy_model.gd").gpu_for(TroopCatalog.find(id))
+	for id in ["grunt","runner","brute"]:
+		var gpu: EnemyGpuModel = load("res://assets/models/enemies/"+id+"_gpu.tres")
 		check(gpu.material()==Baker.MATERIAL and gpu.mesh.surface_get_material(0)==Baker.MATERIAL,"Enemy material is not shared")
 		check(Baker.gait(gpu.mesh,gpu)==gpu.mesh,"Unchanged gait was needlessly repacked")
 		var arrays: Array = gpu.mesh.surface_get_arrays(0)
@@ -50,6 +51,8 @@ func verify():
 	quit(int(failures>0))
 func pixels() -> Array:
 	root.size=Vector2i(640,640)
+	# Isolate the palette/lighting from Art Slice G's drifting cloud shadows.
+	RenderingServer.global_shader_parameter_set("cloud_shadow_strength",0.0)
 	var world := Node3D.new()
 	root.add_child(world)
 	var env := WorldEnvironment.new()
@@ -77,8 +80,17 @@ func pixels() -> Array:
 			material.metallic_specular=0.08
 		var box := BoxMesh.new()
 		box.material=material
+		# Cel lighting: the reference is the same colour/roughness/specular under the
+		# shared cel include, not the smooth StandardMaterial3D ramp.
+		var reference := ShaderMaterial.new()
+		reference.shader=CEL_REFERENCE
+		reference.set_shader_parameter("albedo",color)
+		reference.set_shader_parameter("roughness",material.roughness)
+		reference.set_shader_parameter("specular",material.metallic_specular)
 		node.mesh=box
+		node.material_override=reference
 		var original := await capture()
+		node.material_override=null
 		node.mesh=Baker.mesh(box)
 		var converted := await capture()
 		var legacy := ShaderMaterial.new()
@@ -102,8 +114,47 @@ func pixels() -> Array:
 		check(count>1000 and error<0.003,"Static palette pixel difference: "+str(error))
 		original.save_png(Artifacts.path("rendering/shared_material/color_"+color.to_html()+"_before.png"))
 		converted.save_png(Artifacts.path("rendering/shared_material/color_"+color.to_html()+"_after.png"))
+	errors.append(await cel_bands(node))
 	world.free()
 	return errors
+# A smooth sphere under the shared material must show only the three flat cel
+# bands (plus anti-aliased band edges), never a continuous NdotL gradient.
+func cel_bands(node: MeshInstance3D) -> Dictionary:
+	var sphere := SphereMesh.new()
+	sphere.radial_segments=96
+	sphere.rings=48
+	var source := StandardMaterial3D.new()
+	source.albedo_color=Color("d2c6ab")
+	source.roughness=1.0
+	source.metallic_specular=0.0
+	sphere.material=source
+	node.mesh=Baker.mesh(sphere)
+	var image := await capture()
+	image.save_png(Artifacts.path("rendering/shared_material/cel_sphere.png"))
+	var background := image.get_pixel(0,0)
+	var histogram := {}
+	var count := 0
+	for y in range(0,640,2):
+		for x in range(0,640,2):
+			var c := image.get_pixel(x,y)
+			if c.is_equal_approx(background): continue
+			count += 1
+			var key := int(round(c.get_luminance()*255.0))
+			histogram[key]=int(histogram.get(key,0))+1
+	var levels := histogram.keys()
+	levels.sort_custom(func(a,b): return histogram[a]>histogram[b])
+	var dominant := 0
+	for i in mini(3,levels.size()): dominant += histogram[levels[i]]
+	var share := float(dominant)/maxi(1,count)
+	# Allow +-1 neighbouring luminance codes from dithering/precision per band.
+	var banded := 0
+	for key in histogram:
+		for i in mini(3,levels.size()):
+			if absi(int(key)-int(levels[i]))<=1: banded += histogram[key]; break
+	var band_share := float(banded)/maxi(1,count)
+	check(count>5000,"Cel sphere not rendered")
+	check(band_share>0.9,"Cel sphere is not quantised into three bands: "+str(band_share))
+	return {"pixels":count,"distinct_levels":histogram.size(),"three_band_share":band_share,"top_levels":levels.slice(0,3)}
 func capture() -> Image:
 	await RenderingServer.frame_post_draw
 	await process_frame

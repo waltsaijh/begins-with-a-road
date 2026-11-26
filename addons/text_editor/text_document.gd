@@ -171,6 +171,7 @@ static func parse_csv(raw: String) -> Dictionary:
 	return {"error":"","rows":result,"records":raw_records}
 
 func category(key: String) -> String:
+	if key.begins_with("event."): return "特殊事件"
 	if key.begins_with("relic."): return "遺物"
 	if key.begins_with("tower.") or key.begins_with("card.") or key.begins_with("text.card_"): return "防禦塔與卡牌"
 	if key.begins_with("troop.") or key.begins_with("enemy.") or key.begins_with("text.troop.") or key.contains("_ability.") or key.begins_with("text.enemy_"): return "敵軍"

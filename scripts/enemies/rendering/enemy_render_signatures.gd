@@ -2,13 +2,12 @@ extends RefCounted
 ## Conservative render combinations, independent of troop names and mesh shapes.
 const DefaultScene = preload("res://assets/models/enemies/grunt.tscn")
 const DefaultMesh = preload("res://assets/models/enemies/grunt_mesh.res")
-const WalkShader = preload("res://assets/shaders/solid_color.gdshader")
 const Appearance = preload("res://scripts/enemies/rendering/enemy_model.gd")
 
 static func profile_keys(profile: Troop) -> Array[String]:
 	var gpu := Appearance.gpu_for(profile)
 	if gpu != null:
-		return ["multimesh:"+resource_key(WalkShader)+":"+str(gpu.mesh.surface_get_format(0))+":"+str(gpu.mesh.surface_get_primitive_type(0))]
+		return ["multimesh:"+resource_key(gpu.material().shader)+":"+str(gpu.mesh.surface_get_format(0))+":"+str(gpu.mesh.surface_get_primitive_type(0))]
 	var root := profile.model.instantiate()
 	var keys: Array[String] = []
 	var meshes := root.find_children("*", "MeshInstance3D", true, false)
@@ -50,6 +49,17 @@ static func profile_keys(profile: Troop) -> Array[String]:
 	root.free()
 	keys.sort()
 	return keys
+
+## Uniform-only colours/energies (TimeOfDayPreset) never select another shader,
+## so a recoloured level reuses the Boot warmup instead of re-preparing.
+const ENVIRONMENT_UNIFORM_ONLY := ["background_color", "ambient_light_color", "ambient_light_energy"]
+
+static func environment_key(environment: Environment) -> String:
+	if environment == null: return "none"
+	var neutral := environment.duplicate() as Environment
+	var defaults := Environment.new()
+	for name in ENVIRONMENT_UNIFORM_ONLY: neutral.set(name, defaults.get(name))
+	return resource_key(neutral)
 
 static func resource_key(resource: Resource) -> String:
 	if resource == null: return "none"

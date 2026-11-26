@@ -40,7 +40,7 @@ func validate(definition: TrafficStructureDefinition, at: Vector2i, turns: int) 
 	var wave := tower_map.get_node_or_null("../EnemyWave")
 	var cards := tower_map.get_node_or_null("../CardPlacement")
 	if (wave != null and wave.active) or (cards != null and cards.input_suspended): return "目前不能建造"
-	if tower_map.occupied.has(at) or at in tower_map.controller.terminal_cells(): return "不能覆蓋防禦塔或端點"
+	if tower_map.blocked_occupancy().has(at) or at in tower_map.controller.terminal_cells(): return "不能覆蓋防禦塔或端點"
 	for existing: DefenseTower in tower_map.towers.values():
 		if existing.definition.deployment != null and at == existing.garrison_cell(): return "不能覆蓋兵營駐點"
 	for existing: TrafficStructure in occupied.get(at, []):

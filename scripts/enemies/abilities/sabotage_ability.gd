@@ -18,6 +18,7 @@ const ThrownBomb = preload("res://scripts/enemies/rendering/thrown_bomb.gd")
 var bombs: Array = []
 var clock := 0.0
 var remaining := 0.0
+@export var plant_feet := false
 var marked: Array[WeakRef] = []
 
 func start() -> void:
@@ -27,6 +28,9 @@ func start() -> void:
 
 func is_casting() -> bool:
 	return remaining > 0
+
+func movement_hold_remaining() -> float:
+	return remaining if plant_feet else 0.0
 
 func update(host: Node, delta: float) -> void:
 	if radius <= 0: return
@@ -96,7 +100,11 @@ func _fly_bombs(host: Node) -> void:
 
 ## The tower the cast is aimed at; null when none or already gone.
 func target() -> DefenseTower:
-	return marked[0].get_ref() as DefenseTower if not marked.is_empty() else null
+	var tower := marked[0].get_ref() as DefenseTower if not marked.is_empty() else null
+	return tower if _on_battlefield(tower) else null
+
+static func _on_battlefield(tower: DefenseTower) -> bool:
+	return is_instance_valid(tower) and tower.is_inside_tree() and not tower.is_queued_for_deletion()
 
 func _towers(host: Node) -> Array[DefenseTower]:
 	var result: Array[DefenseTower] = []
@@ -110,7 +118,7 @@ func _cancel() -> void:
 	clock = interval
 
 func _legal(host: Node, tower: DefenseTower) -> bool:
-	if not is_instance_valid(tower) or tower.is_queued_for_deletion() or tower.health <= 0: return false
+	if not _on_battlefield(tower) or tower.health <= 0: return false
 	if tower.attack == null and tower.deployment == null: return false
 	return host.distance(enemy.global_position, tower.global_position) <= radius
 

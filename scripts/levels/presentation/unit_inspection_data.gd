@@ -32,12 +32,20 @@ static func tower(t: DefenseTower, catalog: RelicCatalog) -> Dictionary:
 		if relic != null: notes.append(TranslationServer.translate(relic.name_key))
 	if t.support_bonus > 0: notes.append((GameText.text("text.unit_inspection_data.14",{},en)) % number(t.support_bonus*100))
 	if t.geometry_damage_bonus > 0: notes.append((GameText.text("text.unit_inspection_data.15",{},en)) % number(t.geometry_damage_bonus*100))
+	if t.event_ceasefire: notes.append(TranslationServer.translate("event.tower.ceasefire"))
 	if t.is_disabled(): notes.append(GameText.text("text.unit_inspection_data.16",{},en))
 	return {"name":t.definition.localized_name()+"  ·  Lv.%d" % t.level,"kind":"","stats":stats,"notes":" · ".join(notes),"icon":t.definition.icon,"color":t.definition.accent_color.darkened(0.45),"health":-1.0}
 
+static func enemy_state(e: Node3D, killed := false) -> Dictionary:
+	# Resources and scalar snapshots only; no enemy/renderer Node survives death.
+	return {"troop":e.troop,"health":0.0 if killed else e.health,"max_health":e.max_health,"shield":e.shield,"max_shield":e.max_shield,"base_damage":e.base_damage,"damage_reduction":e.damage_reduction,"killed":killed}
+
 static func enemy(e: Node3D) -> Dictionary:
+	return enemy_from_state(enemy_state(e))
+
+static func enemy_from_state(e: Dictionary) -> Dictionary:
 	var en := TranslationServer.get_locale().begins_with("en")
-	var stats := PackedStringArray(["HP  %s / %s" % [number(e.health),number(e.max_health)]])
+	var stats := PackedStringArray(["HP  %s / %s" % ["0" if e.killed else number(e.health),number(e.max_health)]])
 	stats.append((GameText.text("text.unit_inspection_data.17",{},en)) % e.base_damage)
 	if e.max_shield > 0: stats.append((GameText.text("text.unit_inspection_data.18",{},en)) % [number(e.shield),number(e.max_shield)])
 	var types := PackedStringArray([TranslationServer.translate("ui.progress.size.%s" % e.troop.body_size)])
@@ -50,4 +58,4 @@ static func enemy(e: Node3D) -> Dictionary:
 	var reduction: float = e.damage_reduction
 	if reduction > 0 and not ("減傷" in description or "damage reduction" in description.to_lower()): notes.append((GameText.text("text.unit_inspection_data.20",{},en)) % number(reduction*100))
 	if e.troop.has_tag(&"boss"): notes.append(GameText.text("text.unit_inspection_data.21",{},en))
-	return {"name":e.troop.localized_name(),"kind":" · ".join(types),"stats":stats,"notes":" · ".join(notes),"icon":e.troop.icon,"color":e.troop.icon_color(),"health":100.0*e.health/e.max_health}
+	return {"name":e.troop.localized_name()+("  ·  "+TranslationServer.translate("ui.inspection.killed") if e.killed else ""),"kind":" · ".join(types),"stats":stats,"notes":" · ".join(notes),"icon":e.troop.icon,"color":e.troop.icon_color(),"health":100.0*e.health/e.max_health}

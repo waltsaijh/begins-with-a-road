@@ -7,6 +7,8 @@ const Pose = preload("res://scripts/enemies/rendering/enemy_pose.gd")
 const StatusOverlay = preload("res://scenes/enemies/components/enemy_status_overlay.tscn")
 const Appearance = preload("res://scripts/enemies/rendering/enemy_model.gd")
 const MeshBatch = preload("res://scripts/enemies/rendering/enemy_mesh_batch.gd")
+const RigidClip = preload("res://scripts/enemies/rendering/enemy_rigid_clip.gd")
+const ActionVisual = preload("res://scripts/enemies/rendering/enemy_action_visual.gd")
 @export var death_effects_scene: PackedScene = preload("res://scenes/effects/death_effects.tscn")
 var turn_sharpness := EnemyRenderConstants.TURN_SHARPNESS
 var units: Array[Node3D] = []
@@ -60,7 +62,9 @@ func add_enemy(enemy: Node3D) -> void:
 	_slots[enemy] = units.size()
 	units.append(enemy)
 	_poses.append(Pose.new(enemy))
-	var appearance := Appearance.new(enemy.troop,self)
+	var appearance := Appearance.new(enemy.troop,self,_poses[-1].walk_phase)
+	if appearance.gpu_model is RigidClip and not appearance.gpu_model.gesture.is_empty():
+		appearance.action = ActionVisual.new(enemy,self,appearance.gpu_model.gesture)
 	if appearance.gpu_model != null:
 		appearance.batch = _batch_for(appearance.gpu_model)
 		appearance.batch.add(enemy)
@@ -91,6 +95,13 @@ func update_enemy(enemy: Node3D) -> void:
 	var appearance: RefCounted = _appearances[slot]
 	var model_transform: Transform3D = appearance.transform_for(display)
 	head_positions[slot] = model_transform*appearance.head
+	if appearance.action != null:
+		var was_active: bool = appearance.action.active
+		if appearance.action.update(model_transform):
+			if not was_active: appearance.batch.remove(enemy)
+			appearance.clip_phase = 0.0
+			return
+		if was_active: appearance.batch.add(enemy)
 	if appearance.batch != null:
 		appearance.batch.update(enemy,global_transform.affine_inverse()*model_transform,appearance.custom_data(pose))
 
@@ -107,6 +118,8 @@ func inspection_parts(enemy: Node3D) -> Array[Dictionary]:
 	var slot: int = _slots.get(enemy,-1)
 	if slot < 0: return []
 	var appearance: RefCounted = _appearances[slot]
+	if appearance.action != null and appearance.action.active:
+		return preload("res://scripts/levels/presentation/unit_pick.gd").mesh_parts(appearance.action.model)
 	if appearance.gpu_model == null:
 		var result: Array[Dictionary] = []
 		if not is_instance_valid(appearance.instance): return result
@@ -118,7 +131,10 @@ func inspection_parts(enemy: Node3D) -> Array[Dictionary]:
 	var display := enemy.global_transform
 	display.origin = death_position(enemy)
 	display.basis = Basis(Vector3.UP,_poses[slot].yaw).scaled(display.basis.get_scale())
-	return [{"transform":display*appearance.adjustment*appearance.imported_transform,"bounds":appearance.gpu_model.mesh.get_aabb()}]
+	var transform_for_pick: Transform3D = display*appearance.adjustment*appearance.imported_transform
+	if appearance.gpu_model.has_method("inspection_parts"):
+		return appearance.gpu_model.inspection_parts(transform_for_pick, appearance.clip_phase)
+	return [{"transform":transform_for_pick,"bounds":appearance.gpu_model.mesh.get_aabb()}]
 
 func _on_enemy_died(enemy: Node3D) -> void:
 	var slot: int = _slots.get(enemy, -1)
@@ -138,7 +154,8 @@ func remove_enemy(enemy: Node3D) -> void:
 	if slot < 0:
 		return
 	_slots.erase(enemy)
-	if _appearances[slot].batch != null: _appearances[slot].batch.remove(enemy)
+	if _appearances[slot].batch != null and _appearances[slot].batch.slots.has(enemy):
+		_appearances[slot].batch.remove(enemy)
 	_appearances[slot].dispose()
 	var last: Node3D = units.pop_back()
 	if slot < units.size():

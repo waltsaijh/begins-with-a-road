@@ -27,16 +27,16 @@
 | 設定 `settings` | 可重用的主畫布 Control 頁面、通用選項列與引擎設定介接；宿主管理開關、背景輸入鎖定及遊戲流程 |
 | 音訊 `audio` | 跨場景 BGM、開波號角、實際時間淡化與循環交叉淡化；BGM／Combat 分流至 Master，音量由共用設定頁控制 |
 | 共用介面 `interface` | 跨場景白色過渡及期間的輸入攔截，持續存在於主畫面與關卡之間；呼叫者決定切換目標與遊戲狀態 |
-| 關卡 `levels` | 載入地形與端點、ACT／波次排程、入口擴張、時間線與暫停；協調擊殺收益與金幣呈現；單位檢視協調器共用即時資訊面板、模型射線拾取與選取範圍，顯示資料不回寫戰鬥 |
+| 關卡 `levels` | 載入地形與端點、ACT／波次排程、玩家直接入口放置（只記上次區域、道路自動生成）、時間線與暫停；協調擊殺收益與金幣呈現；單位檢視協調器共用即時資訊面板、模型射線拾取與選取範圍，死亡敵人保留純數值快照，顯示資料不回寫戰鬥 |
 | 教學 `tutorial` | 可選 Resource 保存固定手牌與指定落點；Director 觀察真實動作、協調延後發牌與教學限制，獨立場景呈現半透明 hologram、收斂焦點框及挖孔暗罩，不代玩家交易／建造；通關呈現由共用結算宿主負責 |
-| 卡牌 `cards` | 建造卡組合、手牌、旋轉預覽、放置意圖與商店交易；顯示與交易分開管理 |
+| 卡牌 `cards` | 建造卡組合、淺弧扇形手牌、旋轉預覽、放置意圖與商店交易（HUD補給入口／基地拾取共用階段守衛）；顯示與交易分開管理 |
 | 建造原型 `construction` | 可選的準備期草稿、隔離排程預測及道路幾何獎勵；沿用 cards／map／towers 權威，只由獨立實驗場景啟用 |
 | 地塊編輯 `tower_tile_editor` | 繪圖與屬性 UI、原生配置索引及存取、獨立即時測試的唯讀候選預測；幾何仍交由 cards／map／towers 驗證提交 |
-| 地圖 `map` | 格子資料、道路接口與批次變更；外觀層依雙向接口合併連續路面、完整路線聯集灰化，顯示 MeshLibrary 與邏輯 ID 分離，外觀變種和浮起動畫獨立管理 |
+| 地圖 `map` | 入口／偵查兵共用的建造幾何搜尋（不選敵人路線）、格子資料、道路接口與批次變更；外觀層依雙向接口合併連續路面、完整路線聯集灰化，顯示 MeshLibrary 與邏輯 ID 分離，外觀變種和浮起動畫獨立管理 |
 | 導航 `navigation` | 道路快照、原生介接、兵種評分、有限候選池、路線配額；視覺子層依原完整行程投影寬路中心與動畫，不回寫導航／排程 |
 | 敵人 `enemies` | 兵種設定、出生、固定行程移動；模型、避讓及頭頂狀態由顯示層處理 |
 | 臨時交通設施 `traffic` | 獨立資料、道路覆蓋占位、三波生命週期、選路權重及岔路差異標記 |
-| 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與手牌旁持有圖示 UI |
+| 遺物 `relics` | 本局持有、資料目錄、三槽獎勵、現有／新塔套用、選擇與頂列可收合的持有圖示 UI |
 | 塔與戰鬥 `towers`／`combat` | 塔種、占格、威脅、索敵、攻擊、命中與效果；外觀factory適配GLB包裝層及舊幾何fallback，視覺動畫由實際攻擊／部署事件驅動；渲染Resource與離線色盤衍生網格提供正式／Ghost共用的A/B識別色，見 [Art Slice F](art_slice_f.md) |
 | 鏡頭與環境 `camera`／`environment` | 鏡頭平移、縮放與旋轉、雲海與環境呈現 |
 
@@ -88,7 +88,7 @@ scripts/
 | --- | --- |
 | `levels/` | 關卡 session 在子節點就緒前安裝地形及端點，推進準備、開場等待、戰鬥、ACT 擴張與結束狀態，包含清波後等待砲彈、ACT 遺物選擇，再協調手牌、商店及開波權限 |
 | `levels/definitions/` | `LevelDefinition` → `ActDefinition` → `WaveDefinition` → `WaveSpawnGroup` 保存可編輯配方與設定驗證；Level 的翻譯 key 由 ID 推導，起終點只由地形端點提供，ACT 各自決定完成後是否擴張入口；編輯器外掛、關卡和生成系統共用這些型別 |
-| `levels/expansion/` | 依已提交道路搜尋新入口候選，處理方向選擇、預覽和新增道路／端點；完成後由 session 恢復下一波準備 |
+| `levels/expansion/` | 依已提交道路搜尋新入口候選，只排除上次區域、直接提供玩家選落點，處理預覽和新增道路／端點；完成後由 session 恢復下一波準備 |
 | `levels/presentation/` | 將 session 進度投影到時間線、起點對話框、餘額與下一波兵種列；協調準備期流量預覽、處理倍速、暫停過渡、選單與玩家意圖 |
 | `enemies/spawning/` | 把波次配方與已準備的導航計畫轉成帶有整數出生刻度、路線及數值快照的排程，批次準備各兵種／入口的配額並共用該波唯讀世界座標，再實際生成敵人，追蹤待出生／存活／擊殺／抵達並判定清場 |
 
@@ -129,8 +129,8 @@ scripts/
 | `combat/effects/` | 描述命中後對敵人施加的規則效果，例如減速的倍率、期限及對應狀態圖示 |
 | `combat/rendering/` | 把已存在的飛行／命中資料轉成軌跡、箭矢、AOE 與死亡爆散，管理特效回收及動畫 |
 | `enemies/rendering/` | 把邏輯位置轉成模型姿態、GPU 步態、側向避讓與各網格獨立的 MultiMesh instance 資料；離線 GPU 模型 Resource 保存網格與步態參數，共用同一 shader。外部模型在此管理骨架／動畫及顯示轉換 |
-| `enemies/presentation/` | 依 renderer 提供的頭頂世界座標投影血條、護盾、技能與效果圖示；管理共用圖集、可重用 instance buffer 與單一 2D MultiMesh 提交。另提供獨立場景的開波按鈕。螢幕投影與 3D 模型渲染各自維護 |
-| `camera/`、`environment/` | 分別管理平移／縮放／環形拖曳旋轉／鏡頭邊界，以及雲海材質和範圍；維持獨立的小型功能目錄 |
+| `enemies/presentation/` | 依 renderer 提供的頭頂世界座標投影護盾、技能與效果圖示；管理共用圖集、可重用 instance buffer 與單一 2D MultiMesh 提交。另提供獨立場景的開波按鈕。螢幕投影與 3D 模型渲染各自維護 |
+| `camera/`、`environment/` | 分別管理平移／縮放／環形拖曳旋轉／鏡頭邊界，以及雲海材質和範圍、關卡時段光源／環境光／雲色預設（TimeOfDayPreset）；維持獨立的小型功能目錄 |
 
 `presentation/` 集中螢幕介面與玩家操作回饋；`rendering/` 集中模型、幾何、姿態與世界特效。敵人的狀態顯示會讀取模型層提供的避讓後座標，因此兩者透過顯示資料協作。
 
@@ -171,3 +171,6 @@ Phase 5 的 `levels` 負責防線生命、終局與四次獎勵時序，`levels/
 UI Slice A：敵人 presentation 接實際出生訊號，持有每局已遭遇／未讀佇列，並共用模型預覽與圖鑑版面；HUD 管理詳情頁的暫停／鏡頭鎖定，interface 的 inspection_panel 僅隔離輸入。遺物圖示列仍消費 RunRelics；保存只由 LevelProgress 擴充 v1 ConfigFile 的 codex section。詳見 [UI Slice A](ui_slice_a.md)。
 
 文本編輯器的資料模型僅持有 CSV 字串草稿，處理多行解析、格式參數驗證、檔案衝突及文字欄儲存；主工作區負責分類搜尋、兩語編輯與原生 Undo／Redo。正式遊戲透過 interface/GameText 讀翻譯，不依賴 addons；遺物仍由原 Resource 提供數值，Troop／EnemyAbility 保留機制與傳入格式化參數的責任。
+
+
+Special Events V1：`scripts/events` 保存可編輯事件／特殊卡定義、本局抽取與效果、事件二選一／目標選取及建造新道路的搜尋器。`assets/data/events` 提供 catalog、九事件與五卡 Resource，Level 可改引用；`scenes/events` 是呈現宿主。LevelSession 負責跨波的序列與鎖，BuildCard／CardPlacement 負責原手牌及成功消耗，TowerMap 負責所有建造驗證／占格，DefenseTower 只增加事件倍率與停火狀態。增援仍交給 WaveSpawnSchedule，新路仍交給 ConstructionLayout／PortalMap；不複製路線分流或戰鬥系統。詳細契約見 [特殊事件](special_events.md)。

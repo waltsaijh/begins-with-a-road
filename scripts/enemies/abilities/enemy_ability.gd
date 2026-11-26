@@ -29,6 +29,10 @@ func taunt_rank(_distance: float) -> int:
 func is_casting() -> bool:
 	return false
 
+## Time left with planted feet. Movement resumes on the same waypoint cursor.
+func movement_hold_remaining() -> float:
+	return 0.0
+
 ## One short player-facing line for the codex and progress page.
 func describe(_english: bool) -> String:
 	return ""

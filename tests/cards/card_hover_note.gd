@@ -15,6 +15,15 @@ func hover(view: Control) -> void:
 	event.position = view.get_global_transform_with_canvas()*(view.size*0.5)
 	get_viewport().push_input(event,true)
 	await get_tree().create_timer(0.3).timeout
+	# First-use SVG/font work can consume the first frame. Wait for the actual
+	# real-time reveal instead of assuming a fixed number of render frames.
+	var note: Node
+	var placement := view.get_parent()
+	while placement != null and not placement.has_node("CardHoverNote"): placement = placement.get_parent()
+	if placement != null: note = placement.get_node("CardHoverNote")
+	var deadline := Time.get_ticks_msec()+1000
+	while note != null and note._reveal < 1.0 and Time.get_ticks_msec() < deadline:
+		await get_tree().create_timer(0.02,true,false,true).timeout
 func capture(name: String) -> void:
 	if DisplayServer.get_name() == "headless": return
 	await RenderingServer.frame_post_draw

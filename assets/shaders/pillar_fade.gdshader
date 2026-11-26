@@ -9,6 +9,7 @@ varying vec3 world_position;
 varying float local_height;
 #include "res://assets/shaders/cloud_field.gdshaderinc"
 #include "res://assets/shaders/cloud_shadow.gdshaderinc"
+#include "res://assets/shaders/cel_light.gdshaderinc"
 void vertex() {
 	// Extend/retract below the stationary attachment to the tile foundation.
 	VERTEX.y = -0.37 + (VERTEX.y + 0.37) * support_growth;

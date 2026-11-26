@@ -14,7 +14,7 @@ construction.preset.pocket,Wide Pocket,大環繞
 card.name_format,{prefix} {tower},{prefix}{tower}
 card.unassigned,Unassigned card,未設定卡片
 troop.soldier.name,Soldier,士兵
-troop.quickfeet.name,Quickfeet,疾行兵
+troop.quickfeet.name,Hound,獵犬
 troop.heavy.name,Heavy,重裝兵
 ui.pause.resume,Resume game,繼續遊戲
 ui.menu.subtitle,A bridge above the clouds,開局一座橋
@@ -493,7 +493,7 @@ card.info.range.around,Surrounding area,周圍範圍
 card.info.range.guns,Ahead of each gun,各砲口前方
 card.info.range.garrison,Around road garrisons,道路駐點周圍
 enemy.story.soldier,"Frontline infantry, the backbone of the advancing force.",沿道路推進的前線步兵，是敵軍隊伍的中堅。
-enemy.story.quickfeet,A lightly equipped runner that slips through gaps in the defense.,輕裝斥候善於穿過防線空隙，迅速向終點推進。
+enemy.story.quickfeet,A lean hound that slips through gaps in the defense.,精瘦的獵犬穿過防線空隙，迅速向終點奔去。
 enemy.story.heavy,An armored warrior that advances slowly toward the goal.,沉重裝甲掩護著緩慢推進的戰士。
 enemy.story.rats,Small creatures that surge down the same road in packs.,成群奔竄的小型敵人，沿同一條道路湧向防線。
 enemy.story.rook,A shield bearer that draws fire away from nearby allies.,舉盾前行的守衛，以自身掩護周圍的隊伍。
@@ -501,6 +501,7 @@ enemy.story.bloodmage,A marching spellcaster that restores nearby wounded allies
 enemy.story.winged,A winged creature that follows the attack road from above.,盤旋於道路上方的飛獸，仍沿進攻路線接近終點。
 enemy.story.scout,A scout that takes advantage of newly completed roads.,尋找新通路的偵查兵，會利用最近接通的道路。
 enemy.story.bomber,A saboteur that briefly disables nearby defenses.,潛入火線的破壞者，會讓附近的防禦塔短暫失去作用。
+enemy.route.boss,Lands in a clearing beside a heavily defended road and follows that road to the base.,降落在密集防線旁的空地，接上道路後向基地推進。
 enemy.story.ravager,A siege beast whose arrival at the goal breaks the defense.,向終點緩慢逼近的攻城巨獸，足以撕開整條防線。
 enemy.story.generic,An enemy advancing along the road.,沿道路接近防線的敵軍。
 enemy.intelligence.bloodmage,Heals allies within 2.5 tiles for 18 every 3 seconds,每 3 秒治療 2.5 格內友軍 18 生命。
@@ -610,3 +611,162 @@ ui.run.construction.challenge,This feature is still under construction (〒︿�
 ui.maps.construction.prefix,This level is ,關卡還
 ui.maps.construction.word,unfinished,未完成
 ui.maps.construction.suffix, because I bombed my midterms ( ºΔº ), 因為我期中考炸了( ºΔº )
+event.scouts.title,Enemy Scouts,敵人偵查兵
+event.scouts.description,Your troops have discovered enemy scouts.,你的手下發現了敵人的偵察部隊。
+event.scouts.a.name,Ambush on the Road,埋伏在道路上
+event.scouts.a.effect,Create a separate road to the base. Gain {a_amount} Gold on success.,生成一條相對獨立的新道路，成功後獲得 {a_amount} Gold。
+event.scouts.b.name,Drive Them Away,趕跑他們
+event.scouts.b.effect,Next wave: {b_count} extra scouts at each entrance.,下一波每個出生點額外出現 {b_count} 名偵查兵。
+event.supplies.title,Emergency Supplies,臨時補給
+event.supplies.description,Praise the cloud sea! The kingdom has sent more supplies.,讚美雲海，王國寄來了更多物資。
+event.supplies.a.name,Upgrade the Defenses,升級防線
+event.supplies.a.effect,"Upgrade up to {a_count} eligible random towers by one level, respecting normal limits.",隨機最多 {a_count} 座可升級的塔各升一級，遵守通常上限。
+event.supplies.b.name,Renovate the Defenses,翻新防線
+event.supplies.b.effect,"Remove a chosen tower, keeping its ground and roads. Gain {b_amount} Gold.",選擇一座塔拆除，保留地塊與道路，獲得 {b_amount} Gold。
+event.merchant.title,Wandering Merchant,雲遊商人
+event.merchant.description,A strange merchant asks whether you would like to trade.,奇怪的商人詢問你想不想要交易。
+event.merchant.a.name,Yellow Potion,黃色藥劑
+event.merchant.a.effect,"Pay {a_amount} Gold for a Yellow Potion card. Upgrade a chosen tower once, ignoring its level limit.",支付 {a_amount} Gold，獲得一張黃色藥劑。選塔升一級，本次無視上限。
+event.merchant.b.name,Tasty Cheese,好吃起司
+event.merchant.b.effect,Free sample. Next wave: {b_count} extra rats at entrance 1.,免費試吃。下一波額外出現 {b_count} 隻鼠群（入口 1）。
+event.conscription.title,Royal Conscription,王國徵兵令
+event.conscription.description,"The kingdom demands troops for a distant war. Apparently, the officials have not noticed that you are also fighting.",王國要求你抽調人力參與遠方的戰事。不過，上頭似乎不太清楚你也正在打仗。
+event.conscription.a.name,Obey the Order,服從命令
+event.conscription.a.effect,"Choose a tower to cease fire next wave, then recover. Gain {a_amount} Gold.",選擇一座塔，下一波停止攻擊，波後恢復。獲得 {a_amount} Gold。
+event.conscription.b.name,Refuse Conscription,拒絕徵召
+event.conscription.b.effect,Keep your defenses. Next wave: {b_count} extra soldiers at each entrance.,保留完整防線。下一波每個出生點增加 {b_count} 名士兵。
+event.storm.title,Storm Approaching,暴風將至
+event.storm.description,Thunder rolls deep in the cloud sea. Engineers warn that the roads ahead may not withstand the storm.,雲海深處傳來雷鳴。工兵警告，前方的道路恐怕承受不住這場風暴。
+event.storm.a.name,Reinforce the Road,加固道路
+event.storm.a.effect,Pay {a_amount} Gold for one 1×4 road construction card.,支付 {a_amount} Gold，獲得一張 1×4 道路建造卡。
+event.storm.b.name,Leave It to Fate,聽天由命
+event.storm.b.effect,"Gain {b_count} 1×1 rubble cards. If any remain unplaced at wave start, all towers deal {b_penalty_percent}% less damage that wave; repeats until all are placed.",獲得 {b_count} 張 1×1 碎石卡。開波時若未全部放置，該波全塔傷害 -{b_penalty_percent}%；直到放完。
+event.altar.title,Ancient Altar,古老祭壇
+event.altar.description,Engineers have found an ancient altar beneath the road. Its unreadable inscriptions still seem to hold power.,工兵在道路下方發現一座古老祭壇。上面刻著看不懂的文字，但似乎仍有力量。
+event.altar.a.name,Offer Blood,獻上鮮血
+event.altar.a.effect,Lose {a_amount} base health and gain a random relic. The base must survive.,失去 {a_amount} 點基地生命，獲得一個隨機遺物。必須保持存活。
+event.altar.b.name,Dismantle the Altar,拆除祭壇
+event.altar.b.effect,Gain {b_amount} Gold. Next wave: {b_count} extra winged beasts at entrance 1.,獲得 {b_amount} Gold。下一波額外出現 {b_count} 隻飛翼獸（入口 1）。
+event.strike.title,Engineers on Strike,工程師罷工
+event.strike.description,"The engineers demand higher wages, citing the increasingly unreasonable roads they have been asked to build.",工程師要求提高工資，理由是最近建造的道路實在太不合理。
+event.strike.a.name,Pay the Wages,支付薪資
+event.strike.a.effect,Pay {a_amount} Gold. Upgrade up to {a_count} eligible random towers by one level.,支付 {a_amount} Gold，隨機最多 {a_count} 座可升級的塔各升一級。
+event.strike.b.name,Reject the Demand,拒絕要求
+event.strike.b.effect,"Gain {b_amount} Gold. Downgrade one random tower by one level, never below Lv.1.",獲得 {b_amount} Gold，隨機一座塔降一級，不低於 Lv.1。
+event.payroll.title,Lost Payroll,遺失的軍餉
+event.payroll.description,"A wagon carrying military wages has gone missing. Fortunately, your soldiers seem to know where it is.",一輛運送軍餉的馬車失蹤了。幸運的是，你的士兵似乎知道它在哪裡。
+event.payroll.a.name,Requisition the Funds,收歸軍用
+event.payroll.a.effect,Gain {a_amount} Gold now. Next wave: {a_count} extra heavy infantry at entrance 1.,立即獲得 {a_amount} Gold。下一波額外出現 {a_count} 名重裝兵（入口 1）。
+event.payroll.b.name,Return to the Owner,物歸原主
+event.payroll.b.effect,Gain a free random tower card using the normal tower and ground recipe draw.,免費獲得一張隨機防禦塔卡，使用正常塔種與地塊抽取。
+event.gem.title,Mysterious Gem,神秘寶石
+event.gem.description,A mysterious gem has been seized from the enemy forces.,在敵人的隊伍中繳獲了一顆神秘的寶石。
+event.gem.a.name,Keep It Whole,完整獲得
+event.gem.a.effect,"Gain one 2×2 large gem card. After placement, all towers deal {a_damage_percent}% more damage.",獲得一張 2×2 大寶石卡。放置後，所有塔傷害 +{a_damage_percent}%。
+event.gem.b.name,Shatter It,將其打碎
+event.gem.b.effect,"Gain {b_count} 1×1 small gem cards. Once all are placed, gain {b_wave_gold} extra Gold per completed wave.",獲得 {b_count} 張 1×1 小寶石卡。全部放置後，每波額外獲得 {b_wave_gold} Gold。
+event.card.potion.name,Yellow Potion,黃色藥劑
+event.card.potion.description,"Upgrade a tower once
+ignoring its level limit","選擇一座塔升一級
+此次無視等級上限"
+event.card.road.name,Road Card,道路卡
+event.card.road.description,1×4 road; rotate to fit,1×4 道路，可旋轉
+event.card.rubble.name,Rubble,碎石
+event.card.rubble.description,"1×1 permanent tile
+Place both to remove the storm penalty in later waves","1×1 永久地塊
+放完本批兩張，後續波次解除 -10% 傷害"
+event.card.large_gem.name,Large Gem,大寶石
+event.card.large_gem.description,"2×2 permanent tile
+Place to grant +10% tower damage","2×2 永久地塊
+放置後全塔傷害 +10%"
+event.card.small_gem.name,Small Gem,小寶石
+event.card.small_gem.description,"1×1 permanent tile
+Place all three for +5 Gold per wave","1×1 永久地塊
+本批三張放完，每波 +5 Gold"
+event.ui.heading,Special Event,特殊事件
+event.ui.target,Choose a highlighted tower,請點選一座高亮的防禦塔
+event.ui.free,Free,免費
+event.ui.gold_cost,{amount} Gold,{amount} Gold
+event.ui.gold_reward,+{amount} Gold,+{amount} Gold
+event.ui.health_cost,−{amount} base HP,−{amount} 基地生命
+event.ui.tower_pause,Tower ceases fire,塔停止攻擊
+event.ui.tower_remove,Remove a tower,拆除一座塔
+event.ui.tower_downgrade,Tower loses one level,塔降低一級
+event.ui.rubble_risk,Unplaced rubble lowers damage,未放完碎石會降低傷害
+event.unavailable.gold,Not enough Gold,Gold 不足
+event.unavailable.health,The base must survive the 5 HP cost,支付 5 點後基地必須存活
+event.unavailable.tower,No eligible tower,沒有符合條件的防禦塔
+event.unavailable.relic,No available relic,沒有可取得的遺物
+event.unavailable.road,No reasonable new road can be built,找不到合理且合法的新道路
+event.unavailable.card,No tower card available,沒有可抽取的防禦塔卡
+event.placement.invalid,"Choose a legal, unoccupied location",請選擇合法且未占用的位置
+event.tower.ceasefire,Conscription: cease fire next wave,徵兵：下一波停止攻擊
+event.timeline,Event,特殊事件
+ui.inspection.killed,Defeated,已擊殺
+ui.intelligence.title,Enemy intelligence,敵軍情報
+ui.relics.expand,Expand relics,展開遺物
+ui.relics.collapse,Collapse relics,收合遺物
+ui.shop.open,Open shop (or click the base),開啟商店（也可點擊基地）
+ui.shop.close,Close shop,關閉商店
+spell.shot.name,Shot,射擊
+spell.area_damage,"{damage} damage
+Radius {radius} tile(s)","範圍傷害 {damage}
+半徑 {radius} 格"
+spell.combat_only,Cast during combat on a road tile.,戰鬥中選擇道路格施放。
+spell.target_barracks,Select a barracks during combat.,戰鬥中點選兵營施放。
+spell.target_defense,Select a road tile or a tower during combat.,戰鬥中點選道路格或防禦塔施放。
+spell.target_pair,Select two different road tiles during combat.,戰鬥中依序點選兩個不同道路格。
+spell.base_upgrade,Base Lv.{level} · {count}/{need} towers,基地 Lv.{level} · 已部署 {count}/{need} 座塔
+spell.base_locked,Options locked when the tower threshold was reached. Choose one.,已依達標時的塔種鎖定選項。請選擇一項升級。
+spell.base_threshold,Options lock when you first reach {need} towers.,首次達到 {need} 座塔時，依當下塔種鎖定選項。
+spell.base_page,Base upgrades,基地升級
+spell.base_max,Base Lv.4,基地 Lv.4
+upgrade.heavy,Heavy Artillery,重火力防線
+upgrade.heavy.detail,2 mortar/crossfire | Replace Shot with Heavy Shell,迫擊砲＋交叉火力 ≥ 2｜每波以重砲取代射擊
+spell.cannon.name,Heavy Shell,重砲
+upgrade.wizard,Wizard Tower,巫師之塔
+upgrade.wizard.detail,5 tower types | Extra lightning and 1s stun,5 種塔｜每波加發閃電，癱瘓 1 秒
+spell.lightning.name,Lightning Strike,閃電打擊
+upgrade.marksman,Marksman Lodge,神射手之家
+upgrade.marksman.detail,4 ballistas/sentries | Two 90-damage Shots per wave,弩砲＋哨塔 ≥ 4｜每波 2 張射擊，各 90 傷害
+upgrade.station,Frontline Depot,前線兵站
+upgrade.station.detail,2 barracks | Extra Reinforcements each wave,兵營 ≥ 2｜每波加發援軍，召喚 2 名士兵
+spell.reinforce.name,Reinforcements,援軍
+upgrade.supply,Emergency Supply,緊急補給
+upgrade.supply.detail,Any build | Extra 60-damage Covering Fire,通用｜每波加發援護射擊，60 傷害
+spell.support.name,Covering Fire,援護射擊
+upgrade.mixed,Mixed Battery,交錯砲陣
+upgrade.mixed.detail,2 mortars and 2 crossfires | Extra delayed shell,迫擊砲及交叉火力各 ≥ 2｜加發延時砲擊
+spell.delayed.name,Delayed Shell,延時砲擊
+upgrade.flank,Flank Air Defense,側翼防空
+upgrade.flank.detail,2 broadsides + 2 sentries/ballistas | Extra all-target volley,舷炮 ≥ 2、哨塔＋弩砲 ≥ 2｜加發對空地齊射
+spell.volley.name,Volley,齊射
+upgrade.garrison,Garrison Relief,接力防守
+upgrade.garrison.detail,3 barracks | Extra Hold Fast for soldier shields,兵營 ≥ 3｜加發固守，守軍獲得護盾
+spell.fortify.name,Hold Fast,固守命令
+upgrade.united,Joint Command,聯合施法
+upgrade.united.detail,5 types with 3 pairs | Extra area slow,5 種塔、其中 3 種各 ≥ 2｜加發範圍減速
+spell.bind.name,Bind,束縛
+upgrade.response,Rapid Response,快速應變
+upgrade.response.detail,Any build | Extra Reinforcements each wave,通用｜每波加發援軍，召喚 2 名士兵
+upgrade.double,Twin Barrage,雙區轟擊
+upgrade.double.detail,6 mortar/crossfire with 2 each | One twin barrage,迫擊砲＋交叉火力 ≥ 6、各 ≥ 2｜一次雙區轟擊
+spell.double.name,Twin Barrage,雙區轟擊
+upgrade.rally,Battle Stations,全線備戰
+upgrade.rally.detail,6 types | One area cleanse and 4s immunity,6 種塔｜一次區域解癱，免疫 4 秒
+spell.rally.name,Battle Stations,全線備戰
+upgrade.snipe,Sharpshooter,定點狙擊
+upgrade.snipe.detail,7 sentries/ballistas with 2 each | One 400-damage snipe,哨塔＋弩砲 ≥ 7、各 ≥ 2｜一次單體 400 傷害
+spell.snipe.name,Snipe,定點狙擊
+upgrade.last,Last Stand,最後防線
+upgrade.last.detail,Any build | One 2s area stun,通用｜一次區域癱瘓 2 秒
+spell.last.name,Last Stand,最後防線
+spell.lightning.effect,70 damage · stun 1s,70 傷害 · 癱瘓 1 秒
+spell.reinforce.effect,Summon 2 soldiers until wave end,召喚 2 名士兵至波末
+spell.delayed.effect,160 damage after 0.8s,0.8 秒後造成 160 傷害
+spell.fortify.effect,Barracks soldiers: 30 shield for 6s,兵營守軍獲 30 護盾 6 秒
+spell.bind.effect,Slow by 30% for 3s,減速 30% 持續 3 秒
+spell.double.effect,Choose two areas · 220 damage each,指定兩區 · 各 220 傷害
+spell.rally.effect,Cleanse towers · immune for 4s,解除塔癱瘓 · 免疫 4 秒
+spell.snipe.effect,400 damage to nearest enemy,對最近敵人造成 400 傷害
+spell.last.effect,Stun enemies for 2s,癱瘓敵人 2 秒

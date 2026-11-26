@@ -1,6 +1,10 @@
 # 測試
 
-單位檢視：`godot --path . --script res://tests/levels/unit_inspection.gd`（可加 `--headless`）。驗證真實滑鼠／鏡頭 click 仲裁、六塔與方向／多格原點、升級／加成即時數值、選取不暫停、敵人血量／護盾／主堡傷害、正常移動、UI 不穿透、持牌優先、Esc 與暫停、空白／死亡／離場清除、重疊的深度優先、固定資料不重建、準備期避讓手牌及 800×600 英文。截圖 `.godot/test-results/levels/inspection_*.png`。
+時段光源：`godot --path . --script res://tests/levels/time_of_day.gd`（實際渲染；`--headless` 只驗資料）。以 Frontier 套用早上／中午／黃昏／夜晚，驗證 Sun 顏色／強度／角度、複製後的 Environment、雲色全域參數、陰影與預熱 key 不變、離場與交疊換場的雲色還原、頂列沒有底色、夜晚切換淡色文字與圖示、其他時段維持原深色字、中午等於原設定及四時段畫面不同；截圖 `.godot/test-results/levels/time_of_day/`。
+
+底部部署UI：`godot --path . res://tests/cards/deployment_ui.tscn`。檢查淺弧扇形手牌、懸停置頂放大與離開後回位、無常駐商店牌堆、HUD補給按鈕／基地模型點擊、相機拖曳與持牌／單位優先、階段鎖、Esc收回、反覆開關不交易、書籤及繁中／英文兩種尺寸。截圖在`.godot/test-results/deployment/`。原`cards/card_shop`保留購買／刷新／庫存回歸，`tutorial/intro`的開店焦點改為小型補給按鈕。
+
+單位檢視：`godot --path . --script res://tests/levels/unit_inspection.gd`（可加 `--headless`）。驗證真實滑鼠／鏡頭 click 仲裁、六塔與方向／多格原點、升級／加成即時數值、選取不暫停、敵人血量／護盾／主堡傷害、正常移動、UI 不穿透、持牌優先、Esc 與暫停、空白／離場清除及死亡敵人的無 Node 快照、重疊的深度優先、固定資料不重建、準備期避讓手牌及 800×600 英文。截圖 `.godot/test-results/levels/inspection_*.png`。
 
 擊殺金幣回饋：`godot --path . --script res://tests/levels/coin_feedback.gd`（可加 `--headless`）。涵蓋時間／空間合併、不延長生命、六個重用節點、滿池省略／合併、鏡頭投影／縮放、畫面邊界、暫停與四倍速、二十隻真實死亡完整入帳及清波獎勵、重複傷害、HUD 限頻／恢復、音效分流／單聲道／限頻／暫停、離場清除。實際渲染截圖在 `.godot/test-results/levels/coin_popup.png`。
 
@@ -22,7 +26,7 @@
 
 自動關卡目錄與 DAG：`godot --headless --path . --script tests/levels/level_catalog.gd`，驗證新增／巢狀／刪除檔案、逐層拓撲順序、跨父節點的 sibling ID 排序、掃描順序無關、菱形 AND 解鎖、重複邊、缺失／重複 ID、環及其後代、4096 節點長鏈、保存重載與壞檔保護。`godot --path . tests/menus/level_selection.tscn` 用兩份新 Level 檔驗證自動選項與前置／後代的 01／02 索引、單一延遲預覽、未解鎖按鈕／內部啟動攔截、雙語、實際通關後解鎖、共用場景選中資料與戰鬥中重新開始不誤記通關。可匯出此場景至 Web；第二次以 `?verify_reload=1` 開啟會額外驗證前次的隔離通關檔已持久保存。測試不覆寫玩家資料；輸出在 `.godot/test-results/levels/catalog/`、`.godot/test-results/menus/level_selection/`。
 
-Level 精簡契約亦由上述回歸驗證：ID／檔名推導標題與描述 key，實際選圖雙語切換；`levels/terrain_endpoints.tscn` 檢查缺失端點必須報錯、巢狀變換、模型及多入口保存重載，`levels/act_spawn_expansion.tscn` 檢查自訂端點高度沿用到新增入口與預覽，實際波次編輯器檢查儲存結果不再包含移除的 Level 欄位。
+Level 精簡契約亦由上述回歸驗證：ID／檔名推導標題與描述 key，實際選圖雙語切換；`levels/terrain_endpoints.tscn` 檢查缺失端點必須報錯、巢狀變換、模型及多入口保存重載，`levels/act_spawn_expansion.tscn` 檢查自訂端點高度沿用到玩家放置的新入口，實際波次編輯器檢查儲存結果不再包含移除的 Level 欄位。
 
 Web 啟動頁交接回歸：`node tests/menus/web_loading_shell.cjs`，依環境提供 `PLAYWRIGHT_MODULE` 及可選 `BROWSER_EXECUTABLE`。驗證引擎完成／native draw 的兩種先後順序、已知／未知下載進度與失敗訊息保留；加 `--live` 連到正式本機匯出，`--url=...` 可改網址並擷取資源載入、native 載入與主選單畫面。產物在 `.godot/test-results/menus/loading_labels/`。`startup_loading.gd` 另外檢查換場景及主選單首次繪製期間持續保有正確階段 label。
 
@@ -80,7 +84,7 @@ godot --editor --path . -- --test-card-resource-refresh
 
 滑鼠 hover、像素取樣與動畫截圖測試需要實際渲染；`--headless` 適合資料與排程驗證。JSON 與截圖由 `fixtures/test_artifacts.gd` 建立目錄，寫入 `.godot/test-results/<功能>/`；log 及其他暫存也放 `.godot/`。這些產物不進版本控制或遊戲匯出。Web 驗證見 [工具說明](../tools/README.md)。
 
-`pause_navigation`、`level_hud` 與 `pause_menu` 驗證 Tab 倍速循環、Esc 暫停／繼續、按住不重複觸發、立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及血條投影、交易鎖定與重新開始。
+`pause_navigation`、`level_hud` 與 `pause_menu` 驗證 Tab 倍速循環、Esc 暫停／繼續、按住不重複觸發、立即暫停、1x／2x／4x 恢復、介面動畫、鏡頭及護盾投影、交易鎖定與重新開始。
 
 `road_flow_preview` 驗證跨群組加總、兵種 Hover／移開、按鈕標題保留入口篩選、雙入口同兵種的實際 GPU 線段／流量資料隔離、篩選動畫相位獨立、分岔／合流／環路／雙向區段、多入口的獨立按鈕／實際配額、零配額入口、任一按鈕實際點擊開波、無有效路線、非選取兵種成本與幾何失效、RNG／正式配額一致性、列表溢出，以及開波、清波、ACT 選入口、暫停、重開和卸載。渲染模式額外送入實際滑鼠事件並比較明暗漸變相位及無中心線畫面，並驗證動畫不改變 mesh、直段／圓角、雙向中央位置與複製重合線形的像素一致性（允許一階 8-bit 輸出量化差異），輸出 `levels/road_flow_*.png`；headless 不宣稱像素通過。人工驗收可在 editor 開啟 `tests/levels/road_flow_playground.tscn` 按 F6：開始下一波按鈕內有三兵種，下方為兩入口環路，hover 篩選、移開恢復，按開始下一波確認中心線收起；F1／F2 暫時讓出玩家中心線。測試地形及波次為獨立實例，不修改 Frontier。
 
@@ -181,3 +185,5 @@ godot --path . res://scenes/level.tscn --quit-after 180
 ## UI Slice A
 
 F6 或命令列執行 res://tests/ui_slice_a/hud.tscn；headless檢查保存、四塔卡池、通知／暫停與RNG，實際渲染另檢查真實滑鼠／鍵盤、十種模型、三種尺寸並輸出截圖。測試使用隔離保存，不寫玩家通關檔。現行商店四商品＋重刷牌，情報需實際遭遇後解鎖；取代本文件較早的雙排及準備期直接情報假設。結果、依賴與限制見 [UI Slice A](../docs/ui_slice_a.md)。
+
+2026-11-19 入口直接放置／資訊精簡回歸：`levels/act_spawn_expansion` 覆蓋四區、只排除上次區域、同區回退、獨立路優先、受阻早合流、路長／占格／舊路保護與 native 真實出兵；省略方位按鈕，等待玩家直接點落點，拒絕被排除區域，暫停／相機拖曳不誤放。`levels/wave_expansion` 加速完成十五波、兩次玩家入口放置及事件／遺物串接；`levels/road_flow_preview` 驗證文字 Hover、事件後最終入口數量、鐘擺邊界／固定點擊區／暫停與真正出兵一致；`ui_slice_a/hud` 驗證逐筆未讀 Badge、遺物收合及 800×600 下方展開。完整入口及預設見 [現行規則](../docs/ui_ux_expansion.md)。

@@ -13,6 +13,7 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var acts: Array[ActDefinition] = []
 ## Null runs the ordinary level rules without teaching restrictions.
 @export var tutorial: TutorialDefinition
+@export var special_event_catalog: SpecialEventCatalog = preload("res://assets/data/events/catalog.tres")
 ## Zero keeps independent mechanic fixtures without a loss condition.
 @export_range(0, 100, 1) var base_health := 0
 @export var reward_final_act := false
@@ -20,6 +21,12 @@ const TerrainLayout = preload("res://scripts/map/terrain/terrain_layout.gd")
 @export var opening_shop := false
 ## Positive values replace ACT expansion flags with a global completed-wave cadence.
 @export_range(0, 100, 1) var expansion_wave_interval := 0
+## Exclude candidates beyond the base along these map-local axes, including corners.
+@export_flags("North", "East", "South", "West") var expansion_blocked_goal_sides := 0
+@export_group("Presentation")
+## Fixed sun for the whole run (assets/data/rendering/time_of_day/). Null keeps
+## the Sun as authored in main.tscn (noon).
+@export var time_of_day: TimeOfDayPreset
 
 func expands_after(completed_waves: int) -> bool:
 	if completed_waves <= 0 or completed_waves >= wave_count(): return false

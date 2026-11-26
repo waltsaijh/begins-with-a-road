@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SpecialCardDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/events/special_card_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/interface/special_rubble.svg" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"rubble"
+kind = 1
+cells = Array[Vector2i]([Vector2i(0, 0)])
+accent_color = Color(0.48,0.5,0.47,1)
+icon = ExtResource("2")
+incomplete_damage_multiplier = 0.9

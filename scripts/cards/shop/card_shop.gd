@@ -1,4 +1,5 @@
 extends Node
+const Picker = preload("res://scripts/levels/presentation/unit_pick.gd")
 signal balance_changed(coins: int)
 signal gold_granted(amount: int, reason: String, world_position: Variant)
 signal purchased(card: BuildCard)
@@ -52,6 +53,10 @@ func setup(placement: Node3D, wave: Node) -> void:
 	view.close_requested.connect(close_shop)
 	view.purchase_requested.connect(buy)
 	view.reroll_requested.connect(reroll)
+	view.get_node("Root/BaseUpgrade").pressed.connect(open_base_page)
+	view.get_node("BasePage/Center/Panel/Rows/Back").pressed.connect(close_shop)
+	_placement.towers.towers_changed.connect(_refresh_upgrades)
+	_refresh_upgrades()
 	if _wave != null:
 		_wave.wave_started.connect(_on_wave_started)
 		_wave.wave_finished.connect(_on_wave_finished)
@@ -161,11 +166,38 @@ func _accept_deal(next: Array[BuildCard]) -> void:
 	deals += 1
 
 func open_shop() -> void:
-	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or _wave.active:
-		return
+	if not can_open(): return
+	_refresh_upgrades()
 	_placement.set_shop_open(true)
 	view.set_open(true)
 	if is_instance_valid(_wave.controls): _wave.controls.visible = false
+
+func open_base_page() -> void:
+	if not can_open() or not _placement.commander_enabled or purchase_rule.is_valid(): return
+	open_shop()
+	view.get_node("BasePage").show()
+	view.get_node("Root").hide()
+
+func can_open() -> bool:
+	return available and not _placement.pause_locked and not _placement.entry_selection_active and not _placement._wave_start_pending and not get_tree().paused and not ScreenTransition.active and not (_wave != null and _wave.active)
+
+func upgrade_base(id: String) -> bool:
+	if not view.get_node("BasePage").visible: return false
+	if not _placement.accept_upgrade(id): return false
+	_refresh_upgrades()
+	return true
+
+func try_open_from_world(camera: Camera3D, point: Vector2) -> bool:
+	if not can_open() or _placement.selected >= 0 or _placement.hand.is_dragging(): return false
+	var goal := _placement.get_node_or_null("../Goal") as Node3D
+	if goal == null: return false
+	var distance := Picker.hit_distance(camera.project_ray_origin(point),camera.project_ray_normal(point),Picker.mesh_parts(goal))
+	if not is_finite(distance): return false
+	# Units retain inspection priority when projected over the base.
+	if _wave != null and Picker.pick(camera,point,_placement.towers,_wave.visuals) != null: return false
+	if _placement.commander_enabled and not purchase_rule.is_valid(): open_base_page()
+	else: open_shop()
+	return view.opened
 
 func close_shop() -> void:
 	_placement.set_shop_open(false)
@@ -173,7 +205,7 @@ func close_shop() -> void:
 	if is_instance_valid(_wave.controls): _wave.controls.visible = true
 
 func buy(index: int) -> bool:
-	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or index < 0 or index >= offers.size() or sold[index] != 0 or offers[index] == null:
+	if _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or view.get_node("BasePage").visible or _wave.active or index < 0 or index >= offers.size() or sold[index] != 0 or offers[index] == null:
 		return false
 	if purchase_rule.is_valid() and not purchase_rule.call(offers[index]): return false
 	if coins < prices[index]:
@@ -205,7 +237,7 @@ func current_reroll_price() -> int:
 	return 0 if loyalty_free_ready() else maxi(0,reroll_price)
 
 func reroll() -> bool:
-	if _reroll_in_progress or _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or _wave.active or view.rerolling:
+	if _reroll_in_progress or _placement.pause_locked or _placement.entry_selection_active or get_tree().paused or not available or not view.opened or view.get_node("BasePage").visible or _wave.active or view.rerolling:
 		return false
 	if reroll_rule.is_valid() and not reroll_rule.call(): return false
 	var cost := current_reroll_price()
@@ -228,17 +260,61 @@ func reroll() -> bool:
 	_reroll_in_progress = false
 	return true
 
+func _refresh_upgrades() -> void:
+	var upgrade: Button = view.get_node("Root/BaseUpgrade")
+	upgrade.visible = _placement.commander_enabled and not purchase_rule.is_valid()
+	var notice: Label = view.get_node("Entry/UpgradeNotice")
+	notice.visible = false
+	if not upgrade.visible: return
+	var level: int = _placement.base_level
+	const Catalog = preload("res://scripts/cards/definitions/base_upgrades.gd")
+	var counts := Catalog.counts(_placement.towers)
+	var count := int(counts.values().reduce(func(a,b): return a+b, 0))
+	var ready_to_upgrade: bool = _placement.milestone_counts.has(level)
+	notice.visible = ready_to_upgrade
+	var rows := view.get_node("BasePage/Center/Panel/Rows")
+	rows.get_node("Progress").text = tr("spell.base_max") if level == 4 else tr("spell.base_upgrade").format({"level":level, "count":count, "need":level*5})
+	rows.get_node("Rule").visible = level < 4
+	rows.get_node("Rule").text = tr("spell.base_locked") if ready_to_upgrade else tr("spell.base_threshold").format({"need":level*5})
+	var options := rows.get_node("Options")
+	for old in options.get_children():
+		options.remove_child(old)
+		old.queue_free()
+	if not ready_to_upgrade: return
+	for id: String in Catalog.TIERS[level-1]:
+		if not Catalog.eligible(id, _placement.milestone_counts[level]): continue
+		var choice := Button.new()
+		choice.name = id
+		choice.text = tr("upgrade."+id)+"  ·  "+tr("upgrade."+id+".detail")
+		choice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		choice.pressed.connect(upgrade_base.bind(id))
+		options.add_child(choice)
+
 func _refresh(insert_offers := false) -> void:
 	view.show_offers(offers, prices, sold, coins, current_reroll_price(), insert_offers)
+	balance_changed.emit(coins)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_instance_valid(_placement) and is_node_ready(): _refresh_upgrades()
+
+func _refresh_balance() -> void:
+	view.update_balance(coins, current_reroll_price())
 	balance_changed.emit(coins)
 
 func grant_gold(amount: int, reason: String, world_position: Variant = null) -> void:
 	coins += maxi(0,amount)
 	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":maxi(0,amount),"balance":coins,"reason":reason},"shop")
-	_refresh()
+	_refresh_balance()
 	if amount > 0: gold_granted.emit(amount, reason, world_position)
 
 func _exit_tree() -> void:
 	if is_instance_valid(_wave):
 		if _wave.wave_started.is_connected(_on_wave_started): _wave.wave_started.disconnect(_on_wave_started)
 		if _wave.wave_finished.is_connected(_on_wave_finished): _wave.wave_finished.disconnect(_on_wave_finished)
+
+func spend_gold(amount: int,reason: String) -> bool:
+	if amount < 0 or coins < amount: return false
+	coins -= amount
+	if BalanceTrace.enabled: BalanceTrace.event("gold","shop",{"delta":-amount,"balance":coins,"reason":reason},"shop")
+	_refresh_balance()
+	return true

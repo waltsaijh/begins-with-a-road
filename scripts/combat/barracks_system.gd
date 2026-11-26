@@ -4,11 +4,19 @@ var combat: Node
 var map: GridMap
 var units: Array[Node3D] = []
 var owners := {}
+func summon(cell_at: Vector2i) -> void:
+	for slot in 2:
+		var unit := Soldier.new()
+		add_child(unit)
+		unit.initialize(null, slot, self, cell_at)
+		units.append(unit)
 func _ready() -> void:
 	process_priority = 45
 	map = combat.map
 func cell(point: Vector3) -> Vector2i: return combat._index.cell_for(point)
-func world(at: Vector2i) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y)))
+## Standing point on a road cell: same ground offset as enemies, so friendly
+## soldiers stand on the road pavers instead of sinking into them.
+func world(at: Vector2i) -> Vector3: return map.to_global(map.map_to_local(Vector3i(at.x,0,at.y))+Vector3.UP*EnemyConstants.GROUND_OFFSET)
 func distance(a: Vector3,b: Vector3) -> float:
 	var d := map.to_local(a)-map.to_local(b)
 	return Vector2(d.x/map.cell_size.x,d.z/map.cell_size.z).length()
@@ -63,6 +71,12 @@ func _process(delta: float) -> void:
 		combat.friendly_index_ready = true
 	for i in range(units.size()-1,-1,-1):
 		var unit := units[i]
+		if unit.temporary:
+			if not active or unit.dead:
+				unit.release()
+				unit.queue_free()
+				units.remove_at(i)
+			continue
 		if not is_instance_valid(unit.tower) or unit.tower.is_queued_for_deletion() or unit.tower.health <= 0 or unit.slot_index >= unit.tower.deployment.count:
 			unit.release()
 			unit.queue_free()
@@ -74,6 +88,7 @@ func _process(delta: float) -> void:
 		if active: unit.advance(delta)
 		else:
 			unit.release()
+			unit.shield = 0.0
 			if not unit.dead: unit.global_position = unit.home_position
 	for owner in owners.keys():
 		if not is_instance_valid(owner) or owner.is_queued_for_deletion(): owners.erase(owner)

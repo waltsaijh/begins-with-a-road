@@ -5,6 +5,21 @@
 [ext_resource type="Texture2D" uid="uid://dh38d3ihtyldi" path="res://assets/sprites/cards/gold.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://vbfxygxc14ys" path="res://assets/sprites/cards/card_back.png" id="5"]
 
+[ext_resource type="Texture2D" path="res://assets/sprites/interface/building_supply.svg" id="6_supply"]
+[ext_resource type="Script" path="res://scripts/cards/presentation/card_button.gd" id="7_input"]
+[sub_resource type="StyleBoxEmpty" id="EntryNormal"]
+[sub_resource type="StyleBoxFlat" id="EntryHover"]
+bg_color = Color(0.3,0.46,0.44,0.07)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3,0.46,0.44,0.28)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
 [node name="ShopView" type="CanvasLayer" unique_id=1885429936]
 layer = 4
 script = ExtResource("1")
@@ -12,7 +27,29 @@ vertical_offset = 2.5
 coin_texture = ExtResource("4")
 card_back_texture = ExtResource("5")
 
+[node name="Entry" type="Button" parent="."]
+script = ExtResource("7_input")
+visible = false
+custom_minimum_size = Vector2(32,32)
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -48.0
+offset_top = 37.0
+offset_right = -16.0
+offset_bottom = 69.0
+focus_mode = 0
+toggle_mode = true
+icon = ExtResource("6_supply")
+theme_override_font_sizes/font_size = 14
+theme_override_constants/icon_max_width = 24
+theme_override_styles/normal = SubResource("EntryNormal")
+theme_override_styles/disabled = SubResource("EntryNormal")
+theme_override_styles/hover = SubResource("EntryHover")
+theme_override_styles/pressed = SubResource("EntryHover")
+theme_override_styles/hover_pressed = SubResource("EntryHover")
+
 [node name="Root" type="Control" parent="." unique_id=2008890693]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,6 +64,52 @@ offset_left = 683.84
 offset_top = 507.863
 offset_right = 1280.0
 offset_bottom = 792.423
+
+[node name="BaseUpgrade" type="Button" parent="Root"]
+visible = false
+focus_mode = 0
+text = "spell.base_page"
+
+[node name="BasePage" type="ColorRect" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.09,0.15,0.16,0.50)
+
+[node name="Center" type="CenterContainer" parent="BasePage"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="BasePage/Center"]
+custom_minimum_size = Vector2(500,0)
+
+[node name="Rows" type="VBoxContainer" parent="BasePage/Center/Panel"]
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="BasePage/Center/Panel/Rows"]
+text = "spell.base_page"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 25
+
+[node name="Progress" type="Label" parent="BasePage/Center/Panel/Rows"]
+horizontal_alignment = 1
+
+[node name="Rule" type="Label" parent="BasePage/Center/Panel/Rows"]
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Options" type="VBoxContainer" parent="BasePage/Center/Panel/Rows"]
+theme_override_constants/separation = 6
+
+[node name="Back" type="Button" parent="BasePage/Center/Panel/Rows"]
+text = "ui.settings.back"
+
+[node name="UpgradeNotice" type="Label" parent="Entry"]
+visible = false
+mouse_filter = 2
+offset_left = -7.0
+offset_top = -10.0
+text = "▲"
 
 [node name="Slots" type="Control" parent="Root" unique_id=1990872882]
 layout_mode = 1

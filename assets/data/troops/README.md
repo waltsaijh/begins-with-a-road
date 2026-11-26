@@ -29,7 +29,7 @@
 
 ## 匯入模型
 
-目前 Soldier 使用 `assets/models/enemies/grunt.tscn`，Quickfeet 使用 `runner.tscn`，Heavy 使用 `brute.tscn`；三者的 Model Scale 為 1。Quickfeet 的 Animation Speed 為 3.0。詳見 [模型說明](../../models/enemies/README.md)。
+九種普通兵種的 Model 引用各自的 Blender GLB，GPU Model 引用同目錄的剛體動作烘焙檔。Model Scale 與 Animation Speed 均為 1；獵犬沿用 `quickfeet`，其跑速節奏已寫入模型。詳見[模型說明](../../models/enemies/README.md)。
 
 將 `.glb`／`.gltf` 及貼圖放入專案，等待 Godot 匯入，再把匯入場景拖到 **Model**。也可使用自己建立的 `.tscn`；根節點須為 Node3D 或其子類別。
 
@@ -40,7 +40,7 @@
 - **Animation Speed**：動畫播放倍率。
 - **Head Height**：0 依 mesh 範圍估算血條高度，也可手動覆寫。
 
-Soldier 的 `grunt.tscn` 使用 MultiMesh 與 GPU 步態；Quickfeet／Heavy 的場景以實例顯示並保留自己的材質與 AnimationPlayer。不同模型可以出現在同一波。自訂場景各自產生繪製成本，適合保留完整的匯入模型／骨架動畫。
+九種普通兵種均依幾何分別批次繪製。保留舊模型與自訂場景的呈現入口；沒有相符 GPU Model 的自訂模型可沿用其材質與 AnimationPlayer。
 
 Icon 是 `assets/sprites/enemies/<id>.png` 的 64×64 白色 PNG，遊戲內只取 alpha 當遮罩，波次編輯器以 modulate 上色，不受模型匯入方式影響。Accent Color 是兵種專屬色，顯示時和塔一樣加深 45%（`Troop.icon_color()`）。
 
@@ -80,4 +80,4 @@ Soldier 為 standard＋ground，Quickfeet 為 small＋ground，Heavy 為 large�
 
 ## Phase 5 最終巨獸
 
-`ravager.tres` 是最終波的一隻 boss，與九種普通兵種共用 Troop／Enemy 生命週期。`Sabotage Targets` 控制同次最多標記的塔數（普通爆破手1、巨獸2），`Base Damage` 控制漏敵扣血（普通1、巨獸20）；正式關卡額外將 boss 漏敵視為敗北。巨獸沿 Cost／Uniform 固定路線，boss Tag 排除狩獵處決，其餘狀態及兵營攔截依原規則。載入數值、模型來源與測試見 [Phase 5](../../../docs/phase5.md)。
+`ravager.tres` 是最終波的一隻 boss，與九種普通兵種共用 Troop／Enemy 生命週期。`Sabotage Targets` 控制同次最多標記的塔數（普通爆破手1、巨獸2），`Base Damage` 控制漏敵扣血（普通1、巨獸20）；正式關卡額外將 boss 漏敵視為敗北。巨獸從密集防線旁的 3×3 空地降落，沿專用接道匯入可達基地的固定道路，boss Tag 排除狩獵處決，其餘狀態及兵營攔截依原規則。載入數值、模型來源與測試見 [Phase 5](../../../docs/phase5.md)。

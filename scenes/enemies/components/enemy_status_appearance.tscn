@@ -45,18 +45,11 @@ mouse_filter = 2
 color = Color(0.95686275, 0.827451, 0.36862746, 1)
 
 [node name="Icon" type="Control" parent="."]
-offset_left = 10.5
-offset_top = -14.0
-offset_right = 21.5
+offset_left = 9.0
+offset_top = -17.0
+offset_right = 23.0
 offset_bottom = -3.0
 mouse_filter = 2
-
-[node name="Background" type="Panel" parent="Icon"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("Frame")
 
 [node name="Texture" type="TextureRect" parent="Icon"]
 anchors_preset = 15

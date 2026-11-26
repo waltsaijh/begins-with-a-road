@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/enemies/boss_arrival.gd" id="1"]
+[node name="BossArrivalTest" type="Node"]
+script = ExtResource("1")

@@ -1,7 +1,6 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/levels/expansion/spawn_expansion.gd" id="1"]
-[ext_resource type="Theme" path="res://assets/themes/pause_controls.tres" id="2"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansTC-Medium.ttf" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/levels/components/expansion_start.tscn" id="4"]
 
@@ -58,6 +57,7 @@ material = SubResource("HoverMaterial")
 size = Vector3(0.92, 0.065, 0.92)
 
 [node name="SpawnExpansion" type="Node3D"]
+process_mode = 3
 script = ExtResource("1")
 
 [node name="World" type="Node3D" parent="."]
@@ -82,79 +82,19 @@ visible = false
 [node name="Interface" type="CanvasLayer" parent="."]
 layer = 5
 
-[node name="Root" type="Control" parent="Interface"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="Panel" type="PanelContainer" parent="Interface/Root"]
-visible = false
-layout_mode = 1
+[node name="Hint" type="Label" parent="Interface"]
+anchors_preset = 12
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -250.0
-offset_top = -186.0
 offset_right = 250.0
-offset_bottom = -28.0
-grow_horizontal = 2
-grow_vertical = 0
-theme = ExtResource("2")
-theme_override_styles/panel = SubResource("Panel")
-
-[node name="Margin" type="MarginContainer" parent="Interface/Root/Panel"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 14
-
-[node name="Content" type="VBoxContainer" parent="Interface/Root/Panel/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Heading" type="Label" parent="Interface/Root/Panel/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.19, 0.36, 0.38, 1)
+offset_top = -100.0
+offset_bottom = -68.0
+mouse_filter = 2
 theme_override_fonts/font = ExtResource("3")
-theme_override_font_sizes/font_size = 19
-text = "選擇新入口的方向"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.14,0.3,0.32,1)
+text = "ui.expansion.choose_position"
 horizontal_alignment = 1
-
-[node name="Note" type="Label" parent="Interface/Root/Panel/Margin/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.44, 0.46, 0.85)
-theme_override_font_sizes/font_size = 13
-text = "選擇期間無法放置防禦塔"
-horizontal_alignment = 1
-
-[node name="Directions" type="HBoxContainer" parent="Interface/Root/Panel/Margin/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="First" type="Button" parent="Interface/Root/Panel/Margin/Content/Directions"]
-custom_minimum_size = Vector2(136, 38)
-layout_mode = 2
-text = "← 西方"
-
-[node name="Second" type="Button" parent="Interface/Root/Panel/Margin/Content/Directions"]
-custom_minimum_size = Vector2(136, 38)
-layout_mode = 2
-text = "↑ 北方"
-
-[node name="Third" type="Button" parent="Interface/Root/Panel/Margin/Content/Directions"]
-custom_minimum_size = Vector2(136, 38)
-layout_mode = 2
-text = "↓ 南方"
-
-[node name="Back" type="Button" parent="Interface/Root/Panel/Margin/Content"]
-visible = false
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-text = "← 重選方向"

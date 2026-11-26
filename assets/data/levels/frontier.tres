@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://4q4c3cox24l5" path="res://scripts/levels/definitions/level_definition.gd" id="level"]
 [ext_resource type="PackedScene" uid="uid://catog0p872s0v" path="res://scenes/maps/tile_map.tscn" id="terrain"]
 [ext_resource type="Script" uid="uid://cvef4d4fr1kg7" path="res://scripts/levels/definitions/wave_definition.gd" id="wave"]
+[ext_resource type="Resource" path="res://assets/data/rendering/time_of_day/dusk.tres" id="time_of_day"]
 
 [sub_resource type="Resource" id="W1G1"]
 script = ExtResource("group")
@@ -499,3 +500,5 @@ base_health = 20
 starting_gold = 9
 opening_shop = true
 expansion_wave_interval = 5
+expansion_blocked_goal_sides = 2
+time_of_day = ExtResource("time_of_day")

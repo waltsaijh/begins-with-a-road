@@ -51,11 +51,11 @@ func finish_pause(hud: CanvasLayer) -> void:
 	if hud._cards._pause_card_motion != null and hud._cards._pause_card_motion.is_running(): await hud._cards._pause_card_motion.finished
 	await frames(1)
 
-func health_sample(camera: Camera3D, head: Vector3, bar_size: Vector2) -> Vector2i:
+func shield_sample(camera: Camera3D, head: Vector3, bar_size: Vector2) -> Vector2i:
 	var origin := (camera.unproject_position(head)-bar_size*Vector2(0.5, 1.0)).round()
 	return Vector2i(origin+Vector2(8, bar_size.y*0.5))
 
-func is_health_pixel(image: Image, point: Vector2i, color: Color) -> bool:
+func is_shield_pixel(image: Image, point: Vector2i, color: Color) -> bool:
 	if not Rect2i(Vector2i.ZERO, image.get_size()).has_point(point): return false
 	var pixel := image.get_pixelv(point)
 	return absf(pixel.r-color.r) < 0.01 and absf(pixel.g-color.g) < 0.01 and absf(pixel.b-color.b) < 0.01
@@ -159,13 +159,14 @@ func verify() -> void:
 	hud.set_paused(false)
 	await get_tree().create_timer(0.45, true, false, true).timeout
 	check(not get_tree().paused and not hud.pause_requested and Engine.time_scale == hud.SPEEDS[hud.speed_index], "Presentation transition froze a resumed game")
-	# Freeze real enemies, then inspect rendered health pixels after actual navigation.
+	# Freeze real enemies, then inspect rendered shield pixels after actual navigation.
 	scene.get_node("TowerMap").combat.enabled = false
 	scene._begin_wave_start()
 	scene._process(2.0)
 	wave._process(0.0)
-	check(wave.active and not wave.living_enemies().is_empty(), "Could not prepare enemies for paused health projection")
+	check(wave.active and not wave.living_enemies().is_empty(), "Could not prepare enemies for paused shield projection")
 	var unit: Node3D = wave.living_enemies()[0]
+	unit.add_shield(20.0)
 	var frozen_position := unit.global_position
 	var spawned: int = wave.spawned
 	var walk_phase: float = wave.visuals._poses[0].walk_phase
@@ -178,15 +179,16 @@ func verify() -> void:
 	camera.size = 8.0
 	camera.update_pose()
 	var overlay: Control = wave.visuals.status_overlay
-	check(overlay.can_process(), "Health overlay stopped projecting while gameplay was paused")
+	check(overlay.can_process(), "Status overlay stopped projecting while gameplay was paused")
 	var bar_size: Vector2 = overlay.appearance.size
-	var health_color: Color = overlay.appearance.get_node("Health").color
-	health_color = health_color.lerp(Color.WHITE, hud.pause_menu.get_node("WhiteVeil").color.a)
+	var shield_color: Color = overlay.appearance.get_node("Shield").color
+	shield_color = shield_color.lerp(Color.WHITE, hud.pause_menu.get_node("WhiteVeil").color.a)
 	await frames(3)
-	var old_pixel := health_sample(camera, head, bar_size)
+	check(overlay.batch.multimesh.visible_instance_count > 0, "The frozen shielded enemy submitted status geometry")
+	var old_pixel := shield_sample(camera, head, bar_size)
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		check(is_health_pixel(_viewport.get_texture().get_image(), old_pixel, health_color), "Health bar did not appear above the frozen enemy")
+		check(is_shield_pixel(_viewport.get_texture().get_image(), old_pixel, shield_color), "Shield bar did not appear above the frozen enemy")
 	var motion := InputEventMouseMotion.new()
 	motion.button_mask = MOUSE_BUTTON_MASK_LEFT
 	motion.position = Vector2(620, 340)
@@ -195,12 +197,12 @@ func verify() -> void:
 	_viewport.push_input(motion, true)
 	left(motion.position, false)
 	await frames(3)
-	var moved_pixel := health_sample(camera, head, bar_size)
-	check(moved_pixel.distance_to(old_pixel) > 50, "Camera pan did not move the health projection")
+	var moved_pixel := shield_sample(camera, head, bar_size)
+	check(moved_pixel.distance_to(old_pixel) > 50, "Camera pan did not move the shield projection")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		var image := _viewport.get_texture().get_image()
-		check(is_health_pixel(image, moved_pixel, health_color) and not is_health_pixel(image, old_pixel, health_color), "Paused health bar stayed at its old screen position after panning")
+		check(is_shield_pixel(image, moved_pixel, shield_color) and not is_shield_pixel(image, old_pixel, shield_color), "Paused shield bar stayed at its old screen position after panning")
 	var zoom := InputEventMouseButton.new()
 	zoom.position = motion.position
 	zoom.button_index = MOUSE_BUTTON_WHEEL_UP
@@ -210,9 +212,9 @@ func verify() -> void:
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		var image := _viewport.get_texture().get_image()
-		check(is_health_pixel(image, health_sample(camera, head, bar_size), health_color), "Paused health bar did not follow zoom")
+		check(is_shield_pixel(image, shield_sample(camera, head, bar_size), shield_color), "Paused shield bar did not follow zoom")
 		image.save_png(Artifacts.path("levels/paused_enemy_navigation.png"))
-	check(unit.global_position == frozen_position and get_tree().paused and Engine.time_scale == 0, "Reprojecting health bars advanced gameplay")
+	check(unit.global_position == frozen_position and get_tree().paused and Engine.time_scale == 0, "Reprojecting shield bars advanced gameplay")
 	hud.set_paused(false)
-	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "immediate_pause_at_1x_2x_4x": true, "immediate_input_lock": true, "paused_zoom_and_pan": true, "paused_health_projection": true, "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
+	print("PAUSE_NAVIGATION_CHECK:"+JSON.stringify({"failures": failures, "immediate_pause_at_1x_2x_4x": true, "immediate_input_lock": true, "paused_zoom_and_pan": true, "shield_pixels_checked": DisplayServer.get_name() != "headless", "menu_fades": true, "shop_locked": true, "resume_selection": true, "rapid_toggle": true}))
 	get_tree().quit(1 if failures else 0)

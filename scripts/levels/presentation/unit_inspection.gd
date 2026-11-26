@@ -4,6 +4,7 @@ const Picker = preload("res://scripts/levels/presentation/unit_pick.gd")
 const Data = preload("res://scripts/levels/presentation/unit_inspection_data.gd")
 var session: Node3D
 var target: Node3D
+var fallen: Dictionary = {}
 var _signature: Array = []
 var _motion: Tween
 var updates := 0
@@ -21,10 +22,10 @@ func setup(host: Node3D) -> void:
 	panel.hide()
 
 func has_selection() -> bool:
-	return is_instance_valid(target) and not target.is_queued_for_deletion()
+	return not fallen.is_empty() or (is_instance_valid(target) and not target.is_queued_for_deletion())
 
 func _blocked() -> bool:
-	if not is_instance_valid(session) or session.finished or session._loading or session.choosing_start or session.choosing_relic or ScreenTransition.active: return true
+	if not is_instance_valid(session) or session.finished or session._loading or session.choosing_start or session.choosing_relic or session.choosing_event or ScreenTransition.active: return true
 	var cards: Node = session.get_node("CardPlacement")
 	if cards.selected >= 0 or cards.hand.is_dragging() or cards._shop_open or cards.entry_selection_active: return true
 	if is_instance_valid(session.tutorial) and session.tutorial.stage < session.tutorial.Stage.PRACTICE: return true
@@ -36,16 +37,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_mask & (MOUSE_BUTTON_MASK_RIGHT|MOUSE_BUTTON_MASK_MIDDLE): return
 		var camera := get_viewport().get_camera_3d()
 		if camera == null: return
-		select_unit(Picker.pick(camera,event.position,session.get_node("TowerMap"),session.get_node("EnemyWave").visuals))
+		var unit := Picker.pick(camera,event.position,session.get_node("TowerMap"),session.get_node("EnemyWave").visuals)
+		if unit == null and session.get_node("CardPlacement/Shop").try_open_from_world(camera,event.position):
+			cancel_selection()
+		else: select_unit(unit)
 		get_viewport().set_input_as_handled()
 
 func select_unit(unit: Node3D) -> void:
-	if unit == target and has_selection(): return
+	if unit == target and fallen.is_empty() and has_selection(): return
 	cancel_selection(false)
 	if not is_instance_valid(unit) or unit.is_queued_for_deletion(): return
 	target = unit
 	target.tree_exiting.connect(_target_exited,CONNECT_ONE_SHOT)
-	target.died.connect(_target_exited)
+	target.died.connect(_target_died)
 	if target.has_signal("arrived"): target.arrived.connect(_target_exited)
 	_signature.clear()
 	_refresh()
@@ -59,12 +63,26 @@ func select_unit(unit: Node3D) -> void:
 func _target_exited(_unit: Node3D = null) -> void:
 	cancel_selection()
 
-func cancel_selection(animate := true) -> void:
+func _target_died(unit: Node3D) -> void:
+	if unit is DefenseTower:
+		cancel_selection()
+		return
+	fallen = Data.enemy_state(unit,true)
+	_detach_target()
+	range_view.clear()
+	_signature.clear()
+	_refresh()
+
+func _detach_target() -> void:
 	if is_instance_valid(target):
 		if target.tree_exiting.is_connected(_target_exited): target.tree_exiting.disconnect(_target_exited)
-		if target.died.is_connected(_target_exited): target.died.disconnect(_target_exited)
+		if target.died.is_connected(_target_died): target.died.disconnect(_target_died)
 		if target.has_signal("arrived") and target.arrived.is_connected(_target_exited): target.arrived.disconnect(_target_exited)
 	target = null
+
+func cancel_selection(animate := true) -> void:
+	_detach_target()
+	fallen.clear()
 	_signature.clear()
 	range_view.clear()
 	if _motion: _motion.kill()
@@ -76,14 +94,15 @@ func cancel_selection(animate := true) -> void:
 	_motion.tween_callback(panel.hide)
 
 func _refresh() -> void:
-	var signature: Array = [TranslationServer.get_locale(),target.health,target.max_health]
-	if target is DefenseTower:
+	var signature: Array = [TranslationServer.get_locale(),fallen] if not fallen.is_empty() else [TranslationServer.get_locale(),target.health,target.max_health]
+	if not fallen.is_empty(): pass
+	elif target is DefenseTower:
 		signature.append_array([target.level,target.damage,target.attack_interval,target.attack_radius,target.range_multiplier,target.support_bonus,target.geometry_damage_bonus,target.relic_effects.hash(),target.is_disabled(),target.attack,target.attack.damage_multiplier if target.attack != null else 0.0,target.deployment.damage if target.deployment != null else 0.0,target.deployment.health if target.deployment != null else 0.0,target.deployment.interval if target.deployment != null else 0.0,target.deployment.count if target.deployment != null else 0])
 	else: signature.append_array([target.shield,target.max_shield,target.base_damage,target.damage_reduction,target.abilities.hash()])
 	if signature == _signature: return
 	_signature = signature
 	updates += 1
-	var data: Dictionary = Data.tower(target,session.get_node("TowerMap").relics.catalog) if target is DefenseTower else Data.enemy(target)
+	var data: Dictionary = Data.enemy_from_state(fallen) if not fallen.is_empty() else (Data.tower(target,session.get_node("TowerMap").relics.catalog) if target is DefenseTower else Data.enemy(target))
 	column.get_node("Heading/Name").text = data.name
 	column.get_node("Heading/Kind").text = data.kind
 	column.get_node("Heading/Kind").visible = not data.kind.is_empty()
@@ -108,7 +127,16 @@ func _process(_delta: float) -> void:
 		if target != null: cancel_selection()
 		return
 	if _blocked():
+		if not fallen.is_empty():
+			panel.hide()
+			return
 		cancel_selection()
+		return
+	panel.visible = not get_tree().paused
+	if not fallen.is_empty():
+		if not get_tree().paused:
+			_refresh()
+			_layout()
 		return
 	if target.health <= 0:
 		cancel_selection()
@@ -140,7 +168,7 @@ func _layout() -> void:
 				var at: Vector2 = transform*point
 				hand_right = maxf(hand_right,at.x)
 				hand_top = minf(hand_top,at.y)
-		var right_limit: float = viewport_size.x-(180 if cards.get_node("Shop").available else 16)
+		var right_limit: float = viewport_size.x-16
 		if hand_right+12+width <= right_limit: left = maxf(left,hand_right+12)
 		else: bottom = minf(bottom,hand_top-12)
 	var minimum_height := panel.get_combined_minimum_size().y

@@ -1,6 +1,15 @@
 @tool
 class_name BuildCard
 extends Resource
+@export var spell: CommanderSpell
+## Runtime inventory count. Each spell stack owns its BuildCard.
+var quantity := 1:
+	set(value):
+		quantity = maxi(1, value)
+		emit_changed()
+@export var special: SpecialCardDefinition
+## Per-acquisition identity: repeated events have independent placement goals.
+var event_batch := 0
 ## Shared, editable construction recipe. Geometry is relative to a placement anchor.
 @export_range(0, 100, 1, "or_greater") var price := ShopConstants.DEFAULT_CARD_PRICE:
 	set(value):
@@ -52,12 +61,16 @@ static func from_traffic(definition: TrafficStructureDefinition) -> BuildCard:
 	return result
 
 func visual_definition() -> Resource:
+	if spell != null: return spell
+	if special != null: return special
 	return traffic if traffic != null else tower
 
 func localized_prefix() -> String:
 	return tile_preset.localized_prefix() if tile_preset != null else ""
 
 func localized_name() -> String:
+	if spell != null: return spell.localized_name()
+	if special != null: return special.localized_name()
 	if traffic != null: return traffic.localized_name()
 	if tower == null: return tr("card.unassigned")
 	var tower_name := tower.localized_name()
@@ -74,6 +87,8 @@ static func rotate_cell(cell: Vector2i, turns: int) -> Vector2i:
 ## Translate the authored origin so pointer rotation pivots around the whole body.
 ## Compute absolutely from the selection's initial facing: rounding never accumulates.
 func rotation_anchor_offset(turns: int, initial_turns := 0) -> Vector2i:
+	if special != null and special.kind != SpecialCardDefinition.Kind.CONSUMABLE:
+		return Vector2i((TowerBodyGeometry.center(ground_cells(Vector2i.ZERO,initial_turns))-TowerBodyGeometry.center(ground_cells(Vector2i.ZERO,turns))).round())
 	if traffic != null or tower == null: return Vector2i.ZERO
 	var initial_center := TowerBodyGeometry.center(tower_cells(Vector2i.ZERO, initial_turns))
 	var rotated_center := TowerBodyGeometry.center(tower_cells(Vector2i.ZERO, turns))
@@ -84,11 +99,12 @@ func tower_anchor(anchor: Vector2i, turns := 0) -> Vector2i:
 	return anchor + rotate_cell(tile_preset.tower_offset, turns) if tile_preset != null and traffic == null else anchor
 
 func tower_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
+	var empty: Array[Vector2i] = []
 	if tile_preset != null and not tile_preset.tower_footprint.is_empty():
 		var result: Array[Vector2i] = []
 		for cell in tile_preset.tower_footprint: result.append(anchor+rotate_cell(cell,turns))
 		return result
-	return tower.cells_at(tower_anchor(anchor, turns), turns) if tower != null else []
+	return tower.cells_at(tower_anchor(anchor, turns), turns) if tower != null else empty
 
 func tower_facing(turns: int) -> int:
 	return posmod(turns+(tile_preset.facing_steps if tile_preset != null else 0),4)
@@ -118,6 +134,11 @@ func road_ports(anchor: Vector2i, turns := 0) -> Dictionary:
 	return result
 
 func ground_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
+	if special != null:
+		var cells: Array[Vector2i] = []
+		if special.kind == SpecialCardDefinition.Kind.CONSUMABLE: return cells
+		for cell in special.cells: cells.append(anchor+rotate_cell(cell,turns))
+		return cells
 	if traffic != null: return [anchor]
 	var result := tower_cells(anchor, turns)
 	if tile_preset == null: return result
@@ -129,6 +150,12 @@ func ground_cells(anchor: Vector2i, turns := 0) -> Array[Vector2i]:
 	return result
 
 func configuration_error() -> String:
+	if spell != null:
+		if tower != null or special != null or tile_preset != null or traffic != null: return "Invalid spell card"
+		return "" if spell.damage >= 0 and spell.radius > 0 else "Invalid spell damage or radius"
+	if special != null:
+		if tower != null or traffic != null: return "Special card cannot also contain a tower"
+		return special.configuration_error()
 	if traffic != null:
 		if tower != null: return "建造卡不能同時指定塔與輔助設施"
 		return traffic.configuration_error()

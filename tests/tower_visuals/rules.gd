@@ -58,7 +58,10 @@ func run() -> void:
 				tower.health *= 0.5; tower.next_attack_time = 9.5
 				for level in [2,3]:
 					check(tower.upgrade() and tower.level == level,key+" upgrades without replacement")
-					check(tower._visual.find_child("Level"+str(level),true,false).visible,key+" exposes level assembly")
+					check(tower._upgrade_fx.emitting and not tower._upgrade_fx._lit.is_empty(),key+" lights the upgraded model and emits sparks")
+					if not tower._visual.has_method("supports_body"):
+						var assembly := tower._visual.find_child("Level"+str(level),true,false) as Node3D
+						check(assembly != null and assembly.visible,key+" exposes procedural level assembly")
 					check(tower.occupied_cells == occupied and portal.revision == revision and tower.next_attack_time == 9.5 and is_equal_approx(tower.health/tower.max_health,0.5),key+" upgrade preserves geometry, cooldown and health ratio")
 				if key == "sentry":
 					tower.unlimited_levels = true; check(tower.upgrade() and tower.level == 4,"Unlimited sentry stats retain Lv3 visual cap")

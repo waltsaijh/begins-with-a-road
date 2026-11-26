@@ -1,5 +1,8 @@
 extends Node3D
 ## Immutable route snapshot, health and temporary movement effects; no render state.
+signal landed(point: Vector3)
+const DESCENT_SECONDS := 0.7
+var _descent_remaining := 0.0
 signal arrived(enemy: Node3D)
 signal died(enemy: Node3D)
 signal damaged(enemy: Node3D, amount: float)
@@ -22,6 +25,11 @@ var _next := 1
 var _finished := false
 var _slow_multiplier := 1.0
 var _slow_remaining := 0.0
+var stun_remaining := 0.0
+
+func stun(seconds: float) -> void:
+	stun_remaining = maxf(stun_remaining, seconds)
+	set_effect_icon(&"stun", preload("res://assets/sprites/effects/disabled.svg"))
 var _haste_bonus := 0.0
 var _haste_remaining := 0.0
 var _frost: Array[Dictionary] = []
@@ -186,12 +194,27 @@ func follow(id: int, selected_route: Dictionary, points: PackedVector3Array, sha
 	if waypoints.size() > 1:
 		move_direction = (waypoints[1]-waypoints[0]).normalized()
 
+func begin_descent() -> void:
+	_descent_remaining = DESCENT_SECONDS
+	global_position = waypoints[0]+Vector3.UP*4.5
+
 func _process(delta: float) -> void:
 	if _finished or waypoints.is_empty():
 		return
+	if _descent_remaining > 0.0:
+		var step := minf(delta,_descent_remaining)
+		_descent_remaining -= step
+		delta -= step
+		var t := 1.0-_descent_remaining/DESCENT_SECONDS
+		global_position = waypoints[0]+Vector3.UP*4.5*(1.0-t*t)
+		if _descent_remaining > 0.0: return
+		landed.emit(global_position)
 	# Spend leftover distance on the next segment, preserving speed at corners
 	# and even when one slow frame crosses several tiles.
-	var remaining := maxf(0.0, delta)*move_speed*_speed_factor(maxf(0.0, delta))
+	var hold := stun_remaining
+	for entry in abilities:
+		hold = maxf(hold, entry.movement_hold_remaining())
+	var remaining := maxf(0.0, delta-hold)*move_speed*_speed_factor(maxf(0.0, delta))
 	if is_instance_valid(engaged_by):
 		move_direction = (engaged_by.global_position-global_position).normalized()
 		return

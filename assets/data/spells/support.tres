@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CommanderSpell" format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/definitions/commander_spell.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/sprites/relics/support_attack.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+kind = &"support"
+name_key = "spell.support.name"
+icon = ExtResource("2")
+damage = 60
+radius = 1

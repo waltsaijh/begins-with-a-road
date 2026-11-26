@@ -2,7 +2,7 @@
 
 道路、木橋、Sentry、端點的非發光零件與三種正式敵人共用 `solid_color.tres`，材質引用 `assets/shaders/solid_color.gdshader`。每個模型直接保存同一份外部材質引用，執行時不複製材質或逐模型轉換。
 
-shader 實作集中在 `assets/shaders/solid_color_body.gdshaderinc`。`enemy_walk.gdshader` 保留為改名前的編輯器分頁相容入口，引用同一份實作，避免舊分頁恢復時載入失敗；正式材質與預熱仍引用 `solid_color.gdshader`，不建立第二套材質或步態。
+shader 實作集中在 `assets/shaders/solid_color_body.gdshaderinc`。光照由 `assets/shaders/cel_light.gdshaderinc` 的共用 `light()` 量化成三階色塊（柱底與遠方島嶼 shader 也 include 同一份），階數與門檻只在該 include 調整，見 docs/systems.md「色塊式明暗」。`enemy_walk.gdshader` 保留為改名前的編輯器分頁相容入口，引用同一份實作，避免舊分頁恢復時載入失敗；正式材質與預熱仍引用 `solid_color.gdshader`，不建立第二套材質或步態。
 
 網格資料：
 

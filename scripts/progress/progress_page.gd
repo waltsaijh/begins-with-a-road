@@ -1,5 +1,6 @@
 extends "res://scripts/settings/settings_page.gd"
 ## Read-only sibling of the settings page: sections, then entries, then one entry in detail.
+signal entry_viewed(id: String)
 const Entry = preload("res://scenes/progress/components/progress_entry.tscn")
 const IconMask = preload("res://assets/shaders/ui_icon_mask.gdshader")
 @onready var column: VBoxContainer = $Panel/Margin/Layout/Body/Detail/Column
@@ -33,6 +34,7 @@ func _show_detail(definition: Dictionary) -> void:
 	_show_text("Traits", "  ·  ".join(definition.traits))
 	_show_text("Description", definition.get("detail", definition.description))
 	$Panel/Margin/Layout/Body/Detail.scroll_vertical = 0
+	if selected_section == 1: entry_viewed.emit(str(definition.id))
 
 func _show_text(part: String, text: String) -> void:
 	var label: Label = column.get_node(part)

@@ -150,11 +150,14 @@ func verify() -> void:
 			viewport.get_texture().get_image().save_png(Artifacts.path("cards/invalid_ground_before.png"))
 		var before_count: int = cards.cards.size()
 		check(cards.place_selected(invalid_cell) == null and cards.cards.size() == before_count, "Invalid ground attempt must preserve the hand")
+		check(cards.preview.visible and cards.preview._material.get_shader_parameter("rejection_flash") > 0.5, "Rejected placement lights the red overlay")
+		cards.preview._flash_started = Time.get_ticks_usec()-20000
+		cards.preview._process(0.02)
+		check(not cards.preview._flashed_meshes.is_empty() and absf(cards.preview.ghost.position.x-cards.preview._ghost_rest.x)>0.05, "Rejected tower shakes and turns red")
 		if DisplayServer.get_name() != "headless":
 			await frames(2)
 			await RenderingServer.frame_post_draw
 			viewport.get_texture().get_image().save_png(Artifacts.path("cards/invalid_ground_flash.png"))
-		check(cards.preview.visible and cards.preview.ground.mesh != null and cards.preview._material.get_shader_parameter("rejection_flash") > 0.5, "Rejected red ground must remain visible during the flash")
 		await get_tree().create_timer(0.45, true, false, true).timeout
 		check(is_zero_approx(cards.preview._material.get_shader_parameter("rejection_flash")), "Red ground must fade back without moving the cursor")
 		cards.select_card(-1)
@@ -164,6 +167,7 @@ func verify() -> void:
 	drag_to(point)
 	await frames(3)
 	check(cards.hand.is_dragging() and cards.selected == 0 and cards.preview.visible, "Dragging did not select the card and show the world hologram")
+	check(artwork.position.length() > 4 and absf(artwork.rotation_degrees) > 0.1, "Dragged artwork follows and tilts while its input slot stays in the hand")
 	check(cards.cards.size() == count and is_equal_approx(camera.azimuth, angle) and camera.focus.is_equal_approx(focus) and camera._orbit_press == null and camera._pan_press == null, "A held card drag placed early or moved the camera")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
@@ -206,7 +210,7 @@ func verify() -> void:
 		motion(destination_point, MOUSE_BUTTON_MASK_LEFT)
 		left(destination_point, false)
 		check(cards.selected == -1 and cards.cards.size() == count and not cards.preview.visible and not cards.hand.is_dragging(), "Dropping onto a hand card did not cancel focus safely")
-	# Closed shop backs also cancel focus without opening or buying anything.
+	# The compact supply entry also cancels a dragged card without transacting.
 	var shop: Node = cards.get_node("Shop")
 	shop._on_wave_started()
 	shop._on_wave_finished()
@@ -215,7 +219,7 @@ func verify() -> void:
 	var deals: int = shop.deals
 	drag_to(point)
 	await frames(2)
-	var back: Button = shop.view.slots.back().get_node("Face/Back")
+	var back: Button = shop.view.entry
 	var back_point := back.get_global_transform_with_canvas()*(back.size*0.5)
 	motion(back_point, MOUSE_BUTTON_MASK_LEFT)
 	left(back_point, false)

@@ -56,7 +56,12 @@ func verify() -> void:
 	var batch := Batch.new()
 	scene.add_child(batch)
 	batch.set_process(false)
-	for id in ["quickfeet","heavy"]: compare_clip(TroopCatalog.find(id))
+	# The original analytic gait remains a supported asset format.
+	for id in ["runner","brute"]:
+		var legacy := Troop.new()
+		legacy.model = load("res://assets/models/enemies/"+id+".tscn")
+		legacy.gpu_model = load("res://assets/models/enemies/"+id+"_gpu.tres")
+		compare_clip(legacy)
 	var profiles: Array[Troop] = [TroopCatalog.find("soldier"),TroopCatalog.find("quickfeet"),TroopCatalog.find("heavy")]
 	var alternate := profiles[1].duplicate() as Troop
 	batch.reserve_population({profiles[1]:85,alternate:86})
@@ -70,16 +75,18 @@ func verify() -> void:
 		enemy.set_process(false)
 		batch.add_enemy(enemy)
 		enemies.append(enemy)
-	check(batch._batches.size() == 3,"Expected three independent geometry batches")
-	for geometry: RefCounted in batch._batches.values():
+	check(batch._batches[Appearance.DefaultGpu].units.is_empty(),"Legacy fallback also drew authored enemies")
+	for profile in profiles:
+		var geometry: RefCounted = batch._batches[profile.gpu_model]
 		check(geometry.units.size() == 86 and geometry.view.multimesh.visible_instance_count == 86,"Per-mesh population or growth incorrect")
-		check(geometry.view.material_override.shader == Batch.WalkShader,"GPU batches do not share one shader")
-		check(geometry.view.material_override == preload("res://assets/materials/solid_color.tres"),"GPU batches duplicated the shared world material")
+		check(geometry.view.material_override == profile.gpu_model.material(),"Instances lost their shared clip material")
 	for appearance: RefCounted in batch._appearances:
 		check(appearance.instance == null and appearance.animation == null and appearance.batched,"GPU enemy retained scene/AnimationPlayer")
 	var quick: RefCounted = batch._appearances[1]
+	var initial: float = quick.clip_phase
+	check(initial != batch._appearances[4].clip_phase,"Identical models started in lockstep")
 	quick.advance(0.125,0.6)
-	check(is_equal_approx(quick.clip_phase,0.125*0.6*3.0*TAU/quick.gpu_model.clip_length),"Quickfeet clip lost 3x playback or blend")
+	check(is_equal_approx(quick.clip_phase,fposmod(initial+0.125*0.6*TAU/quick.gpu_model.clip_length,TAU)),"Hound lost its authored playback or movement blend")
 	var phase: float = quick.clip_phase
 	quick.advance(0.5,0)
 	check(quick.clip_phase == phase,"Stopped authored clip did not freeze")

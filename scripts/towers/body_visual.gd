@@ -54,6 +54,15 @@ static func set_level(root: Node3D, level: int) -> void:
 	for node in root.find_children("Level*","Node3D",true,false):
 		node.visible = level >= int(String(node.name).trim_prefix("Level"))
 
+static func visible_bounds(root: Node3D, relative_to: Node3D) -> AABB:
+	var bounds := AABB()
+	var inverse := relative_to.global_transform.affine_inverse()
+	for piece: MeshInstance3D in root.find_children("*", "MeshInstance3D", true, false):
+		if piece.mesh == null or not piece.is_visible_in_tree(): continue
+		var box: AABB = (inverse * piece.global_transform) * piece.get_aabb()
+		bounds = bounds.merge(box) if bounds.has_surface() else box
+	return bounds
+
 static func group(parent: Node3D, title: String, position := Vector3.ZERO) -> Node3D:
 	var node := Node3D.new(); node.name = title; node.position = position; parent.add_child(node)
 	return node

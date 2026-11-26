@@ -4,6 +4,7 @@ const Waypoints = preload("res://scripts/enemies/spawning/route_waypoints.gd")
 ## Freeze routes/stats at wave start. Shuffle assignments only within each group.
 static func origins_for(group: WaveSpawnGroup, additional_starts: PackedInt32Array) -> PackedInt32Array:
 	var origins := PackedInt32Array([group.start_index])
+	if group.fixed_start: return origins
 	for index in additional_starts:
 		if not index in origins: origins.append(index)
 	return origins
@@ -30,8 +31,18 @@ static func build(definition: WaveDefinition, controller: Node, first_id: int, s
 	var batches := {}
 	# Troops that weigh traffic plan second, against the first pass's routes.
 	var followers: Array[Troop] = []
+	var boss_approach := {}
 	for key: String in quotas:
 		var profile: Troop = sources[key].profile
+		if profile.has_tag(&"boss"):
+			if boss_approach.is_empty(): boss_approach = preload("res://scripts/enemies/spawning/boss_approach.gd").plan(controller)
+			if boss_approach.is_empty(): return {}
+			var trips: Array[Dictionary] = []
+			trips.resize(quotas[key])
+			trips.fill(boss_approach)
+			batches[key] = trips
+			pool_size += 1
+			continue
 		if profile.road_traffic_weight != 0:
 			if not profile in followers: followers.append(profile)
 			continue
@@ -115,12 +126,12 @@ static func _assigned_origins(definition: WaveDefinition, additional_starts: Pac
 	var source_totals := {}
 	var source_used := {}
 	for group in definition.groups:
-		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]
+		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]+(":fixed" if group.fixed_start else "")
 		source_totals[key] = int(source_totals.get(key,0))+ceili(float(group.enemy_count)/group.troop.cohort_size)
 		source_used[key] = 0
 	var assignments: Array[PackedInt32Array] = []
 	for group in definition.groups:
-		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]
+		var key := "%d:%d" % [group.troop.get_instance_id(),group.start_index]+(":fixed" if group.fixed_start else "")
 		var origins := origins_for(group,additional_starts)
 		var assigned := PackedInt32Array()
 		for first in range(0, group.enemy_count, group.troop.cohort_size):

@@ -194,7 +194,7 @@ func verify() -> void:
 	var wave: Node = scene.get_node("EnemyWave")
 	var controller: Node = scene.get_node("PortalMap")
 	var hud: CanvasLayer = scene.get_node("LevelHUD")
-	check(panel.visible and hud.early_start.visible and preview.arrows.visible and preview.arrows.mesh != null, "Initial troop icons or prediction missing")
+	check(not panel.visible and hud.early_start.visible and preview.arrows.visible and preview.arrows.mesh != null, "Initial compact action or prediction missing")
 	check(controller.start_nodes.size() == 2 and preview.forecast.by_origin.size() == 2, "Multi-entrance flow missing")
 	var vertex_count: int = (preview.arrows.mesh as ArrayMesh).surface_get_array_len(0)
 	check(preview.arrows.mesh.get_surface_count() == 1 and vertex_count == preview.arrows.rendered_cells.size()*6, "Flow is not a single batch of disjoint cell patches")
@@ -203,11 +203,25 @@ func verify() -> void:
 	var second_panel: Control = hud.start_callouts[1].get_node("NextWaveIntel")
 	for action: Button in hud.start_callouts:
 		var intel: Control = action.get_node("NextWaveIntel")
-		check(intel.position.y >= action.get_node("Title").get_rect().end.y, "Troop row overlaps the start title after export: intel=%s title=%s" % [intel.get_rect(),action.get_node("Title").get_rect()])
-		check(is_equal_approx(action.get_node("Title").get_rect().get_center().x,action.size.x*0.5),"Start label is not centered above its icons")
+		check(not intel.get_rect().intersects(Rect2(Vector2.ZERO,action.size)) and intel.position.y < action.size.y, "Troop row overlaps the start title after export: intel=%s title=%s" % [intel.get_rect(),action.get_node("Title").get_rect()])
+		check(action.get_node("Title").pivot_offset.is_equal_approx(action.get_node("Title").size*0.5) and is_zero_approx(action.rotation),"Start label is not centered above its icons")
 	check(panel.counts[soldier] == 10 and panel.counts.size() == 2, "First entrance shows global rather than allocated counts")
 	check(second_panel.counts[soldier] == 6 and second_panel.counts.size() == 2, "Second entrance troop counts incorrect")
 	check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition), "Entrance counts do not sum to the wave")
+	var reminder: Button = hud.start_callouts[0]
+	var hit_rect := reminder.get_global_rect()
+	for phase: float in [0.4,1.0,2.0]:
+		reminder._swing_time = phase
+		reminder._last_usec = Time.get_ticks_usec()
+		reminder._process(0)
+		var expected_angle := -10.0 if phase == 0.4 else (10.0 if phase == 1.0 else 0.0)
+		check(absf(reminder.get_node("Title").rotation_degrees-expected_angle) < 0.01,"Reminder does not swing smoothly to both extremes and rest")
+		check(reminder.get_global_rect() == hit_rect,"Reminder animation changes its click area")
+	hud.set_paused(true)
+	var frozen_swing: float = reminder._swing_time
+	reminder._process(1.0)
+	check(reminder._swing_time == frozen_swing,"Paused reminder still advances its animation")
+	hud.set_paused(false)
 	# The shared loading contract must suspend every entrance and its forecast,
 	# while preserving the exact unshuffled quotas and departure RNG.
 	var forecast_before_loading: Dictionary = preview.forecast.all.duplicate()
@@ -259,26 +273,27 @@ func verify() -> void:
 	builds = preview.rebuild_count
 	var item := panel.get_node("Scroll/Items").get_child(0)
 	if rendered:
-		check(panel.visible and second_panel.visible and hud.early_start.get_node("Title").visible,"Idle entrances should show a start label and troop icons")
+		check(not panel.visible and not second_panel.visible and hud.early_start.get_node("Title").text == "!","Idle entrances show only the exclamation")
 		for entry in panel.get_node("Scroll/Items").get_children():
-			check(not entry.get_node("Body/Content/Count").visible,"Idle troop icon revealed its count")
+			check(entry.body.get_node_or_null("Content/Icon") == null,"Text rows contain no enemy icons")
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(Artifacts.path("levels/wave_icons_idle.png"))
 		for offset in [0.0,-65.0,65.0]: await traverse_callout(hud.early_start,offset)
 		await move_mouse(Vector2(8,200))
 		await move_mouse(hud.early_start.get_global_rect().get_center())
-		check(panel.visible and second_panel.visible,"Hover hid another entrance's troop icons")
+		check(panel.visible and not second_panel.visible,"Only the hovered entrance expands")
 		await move_mouse(item.body.get_global_rect().get_center())
 	else:
+		panel.set_interactive(true)
 		item.body.mouse_entered.emit()
 	check(panel.selected == soldier and preview.selected_origin == 0 and not preview.forecast.by_troop_origin[soldier][0].is_empty(), "Hover did not filter troop and entrance")
 	check_rendered_scope(preview,soldier,0)
 	if rendered:
 		await get_tree().create_timer(0.4).timeout
-		check(item.get_node("Body/Content/Count").visible and item.body.size.x > 40,"Hover did not expand the icon frame and reveal its count")
-		check(item.get_node("Body/Content/Count").text == "×10","Hover count differs from the entrance quota")
+		check(item.body.is_visible_in_tree() and item.body.size.x > 40,"Hover reveals the text row")
+		check(item.body.text == "%s × 10" % soldier.localized_name(),"Hover text and count match final entrance quota")
 		for sibling in panel.get_node("Scroll/Items").get_children():
-			if sibling != item: check(not sibling.get_node("Body/Content/Count").visible,"Hover expanded an unrelated troop icon")
+			if sibling != item: check(sibling.body.text.contains(" × "),"Every visible row uses localized name and quantity")
 		check_rendered_scope(preview,soldier,0)
 	check(preview.rebuild_count == builds, "Hover regenerated schedule")
 	if rendered:
@@ -307,6 +322,7 @@ func verify() -> void:
 		await move_mouse(hud.start_callouts[1].get_global_rect().get_center())
 		await move_mouse(second_item.body.get_global_rect().get_center())
 	else:
+		second_panel.set_interactive(true)
 		second_item.body.mouse_entered.emit()
 	check(preview.selected_origin == 1 and second_panel.selected == soldier and panel.selected == null, "Second entrance hover did not isolate its own allocation")
 	check_rendered_scope(preview,soldier,1)
@@ -330,7 +346,7 @@ func verify() -> void:
 		event.pressed = true
 		scene.get_node("PortalOverlay")._unhandled_key_input(event)
 		await frames()
-		check(panel.visible and not preview.arrows.visible, "Debug layer did not hide player arrows or hid the persistent icons")
+		check(not preview.arrows.visible, "Debug layer did not hide player arrows")
 		scene.get_node("PortalOverlay")._unhandled_key_input(event)
 		await frames()
 		check(preview.arrows.visible, "Closing debug layer did not restore arrows")
@@ -342,9 +358,9 @@ func verify() -> void:
 	panel.display(overflow)
 	if rendered: await move_mouse(hud.early_start.get_global_rect().get_center())
 	await frames()
-	check(panel.get_parent() == hud.early_start and panel.size.x <= 480.01 and panel.size.y <= 64, "Troop row escaped the start button or expanded without bounds: %s, action=%s" % [panel.get_rect(),hud.early_start.get_rect()])
-	check(panel.get_node("Scroll/Items") is HBoxContainer,"Troops are not arranged horizontally")
-	check(panel.get_node("Scroll").get_h_scroll_bar().max_value > panel.size.x, "Troop overflow is not horizontally scrollable")
+	check(panel.get_parent() == hud.early_start and panel.size.x <= 300.01 and panel.size.y <= 234.01, "Troop row escaped the start button or expanded without bounds: %s, action=%s" % [panel.get_rect(),hud.early_start.get_rect()])
+	check(panel.get_node("Scroll/Items") is VBoxContainer,"Troops are not arranged as text rows")
+	check(panel.get_node("Scroll").get_v_scroll_bar().max_value > panel.size.y, "Troop overflow is not vertically scrollable")
 	panel.display(preview.forecast.counts_by_origin[0])
 	await frames()
 	var after := WaveSpawnSchedule.build(wave.definition, controller, 0, false)
@@ -372,7 +388,7 @@ func verify() -> void:
 	check(not panel.visible and not second_panel.visible and not preview.arrows.visible, "Pause retained active preview")
 	hud.set_paused(false)
 	await frames()
-	check(panel.visible and preview.arrows.visible and panel.selected == null, "Resume did not restore neutral preview and troop icons")
+	check(hud.early_start.visible and preview.arrows.visible and panel.selected == null, "Resume restores neutral preview and compact action")
 	if rendered: await visual_check(scene)
 	# Start, finish, ACT expansion and teardown through real session entry points.
 	wave.set_process(false)
@@ -409,17 +425,17 @@ func verify() -> void:
 			scene.relic_choice.choose(scene.relic_choice.offers[0])
 			await get_tree().create_timer(0.3).timeout
 		if index == 0:
-			check(panel.visible and second_panel.visible and hud.early_start.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion did not refresh per-entrance icons")
+			check(hud.early_start.visible and preview.arrows.mesh != null and panel.counts.size() == 1, "Wave completion refreshes compact action and final counts")
 			check(displayed_totals(hud) == RoadFlowForecast.troop_counts(wave.definition),"Next wave retained stale entrance counts")
 		else:
-			check(scene.choosing_start and not panel.visible and preview.arrows.mesh == null, "ACT selection retained stale arrows")
-	var expansion: Node = scene.get_node("SpawnExpansion")
-	expansion.choose_direction(0)
-	var new_cell: Vector2i = expansion.choices[0].paths.keys()[0]
-	check(expansion.commit(Vector3i(new_cell.x, 0, new_cell.y)), "ACT entrance commit failed")
-	check(not panel.visible and preview.arrows.mesh == null, "Entrance rebuild exposed stale prediction")
+			check(scene.choosing_start,"ACT entrance waits for player placement")
+			var region: Dictionary = scene.expansion.choices[0]
+			var entrance: Vector2i = region.paths.keys()[0]
+			check(scene.expansion.commit(Vector3i(entrance.x,0,entrance.y)),"Player directly places the next entrance")
+			await frames(10)
+			check(not scene.choosing_start,"ACT entrance resolves after player placement")
 	await frames(10)
-	check(hud.early_start.visible and panel.visible and preview.arrows.mesh != null, "ACT completion failed to restore prediction and icons")
+	check(hud.early_start.visible and preview.arrows.mesh != null,"Player placement restores prediction")
 	check(controller.start_nodes.size() == 3 and preview.forecast.by_origin.size() == 3, "Added ACT entrance missing from prediction")
 	check(hud.start_callouts.size() == 3 and displayed_totals(hud).values().reduce(func(a: int, b: int): return a+b, 0) == 29, "New entrance lacks an action or changed troop totals")
 	for i in 3:
@@ -466,6 +482,11 @@ func visual_check(scene: Node3D) -> void:
 	get_viewport().get_texture().get_image().save_png(Artifacts.path("levels/road_flow_all.png"))
 	# Remove animated cloud pixels from the controlled shader phase comparison.
 	scene.get_node("CloudLayer").hide()
+	# Art Slice G also animates cloud shadows on the road itself. Freeze only
+	# this visual input while comparing identical shader geometry between frames.
+	var shadow_wind: Vector2 = ProjectSettings.get_setting("shader_globals/cloud_shadow_wind").value
+	RenderingServer.global_shader_parameter_set("cloud_shadow_wind",Vector2.ZERO)
+	for action: Button in scene.get_node("LevelHUD").start_callouts: action.set_process(false)
 	# Pixel contrast uses a short reference brush, independent of editor tuning.
 	preview.arrows.material_override.set_shader_parameter("highlight_length",0.5)
 	preview.arrows.material_override.set_shader_parameter("flow_speed", 0.0)
@@ -551,5 +572,7 @@ func visual_check(scene: Node3D) -> void:
 	preview.arrows.material_override.set_shader_parameter("flow_speed", preview.arrows.flow_speed)
 	preview.arrows.material_override.set_shader_parameter("highlight_length",preview.arrows.highlight_length)
 	scene.get_node("CloudLayer").show()
+	RenderingServer.global_shader_parameter_set("cloud_shadow_wind",shadow_wind)
+	for action: Button in scene.get_node("LevelHUD").start_callouts: action.set_process(true)
 	preview.set_process(true)
 	await frames()

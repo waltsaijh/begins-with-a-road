@@ -14,6 +14,7 @@ func wait_map(scene: Node) -> void:
 	check(false,"Map rebuild timed out")
 func verify() -> void:
 	var authored: LevelDefinition = load("res://assets/data/levels/frontier.tres")
+	check(authored.expansion_blocked_goal_sides == 2,"Second level disables placement east of the base")
 	for completed in range(16):
 		check(authored.expands_after(completed) == (completed in [5,10]),"Wrong Frontier expansion at %d" % completed)
 	var level: LevelDefinition = authored.duplicate(true)
@@ -71,15 +72,35 @@ func verify() -> void:
 			check(not scene.choosing_start,"Reward and expansion opened simultaneously")
 			scene.relic_choice.choose(scene.relic_choice.offers[0])
 			await get_tree().create_timer(0.3).timeout
-		check(scene.choosing_start == (index in [4,9]),"Wrong runtime expansion timing")
-		if scene.choosing_start:
-			check(not wave.start_allowed and scene.get_node("CardPlacement").input_suspended,"Expansion did not lock construction/start")
-			var expansion: Node = scene.expansion
-			expansion.choose_direction(0)
-			var cell: Vector2i = expansion.choices[0].paths.keys()[0]
-			check(expansion.commit(Vector3i(cell.x,0,cell.y)),"Entrance commit failed")
+		if index in [4,9]:
+			check(scene.choosing_start and not scene.expansion.committing,"Expansion waits for a player-chosen location")
+			var planner = preload("res://scripts/levels/expansion/spawn_expansion_planner.gd")
+			var goal: Vector2i = scene.get_node("PortalMap").terminal_cells()[0]
+			check(scene.expansion.blocked_goal_sides == 2,"Level restriction reaches the placement controller")
+			for option: Dictionary in scene.expansion.choices:
+				check(option.direction != "east","East region never appears in the second level")
+				for at: Vector2i in option.paths: check(at.x <= goal.x,"North/south corner candidates cannot slip behind the base")
+			check(not planner.permitted_side(goal+Vector2i(1,-20),goal,2) and not planner.permitted_side(goal+Vector2i(1,20),goal,2),"Both eastern corners are excluded")
+			for raw: Dictionary in planner.generate(scene.get_node("PortalMap"),8,3):
+				if raw.direction != "east": continue
+				var forbidden: Vector2i = raw.paths.keys()[0]
+				check(not scene.expansion.commit(Vector3i(forbidden.x,0,forbidden.y)),"Direct commit cannot bypass the east restriction")
+				break
+			var region: Dictionary = scene.expansion.choices[0]
+			var cell: Vector2i = region.paths.keys()[0]
+			check(scene.expansion.commit(Vector3i(cell.x,0,cell.y)),"Player places an allowed entrance directly")
 			await wait_map(scene)
-			check(not scene.choosing_start and wave.start_allowed,"Entrance completion did not restore preparation")
+			check(scene.get_node("PortalMap").start_paths.size() == (2 if index == 4 else 3),"Player placement follows the configured cadence")
+		if scene.choosing_event:
+			check(not scene.choosing_start and not wave.start_allowed,"Special event follows completed entrance placement")
+			var manager: SpecialEventManager = scene.special_events
+			var option := 0 if manager.option_error(manager.active,0).is_empty() else 1
+			manager.choose(option)
+			if manager._target_option >= 0:
+				var pool := manager.eligible_towers("remove")
+				if not pool.is_empty(): manager.select_target(pool[0])
+		await wait_map(scene)
+		check(not scene.choosing_start and wave.start_allowed == (index < 14),"Transition restores preparation or ends the run")
 		scene.set_process(false)
 		await get_tree().process_frame
 	check(scene.finished and scene.victory and scene.get_node("PortalMap").start_nodes.size() == 3,"Final wave did not win with exactly two added entrances")

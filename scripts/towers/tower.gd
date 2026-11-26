@@ -37,6 +37,8 @@ var attack_interval := TowerConstants.ATTACK_INTERVAL
 var attack: TowerAttack
 var level := 1
 var unlimited_levels := false
+var event_damage_multiplier := 1.0
+var event_ceasefire := false
 var deployment: BarracksDeployment
 var relic_effects := {}
 var support_bonus := 0.0
@@ -51,9 +53,13 @@ var rapid_next := 0.0
 var mortar_shots := 0
 var _gun_ready := {}
 var _disables := {}
+var disable_immunity := 0.0
 var _disable_icon: Sprite3D
+var _disable_bob: Tween
+var _upgrade_fx: CPUParticles3D
 
 func apply_disable(source: Node3D, seconds: float) -> void:
+	if disable_immunity > 0: return
 	if not is_instance_valid(source) or not source.can_be_targeted() or not is_finite(seconds) or seconds <= 0: return
 	var key := source.get_instance_id()
 	_disables[key] = {"source":weakref(source),"remaining":maxf(seconds,float(_disables.get(key,{}).get("remaining",0.0)))}
@@ -61,16 +67,19 @@ func apply_disable(source: Node3D, seconds: float) -> void:
 	_refresh_disable_visual()
 
 func is_disabled() -> bool:
+	if event_ceasefire: return true
 	for key in _disables.keys():
 		var source: Node3D = _disables[key].source.get_ref()
 		if not is_instance_valid(source) or not source.can_be_targeted() or _disables[key].remaining <= 0: _disables.erase(key)
 	return not _disables.is_empty()
 
 func advance_disable(delta: float) -> void:
+	disable_immunity = maxf(0.0, disable_immunity-delta)
 	for state: Dictionary in _disables.values(): state.remaining -= delta
 	_refresh_disable_visual()
 
 func clear_disable() -> void:
+	disable_immunity = 0.0
 	_disables.clear()
 	_refresh_disable_visual()
 
@@ -80,11 +89,20 @@ func _refresh_disable_visual() -> void:
 		_disable_icon = Sprite3D.new()
 		_disable_icon.texture = preload("res://assets/sprites/effects/disabled.svg")
 		_disable_icon.pixel_size = 0.009
-		_disable_icon.position.y = 1.4
 		_disable_icon.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		_disable_icon.no_depth_test = true
+		_disable_icon.hide()
 		add_child(_disable_icon)
-	if is_instance_valid(_disable_icon): _disable_icon.visible = disabled
+	if is_instance_valid(_disable_icon) and _disable_icon.visible != disabled:
+		_disable_icon.visible = disabled
+		if _disable_bob != null: _disable_bob.kill()
+		if disabled:
+			var bounds := preload("res://scripts/towers/body_visual.gd").visible_bounds(_visual,self) if _visual != null else AABB()
+			_disable_icon.position = Vector3(bounds.get_center().x, maxf(1.4, bounds.end.y + .46), bounds.get_center().z)
+			var base_y := _disable_icon.position.y
+			_disable_bob = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+			_disable_bob.tween_property(_disable_icon, "position:y", base_y + .055, .8)
+			_disable_bob.tween_property(_disable_icon, "position:y", base_y, .8)
 	if disabled != _dimmed: _fade_dim(disabled)
 
 const DISABLED_DIM := 0.45
@@ -207,9 +225,9 @@ func _ready() -> void:
 			_muzzle = _visual.get_node(definition.muzzle_path) as Marker3D
 	# The complete footprint already has a flush foundation in TileVisuals.
 
-func upgrade_error() -> String:
+func upgrade_error(ignore_limit := false) -> String:
 	if definition == null or health <= 0 or is_queued_for_deletion(): return "防禦塔已不存在"
-	if not unlimited_levels and level >= definition.growth.max_level: return "已達最高等級 Lv.%d" % level
+	if not ignore_limit and not unlimited_levels and level >= definition.growth.max_level: return "已達最高等級 Lv.%d" % level
 	if level == 9223372036854775807: return "等級超出可表示範圍"
 	for value in growth_values(level+1):
 		if not is_finite(value) or value <= 0: return "成長數值超出可表示範圍"
@@ -222,11 +240,24 @@ func growth_values(at_level: int) -> Array[float]:
 	var curve := definition.growth
 	return [maxf(definition.default_damage, 0.000001)*curve.multiplier(curve.damage, at_level), definition.attack_interval*curve.multiplier(curve.interval, at_level), definition.max_health*curve.multiplier(curve.health, at_level), curve.multiplier(curve.friendly_health, at_level), curve.multiplier(curve.friendly_damage, at_level)]
 
-func upgrade() -> bool:
-	if not upgrade_error().is_empty(): return false
+func upgrade(ignore_limit := false) -> bool:
+	if not upgrade_error(ignore_limit).is_empty(): return false
 	level += 1
+	if _visual != null:
+		preload("res://scripts/towers/body_visual.gd").set_level(_visual,level)
+		if not is_instance_valid(_upgrade_fx) or _upgrade_fx.is_queued_for_deletion():
+			_upgrade_fx = preload("res://scenes/towers/components/upgrade_feedback.tscn").instantiate()
+			add_child(_upgrade_fx)
+		_upgrade_fx.play(_visual)
+	refresh_stats()
+	return true
+
+func downgrade() -> bool:
+	if level <= 1 or health <= 0 or is_queued_for_deletion(): return false
+	level -= 1
 	if _visual != null: preload("res://scripts/towers/body_visual.gd").set_level(_visual,level)
 	refresh_stats()
+	_invalidate_attack_area()
 	return true
 
 func refresh_stats() -> void:
@@ -253,9 +284,10 @@ func effective_values(at_level: int) -> Dictionary:
 		result.interval *= relic_value(&"assembled_cannon", &"interval_multiplier")
 	if has_relic(&"crew_concentration"): result.damage *= relic_value(&"crew_concentration", &"damage_multiplier")
 	if has_relic(&"secret_mission") and isolated: result.damage *= relic_value(&"secret_mission", &"damage_multiplier")
+	result.damage *= event_damage_multiplier
 	if definition.deployment != null:
 		result.friendly_health = definition.deployment.health*base[3]
-		result.friendly_damage = definition.deployment.damage*base[4]*bonus
+		result.friendly_damage = definition.deployment.damage*base[4]*bonus*event_damage_multiplier
 		result.friendly_interval = definition.deployment.interval/haste
 	return result
 

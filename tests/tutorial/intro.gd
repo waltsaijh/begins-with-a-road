@@ -158,12 +158,12 @@ func verify() -> void:
 	check(director.stage == director.Stage.BUY_SENTRY and shop.available and shop.offers[0].tower == data.upgrade_card.tower and not session.choosing_relic,"Wave reward guarantees Sentry before any end-of-ACT relic choice")
 	check(not shop.view.opened,"Step four must let the player open the shop")
 	await frames()
-	check(director.focus.target == shop.view.slots.back().get_node("Face/Back"),"The closed shop must receive the focus frame")
+	check(director.focus.target == shop.view.entry,"The closed shop must receive the focus frame")
 	var expanded_width: float = director.focus._rect.size.x
 	await get_tree().create_timer(0.6,true,false,true).timeout
 	check(director.focus._rect.size.x < expanded_width and director.focus._alpha > 0.95 and director.focus.mouse_filter == Control.MOUSE_FILTER_IGNORE,"The focus frame must contract without intercepting clicks")
 	await snapshot("03_open_shop_focus")
-	await click(shop.view.slots.back().get_node("Face/Back"))
+	await click(shop.view.entry)
 	shop.view.finish_animation()
 	await frames()
 	check(shop.view.opened and director.focus.target == shop.view.slots[1].get_node("Face/Card"),"Opening the shop moves the focus frame to the required purchase")
@@ -183,7 +183,7 @@ func verify() -> void:
 	check(director.stage == director.Stage.REROLL and cards.placement.map.get_used_cells() == cells and session.get_node("PortalMap").revision == revision,"Upgrade keeps roads and navigation unchanged")
 	coins = shop.coins
 	check(not shop.view.opened,"The reroll lesson must also let the player open the shop")
-	await click(shop.view.slots.back().get_node("Face/Back"))
+	await click(shop.view.entry)
 	shop.view.finish_animation()
 	await click(shop.view.slots[0].get_node("Face/Back"))
 	check(shop.coins == coins-shop.reroll_price and director.stage == director.Stage.BUY_NEW,"Player reroll charges the normal fee and advances")

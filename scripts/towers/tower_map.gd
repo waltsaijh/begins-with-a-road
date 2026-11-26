@@ -13,6 +13,7 @@ var placement: Node3D
 var towers := {}
 ## Anchor -> tower and occupied cell -> tower remain separate for larger towers.
 var occupied := {}
+var special_occupied := {}
 var _settings := {}
 var last_error := ""
 var input_enabled := true
@@ -24,6 +25,11 @@ var card_filter: Callable
 var combat: Node
 var traffic: TrafficStructures
 var relics: RunRelics
+
+func blocked_occupancy() -> Dictionary:
+	var result := occupied.duplicate()
+	result.merge(special_occupied)
+	return result
 
 func _ready() -> void:
 	controller = get_node_or_null("../PortalMap")
@@ -100,6 +106,7 @@ func place_tower(cell: Vector3i, scene: PackedScene = null) -> DefenseTower:
 
 ## Preview is read-only. Commit always validates again against current world state.
 func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
+	if card != null and card.spell != null: return tr("spell.combat_only")
 	if card_filter.is_valid():
 		var denied: String = card_filter.call(card)
 		if not denied.is_empty(): return denied
@@ -113,6 +120,7 @@ func validate_card(card: BuildCard, cell: Vector3i, turns := 0) -> String:
 		if not rule_error.is_empty(): return rule_error
 	if cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767:
 		return "超出可建造範圍"
+	if card.special != null: return _special_plan(card,cell,turns).error
 	var at := Vector2i(cell.x, cell.z)
 	if card.traffic != null: return traffic.validate(card.traffic, at, turns)
 	var upgrade := upgrade_target(cell, card)
@@ -125,6 +133,7 @@ func place_card(card: BuildCard, cell: Vector3i, turns := 0) -> Node3D:
 	if not error.is_empty():
 		_feedback(error)
 		return null
+	if card.special != null: return _place_special(card,cell,turns)
 	if card.traffic != null:
 		_feedback("")
 		return traffic.place(card.traffic, Vector2i(cell.x,cell.z), turns)
@@ -149,6 +158,7 @@ func card_ground(card: BuildCard, anchor: Vector2i, turns: int) -> Array[Vector2
 	return result
 
 func upgrade_target(cell: Vector3i, card: BuildCard = null) -> DefenseTower:
+	if card != null and card.special != null: return null
 	var target: DefenseTower = occupied.get(Vector2i(cell.x, cell.z)) if cell.y == 0 else null
 	if target != null and card != null and card.tower != target.definition: return null
 	return target
@@ -161,7 +171,7 @@ func upgrade_error(card: BuildCard, tower: DefenseTower) -> String:
 
 func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 	var terminals: Array[Vector2i] = controller.terminal_cells()
-	var proposed: Dictionary = occupied.duplicate()
+	var proposed: Dictionary = blocked_occupancy()
 	var added := {}
 	if footprint.is_empty() or terminals.is_empty():
 		return "防禦塔或起終點尚未準備好"
@@ -170,7 +180,7 @@ func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 		if absi(pos.x) >= 32767 or absi(pos.y) >= 32767:
 			return "超出可建造範圍"
 		var item := map.get_cell_item(Vector3i(pos.x, 0, pos.y))
-		if item == 0 or occupied.has(pos):
+		if item == 0 or blocked_occupancy().has(pos):
 			return "卡片範圍與障礙物或防禦塔重疊"
 		if pos in terminals:
 			return "卡片不能覆蓋起點或終點"
@@ -183,7 +193,7 @@ func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 			return "超出可建造範圍"
 		if map.get_cell_item(Vector3i(pos.x, 0, pos.y)) <= 0 and not additions.has(pos):
 			return "防禦塔必須完整放在地塊上"
-		if occupied.has(pos):
+		if blocked_occupancy().has(pos):
 			return "此處已被防禦塔占用"
 		if pos in terminals:
 			return "不能占用起點或終點"
@@ -202,7 +212,7 @@ func _validate_deployment(definition: TowerDefinition,at: Vector2i,turns: int) -
 	var home := at+BuildCard.rotate_cell(Vector2i(0,-1),turns)
 	for position in [at,home]:
 		if traffic != null and traffic.occupied.has(position): return "兵營或駐點不能覆蓋輔助設施"
-		if map.get_cell_item(Vector3i(position.x,0,position.y)) <= 0 or occupied.has(position) or position in terminals:
+		if map.get_cell_item(Vector3i(position.x,0,position.y)) <= 0 or blocked_occupancy().has(position) or position in terminals:
 			return "兵營必須覆蓋既有道路，前方必須保留合法士兵駐點"
 	return ""
 
@@ -212,7 +222,7 @@ func _validate_card_home(card: BuildCard, anchor: Vector2i, turns: int) -> Strin
 	var home := card.home_cell(anchor,turns)
 	for pos in [at,home]:
 		if traffic != null and traffic.occupied.has(pos): return "兵營或駐點不能覆蓋輔助設施"
-		if occupied.has(pos) or pos in controller.terminal_cells(): return "兵營或駐點與占用格衝突"
+		if blocked_occupancy().has(pos) or pos in controller.terminal_cells(): return "兵營或駐點與占用格衝突"
 	if home in card.tower_cells(anchor,turns): return "兵營駐點不能位於塔體內"
 	if not card.tile_preset.custom_home: return _validate_deployment(card.tower,at,card.tower_facing(turns))
 	if map.get_cell_item(Vector3i(at.x,0,at.y)) <= 0: return "兵營錨點必須覆蓋既有道路"
@@ -237,7 +247,7 @@ func _commit(tower: DefenseTower, at: Vector2i, additions: Dictionary) -> Defens
 	_settings[at] = values
 	tower.influence_changed.connect(_on_influence_changed.bind(at))
 	tower.died.connect(_on_tower_died)
-	controller.set_blocked_cells(occupied)
+	controller.set_blocked_cells(blocked_occupancy())
 	_apply_change(at, [], values)
 	placement.notify_cells(new_cells)
 	var tile_visuals := get_node_or_null("../TileVisuals")
@@ -265,7 +275,7 @@ func remove_tower(cell: Vector3i) -> bool:
 		var ground_cell := Vector3i(position.x,0,position.y)
 		placement.refresh_cell(ground_cell)
 		for direction: Vector3i in TileConstants.DIRECTIONS: placement.refresh_cell(ground_cell+direction)
-	controller.set_blocked_cells(occupied)
+	controller.set_blocked_cells(blocked_occupancy())
 	_apply_change(at, _settings[at], [])
 	towers.erase(at)
 	_settings.erase(at)
@@ -314,7 +324,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 	var ground := {}
 	var roads := {}
 	var ports := {}
-	var proposed := occupied.duplicate()
+	var proposed := blocked_occupancy()
 	var additions := {}
 	var upgrades := {}
 	var builds: Array[Dictionary] = []
@@ -331,6 +341,8 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		var turns: int = entry.get("turns",0)
 		if card == null: failure.error = "缺少預擺卡牌"
 		elif not card.configuration_error().is_empty(): failure.error = card.configuration_error()
+		elif card.spell != null: failure.error = tr("spell.combat_only")
+		elif card.special != null: failure.error = "Special cards use direct placement"
 		elif card.traffic != null: failure.error = "輔助設施請在確認預擺後單獨放置"
 		elif cell.y != 0 or absi(cell.x) >= 32767 or absi(cell.z) >= 32767: failure.error = "超出可建造範圍"
 		if not failure.error.is_empty(): return failure
@@ -363,7 +375,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		for pos in clipped_ground:
 			if absi(pos.x) >= 32767 or absi(pos.y) >= 32767: failure.error = "超出可建造範圍"
 			elif pos in terminals: failure.error = "地塊不能覆蓋起點或終點"
-			elif occupied.has(pos) or map.get_cell_item(Vector3i(pos.x,0,pos.y)) == 0: failure.error = "地塊與已建防禦塔或石地重疊"
+			elif blocked_occupancy().has(pos) or map.get_cell_item(Vector3i(pos.x,0,pos.y)) == 0: failure.error = "地塊與已建防禦塔或石地重疊"
 			elif traffic != null and traffic.occupied.has(pos): failure.error = "地塊不能覆蓋輔助設施"
 			if not failure.error.is_empty(): return failure
 			ground[pos] = true
@@ -398,7 +410,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 	if wave != null and wave.reserves_cells(additions):
 		failure.error = "此處在敵軍已固定的路線上"
 		return failure
-	var layout := ConstructionLayout.build(map,ground,ports,placement.port_overrides,proposed)
+	var layout := ConstructionLayout.build(map,ground,ports,placement.port_overrides,proposed,true)
 	var reachable: Array[Vector2i] = terminals.duplicate()
 	for home: Vector2i in homes:
 		if proposed.has(home) or not layout.masks.has(home):
@@ -450,7 +462,7 @@ func commit_construction(entries: Array) -> Array[Node3D]:
 		for i in int(plan.upgrades[tower]):
 			tower.upgrade()
 			result.append(tower)
-	if not prepared.is_empty(): controller.set_blocked_cells(occupied)
+	if not prepared.is_empty(): controller.set_blocked_cells(blocked_occupancy())
 	records.end_update()
 	placement.notify_cells(new_cells)
 	for tower: DefenseTower in plan.upgrades: tower_upgraded.emit(tower)
@@ -463,3 +475,59 @@ func commit_construction(entries: Array) -> Array[Node3D]:
 		if BalanceTrace.enabled: BalanceTrace.event("upgrade",BalanceTrace.tower_id(tower),{"level":tower.level,"gold":0})
 	_feedback("")
 	return result
+
+## Special cards never enter the combat tower registry.
+func _special_plan(card: BuildCard, cell: Vector3i, turns: int) -> Dictionary:
+	var fail := {"ok":false,"error":tr("event.placement.invalid")}
+	var definition := card.special
+	if definition.kind == SpecialCardDefinition.Kind.CONSUMABLE:
+		var target: DefenseTower = occupied.get(Vector2i(cell.x,cell.z))
+		if target == null: return fail
+		var error := target.upgrade_error(true)
+		return {"ok":error.is_empty(),"error":error,"target":target}
+	var ground := {}
+	var proposed := blocked_occupancy()
+	var added := {}
+	for at in card.ground_cells(Vector2i(cell.x,cell.z),turns):
+		if absi(at.x) >= 32767 or absi(at.y) >= 32767: return fail
+		if proposed.has(at) or traffic.occupied.has(at) or at in controller.terminal_cells(): return fail
+		if map.get_cell_item(Vector3i(at.x,0,at.y)) == 0: return fail
+		for tower: DefenseTower in towers.values():
+			if tower.deployment != null and at == tower.garrison_cell(): return fail
+		ground[at] = true
+		if definition.kind == SpecialCardDefinition.Kind.TILE:
+			proposed[at] = true
+			added[at] = true
+	var wave := get_node_or_null("../EnemyWave")
+	if wave != null and (wave.active or wave.reserves_cells(added)): return fail
+	var requested := {}
+	if definition.kind == SpecialCardDefinition.Kind.TILE:
+		for at in ground: requested[at] = 0
+	var layout := ConstructionLayout.build(map,ground,requested,placement.port_overrides,proposed,true)
+	var reachable: Array[Vector2i] = controller.terminal_cells()
+	for tower: DefenseTower in towers.values():
+		if tower.deployment != null: reachable.append(tower.garrison_cell())
+	if not Snapshot.connects_terminals(layout.snapshot,reachable): return fail
+	return {"ok":true,"error":"","layout":layout,"cells":ground}
+
+func _place_special(card: BuildCard,cell: Vector3i,turns: int) -> Node3D:
+	var plan := _special_plan(card,cell,turns)
+	if not plan.ok: return null
+	if card.special.kind == SpecialCardDefinition.Kind.CONSUMABLE:
+		var target: DefenseTower = plan.target
+		if not target.upgrade(true): return null
+		tower_upgraded.emit(target)
+		return target
+	var instance := card.special.create_visual()
+	instance.name = "Special_"+str(card.special.id)
+	var new_cells: Array[Vector3i] = ConstructionLayout.apply(placement,plan.layout)
+	add_child(instance)
+	instance.global_transform = map.global_transform*Transform3D(Basis(Vector3.UP,-turns*PI/2),map.map_to_local(cell))
+	if card.special.kind == SpecialCardDefinition.Kind.TILE:
+		for at in plan.cells: special_occupied[at] = instance
+	controller.set_blocked_cells(blocked_occupancy())
+	placement.notify_cells(new_cells)
+	var visuals := get_node_or_null("../TileVisuals")
+	if visuals != null: visuals.follow_new_cell(cell,instance)
+	_feedback("")
+	return instance

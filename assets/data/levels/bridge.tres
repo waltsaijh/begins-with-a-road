@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cvef4d4fr1kg7" path="res://scripts/levels/definitions/wave_definition.gd" id="2_q2umf"]
 [ext_resource type="Script" uid="uid://cahlwhgvymd6c" path="res://scripts/levels/definitions/wave_spawn_group.gd" id="3_f3616"]
 [ext_resource type="PackedScene" uid="uid://dfsnynou7piuy" path="res://scenes/maps/bridge.tscn" id="5_gv56x"]
+[ext_resource type="Resource" path="res://assets/data/rendering/time_of_day/night.tres" id="time_of_day"]
 
 [sub_resource type="Resource" id="Resource_76kpm"]
 script = ExtResource("3_f3616")
@@ -33,3 +34,4 @@ required_to_complete_levels = PackedStringArray("tutorial", "frontier")
 terrain = ExtResource("5_gv56x")
 acts = Array[ExtResource("1_fn762")]([SubResource("Resource_pntgv")])
 metadata/_custom_type_script = "uid://4q4c3cox24l5"
+time_of_day = ExtResource("time_of_day")

@@ -1,6 +1,10 @@
 # 敵人模型
 
-遊戲使用以下獨立模型，重建時參考 card-tower-defense 的原型素材；執行時不依賴原專案：
+九種普通敵人使用 `slice_a/` 的 Blender GLB 與同名 `_gpu.res`。每個 GLB 含可循環的 Walk 物件動畫，血法師與爆破手另含 Cast 與 Throw。鼠群每個 GLB 對應一隻可獨立受傷的鼠，同群五員共路。波次沿用 EnemyWave、EnemyPose 和 MultiMesh。獵犬的資料 ID 為 `quickfeet`。可用 F6 執行 `tests/enemies/enemy_art_gallery.tscn` 比較外觀。尺寸、重建及驗收見[來源規格](../../../tools/assets/blender/enemy_slice_a/model-spec.md)。
+
+## 舊版與相容資產
+
+下列為早期模型、內建缺省模型與舊格式的重建資料。既有場景引用仍可載入。
 
 | 遊戲兵種 | 原專案模型 | 場景 | 外觀 |
 |---|---|---|---|
@@ -22,7 +26,7 @@ godot --headless --path . --script tools/assets/bake_enemy_gpu.gd
 
 `tests/enemies/enemy_gpu_models.gd` 比對所有烘焙頂點、法線、色彩、動畫時間與混兵 slot 回收；`enemy_gpu_render.gd` 以實際 Compatibility renderer 比對原場景與 GPU 在多個姿勢的畫面。後者不可用 headless 代替。
 
-## Phase 4 自足模型
+## Phase 4 舊版自足模型
 
 `rats`、`rook`、`bloodmage`、`winged`、`scout`、`bomber` 為本專案新製的低面數微縮場景，不引用原型。各模型以可編輯 MeshInstance3D 組成，分別使用長尾鼠輪廓、大盾、法杖、雙翼、望遠鏡與炸藥背包區分。共用 `scripts/enemies/rendering/miniature_enemy.gd` 處理步態／擺臂／翼拍，由 EnemyModel.advance 依模擬時間更新。
 

@@ -2,10 +2,21 @@ extends CanvasLayer
 signal selected(relic: RelicDefinition)
 const Card = preload("res://scenes/relics/components/relic_card.tscn")
 const IconMask = preload("res://assets/shaders/ui_icon_mask.gdshader")
+## Held-relic stack count text; HudTextPalette switches it for night skies.
+var count_color := Color("244c52")
 var relics: RunRelics
 var offers: Array[RelicDefinition] = []
 var choosing := false
 var _committing := false
+var collapsed := false
+var _bar_limit := 206.0
+var _narrow_open := false
+var _bar_motion: Tween
+var _bar_progress := 1.0:
+	set(value):
+		_bar_progress = value
+		_layout_bar()
+var _previous_total := 0
 var _inspected: RelicDefinition
 var _inspection_hud: Node
 @onready var modal: Control = $Modal
@@ -14,6 +25,7 @@ var _inspection_hud: Node
 
 func _ready() -> void:
 	debug_reroll_button.visible = OS.is_debug_build()
+	$RelicBar/Toggle.pressed.connect(func(): set_collapsed((not collapsed if _narrow_open else false) if _bar_limit < 98 else not collapsed))
 	debug_reroll_button.pressed.connect(debug_reroll)
 
 func _process(_delta: float) -> void:
@@ -138,7 +150,7 @@ func _finish_choice(relic: RelicDefinition) -> void:
 	selected.emit(relic)
 
 func _refresh_collection() -> void:
-	for child in $RelicBar/Items.get_children(): child.free()
+	for child in $RelicBar/Scroll/Items.get_children(): child.free()
 	$RelicBar.visible = not choosing and not relics.held.is_empty()
 	for id: StringName in relics.held:
 		var relic := relics.catalog.find(id)
@@ -173,11 +185,18 @@ func _refresh_collection() -> void:
 			count.text = "×%d" % relics.held[id]
 			count.position = Vector2(18,20)
 			count.add_theme_font_size_override("font_size",12)
-			count.add_theme_color_override("font_color",Color("244c52"))
+			count.add_theme_color_override("font_color",count_color)
 			count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			button.add_child(count)
 		button.pressed.connect(open_collection.bind(relic))
-		$RelicBar/Items.add_child(button)
+		$RelicBar/Scroll/Items.add_child(button)
+	_layout_bar()
+	var total := held_count()
+	if total > _previous_total and collapsed:
+		var glow := create_tween().set_ignore_time_scale(true)
+		$RelicBar/Toggle.modulate = Color("badacc")
+		glow.tween_property($RelicBar/Toggle,"modulate",Color.WHITE,0.35)
+	_previous_total = total
 	if $Collection.visible and _inspected != null: _show_relic()
 
 func open_collection(relic: RelicDefinition) -> void:
@@ -214,3 +233,54 @@ func _notification(what: int) -> void:
 
 func _exit_tree() -> void:
 	if is_instance_valid(_inspection_hud) and _inspection_hud.is_inside_tree(): _inspection_hud.end_inspection(self)
+
+func held_count() -> int:
+	var total := 0
+	if relics != null:
+		for count: int in relics.held.values(): total += count
+	return total
+
+func set_collapsed(value: bool) -> void:
+	if _bar_limit < 98 and not value:
+		if not _narrow_open: _bar_progress = 0.0
+		_narrow_open = true
+	collapsed = value
+	if _bar_motion != null: _bar_motion.kill()
+	_bar_motion = create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	_bar_motion.tween_property(self,"_bar_progress",0.0 if value else 1.0,0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	if value: _bar_motion.tween_callback(func():
+		if collapsed: _narrow_open = false)
+
+func set_bar_width_limit(value: float) -> void:
+	_bar_limit = maxf(56,value)
+	_layout_bar()
+
+func bar_width() -> float:
+	if _bar_limit < 98: return 56.0
+	var progress := _bar_progress
+	var list_width := minf(176,$RelicBar/Scroll/Items.get_combined_minimum_size().x)
+	return lerpf(56,24,progress)+(minf(list_width,_bar_limit-30)+6)*progress
+
+func _layout_bar() -> void:
+	if not is_node_ready(): return
+	var progress := _bar_progress if _bar_limit >= 98 else 0.0
+	var toggle: Button = $RelicBar/Toggle
+	var scroll: ScrollContainer = $RelicBar/Scroll
+	var width := lerpf(56,24,progress)
+	toggle.position = Vector2.ZERO
+	toggle.size = Vector2(width,38)
+	var compact := progress < 0.5 or _bar_limit < 98
+	toggle.text = str(held_count()) if compact else "‹"
+	toggle.icon = preload("res://assets/sprites/interface/relic_choice.svg") if compact else null
+	toggle.tooltip_text = tr("ui.relics.expand") if (compact and not _narrow_open) else tr("ui.relics.collapse")
+	scroll.position = Vector2(width+6*progress,0)
+	scroll.size = Vector2(maxf(0,bar_width()-scroll.position.x),38)
+	if _bar_limit < 98:
+		toggle.size.x = 56
+		scroll.position = Vector2(0,42)
+		scroll.size = Vector2(minf(176,$RelicBar/Scroll/Items.get_combined_minimum_size().x),38)
+		scroll.visible = _narrow_open and _bar_progress > 0.001
+		scroll.modulate.a = _bar_progress
+	else:
+		scroll.visible = progress > 0.001
+		scroll.modulate.a = progress

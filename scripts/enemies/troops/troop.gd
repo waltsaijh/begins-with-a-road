@@ -239,6 +239,7 @@ func prefers_new_roads() -> bool:
 func route_description() -> String:
 	var en := TranslationServer.get_locale().begins_with("en")
 	var text: String
+	if has_tag(&"boss"): return GameText.text("enemy.route.boss",{},en)
 	if only_shortest():
 		text = GameText.text("text.troop.1",{},en)
 		if has_tag(&"flying"): text += GameText.text("text.troop.2",{},en)

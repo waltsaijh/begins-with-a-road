@@ -58,6 +58,16 @@ func _process(_delta: float) -> void:
 	_last_process_usec = now
 	_advance_orbit(real_delta)
 
+var _shake: Tween
+
+func shake_landing() -> void:
+	if _shake != null: _shake.kill()
+	_shake = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	_shake.tween_method(func(t: float):
+		var amplitude := 0.18*pow(1.0-t,2)
+		h_offset = sin(t*TAU*4.0)*amplitude
+		v_offset = cos(t*TAU*3.0)*amplitude,0.0,1.0,0.36)
+
 func _advance_orbit(real_delta: float) -> void:
 	if real_delta <= 0.0: return
 	var maximum_speed := deg_to_rad(maxf(1.0, maximum_orbit_speed))

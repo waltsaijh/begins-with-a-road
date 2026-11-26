@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SpecialEventDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/events/special_event_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"gem"
+option_a = Array[Dictionary]([{"type": "card", "id": "large_gem", "count": 1}])
+option_b = Array[Dictionary]([{"type": "card", "id": "small_gem", "count": 3}])

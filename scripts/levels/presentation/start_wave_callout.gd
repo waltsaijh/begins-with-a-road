@@ -1,10 +1,8 @@
 @tool
 extends Button
-## The shared speech bubble encloses its start label and entrance troop icons.
-const CONTENT_PADDING := Vector2(12, 8)
-const TAIL_HEIGHT := 8.0
-@export var hover_background := Color("dcece7")
-@export var hover_border := Color("3f7378")
+## The fixed hit area stays still; only its exclamation artwork swings.
+@export_range(0,15,0.5) var swing_degrees := 10.0
+@export var swing_cycle := 3.0
 var hover_amount := 0.0:
 	set(value):
 		hover_amount = value
@@ -14,26 +12,37 @@ var _hovered := false
 var _intel_available := false
 var _pointer_position := Vector2.ZERO
 var _pointer_known := false
-var _intel_size := Vector2(34, 34)
-var _background: Color
-var _border: Color
+var _intel_size := Vector2(100,26)
+var _swing_time := 0.0
+var _last_usec := 0
 
 func _ready() -> void:
-	_background = $Shape/Background.color
-	_border = $Shape/Border.default_color
-	resized.connect(_update_frame)
-	_refresh_labels()
+	resized.connect(_layout_popup)
+	$Title.text = "!"
+	$Title.pivot_offset = $Title.size*0.5
+	$NextWaveIntel.hide()
 	_update_visuals()
+	_last_usec = Time.get_ticks_usec()
 	if Engine.is_editor_hint(): return
 	mouse_entered.connect(update_pointer_hover)
 	mouse_exited.connect(func(): update_pointer_hover.call_deferred())
-	var viewport := get_viewport()
-	if viewport.has_signal("mouse_exited"):
-		viewport.connect("mouse_exited", _forget_pointer)
+	if get_viewport().has_signal("mouse_exited"): get_viewport().connect("mouse_exited",_forget_pointer)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready(): _refresh_labels()
 	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT and is_node_ready(): _forget_pointer()
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouse:
+		_pointer_position = event.position
+		_pointer_known = true
+
+func _has_point(point: Vector2) -> bool:
+	if Rect2(Vector2.ZERO,size).has_point(point): return true
+	return is_node_ready() and _hovered and $Popup.visible and $Popup.get_rect().has_point(point)
+
+func start_from_list() -> void:
+	if _hovered and _intel_available and is_visible_in_tree() and not disabled and not get_tree().paused:
+		pressed.emit()
 
 func clear_hover() -> void:
 	if Engine.is_editor_hint(): return
@@ -44,66 +53,81 @@ func _forget_pointer() -> void:
 	_pointer_known = false
 	clear_hover()
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventMouse:
-		_pointer_position = event.position
-		_pointer_known = true
-
 func update_pointer_hover() -> void:
+	if not is_node_ready(): return
+	_layout_popup()
 	var control := get_viewport().gui_get_hovered_control()
 	var owned := control != null and (control == self or is_ancestor_of(control))
 	var unobstructed := control == null or owned or control.is_ancestor_of(self)
 	var local := get_global_transform_with_canvas().affine_inverse()*_pointer_position
-	var inside := _pointer_known and Rect2(Vector2.ZERO, size).has_point(local)
-	_animate_hover(is_visible_in_tree() and _intel_available and not disabled and inside and unobstructed)
-	$NextWaveIntel.set_interactive(_intel_available and not disabled)
+	var inside := Rect2(Vector2.ZERO,size).has_point(local)
+	if _hovered: inside = Rect2(Vector2.ZERO,size).merge($Popup.get_rect()).grow(1).has_point(local)
+	var hovered := _pointer_known and is_visible_in_tree() and _intel_available and not disabled and not get_tree().paused and inside and unobstructed
+	_animate_hover(hovered)
+	$NextWaveIntel.set_interactive(hovered)
 
 func set_intel_size(value: Vector2) -> void:
 	_intel_size = value
-	_update_layout()
+	_layout_popup()
 
-func _update_layout() -> void:
+func _layout_popup() -> void:
 	if not is_node_ready(): return
-	var width := maxf($Title.get_combined_minimum_size().x, _intel_size.x)+CONTENT_PADDING.x*2
-	custom_minimum_size = Vector2(maxf(144,width), CONTENT_PADDING.y*2+30+_intel_size.y+TAIL_HEIGHT)
-	size = custom_minimum_size
-	$Title.offset_left = CONTENT_PADDING.x
-	$Title.offset_top = CONTENT_PADDING.y
-	$Title.offset_right = size.x-CONTENT_PADDING.x
-	$Title.offset_bottom = CONTENT_PADDING.y+26
-	$NextWaveIntel.offset_left = CONTENT_PADDING.x
-	$NextWaveIntel.offset_top = CONTENT_PADDING.y+30
-	$NextWaveIntel.offset_right = size.x-CONTENT_PADDING.x
-	$NextWaveIntel.offset_bottom = size.y-CONTENT_PADDING.y-TAIL_HEIGHT
-	_update_frame()
-
-func _update_frame() -> void:
-	if not is_node_ready(): return
-	$Shape.frame_size = size
+	var extent := _intel_size+Vector2(20,16)
+	var at := Vector2((size.x-extent.x)*0.5,-extent.y-4)
+	# Include the gap in the hover rectangle; keep the list inside the viewport.
+	var area := get_viewport_rect().grow(-8)
+	var global_at := get_global_transform_with_canvas()*at
+	global_at.x = clampf(global_at.x,area.position.x,maxf(area.position.x,area.end.x-extent.x))
+	if global_at.y < area.position.y:
+		var marker := get_global_rect()
+		var side := marker.end.x+4 if marker.end.x+4+extent.x <= area.end.x else marker.position.x-extent.x-4
+		global_at.x = clampf(side,area.position.x,maxf(area.position.x,area.end.x-extent.x))
+		global_at.y = area.position.y
+	at = get_global_transform_with_canvas().affine_inverse()*global_at
+	$Popup.position = at
+	$Popup.size = extent
+	$NextWaveIntel.position = at+Vector2(10,8)
+	$NextWaveIntel.size = _intel_size
 
 func set_intel_available(available: bool) -> void:
 	if _intel_available == available: return
 	_intel_available = available
-	if not available: _forget_pointer()
+	if not available:
+		_forget_pointer()
+		_swing_time = 0.0
+		$Title.rotation = 0.0
 	_update_visuals()
 
 func _animate_hover(hovered: bool) -> void:
 	if _hovered == hovered: return
 	_hovered = hovered
+	if not hovered: $NextWaveIntel.clear_filter()
 	if _hover_motion != null: _hover_motion.kill()
-	_hover_motion = create_tween().set_pause_mode(Tween.TWEEN_PAUSE_STOP)
-	_hover_motion.tween_property(self, "hover_amount", 1.0 if hovered else 0.0, 0.15)
-
-func _refresh_labels() -> void:
-	$Title.text = tr("ui.wave.start_next")
-	_update_layout()
+	_hover_motion = create_tween().set_ignore_time_scale(true).set_pause_mode(Tween.TWEEN_PAUSE_STOP)
+	_hover_motion.tween_property(self,"hover_amount",1.0 if hovered else 0.0,0.14).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _update_visuals() -> void:
 	if not is_node_ready(): return
 	$Title.visible = _intel_available or Engine.is_editor_hint()
-	$NextWaveIntel.visible = _intel_available or Engine.is_editor_hint()
-	$Shape.visible = _intel_available or Engine.is_editor_hint()
-	$Shape/Background.color = _background.lerp(Color(hover_background,_background.a),hover_amount)
-	$Shape/Border.default_color = _border.lerp(hover_border,hover_amount)
-	$Title.modulate = Color.WHITE.lerp(Color(0.45, 0.62, 0.62), hover_amount)
-	if not Engine.is_editor_hint(): $NextWaveIntel.set_interactive(_intel_available and not disabled)
+	$Diamond.visible = $Title.visible
+	$Title.modulate = Color.WHITE.lerp(Color(0.45,0.62,0.62),hover_amount)
+	var reveal := hover_amount > 0.001 and _intel_available and not disabled and not get_tree().paused
+	$Popup.visible = reveal
+	$NextWaveIntel.visible = reveal
+	$Popup.modulate.a = hover_amount
+	$NextWaveIntel.modulate.a = hover_amount
+
+func _process(_delta: float) -> void:
+	var now := Time.get_ticks_usec()
+	var seconds := minf(0.1,(now-_last_usec)/1000000.0)
+	_last_usec = now
+	_update_visuals()
+	if Engine.is_editor_hint() or get_tree().paused or disabled or not _intel_available or not is_visible_in_tree(): return
+	_swing_time += seconds
+	var phase := fposmod(_swing_time,maxf(2.0,swing_cycle))
+	var angle := 0.0
+	if phase < 0.4: angle = lerpf(0.0,-swing_degrees,smoothstep(0.0,0.4,phase))
+	elif phase < 1.0: angle = lerpf(-swing_degrees,swing_degrees,smoothstep(0.4,1.0,phase))
+	elif phase < 1.5: angle = lerpf(swing_degrees,0.0,smoothstep(1.0,1.5,phase))
+	$Title.pivot_offset = $Title.size*0.5
+	$Title.rotation_degrees = angle

@@ -24,22 +24,27 @@ var respawn_pulse := 0.0
 var _max_health := 40.0
 var ranged_timer := 0.0
 var slot_index := 0
-func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node) -> void:
+var temporary := false
+var shield := 0.0
+var shield_seconds := 0.0
+func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node, rally_cell := Vector2i.ZERO) -> void:
 	slot_index = slot
 	tower = owner_tower
 	manager = owner_manager
-	settings = tower.deployment
+	temporary = tower == null
+	settings = preload("res://assets/data/towers/barracks.tres").deployment if temporary else tower.deployment
 	health = settings.health
 	_max_health = settings.health
-	tower.stats_changed.connect(_refresh_stats)
-	home = tower.garrison_cell()
-	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),tower.rotation_steps))*(6.0/48.0 if slot == 1 else (-6.0/48.0 if slot == 0 else 0.0))
+	if not temporary: tower.stats_changed.connect(_refresh_stats)
+	home = rally_cell if temporary else tower.garrison_cell()
+	var facing := 0 if temporary else tower.rotation_steps
+	var side := Vector2(BuildCard.rotate_cell(Vector2i(1,0),facing))*(6.0/48.0 if slot == 1 else (-6.0/48.0 if slot == 0 else 0.0))
 	home_position = manager.world(home)+manager.map.global_basis*Vector3(side.x*manager.map.cell_size.x,0,side.y*manager.map.cell_size.z)
 	if slot >= 2:
 		var back := Vector2(BuildCard.rotate_cell(Vector2i(0,1),tower.rotation_steps))*0.18
 		home_position += manager.map.global_basis*Vector3(back.x*manager.map.cell_size.x,0,back.y*manager.map.cell_size.z)
 	global_position = home_position
-	rotation.y = -tower.rotation_steps*PI/2
+	rotation.y = -facing*PI/2
 	model = settings.unit_model.instantiate()
 	add_child(model)
 	for child in model.find_children("*","Node3D",true,false):
@@ -79,24 +84,32 @@ func _refresh_stats() -> void:
 	_refresh_bar()
 func take_damage(amount: float) -> void:
 	if dead: return
+	var absorbed := minf(shield, amount)
+	shield -= absorbed
+	amount -= absorbed
 	health = maxf(0,health-amount)
 	_refresh_bar()
 	flash = 0.15
 	manager.effect(global_position,"hit")
 	if health <= 0:
 		dead = true
+		shield = 0.0
+		if temporary: hide()
 		respawn_timer = settings.respawn_seconds
 		release()
 		manager.effect(global_position,"death")
 func advance(delta: float) -> void:
-	if not is_instance_valid(tower) or tower.is_queued_for_deletion():
+	shield_seconds = maxf(0.0, shield_seconds-delta)
+	if shield_seconds <= 0: shield = 0.0
+	if not temporary and (not is_instance_valid(tower) or tower.is_queued_for_deletion()):
 		release()
 		queue_free()
 		return
-	if tower.is_disabled():
+	if not temporary and tower.is_disabled():
 		release()
 		return
 	if dead:
+		if temporary: return
 		respawn_timer = maxf(0,respawn_timer-delta)
 		visible = respawn_timer > settings.respawn_seconds-0.2
 		scale = Vector3.ONE*maxf(0.01,(respawn_timer-settings.respawn_seconds+0.2)/0.2)
@@ -128,7 +141,7 @@ func advance(delta: float) -> void:
 			if enemy.troop != null and enemy.troop.has_tag(&"flying"): continue
 			if is_instance_valid(enemy.engaged_by) or manager.path(home,manager.cell(enemy.global_position),home,settings.local_radius).is_empty(): continue
 			eligible.append(enemy)
-		var preferred: Node3D = manager.combat.enemy_abilities.preferred(tower,eligible)
+		var preferred: Node3D = null if temporary else manager.combat.enemy_abilities.preferred(tower,eligible)
 		if preferred != null:
 			target = preferred
 		elif not eligible.is_empty(): target = eligible[0]
@@ -139,20 +152,20 @@ func advance(delta: float) -> void:
 	else:
 		if not is_instance_valid(target.engaged_by):
 			target.engaged_by = self
-			if BalanceTrace.enabled: BalanceTrace.event("intercept",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"slot":slot_index})
+			if BalanceTrace.enabled and not temporary: BalanceTrace.event("intercept",BalanceTrace.tower_id(tower),{"target":target.enemy_id,"slot":slot_index})
 			attack_timer = settings.interval
 			enemy_timer = target.melee_interval
 		attack_timer -= delta
 		enemy_timer -= delta
-		if BalanceTrace.enabled: BalanceTrace.sample(tower,"interception_unit_seconds",delta)
+		if BalanceTrace.enabled and not temporary: BalanceTrace.sample(tower,"interception_unit_seconds",delta)
 		if attack_timer <= 0:
 			attack_timer += settings.interval
 			pulse = 1
-			target.take_damage(settings.damage,BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "barracks")
-		if is_instance_valid(target) and target.can_be_targeted() and enemy_timer <= 0:
+			target.take_damage(settings.damage,"reinforcement" if temporary else (BalanceTrace.tower_id(tower) if BalanceTrace.enabled else "barracks"))
+		if is_instance_valid(target) and target.can_be_targeted() and target.stun_remaining <= 0 and enemy_timer <= 0:
 			enemy_timer += target.melee_interval
 			take_damage(target.melee_damage)
-	if not dead and tower.has_relic(&"sharpshooter") and (not is_instance_valid(target) or target.engaged_by != self) and ranged_timer <= 0:
+	if not temporary and not dead and tower.has_relic(&"sharpshooter") and (not is_instance_valid(target) or target.engaged_by != self) and ranged_timer <= 0:
 		var ranged: Array[Node3D] = manager.combat._index.targets_near(global_position,tower.relic_value(&"sharpshooter", &"range"))
 		ranged.sort_custom(func(a,b): return a.enemy_id < b.enemy_id)
 		var preferred: Node3D = manager.combat.enemy_abilities.preferred(tower,ranged)

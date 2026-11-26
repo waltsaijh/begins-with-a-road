@@ -11,6 +11,8 @@ const Atlas = preload("res://scripts/enemies/presentation/enemy_status_atlas.gd"
 	set(value):
 		opacity = value
 		if batch != null and batch.material is ShaderMaterial: (batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)
+@export var icon_bob_pixels := 1.5
+var _icon_phase := 0.0
 var renderer: MultiMeshInstance3D
 var batch: MultiMeshInstance2D
 var _atlas: RefCounted
@@ -61,8 +63,8 @@ func _prepare_appearance() -> void:
 	_shield_color = appearance.get_node("Shield").color
 	_skill_color = skill.color
 	var frame: StyleBox = appearance.get_node("Background").get_theme_stylebox("panel")
-	var styles: Array[StyleBox] = [frame, frame, icon.get_node("Background").get_theme_stylebox("panel")]
-	var sizes: Array[Vector2] = [_bar_size, _skill_size, _icon_size]
+	var styles: Array[StyleBox] = [frame, frame]
+	var sizes: Array[Vector2] = [_bar_size, _skill_size]
 	var canvas := FrameCanvas.new()
 	canvas.styles = styles
 	var extent := Vector2i.ZERO
@@ -155,8 +157,10 @@ static func health_fills(enemy: Node3D) -> Vector2:
 	if capacity <= 0.0: return Vector2.ZERO
 	return Vector2(clampf(enemy.health, 0.0, enemy.max_health), clampf(enemy.shield, 0.0, enemy.max_shield))/capacity
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not _atlas_ready: return
+	if not get_tree().paused:
+		_icon_phase = fmod(_icon_phase + delta * TAU / 1.6, TAU)
 	batch.begin()
 	if renderer == null or not renderer.is_visible_in_tree():
 		batch.submit()
@@ -184,10 +188,11 @@ func _process(_delta: float) -> void:
 			_frame(1, skill_origin)
 			batch.append(Rect2(skill_origin, Vector2(_skill_size.x*clampf(enemy.skill_progress, 0, 1), _skill_size.y)), _atlas.white, _skill_color)
 		var count: int = enemy.effect_icons.size()
+		if count == 0: continue
 		var width: float = count*_icon_size.x+maxi(0, count-1)*icon_gap
-		var icon_origin := Vector2(roundf(center.x-width*0.5), origin.y+_icon_y)
+		var bob := roundf(icon_bob_pixels * sin(_icon_phase + enemy.enemy_id * 2.4))
+		var icon_origin := Vector2(roundf(center.x-width*0.5), origin.y+_icon_y+bob)
 		for id: StringName in enemy.effect_icons:
-			_frame(2, icon_origin)
 			var region: Rect2 = _atlas.icon(enemy.effect_icons[id])
 			batch.append(Rect2(icon_origin, _icon_size), region)
 			icon_origin.x += _icon_size.x+icon_gap
