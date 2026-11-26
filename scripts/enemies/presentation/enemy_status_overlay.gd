@@ -7,7 +7,7 @@ const Atlas = preload("res://scripts/enemies/presentation/enemy_status_atlas.gd"
 ## under bars. Skill wind-ups and effect icons still show.
 @export var hide_full_health := true
 ## Health / skill bars and icons are drawn semi-transparent.
-@export_range(0.1, 1.0, 0.05) var opacity := 0.65:
+@export_range(0.1, 1.0, 0.05) var opacity := 0.45:
 	set(value):
 		opacity = value
 		if batch != null and batch.material is ShaderMaterial: (batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)

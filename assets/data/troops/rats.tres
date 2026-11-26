@@ -23,4 +23,5 @@ debug_color = Color(0.58, 0.45, 0.36, 1)
 max_health = 25.0
 route_selection = 0
 model = ExtResource("2")
+model_scale = Vector3(0.65, 0.65, 0.65)
 detail_model = ExtResource("detail")
