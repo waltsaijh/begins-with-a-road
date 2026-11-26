@@ -2,21 +2,21 @@ extends RefCounted
 ## Display-only meshes. Logical GridMap IDs, ports and routes remain untouched.
 const Snapshot = preload("res://scripts/navigation/road_graph_snapshot.gd")
 const MATERIAL = preload("res://assets/materials/solid_color.tres")
-## Art Slice G "sky island": grass tops, carved stone curbs, large weathered
+## Art Slice G "sky island": sandstone tops, carved stone curbs, large weathered
 ## flagstone roads and massive grey stone sides.
 const ROAD := Color("6f736d") # deep joints between slabs
 const INACTIVE := Color("6c7272")
-const STONE := Color("8fae5c") # grass on island tops
+const STONE := Color("d2c6aa") # original warm sandstone on island tops (no grass)
 const CURB := Color("b9bbb2")
 const SIDE := Color("8e928b")
 const SLABS := [Color("cfcdc3"), Color("c2c1b8"), Color("d8d5ca"), Color("b8b8b0"), Color("c9c4b6")]
-const SLAB_MOSS := Color("9fae7c")
+const SLAB_MOSS := Color("c9b98f") # weathered tan, no green moss
 const SLABS_INACTIVE := [Color("9da3a2"), Color("8f9594"), Color("a8adac")]
 const SLAB_PITCH := 0.25
 const SLAB_GAP := 0.016
 const SLAB_HEIGHT := 0.018
-## Island side: grass lip, then two courses of massive grey stone.
-const SIDE_BANDS := [[-0.028, Color("6e8d43")], [-0.175, Color("9a9d95")], [-0.19, Color("666a65")], [-0.37, Color("8b8f88")]]
+## Island side: sandstone lip, then two courses of massive grey stone.
+const SIDE_BANDS := [[-0.028, Color("bca77b")], [-0.175, Color("9a9d95")], [-0.19, Color("666a65")], [-0.37, Color("8b8f88")]]
 const ROAD_HEIGHT := 0.0
 const BANK_HEIGHT := 0.065
 const BANK_SLOPE := 0.045

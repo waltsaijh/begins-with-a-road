@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_blno5"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_065v2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_body.res" id="3_kqcb0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_tail.res" id="4_8638r"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_wing1.res" id="5_j7hoh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_wingtip1.res" id="6_jgh56"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_wingm1.res" id="7_wqdrl"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/winged_wingtipm1.res" id="8_6sckw"]
+
+[node name="Winged" type="Node3D" unique_id=101920831]
+script = ExtResource("1_blno5")
+flying = true
+style = "fly"
+rate = 9.0
+bob = 0.06
+sway = 0.04
+pitch = 0.04
+flap = 0.55
+
+[node name="Rig" type="Node3D" parent="." unique_id=1252232071]
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=1832023880]
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("3_kqcb0")
+
+[node name="Tail" type="MeshInstance3D" parent="Rig" unique_id=1970597961]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00019602905, 0.14983064, -0.002579704)
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("4_8638r")
+metadata/tail = 1
+
+[node name="Wing1" type="MeshInstance3D" parent="Rig" unique_id=1269025038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.058479644, 0.3156608, -0.17949921)
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("5_j7hoh")
+metadata/wing = -1
+
+[node name="WingTip1" type="MeshInstance3D" parent="Rig/Wing1" unique_id=1465211289]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35913977, 0.0143428445, -0.09974858)
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("6_jgh56")
+metadata/wing_tip = -1
+
+[node name="Wing-1" type="MeshInstance3D" parent="Rig" unique_id=1776859273]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.058479637, 0.3156608, -0.1794992)
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("7_wqdrl")
+metadata/wing = 1
+
+[node name="WingTip-1" type="MeshInstance3D" parent="Rig/Wing-1" unique_id=860970377]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35913986, 0.014343083, -0.09974854)
+material_override = ExtResource("2_065v2")
+mesh = ExtResource("8_6sckw")
+metadata/wing_tip = 1

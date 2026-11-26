@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_7pymh"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_qgnwc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/scout_body.res" id="3_vpgg5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/scout_leg1.res" id="4_ukteb"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/scout_legm1.res" id="5_2567s"]
+
+[node name="Scout" type="Node3D" unique_id=329269165]
+script = ExtResource("1_7pymh")
+style = "walk"
+rate = 13.0
+sway = 0.018
+lean = 0.14
+swing = 0.55
+lift = 0.045
+
+[node name="Rig" type="Node3D" parent="." unique_id=1685960284]
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=511139549]
+material_override = ExtResource("2_qgnwc")
+mesh = ExtResource("3_vpgg5")
+
+[node name="Leg1" type="MeshInstance3D" parent="." unique_id=348482001]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0798759, 0.39033797, 0.043633796)
+material_override = ExtResource("2_qgnwc")
+mesh = ExtResource("4_ukteb")
+metadata/gait = 1
+
+[node name="Leg-1" type="MeshInstance3D" parent="." unique_id=331038674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0798949, 0.389768, 0.0847578)
+material_override = ExtResource("2_qgnwc")
+mesh = ExtResource("5_2567s")
+metadata/gait = -1

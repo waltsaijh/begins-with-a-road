@@ -3,6 +3,14 @@ extends Control
 const Batch = preload("res://scripts/enemies/presentation/enemy_status_batch.gd")
 const Atlas = preload("res://scripts/enemies/presentation/enemy_status_atlas.gd")
 @export var icon_gap := 2.0
+## Uninjured, unshielded enemies show no health bar, so a full wave does not bury the road
+## under bars. Skill wind-ups and effect icons still show.
+@export var hide_full_health := true
+## Health / skill bars and icons are drawn semi-transparent.
+@export_range(0.1, 1.0, 0.05) var opacity := 0.65:
+	set(value):
+		opacity = value
+		if batch != null and batch.material is ShaderMaterial: (batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)
 var renderer: MultiMeshInstance3D
 var batch: MultiMeshInstance2D
 var _atlas: RefCounted
@@ -35,6 +43,7 @@ func _ready() -> void:
 	batch.name = "StatusBatch"
 	add_child(batch)
 	batch.clear()
+	(batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)
 	_atlas = Atlas.new()
 	batch.texture = _atlas.texture
 	set_process(false)
@@ -138,6 +147,9 @@ func _flush_update() -> void:
 	_update_queued = false
 	if is_inside_tree(): _process(0.0)
 
+static func is_uninjured(enemy: Node3D) -> bool:
+	return enemy.health >= enemy.max_health and enemy.shield <= 0.0
+
 static func health_fills(enemy: Node3D) -> Vector2:
 	var capacity: float = maxf(0.0, enemy.max_health)+maxf(0.0, enemy.max_shield)
 	if capacity <= 0.0: return Vector2.ZERO
@@ -163,9 +175,10 @@ func _process(_delta: float) -> void:
 		if not viewport.has_point(center): continue
 		var origin := (center-_bar_size*Vector2(0.5, 1)).round()
 		var fills := health_fills(enemy)
-		_frame(0, origin)
-		batch.append(Rect2(origin, Vector2(_bar_size.x*fills.x, _bar_size.y)), _atlas.white, _health_color)
-		batch.append(Rect2(origin+Vector2(_bar_size.x*fills.x, 0), Vector2(_bar_size.x*fills.y, _bar_size.y)), _atlas.white, _shield_color)
+		if not (hide_full_health and is_uninjured(enemy)):
+			_frame(0, origin)
+			batch.append(Rect2(origin, Vector2(_bar_size.x*fills.x, _bar_size.y)), _atlas.white, _health_color)
+			batch.append(Rect2(origin+Vector2(_bar_size.x*fills.x, 0), Vector2(_bar_size.x*fills.y, _bar_size.y)), _atlas.white, _shield_color)
 		if is_finite(enemy.skill_progress) and enemy.skill_progress >= 0:
 			var skill_origin := origin+_skill_position
 			_frame(1, skill_origin)

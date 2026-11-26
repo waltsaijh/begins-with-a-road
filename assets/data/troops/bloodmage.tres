@@ -2,7 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_evq6m"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/bloodmage.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/bloodmage.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/bloodmage_detail.tscn" id="detail"]
 [ext_resource type="Script" uid="uid://cqiial8p7uqi7" path="res://scripts/enemies/abilities/taunt_ability.gd" id="2_kla7u"]
 [ext_resource type="Texture2D" uid="uid://c0v5lfpyh11tr" path="res://assets/sprites/enemies/bloodmage.png" id="3"]
 [ext_resource type="Script" uid="uid://cmiri4sb3e634" path="res://scripts/enemies/abilities/heal_ability.gd" id="3_23arm"]
@@ -37,3 +38,4 @@ path_base_cost = 0.0
 damage_weight = -0.125
 road_traffic_weight = -1.0
 model = ExtResource("2")
+detail_model = ExtResource("detail")

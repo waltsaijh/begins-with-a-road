@@ -145,6 +145,8 @@ func has_tag(tag: StringName) -> bool:
 @export_group("Model")
 ## Drag an imported .glb/.gltf scene or a local .tscn here. Empty uses the built-in grunt.
 @export var model: PackedScene
+## Optional high-detail scene for the progress catalog / inspection preview only. Empty uses Model.
+@export var detail_model: PackedScene
 ## Optional offline bake; only used while it matches Model and the selected clip.
 @export var gpu_model: EnemyGpuModel
 @export var model_scale := Vector3.ONE

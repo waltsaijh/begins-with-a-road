@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_cr0sb"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_aayt4"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rook_arm1.res" id="3_yy1q4"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rook_armm1.res" id="4_xjnfr"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rook_body.res" id="5_sooju"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rook_leg1.res" id="6_0k8oj"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rook_legm1.res" id="7_f2blk"]
+
+[node name="Rook" type="Node3D" unique_id=1133602361]
+script = ExtResource("1_cr0sb")
+style = "walk"
+rate = 10.0
+sway = 0.025
+lean = 0.05
+lift = 0.045
+
+[node name="Rig" type="Node3D" parent="." unique_id=1214820640]
+
+[node name="Arm1" type="MeshInstance3D" parent="Rig" unique_id=1972729993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.090015344, 0.6628827, 0.077074975)
+material_override = ExtResource("2_aayt4")
+mesh = ExtResource("3_yy1q4")
+metadata/arm = 0.12
+
+[node name="Arm-1" type="MeshInstance3D" parent="Rig" unique_id=886382101]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19117658, 0.65266985, 0.10670164)
+material_override = ExtResource("2_aayt4")
+mesh = ExtResource("4_xjnfr")
+metadata/arm = -0.5
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=222803864]
+material_override = ExtResource("2_aayt4")
+mesh = ExtResource("5_sooju")
+
+[node name="Leg1" type="MeshInstance3D" parent="." unique_id=241938407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04412631, 0.4564155, 0.041053012)
+material_override = ExtResource("2_aayt4")
+mesh = ExtResource("6_0k8oj")
+metadata/gait = 1
+
+[node name="Leg-1" type="MeshInstance3D" parent="." unique_id=80958342]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13861127, 0.45476255, 0.10427245)
+material_override = ExtResource("2_aayt4")
+mesh = ExtResource("7_f2blk")
+metadata/gait = -1

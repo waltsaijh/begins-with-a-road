@@ -100,6 +100,10 @@ func verify() -> void:
 	units[4].skill_progress = 0.35
 	units[4].add_shield(40)
 	units[4].take_damage(20)
+	check(Overlay.is_uninjured(units[0]) and not Overlay.is_uninjured(units[1]) and not Overlay.is_uninjured(units[2]), "Only untouched enemies may hide their health bar")
+	# Pixel reference checks below cover every bar, including full-health ones.
+	batch.status_overlay.hide_full_health = false
+	batch.status_overlay.opacity = 1.0
 	check(Overlay.health_fills(units[1]).is_equal_approx(Vector2(0.4, 0)), "Health fill ratio is incorrect")
 	check(Overlay.health_fills(units[2]).is_equal_approx(Vector2(0.625, 0.375)), "Health and shield do not share their capacity proportionally")
 	await get_tree().process_frame
@@ -315,6 +319,8 @@ func verify_baked_appearance(renderer: MultiMeshInstance3D) -> void:
 	style.border_color = Color.BLUE
 	panel.add_theme_stylebox_override("panel", style)
 	overlay.renderer = renderer
+	overlay.opacity = 1.0
+	overlay.hide_full_health = false
 	renderer.status_overlay.hide()
 	add_child(layer)
 	overlay.set_process(true)
