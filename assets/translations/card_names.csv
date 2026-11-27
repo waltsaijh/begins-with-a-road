@@ -770,3 +770,7 @@ spell.double.effect,Choose two areas · 220 damage each,指定兩區 · 各 220 
 spell.rally.effect,Cleanse towers · immune for 4s,解除塔癱瘓 · 免疫 4 秒
 spell.snipe.effect,400 damage to nearest enemy,對最近敵人造成 400 傷害
 spell.last.effect,Stun enemies for 2s,癱瘓敵人 2 秒
+ui.maps.title.highroad,Noon Highroad,正午長路
+ui.maps.description.highroad,A long road winds across the noon clouds. Make every bend count.,蜿蜒的長路橫越正午雲海，善用每一個轉角。
+ui.maps.title.lantern_pass,Lantern Pass,燈火隘口
+ui.maps.description.lantern_pass,Two roads meet in the night. Hold the crossing by lantern light.,兩條路在夜裡交會，藉著燈火守住隘口。

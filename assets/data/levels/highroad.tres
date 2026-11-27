@@ -1,0 +1,118 @@
+[gd_resource type="Resource" script_class="LevelDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/definitions/act_definition.gd" id="1_4wuye"]
+[ext_resource type="Script" path="res://scripts/levels/definitions/wave_definition.gd" id="2_ln8wr"]
+[ext_resource type="Script" path="res://scripts/levels/definitions/wave_spawn_group.gd" id="3_xdshe"]
+[ext_resource type="Script" path="res://scripts/levels/definitions/level_definition.gd" id="4_1wnvs"]
+[ext_resource type="Resource" path="res://assets/data/events/catalog.tres" id="5_v22cl"]
+[ext_resource type="PackedScene" path="res://scenes/maps/highroad.tscn" id="6_dcxvl"]
+[ext_resource type="Resource" path="res://assets/data/rendering/time_of_day/noon.tres" id="7_5qudo"]
+
+[sub_resource type="Resource" id="Resource_2umb5"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 5
+interval_ticks = 10
+
+[sub_resource type="Resource" id="Resource_gp5tt"]
+script = ExtResource("2_ln8wr")
+groups = Array[ExtResource("3_xdshe")]([SubResource("Resource_2umb5")])
+move_speed = 1.25
+reward = 60
+
+[sub_resource type="Resource" id="Resource_mq52t"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/soldier.tres"
+enemy_count = 4
+interval_ticks = 8
+
+[sub_resource type="Resource" id="Resource_eag6c"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/scout.tres"
+start_tick = 10
+enemy_count = 3
+interval_ticks = 8
+
+[sub_resource type="Resource" id="Resource_5dwyv"]
+script = ExtResource("2_ln8wr")
+groups = Array[ExtResource("3_xdshe")]([SubResource("Resource_mq52t"), SubResource("Resource_eag6c")])
+move_speed = 1.25
+reward = 60
+
+[sub_resource type="Resource" id="Resource_n4qj7"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/rats.tres"
+interval_ticks = 6
+
+[sub_resource type="Resource" id="Resource_wqwvc"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/rook.tres"
+start_tick = 15
+enemy_count = 2
+interval_ticks = 20
+
+[sub_resource type="Resource" id="Resource_eymtp"]
+script = ExtResource("2_ln8wr")
+groups = Array[ExtResource("3_xdshe")]([SubResource("Resource_n4qj7"), SubResource("Resource_wqwvc")])
+move_speed = 1.25
+reward = 50
+
+[sub_resource type="Resource" id="Resource_ecqfk"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/quickfeet.tres"
+enemy_count = 4
+interval_ticks = 10
+
+[sub_resource type="Resource" id="Resource_ltdo0"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 6
+enemy_count = 6
+interval_ticks = 6
+
+[sub_resource type="Resource" id="Resource_k0tud"]
+script = ExtResource("2_ln8wr")
+groups = Array[ExtResource("3_xdshe")]([SubResource("Resource_ecqfk"), SubResource("Resource_ltdo0")])
+move_speed = 1.25
+reward = 50
+
+[sub_resource type="Resource" id="Resource_ms2d8"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/heavy.tres"
+enemy_count = 2
+interval_ticks = 20
+
+[sub_resource type="Resource" id="Resource_seure"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/soldier.tres"
+start_tick = 4
+enemy_count = 6
+interval_ticks = 6
+
+[sub_resource type="Resource" id="Resource_w4e1k"]
+script = ExtResource("3_xdshe")
+troop_path = "res://assets/data/troops/bomber.tres"
+start_tick = 20
+enemy_count = 1
+
+[sub_resource type="Resource" id="Resource_50d1p"]
+script = ExtResource("2_ln8wr")
+groups = Array[ExtResource("3_xdshe")]([SubResource("Resource_ms2d8"), SubResource("Resource_seure"), SubResource("Resource_w4e1k")])
+move_speed = 1.25
+reward = 40
+
+[sub_resource type="Resource" id="Resource_jbsln"]
+script = ExtResource("1_4wuye")
+add_start_after_completion = false
+waves = Array[ExtResource("2_ln8wr")]([SubResource("Resource_gp5tt"), SubResource("Resource_5dwyv"), SubResource("Resource_eymtp"), SubResource("Resource_k0tud"), SubResource("Resource_50d1p")])
+
+[resource]
+script = ExtResource("4_1wnvs")
+level_id = "highroad"
+required_to_complete_levels = PackedStringArray("tutorial", "frontier")
+terrain = ExtResource("6_dcxvl")
+acts = Array[ExtResource("1_4wuye")]([SubResource("Resource_jbsln")])
+base_health = 20
+starting_gold = 9
+opening_shop = true
+time_of_day = ExtResource("7_5qudo")

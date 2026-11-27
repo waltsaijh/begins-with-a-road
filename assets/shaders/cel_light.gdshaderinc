@@ -8,6 +8,7 @@ const float CEL_MID = 0.2;     // above this: middle band, below: dark band
 const float CEL_MID_LEVEL = 0.5;
 const float CEL_EDGE = 0.015;  // half-width of the band boundary anti-aliasing
 const float CEL_SPECULAR_CUT = 0.6;
+const float LOCAL_LIGHT_CAP = 0.55; // brightness local lights may build up to (see light())
 const float CEL_SHADOW = 0.7;  // ATTENUATION below this counts as in shadow
                                // (Sun shadow_opacity 0.62 leaves 0.38 inside)
 
@@ -18,19 +19,30 @@ float cel_band(float value) {
 
 void light() {
 	float n_dot_l = clamp(dot(NORMAL, LIGHT), 0.0, 1.0);
-	// Shadow is judged on its own and can only cap a surface at the middle band.
-	// Multiplying it into NdotL let shadow-map acne on side faces flip bands and
-	// draw sawtooth stripes; side faces already in the middle band now ignore it.
-	float shadowed = 1.0 - smoothstep(CEL_SHADOW - CEL_EDGE * 4.0, CEL_SHADOW + CEL_EDGE * 4.0, ATTENUATION);
-	float band = min(cel_band(n_dot_l), mix(1.0, CEL_MID_LEVEL, shadowed));
-	float lit = n_dot_l * (1.0 - shadowed);
-	DIFFUSE_LIGHT += band * LIGHT_COLOR / PI;
-	// Hard-edged highlight; roughness 1 surfaces (rock, islands) get none.
-	float gloss = 1.0 - ROUGHNESS;
-	if (gloss > 0.0 && SPECULAR_AMOUNT > 0.0) {
-		vec3 half_vector = normalize(VIEW + LIGHT);
-		float spec = pow(clamp(dot(NORMAL, half_vector), 0.0, 1.0), mix(8.0, 128.0, gloss)) * lit;
-		SPECULAR_LIGHT += smoothstep(CEL_SPECULAR_CUT - CEL_EDGE, CEL_SPECULAR_CUT + CEL_EDGE, spec)
-			* SPECULAR_AMOUNT * gloss * LIGHT_COLOR / PI;
+	if (!LIGHT_IS_DIRECTIONAL) {
+		// Local lights (night tower torches): the distance falloff is banded too, so a
+		// torch throws a flat two-step pool of warm light instead of a smooth gradient.
+		float pool = 0.5 * smoothstep(0.08, 0.12, ATTENUATION) + 0.5 * smoothstep(0.38, 0.42, ATTENUATION);
+		// Overlapping torches do not stack into a hot spot: each local light only fills
+		// the headroom left under LOCAL_LIGHT_CAP by the light already gathered here.
+		float gathered = dot(DIFFUSE_LIGHT, vec3(0.299, 0.587, 0.114));
+		float room = clamp(1.0 - gathered / LOCAL_LIGHT_CAP, 0.0, 1.0);
+		DIFFUSE_LIGHT += cel_band(n_dot_l) * pool * LIGHT_COLOR / PI * room;
+	} else {
+		// Shadow is judged on its own and can only cap a surface at the middle band.
+		// Multiplying it into NdotL let shadow-map acne on side faces flip bands and
+		// draw sawtooth stripes; side faces already in the middle band now ignore it.
+		float shadowed = 1.0 - smoothstep(CEL_SHADOW - CEL_EDGE * 4.0, CEL_SHADOW + CEL_EDGE * 4.0, ATTENUATION);
+		float band = min(cel_band(n_dot_l), mix(1.0, CEL_MID_LEVEL, shadowed));
+		float lit = n_dot_l * (1.0 - shadowed);
+		DIFFUSE_LIGHT += band * LIGHT_COLOR / PI;
+		// Hard-edged highlight; roughness 1 surfaces (rock, islands) get none.
+		float gloss = 1.0 - ROUGHNESS;
+		if (gloss > 0.0 && SPECULAR_AMOUNT > 0.0) {
+			vec3 half_vector = normalize(VIEW + LIGHT);
+			float spec = pow(clamp(dot(NORMAL, half_vector), 0.0, 1.0), mix(8.0, 128.0, gloss)) * lit;
+			SPECULAR_LIGHT += smoothstep(CEL_SPECULAR_CUT - CEL_EDGE, CEL_SPECULAR_CUT + CEL_EDGE, spec)
+				* SPECULAR_AMOUNT * gloss * LIGHT_COLOR / PI;
+		}
 	}
 }

@@ -1,10 +1,20 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_00.res" id="1_3sldw"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_01.res" id="2_tj3q4"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_02.res" id="3_5nnqt"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_00.res" id="1_th1bv"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_01.res" id="2_vkkrv"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_02.res" id="3_5ui58"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_03.res" id="4_5jarr"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_04.res" id="5_ughsk"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_05.res" id="6_s3c62"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_06.res" id="7_e7fvv"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_07.res" id="8_1l054"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_08.res" id="9_ielf2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_09.res" id="10_8rhab"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_10.res" id="11_tk375"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_11.res" id="12_iaupl"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/sentry_part_12.res" id="13_mklak"]
 
-[sub_resource type="Animation" id="Animation_gb875"]
+[sub_resource type="Animation" id="Animation_46n46"]
 step = 0.041666668
 tracks/0/type = "position_3d"
 tracks/0/imported = false
@@ -14,36 +24,107 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0.0325, 0.25, 1, 0, 0, 0.065, 0.29166666, 1, 0, 0, 0.061875, 0.33333334, 1, 0, 0, 0.055, 0.375, 1, 0, 0, 0.048125, 0.41666666, 1, 0, 0, 0.045, 0.45833334, 1, 0, 0, 0.044344023, 0.5, 1, 0, 0, 0.042507287, 0.5416667, 1, 0, 0, 0.03968659, 0.5833333, 1, 0, 0, 0.036078718, 0.625, 1, 0, 0, 0.031880468, 0.6666667, 1, 0, 0, 0.02728863, 0.7083333, 1, 0, 0, 0.0225, 0.75, 1, 0, 0, 0.017711371, 0.7916667, 1, 0, 0, 0.013119534, 0.8333333, 1, 0, 0, 0.008921282, 0.875, 1, 0, 0, 0.005313411, 0.9166667, 1, 0, 0, 0.0024927114, 0.9583333, 1, 0, 0, 0.00065597665, 1, 1, 0, 0, 0)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_atwxl"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_amv3e"]
 _data = {
-&"fire": SubResource("Animation_gb875")
+&"fire": SubResource("Animation_46n46")
 }
 
-[node name="sentry" type="Node3D" unique_id=229437742]
+[node name="sentry" type="Node3D" unique_id=626583476]
 
-[node name="BWAR_G_sentry__Model" type="Node3D" parent="." unique_id=821829968]
+[node name="BWAR_G_sentry__Model" type="Node3D" parent="." unique_id=674566663]
 
-[node name="BWAR_G_sentry__FixedBase" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=1656926793]
+[node name="BWAR_G_sentry__FixedBase" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=253612190]
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=1550748147]
-mesh = ExtResource("1_3sldw")
+[node name="Below3" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=51740849]
 
-[node name="BWAR_G_sentry__AimPivot" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=1826525999]
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Below3" unique_id=170138535]
+mesh = ExtResource("1_th1bv")
+
+[node name="Below2" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=1234750570]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Below2" unique_id=767760572]
+mesh = ExtResource("2_vkkrv")
+
+[node name="Level2" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=42019954]
+
+[node name="Below3Fort" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level2" unique_id=432622729]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level2/Below3Fort" unique_id=281174868]
+mesh = ExtResource("3_5ui58")
+
+[node name="BWAR_G_sentry__Torch1Lamp" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level2" unique_id=1643300890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.6, -0.45)
+
+[node name="BWAR_G_sentry__Torch3Lamp" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level2" unique_id=620190579]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.6, 0.45)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level2" unique_id=435368508]
+mesh = ExtResource("4_5jarr")
+
+[node name="Level3" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=798992440]
+
+[node name="BWAR_G_sentry__StandardBeacon" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level3" unique_id=889354223]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.36, 1.84, -0.36)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase/Level3" unique_id=206937474]
+mesh = ExtResource("5_ughsk")
+
+[node name="BWAR_G_sentry__Torch0Lamp" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=581257847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.6, -0.2)
+
+[node name="BWAR_G_sentry__Torch2Lamp" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=946780459]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.45, 0.6, 0.2)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__FixedBase" unique_id=1420352099]
+mesh = ExtResource("6_s3c62")
+
+[node name="BWAR_G_sentry__AimPivot" type="Node3D" parent="BWAR_G_sentry__Model" unique_id=1691078881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 
-[node name="BWAR_G_sentry__UpgradeSocket" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1257433541]
+[node name="Level2WA" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1033925899]
+
+[node name="Below3WA" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/Level2WA" unique_id=773751919]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/Level2WA/Below3WA" unique_id=2107003180]
+mesh = ExtResource("7_e7fvv")
+
+[node name="Level3WA" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1173286598]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/Level3WA" unique_id=1702496923]
+mesh = ExtResource("8_1l054")
+
+[node name="Below2WA" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1151930134]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/Below2WA" unique_id=536066057]
+mesh = ExtResource("9_ielf2")
+
+[node name="BWAR_G_sentry__UpgradeSocket" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=203863769]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
 
-[node name="BWAR_G_sentry__RecoilAssembly" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=927367520]
+[node name="BWAR_G_sentry__RecoilAssembly" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=21936815]
 
-[node name="BWAR_G_sentry__ArrowRelease" type="Marker3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1304187674]
+[node name="Level2WB" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1479876999]
+
+[node name="Below3WB" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly/Level2WB" unique_id=556321484]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly/Level2WB/Below3WB" unique_id=1256914812]
+mesh = ExtResource("10_8rhab")
+
+[node name="Level3WB" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1521465101]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly/Level3WB" unique_id=1044612782]
+mesh = ExtResource("11_tk375")
+
+[node name="Below2WB" type="Node3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=296039455]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly/Below2WB" unique_id=1088328742]
+mesh = ExtResource("12_iaupl")
+
+[node name="BWAR_G_sentry__String" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1907121833]
+mesh = ExtResource("13_mklak")
+
+[node name="BWAR_G_sentry__ArrowRelease" type="Marker3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=43514008]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.23, -0.4)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot/BWAR_G_sentry__RecoilAssembly" unique_id=1592471873]
-mesh = ExtResource("2_tj3q4")
-
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_sentry__Model/BWAR_G_sentry__AimPivot" unique_id=1901881968]
-mesh = ExtResource("3_5nnqt")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2118807576]
-libraries/ = SubResource("AnimationLibrary_atwxl")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=582367151]
+libraries/ = SubResource("AnimationLibrary_amv3e")

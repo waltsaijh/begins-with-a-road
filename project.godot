@@ -57,11 +57,17 @@ locale/fallback="zh_TW"
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+limits/opengl/max_renderable_lights=96
+limits/opengl/max_lights_per_object=16
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
 anti_aliasing/quality/msaa_3d=2
 
 [shader_globals]
 
+night_sky={
+"type": "float",
+"value": 0.0
+}
 cloud_low={
 "type": "color",
 "value": Color(0.79, 0.84, 0.88, 1)

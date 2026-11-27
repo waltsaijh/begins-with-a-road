@@ -115,6 +115,110 @@ func _ready() -> void:
 			_players[String(clip)]=player
 		source.stop()
 	set_process(false)
+	if TimeOfDayPreset.lights_on: _light_lamps.call_deferred()
+
+const LAMP_COLOR := Color(0.92, 0.95, 1.0)   ## tower lamps: cool white
+const BEACON_COLOR := Color(1.0, 0.86, 0.5)
+static var _flame_mesh: SphereMesh
+static var _halo_mesh: SphereMesh
+static var _beacon_mesh: SphereMesh
+static var _beacon_halo: SphereMesh
+## Dusk / night: a flame on every modelled torch / dock lamp ("...Lamp" nodes) and a
+## few warm lights. Upgrades read at a glance in the dark: Lv.1 lights two torches,
+## the Level2 group adds two more, and Level3 crowns the tower with a bright gold
+## beacon ("...Beacon" nodes) on its standard. Lights and flames live inside their
+## level group, so set_level() shows and hides them. Previews stay dark.
+func _light_lamps() -> void:
+	if _preview or not is_inside_tree(): return
+	_make_lamp_meshes()
+	var groups := {}
+	for node in find_children("*", "Node3D", true, false):
+		var title := String(node.name)
+		if title.ends_with("Beacon"):
+			_beacon(node)
+		elif title.ends_with("Lamp"):
+			var holder := _level_group(node)
+			if not groups.has(holder): groups[holder] = []
+			groups[holder].append(node)
+	for holder: Node3D in groups:
+		var lamps: Array = groups[holder]
+		var centre := Vector3.ZERO
+		for lamp: Node3D in lamps:
+			lamp.add_child(_glow(_flame_mesh, "Flame")); lamp.add_child(_glow(_halo_mesh, "Halo"))
+			centre += lamp.global_position
+		centre /= lamps.size()
+		# Two lights on opposite diagonals, so the wall faces in front of each get one.
+		var halves := [[], []]
+		for lamp: Node3D in lamps:
+			var d: Vector3 = lamp.global_position-centre
+			halves[0 if d.x+d.z >= 0.0 else 1].append(lamp.global_position)
+		for half: Array in halves:
+			if half.is_empty(): continue
+			var at := Vector3.ZERO
+			for p: Vector3 in half: at += p
+			at /= half.size()
+			var out := Vector3(at.x-centre.x, 0, at.z-centre.z)
+			# Lifted above the torches and pushed out a little: the light falls on the
+			# wall tops, merlons and weapons as well as the walls, so tops stay readable.
+			var spot := at+out.normalized()*.22+Vector3.UP*.45 if out.length() > .01 else at+Vector3.UP*.45
+			_add_light(holder, spot, LAMP_COLOR, 0.55, 1.7)   # soft, wide white wash
+
+## The nearest Level<N> group above a node (or this visual when it has none).
+func _level_group(node: Node) -> Node3D:
+	var at := node.get_parent()
+	while at != null and at != self:
+		if String(at.name).begins_with("Level"): return at as Node3D
+		at = at.get_parent()
+	return self
+
+func _beacon(node: Node3D) -> void:
+	var fire := _glow(_beacon_mesh, "BeaconFire")
+	node.add_child(fire)
+	var halo := _glow(_beacon_halo, "BeaconHalo"); halo.scale = Vector3.ONE*1.9
+	node.add_child(halo)
+	_add_light(node, node.global_position, BEACON_COLOR, 2.4, 1.7)
+
+func _add_light(parent: Node3D, at: Vector3, color: Color, energy: float, reach: float) -> void:
+	var light := OmniLight3D.new(); light.name = "TorchLight"
+	light.light_color = color; light.light_energy = energy; light.omni_range = reach
+	light.shadow_enabled = false
+	parent.add_child(light)
+	light.global_position = at
+	var flicker := light.create_tween().set_loops()
+	flicker.tween_property(light, "light_energy", energy*.84, .23+randf()*.1).set_trans(Tween.TRANS_SINE)
+	flicker.tween_property(light, "light_energy", energy*1.09, .31+randf()*.1).set_trans(Tween.TRANS_SINE)
+
+func _glow(mesh: Mesh, title: String) -> MeshInstance3D:
+	var part := MeshInstance3D.new(); part.name = title; part.mesh = mesh
+	part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return part
+
+static func _make_lamp_meshes() -> void:
+	if _flame_mesh != null: return
+	_flame_mesh = SphereMesh.new(); _flame_mesh.radius = .036; _flame_mesh.height = .08
+	_flame_mesh.radial_segments = 6; _flame_mesh.rings = 3
+	var glow := StandardMaterial3D.new()
+	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	glow.albedo_color = Color(0.86, 0.9, 0.98)
+	_flame_mesh.material = glow
+	_beacon_mesh = SphereMesh.new(); _beacon_mesh.radius = .06; _beacon_mesh.height = .13
+	_beacon_mesh.radial_segments = 8; _beacon_mesh.rings = 4
+	var gold := StandardMaterial3D.new()
+	gold.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	gold.albedo_color = Color(1.0, 0.93, 0.62)
+	_beacon_mesh.material = gold
+	_halo_mesh = SphereMesh.new(); _halo_mesh.radius = .09; _halo_mesh.height = .18
+	_halo_mesh.radial_segments = 8; _halo_mesh.rings = 4
+	var halo := StandardMaterial3D.new()
+	halo.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	halo.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	halo.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	halo.albedo_color = Color(0.7, 0.8, 1.0, 0.11)
+	_halo_mesh.material = halo
+	_beacon_halo = _halo_mesh.duplicate()
+	var gold_halo := halo.duplicate() as StandardMaterial3D
+	gold_halo.albedo_color = Color(1.0, 0.65, 0.25, 0.35)
+	_beacon_halo.material = gold_halo
 
 ## The two bed stops were baked into the turning assembly's mesh; they stay on the bed.
 func _fix_mortar_stops() -> void:

@@ -27,9 +27,19 @@ const CLOUD_HIGH := &"cloud_high"
 ## (HudTextPalette). Daytime presets keep the authored dark-teal text.
 @export var hud_light_text := false
 
+@export_group("Towers")
+## Light the towers' wall torches and dock lamps (imported_tower_visual.gd).
+@export var tower_lights := false
+## Stars in the cloud gaps (cloud_layer.gdshader, global night_sky).
+@export var stars := false
+## Whether the active preset wants tower lamps; read by towers when they are built.
+static var lights_on := false
+
 ## Applies to the level's Sun and WorldEnvironment. The Environment is duplicated
 ## so the shared level_environment.tres used by Boot warmup is never mutated.
 func apply(sun: DirectionalLight3D, world: WorldEnvironment) -> void:
+	lights_on = tower_lights
+	RenderingServer.global_shader_parameter_set(&"night_sky", 1.0 if stars else 0.0)
 	if sun != null:
 		sun.light_color = sun_color
 		sun.light_energy = sun_energy
@@ -51,11 +61,16 @@ static var current_clouds: Array[Color] = []
 static func claim(owner: Object, preset: TimeOfDayPreset, sun: DirectionalLight3D, world: WorldEnvironment) -> void:
 	_owner_id = owner.get_instance_id()
 	if preset != null: preset.apply(sun, world)
-	else: reset_clouds()
+	else:
+		lights_on = false
+		RenderingServer.global_shader_parameter_set(&"night_sky", 0.0)
+		reset_clouds()
 
 static func release(owner: Object) -> void:
 	if _owner_id != owner.get_instance_id(): return
 	_owner_id = 0
+	lights_on = false
+	RenderingServer.global_shader_parameter_set(&"night_sky", 0.0)
 	reset_clouds()
 
 static func set_clouds(low: Color, high: Color) -> void:

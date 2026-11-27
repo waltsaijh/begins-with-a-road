@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="MeshLibrary" path="res://assets/models/mesh_library.tres" id="1_nx0mm"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/start_point.tscn" id="2_myal5"]
+[ext_resource type="Script" path="res://scripts/map/terrain/terrain_endpoint.gd" id="3_c3hof"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/goal_point.tscn" id="4_2l2vc"]
+
+[node name="LanternPassTerrain" type="GridMap" unique_id=1238711202]
+mesh_library = ExtResource("1_nx0mm")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(0, 0, 6, 1, 0, 6, 2, 0, 6, 3, 0, 6, 4, 0, 6, 5, 0, 6, 5, 1, 6, 5, 2, 6, 5, 3, 6, 0, 6, 6, 1, 6, 6, 2, 6, 6, 3, 6, 6, 4, 6, 6, 5, 6, 6, 5, 5, 6, 5, 4, 6, 6, 3, 6, 7, 3, 6, 8, 3, 6, 9, 3, 6, 10, 3, 6, 11, 3, 6, 12, 3, 6)
+}
+
+[node name="Start" type="Marker3D" parent="." unique_id=1563493406 instance=ExtResource("2_myal5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.0305, 0.5)
+script = ExtResource("3_c3hof")
+
+[node name="Start2" type="Marker3D" parent="." unique_id=368605498 instance=ExtResource("2_myal5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.0305, 6.5)
+script = ExtResource("3_c3hof")
+
+[node name="Goal" type="Marker3D" parent="." unique_id=1409969910 instance=ExtResource("4_2l2vc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.0305, 3.5)
+script = ExtResource("3_c3hof")
+role = 1

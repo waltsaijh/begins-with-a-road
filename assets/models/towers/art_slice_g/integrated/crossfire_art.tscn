@@ -1,13 +1,26 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_00.res" id="1_hyjuh"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_01.res" id="2_mwjyh"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_02.res" id="3_twkau"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_03.res" id="4_j3cwa"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_04.res" id="5_cwrjq"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_05.res" id="6_3rdej"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_00.res" id="1_1vk8f"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_01.res" id="2_ix2k3"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_02.res" id="3_joqb8"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_03.res" id="4_cvwvc"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_04.res" id="5_ans56"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_05.res" id="6_sarwb"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_06.res" id="7_qj2iq"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_07.res" id="8_l2vd5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_08.res" id="9_33dyn"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_09.res" id="10_nd4k0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_10.res" id="11_ciujj"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_11.res" id="12_fysh5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_12.res" id="13_5htn0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_13.res" id="14_xuf7u"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_14.res" id="15_08ci5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_15.res" id="16_hy7vp"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_16.res" id="17_851ro"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_17.res" id="18_4jyv2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/crossfire_part_18.res" id="19_7got6"]
 
-[sub_resource type="Animation" id="Animation_3ne3g"]
+[sub_resource type="Animation" id="Animation_asv5l"]
 step = 0.041666668
 tracks/0/type = "position_3d"
 tracks/0/imported = false
@@ -17,7 +30,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, -0.0425, 0, 0, 0.25, 1, -0.085, 0, 0, 0.29166666, 1, -0.0803125, 0, 0, 0.33333334, 1, -0.07, 0, 0, 0.375, 1, -0.0596875, 0, 0, 0.41666666, 1, -0.055, 0, 0, 0.45833334, 1, -0.05419825, 0, 0, 0.5, 1, -0.051953353, 0, 0, 0.5416667, 1, -0.04850583, 0, 0, 0.5833333, 1, -0.04409621, 0, 0, 0.625, 1, -0.038965013, 0, 0, 0.6666667, 1, -0.03335277, 0, 0, 0.7083333, 1, -0.0275, 0, 0, 0.75, 1, -0.02164723, 0, 0, 0.7916667, 1, -0.016034985, 0, 0, 0.8333333, 1, -0.01090379, 0, 0, 0.875, 1, -0.006494169, 0, 0, 0.9166667, 1, -0.0030466472, 0, 0, 0.9583333, 1, -0.0008017493, 0, 0, 1, 1, 0, 0, 0)
 
-[sub_resource type="Animation" id="Animation_uskco"]
+[sub_resource type="Animation" id="Animation_bc8c2"]
 step = 0.041666668
 tracks/0/type = "position_3d"
 tracks/0/imported = false
@@ -27,7 +40,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0.0425, 0.25, 1, 0, 0, 0.085, 0.29166666, 1, 0, 0, 0.0803125, 0.33333334, 1, 0, 0, 0.07, 0.375, 1, 0, 0, 0.0596875, 0.41666666, 1, 0, 0, 0.055, 0.45833334, 1, 0, 0, 0.05419825, 0.5, 1, 0, 0, 0.051953353, 0.5416667, 1, 0, 0, 0.04850583, 0.5833333, 1, 0, 0, 0.04409621, 0.625, 1, 0, 0, 0.038965013, 0.6666667, 1, 0, 0, 0.03335277, 0.7083333, 1, 0, 0, 0.0275, 0.75, 1, 0, 0, 0.02164723, 0.7916667, 1, 0, 0, 0.016034985, 0.8333333, 1, 0, 0, 0.01090379, 0.875, 1, 0, 0, 0.006494169, 0.9166667, 1, 0, 0, 0.0030466472, 0.9583333, 1, 0, 0, 0.0008017493, 1, 1, 0, 0, 0)
 
-[sub_resource type="Animation" id="Animation_dm5s7"]
+[sub_resource type="Animation" id="Animation_qyg03"]
 step = 0.041666668
 tracks/0/type = "position_3d"
 tracks/0/imported = false
@@ -37,7 +50,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, -0.0425, 0.25, 1, 0, 0, -0.085, 0.29166666, 1, 0, 0, -0.0803125, 0.33333334, 1, 0, 0, -0.07, 0.375, 1, 0, 0, -0.0596875, 0.41666666, 1, 0, 0, -0.055, 0.45833334, 1, 0, 0, -0.05419825, 0.5, 1, 0, 0, -0.051953353, 0.5416667, 1, 0, 0, -0.04850583, 0.5833333, 1, 0, 0, -0.04409621, 0.625, 1, 0, 0, -0.038965013, 0.6666667, 1, 0, 0, -0.03335277, 0.7083333, 1, 0, 0, -0.0275, 0.75, 1, 0, 0, -0.02164723, 0.7916667, 1, 0, 0, -0.016034985, 0.8333333, 1, 0, 0, -0.01090379, 0.875, 1, 0, 0, -0.006494169, 0.9166667, 1, 0, 0, -0.0030466472, 0.9583333, 1, 0, 0, -0.0008017493, 1, 1, 0, 0, 0)
 
-[sub_resource type="Animation" id="Animation_oaifd"]
+[sub_resource type="Animation" id="Animation_j2qyg"]
 step = 0.041666668
 tracks/0/type = "position_3d"
 tracks/0/imported = false
@@ -47,64 +60,163 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0.0425, 0, 0, 0.25, 1, 0.085, 0, 0, 0.29166666, 1, 0.0803125, 0, 0, 0.33333334, 1, 0.07, 0, 0, 0.375, 1, 0.0596875, 0, 0, 0.41666666, 1, 0.055, 0, 0, 0.45833334, 1, 0.05419825, 0, 0, 0.5, 1, 0.051953353, 0, 0, 0.5416667, 1, 0.04850583, 0, 0, 0.5833333, 1, 0.04409621, 0, 0, 0.625, 1, 0.038965013, 0, 0, 0.6666667, 1, 0.03335277, 0, 0, 0.7083333, 1, 0.0275, 0, 0, 0.75, 1, 0.02164723, 0, 0, 0.7916667, 1, 0.016034985, 0, 0, 0.8333333, 1, 0.01090379, 0, 0, 0.875, 1, 0.006494169, 0, 0, 0.9166667, 1, 0.0030466472, 0, 0, 0.9583333, 1, 0.0008017493, 0, 0, 1, 1, 0, 0, 0)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_4qtuv"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4i3re"]
 _data = {
-&"fire_east": SubResource("Animation_3ne3g"),
-&"fire_north": SubResource("Animation_uskco"),
-&"fire_south": SubResource("Animation_dm5s7"),
-&"fire_west": SubResource("Animation_oaifd")
+&"fire_east": SubResource("Animation_asv5l"),
+&"fire_north": SubResource("Animation_bc8c2"),
+&"fire_south": SubResource("Animation_qyg03"),
+&"fire_west": SubResource("Animation_j2qyg")
 }
 
-[node name="crossfire" type="Node3D" unique_id=2005061711]
+[node name="crossfire" type="Node3D" unique_id=280209999]
 
-[node name="BWAR_G_crossfire__Model" type="Node3D" parent="." unique_id=209694105]
+[node name="BWAR_G_crossfire__Model" type="Node3D" parent="." unique_id=1245827579]
 
-[node name="BWAR_G_crossfire__FixedBase" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=307913924]
+[node name="BWAR_G_crossfire__FixedBase" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=861703121]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=1458047509]
-mesh = ExtResource("1_hyjuh")
+[node name="Below3" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=739119014]
 
-[node name="BWAR_G_crossfire__Turret" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=654969502]
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Below3" unique_id=1073779706]
+mesh = ExtResource("1_1vk8f")
+
+[node name="Below2" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=574259306]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Below2" unique_id=74168362]
+mesh = ExtResource("2_ix2k3")
+
+[node name="Level2" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=668178929]
+
+[node name="Below3Fort" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level2" unique_id=1087498937]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level2/Below3Fort" unique_id=701658956]
+mesh = ExtResource("3_joqb8")
+
+[node name="BWAR_G_crossfire__Torch2Lamp" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level2" unique_id=1622406644]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17, 0.32, -0.74)
+
+[node name="BWAR_G_crossfire__Torch6Lamp" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level2" unique_id=1440302738]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.17, 0.32, 0.74)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level2" unique_id=833913173]
+mesh = ExtResource("4_cvwvc")
+
+[node name="Level3" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=184846009]
+
+[node name="BWAR_G_crossfire__Standard1Beacon" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level3" unique_id=983608325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6929647, 1.17, -0.6929647)
+
+[node name="BWAR_G_crossfire__Standard5Beacon" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level3" unique_id=215809614]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6929647, 1.17, 0.6929647)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase/Level3" unique_id=872852025]
+mesh = ExtResource("5_ans56")
+
+[node name="BWAR_G_crossfire__Torch0Lamp" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=61126466]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.74, 0.32, -0.17)
+
+[node name="BWAR_G_crossfire__Torch4Lamp" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=1702083009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74, 0.32, 0.17)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__FixedBase" unique_id=2025952314]
+mesh = ExtResource("6_sarwb")
+
+[node name="BWAR_G_crossfire__Turret" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=1948680623]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__Turret" unique_id=1560915056]
-mesh = ExtResource("2_mwjyh")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__Turret" unique_id=1559421345]
+mesh = ExtResource("7_qj2iq")
 
-[node name="BWAR_G_crossfire__RecoilAssembly0" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=1747497229]
+[node name="BWAR_G_crossfire__RecoilAssembly0" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=378351088]
 
-[node name="BWAR_G_crossfire__Muzzle0" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=1614834205]
+[node name="Level2WA" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=2130066067]
+
+[node name="Below3WA" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0/Level2WA" unique_id=967975444]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0/Level2WA/Below3WA" unique_id=1539056278]
+mesh = ExtResource("8_l2vd5")
+
+[node name="Level3WA" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=191926275]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0/Level3WA" unique_id=1460074882]
+mesh = ExtResource("9_33dyn")
+
+[node name="Below2WA" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=1005724193]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0/Below2WA" unique_id=1156905534]
+mesh = ExtResource("10_nd4k0")
+
+[node name="BWAR_G_crossfire__Muzzle0" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=2056678859]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.62, -1.4)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly0" unique_id=452639617]
-mesh = ExtResource("3_twkau")
+[node name="BWAR_G_crossfire__RecoilAssembly1" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=1943766030]
 
-[node name="BWAR_G_crossfire__RecoilAssembly1" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=281303317]
+[node name="Level2WB" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=1081314737]
 
-[node name="BWAR_G_crossfire__Muzzle1" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=31114803]
+[node name="Below3WB" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1/Level2WB" unique_id=401493379]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1/Level2WB/Below3WB" unique_id=1790826460]
+mesh = ExtResource("11_ciujj")
+
+[node name="Level3WB" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=825373934]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1/Level3WB" unique_id=2050607143]
+mesh = ExtResource("12_fysh5")
+
+[node name="Below2WB" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=1766321562]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1/Below2WB" unique_id=1298767987]
+mesh = ExtResource("13_5htn0")
+
+[node name="BWAR_G_crossfire__Muzzle1" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=956273271]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 1.4, 0.62, -0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly1" unique_id=1348469685]
-mesh = ExtResource("4_j3cwa")
+[node name="BWAR_G_crossfire__RecoilAssembly2" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=148803214]
 
-[node name="BWAR_G_crossfire__RecoilAssembly2" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=1484212249]
+[node name="Level2WC" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=564763291]
 
-[node name="BWAR_G_crossfire__Muzzle2" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=2011268645]
+[node name="Below3WC" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2/Level2WC" unique_id=156261987]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2/Level2WC/Below3WC" unique_id=892491553]
+mesh = ExtResource("14_xuf7u")
+
+[node name="Level3WC" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=2115021323]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2/Level3WC" unique_id=1065158242]
+mesh = ExtResource("15_08ci5")
+
+[node name="Below2WC" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=841755449]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2/Below2WC" unique_id=679950758]
+mesh = ExtResource("16_hy7vp")
+
+[node name="BWAR_G_crossfire__Muzzle2" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=1746912572]
 transform = Transform3D(-1, 0, 1.2246469e-16, 0, 1, 0, -1.2246469e-16, 0, -1, 0.5, 0.62, 0.4)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly2" unique_id=1853898522]
-mesh = ExtResource("5_cwrjq")
+[node name="BWAR_G_crossfire__RecoilAssembly3" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=535977930]
 
-[node name="BWAR_G_crossfire__RecoilAssembly3" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=1110750436]
+[node name="Level2WD" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=1744195829]
 
-[node name="BWAR_G_crossfire__Muzzle3" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=1174175926]
+[node name="Below3WD" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3/Level2WD" unique_id=1739485045]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3/Level2WD/Below3WD" unique_id=1253440911]
+mesh = ExtResource("17_851ro")
+
+[node name="Level3WD" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=952439976]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3/Level3WD" unique_id=520086268]
+mesh = ExtResource("18_4jyv2")
+
+[node name="Below2WD" type="Node3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=1478376776]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3/Below2WD" unique_id=486690220]
+mesh = ExtResource("19_7got6")
+
+[node name="BWAR_G_crossfire__Muzzle3" type="Marker3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=1194605822]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.4, 0.62, -0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_crossfire__Model/BWAR_G_crossfire__RecoilAssembly3" unique_id=989539925]
-mesh = ExtResource("6_3rdej")
-
-[node name="BWAR_G_crossfire__UpgradeSocket" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=734981388]
+[node name="BWAR_G_crossfire__UpgradeSocket" type="Node3D" parent="BWAR_G_crossfire__Model" unique_id=485081282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.77, -0.5)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=539795835]
-libraries/ = SubResource("AnimationLibrary_4qtuv")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1879216469]
+libraries/ = SubResource("AnimationLibrary_4i3re")

@@ -15,6 +15,13 @@ PALETTE = {
     'iron': '#3E4549', 'iron_light': '#646C70', 'bore': '#1C1F21', 'brass': '#B8934A',
     'moss': '#6C9A42', 'moss_light': '#8DB653',
     'canvas': '#E6DCC4', 'rope': '#B59A6A',
+    # Lv.2 dark fortress stone (walls / core / plinth swap to these; light trim stays)
+    'fort_light': '#6E727A', 'fort_mid': '#5D6169', 'fort_dark': '#3F4247', 'fort_grout': '#474A50',
+    # Lv.3 royal: near-black stone, gold, crimson
+    'royal_light': '#3E4046', 'royal_mid': '#34363B', 'royal_dark': '#28292D', 'royal_grout': '#2E3034',
+    'gold': '#D1A53C', 'crimson': '#8F2B2B',
+    'steel': '#7E8990', 'steel_light': '#AEB7BC',
+    'plaster': '#E7E1D3',
     # one identity pennant colour per tower (matches the card accents)
     'flag_sentry': '#648A82', 'flag_ballista': '#537B9A', 'flag_barracks': '#B78C58',
     'flag_mortar': '#A96F61', 'flag_crossfire': '#887BA6', 'flag_broadside': '#648EA0',

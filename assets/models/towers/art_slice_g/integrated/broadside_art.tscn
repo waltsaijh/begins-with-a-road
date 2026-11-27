@@ -1,15 +1,22 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_00.res" id="1_cp004"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_01.res" id="2_hy8ri"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_02.res" id="3_u5dn4"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_03.res" id="4_8gav1"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_04.res" id="5_twui3"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_05.res" id="6_doti8"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_06.res" id="7_lao8f"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_07.res" id="8_vneuv"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_00.res" id="1_vneuv"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_01.res" id="2_r1mcj"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_02.res" id="3_sgwh0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_03.res" id="4_17uun"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_04.res" id="5_yfive"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_05.res" id="6_iu740"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_06.res" id="7_pikqn"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_07.res" id="8_0rntk"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_08.res" id="9_5h5u7"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_09.res" id="10_7fu8w"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_10.res" id="11_2olf3"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_11.res" id="12_bkius"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_12.res" id="13_mgiik"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_13.res" id="14_edy1d"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/broadside_part_14.res" id="15_otfm1"]
 
-[sub_resource type="Animation" id="Animation_r1mcj"]
+[sub_resource type="Animation" id="Animation_xb1s4"]
 length = 1.3333333333333333
 step = 0.041666668
 tracks/0/type = "position_3d"
@@ -34,7 +41,7 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.29166666, 1, 0, 0, 0, 0.33333334, 1, 0, 0, 0, 0.375, 1, 0.0275, 0, 0, 0.41666666, 1, 0.055, 0, 0, 0.45833334, 1, 0.05292, 0, 0, 0.5, 1, 0.04796, 0, 0, 0.5416667, 1, 0.04204, 0, 0, 0.5833333, 1, 0.03708, 0, 0, 0.625, 1, 0.035, 0, 0, 0.6666667, 1, 0.034554075, 0, 0, 0.7083333, 1, 0.03329926, 0, 0, 0.75, 1, 0.03136, 0, 0, 0.7916667, 1, 0.02886074, 0, 0, 0.8333333, 1, 0.025925925, 0, 0, 0.875, 1, 0.02268, 0, 0, 0.9166667, 1, 0.019247407, 0, 0, 0.9583333, 1, 0.015752593, 0, 0, 1, 1, 0.01232, 0, 0, 1.0416666, 1, 0.009074074, 0, 0, 1.0833334, 1, 0.0061392593, 0, 0, 1.125, 1, 0.00364, 0, 0, 1.1666666, 1, 0.0017007408, 0, 0, 1.2083334, 1, 0.00044592592, 0, 0, 1.25, 1, 0, 0, 0, 1.2916666, 1, 0, 0, 0, 1.3333334, 1, 0, 0, 0)
 
-[sub_resource type="Animation" id="Animation_sgwh0"]
+[sub_resource type="Animation" id="Animation_4r2nr"]
 length = 1.3333333333333333
 step = 0.041666668
 tracks/0/type = "position_3d"
@@ -59,84 +66,135 @@ tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.29166666, 1, 0, 0, 0, 0.33333334, 1, 0, 0, 0, 0.375, 1, -0.0275, 0, 0, 0.41666666, 1, -0.055, 0, 0, 0.45833334, 1, -0.05292, 0, 0, 0.5, 1, -0.04796, 0, 0, 0.5416667, 1, -0.04204, 0, 0, 0.5833333, 1, -0.03708, 0, 0, 0.625, 1, -0.035, 0, 0, 0.6666667, 1, -0.034554075, 0, 0, 0.7083333, 1, -0.03329926, 0, 0, 0.75, 1, -0.03136, 0, 0, 0.7916667, 1, -0.02886074, 0, 0, 0.8333333, 1, -0.025925925, 0, 0, 0.875, 1, -0.02268, 0, 0, 0.9166667, 1, -0.019247407, 0, 0, 0.9583333, 1, -0.015752593, 0, 0, 1, 1, -0.01232, 0, 0, 1.0416666, 1, -0.009074074, 0, 0, 1.0833334, 1, -0.0061392593, 0, 0, 1.125, 1, -0.00364, 0, 0, 1.1666666, 1, -0.0017007408, 0, 0, 1.2083334, 1, -0.00044592592, 0, 0, 1.25, 1, 0, 0, 0, 1.2916666, 1, 0, 0, 0, 1.3333334, 1, 0, 0, 0)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_17uun"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_87jfm"]
 _data = {
-&"fire_port": SubResource("Animation_r1mcj"),
-&"fire_starboard": SubResource("Animation_sgwh0")
+&"fire_port": SubResource("Animation_xb1s4"),
+&"fire_starboard": SubResource("Animation_4r2nr")
 }
 
-[node name="broadside" type="Node3D" unique_id=1031434220]
+[node name="broadside" type="Node3D" unique_id=2080928768]
 
-[node name="BWAR_G_broadside__Model" type="Node3D" parent="." unique_id=353261852]
+[node name="BWAR_G_broadside__Model" type="Node3D" parent="." unique_id=743868292]
 
-[node name="BWAR_G_broadside__FixedBase" type="Node3D" parent="BWAR_G_broadside__Model" unique_id=193900402]
+[node name="BWAR_G_broadside__FixedBase" type="Node3D" parent="BWAR_G_broadside__Model" unique_id=970484469]
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=1609778287]
-mesh = ExtResource("1_cp004")
+[node name="Below3" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=1368716026]
 
-[node name="BWAR_G_broadside__Airship" type="Node3D" parent="BWAR_G_broadside__Model" unique_id=240568950]
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Below3" unique_id=1340982241]
+mesh = ExtResource("1_vneuv")
+
+[node name="Below2" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=600557794]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Below2" unique_id=1563787672]
+mesh = ExtResource("2_r1mcj")
+
+[node name="Level2Dock" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=837866364]
+
+[node name="Below3Fort" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level2Dock" unique_id=1426685537]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level2Dock/Below3Fort" unique_id=830649566]
+mesh = ExtResource("3_sgwh0")
+
+[node name="BWAR_G_broadside__DockLamp2Lamp" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level2Dock" unique_id=1958223142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.33, 0.52, 1.33)
+
+[node name="BWAR_G_broadside__DockLamp3Lamp" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level2Dock" unique_id=98084636]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.52, 1.33)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level2Dock" unique_id=1074384358]
+mesh = ExtResource("4_17uun")
+
+[node name="Level3Dock" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=1065081764]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase/Level3Dock" unique_id=2041085263]
+mesh = ExtResource("5_yfive")
+
+[node name="BWAR_G_broadside__DockLamp0Lamp" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=266865038]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.33, 0.52, -0.33)
+
+[node name="BWAR_G_broadside__DockLamp1Lamp" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=825543554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.33, 0.52, -0.33)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__FixedBase" unique_id=1171287049]
+mesh = ExtResource("6_iu740")
+
+[node name="BWAR_G_broadside__Airship" type="Node3D" parent="BWAR_G_broadside__Model" unique_id=577730428]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74, 0.5)
 
-[node name="BWAR_G_broadside__UpgradeSocket" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=1182608715]
+[node name="Below2Ship" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=515741421]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/Below2Ship" unique_id=933653726]
+mesh = ExtResource("7_pikqn")
+
+[node name="BWAR_G_broadside__UpgradeSocket" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=1419815505]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.49, 0.15)
 
-[node name="BWAR_G_broadside__RecoilAssembly" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=356572587]
+[node name="BWAR_G_broadside__RecoilAssembly" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=682198658]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.74, -0.5)
 
-[node name="BWAR_G_broadside__Port" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly" unique_id=808832206]
+[node name="BWAR_G_broadside__Port" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly" unique_id=544132600]
 
-[node name="BWAR_G_broadside__PortGun1" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=1693291333]
+[node name="BWAR_G_broadside__PortGun1" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=1498227210]
 
-[node name="BWAR_G_broadside__Muzzle(-1, 0)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun1" unique_id=384771693]
+[node name="BWAR_G_broadside__Muzzle(-1, 0)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun1" unique_id=945259712]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.48, 0.75, 1)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun1" unique_id=819784512]
-mesh = ExtResource("2_hy8ri")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun1" unique_id=1724589932]
+mesh = ExtResource("8_0rntk")
 
-[node name="BWAR_G_broadside__PortGun2" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=670078400]
+[node name="BWAR_G_broadside__PortGun2" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=122240808]
 
-[node name="BWAR_G_broadside__Muzzle(-1, 1)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun2" unique_id=718875065]
+[node name="BWAR_G_broadside__Muzzle(-1, 1)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun2" unique_id=2114378168]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.48, 0.75, 0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun2" unique_id=358160985]
-mesh = ExtResource("3_u5dn4")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun2" unique_id=1079437251]
+mesh = ExtResource("9_5h5u7")
 
-[node name="BWAR_G_broadside__PortGun3" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=2031058995]
+[node name="BWAR_G_broadside__PortGun3" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port" unique_id=807893790]
 
-[node name="BWAR_G_broadside__Muzzle(-1, 2)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun3" unique_id=1901713263]
+[node name="BWAR_G_broadside__Muzzle(-1, 2)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun3" unique_id=840009899]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -0.48, 0.75, 0.02)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun3" unique_id=670130337]
-mesh = ExtResource("4_8gav1")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Port/BWAR_G_broadside__PortGun3" unique_id=2144456644]
+mesh = ExtResource("10_7fu8w")
 
-[node name="BWAR_G_broadside__Starboard" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly" unique_id=543008288]
+[node name="BWAR_G_broadside__Starboard" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly" unique_id=559665551]
 
-[node name="BWAR_G_broadside__StarboardGun1" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=1917944186]
+[node name="BWAR_G_broadside__StarboardGun1" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=888717045]
 
-[node name="BWAR_G_broadside__Muzzle(1, 0)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun1" unique_id=1466192312]
+[node name="BWAR_G_broadside__Muzzle(1, 0)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun1" unique_id=1075534289]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.48, 0.75, 1)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun1" unique_id=295888236]
-mesh = ExtResource("5_twui3")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun1" unique_id=1171721468]
+mesh = ExtResource("11_2olf3")
 
-[node name="BWAR_G_broadside__StarboardGun2" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=1579825881]
+[node name="BWAR_G_broadside__StarboardGun2" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=827220616]
 
-[node name="BWAR_G_broadside__Muzzle(1, 1)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun2" unique_id=150869526]
+[node name="BWAR_G_broadside__Muzzle(1, 1)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun2" unique_id=1494698501]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.48, 0.75, 0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun2" unique_id=560549781]
-mesh = ExtResource("6_doti8")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun2" unique_id=347100541]
+mesh = ExtResource("12_bkius")
 
-[node name="BWAR_G_broadside__StarboardGun3" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=1883902602]
+[node name="BWAR_G_broadside__StarboardGun3" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard" unique_id=567940516]
 
-[node name="BWAR_G_broadside__Muzzle(1, 2)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun3" unique_id=924245350]
+[node name="BWAR_G_broadside__Muzzle(1, 2)" type="Marker3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun3" unique_id=891654488]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.48, 0.75, 0.02)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun3" unique_id=1697870649]
-mesh = ExtResource("7_lao8f")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/BWAR_G_broadside__RecoilAssembly/BWAR_G_broadside__Starboard/BWAR_G_broadside__StarboardGun3" unique_id=1027955312]
+mesh = ExtResource("13_mgiik")
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=480797724]
-mesh = ExtResource("8_vneuv")
+[node name="Level2Ship" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=187886630]
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=663286672]
-libraries/ = SubResource("AnimationLibrary_17uun")
+[node name="Below3Ship" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/Level2Ship" unique_id=1012852893]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/Level2Ship/Below3Ship" unique_id=1002966149]
+mesh = ExtResource("14_edy1d")
+
+[node name="Level3Ship" type="Node3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship" unique_id=1992074664]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_broadside__Model/BWAR_G_broadside__Airship/Level3Ship" unique_id=2019215103]
+mesh = ExtResource("15_otfm1")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1850539621]
+libraries/ = SubResource("AnimationLibrary_87jfm")
