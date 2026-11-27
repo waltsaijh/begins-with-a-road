@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_p2xft"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_r75ce"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/bomber_body.res" id="3_j18f1"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/bomber_leg1.res" id="4_pgg1w"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/bomber_legm1.res" id="5_703h8"]
+
+[node name="Bomber" type="Node3D" unique_id=11674248]
+script = ExtResource("1_p2xft")
+style = "walk"
+rate = 15.0
+bob = 0.04
+sway = 0.04
+lean = 0.1
+swing = 0.6
+
+[node name="Rig" type="Node3D" parent="." unique_id=1534667135]
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=489273793]
+material_override = ExtResource("2_r75ce")
+mesh = ExtResource("3_j18f1")
+
+[node name="Leg1" type="MeshInstance3D" parent="." unique_id=134906421]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0811429, 0.24094644, 0.012701929)
+material_override = ExtResource("2_r75ce")
+mesh = ExtResource("4_pgg1w")
+metadata/gait = 1
+
+[node name="Leg-1" type="MeshInstance3D" parent="." unique_id=1606566411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08572792, 0.24094644, 0.012701955)
+material_override = ExtResource("2_r75ce")
+mesh = ExtResource("5_703h8")
+metadata/gait = -1

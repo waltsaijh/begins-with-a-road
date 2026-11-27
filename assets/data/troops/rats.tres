@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://nlewhl04qto1"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/rats.glb" id="2"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/rats_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/rats.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/rats_detail.tscn" id="detail"]
 [ext_resource type="Texture2D" uid="uid://b54ajd6dt6trl" path="res://assets/sprites/enemies/rats.png" id="3"]
 
 [resource]
@@ -23,4 +23,5 @@ debug_color = Color(0.58, 0.45, 0.36, 1)
 max_health = 25.0
 route_selection = 0
 model = ExtResource("2")
-gpu_model = ExtResource("Gpu")
+model_scale = Vector3(0.65, 0.65, 0.65)
+detail_model = ExtResource("detail")

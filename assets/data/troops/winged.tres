@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="Troop" format=3 uid="uid://ckr7p170cy3tn"]
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/winged.glb" id="2"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/winged_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/winged.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/winged_detail.tscn" id="detail"]
 [ext_resource type="Texture2D" uid="uid://dbhjpym3xc7q2" path="res://assets/sprites/enemies/winged.png" id="3"]
 
 [resource]
@@ -23,4 +23,4 @@ score_threshold = 0.5
 route_selection = 0
 search_budget = 4
 model = ExtResource("2")
-gpu_model = ExtResource("Gpu")
+detail_model = ExtResource("detail")

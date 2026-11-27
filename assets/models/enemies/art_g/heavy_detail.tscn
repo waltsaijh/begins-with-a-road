@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="1_w6127"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/heavy_detail.res" id="2_fmm3r"]
+
+[node name="HeavyDetail" type="Node3D" unique_id=641739371]
+
+[node name="Detail" type="MeshInstance3D" parent="." unique_id=377086551]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+material_override = ExtResource("1_w6127")
+mesh = ExtResource("2_fmm3r")

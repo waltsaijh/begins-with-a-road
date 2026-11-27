@@ -3,6 +3,14 @@ extends Control
 const Batch = preload("res://scripts/enemies/presentation/enemy_status_batch.gd")
 const Atlas = preload("res://scripts/enemies/presentation/enemy_status_atlas.gd")
 @export var icon_gap := 2.0
+## Uninjured, unshielded enemies show no health bar, so a full wave does not bury the road
+## under bars. Skill wind-ups and effect icons still show.
+@export var hide_full_health := true
+## Health / skill bars and icons are drawn semi-transparent.
+@export_range(0.1, 1.0, 0.05) var opacity := 0.45:
+	set(value):
+		opacity = value
+		if batch != null and batch.material is ShaderMaterial: (batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)
 @export var icon_bob_pixels := 1.5
 var _icon_phase := 0.0
 var renderer: MultiMeshInstance3D
@@ -18,6 +26,7 @@ var _skill_size: Vector2
 var _skill_position: Vector2
 var _icon_size: Vector2
 var _icon_y: float
+var _health_color: Color
 var _shield_color: Color
 var _skill_color: Color
 @onready var appearance: Control = $Appearance
@@ -36,6 +45,7 @@ func _ready() -> void:
 	batch.name = "StatusBatch"
 	add_child(batch)
 	batch.clear()
+	(batch.material as ShaderMaterial).set_shader_parameter("opacity", opacity)
 	_atlas = Atlas.new()
 	batch.texture = _atlas.texture
 	set_process(false)
@@ -49,6 +59,7 @@ func _prepare_appearance() -> void:
 	_skill_position = skill.position
 	_icon_size = icon.size
 	_icon_y = icon.position.y
+	_health_color = appearance.get_node("Health").color
 	_shield_color = appearance.get_node("Shield").color
 	_skill_color = skill.color
 	var frame: StyleBox = appearance.get_node("Background").get_theme_stylebox("panel")
@@ -138,8 +149,13 @@ func _flush_update() -> void:
 	_update_queued = false
 	if is_inside_tree(): _process(0.0)
 
-static func shield_fill(enemy: Node3D) -> float:
-	return clampf(enemy.shield/ enemy.max_shield,0.0,1.0) if enemy.max_shield > 0.0 else 0.0
+static func is_uninjured(enemy: Node3D) -> bool:
+	return enemy.health >= enemy.max_health and enemy.shield <= 0.0
+
+static func health_fills(enemy: Node3D) -> Vector2:
+	var capacity: float = maxf(0.0, enemy.max_health)+maxf(0.0, enemy.max_shield)
+	if capacity <= 0.0: return Vector2.ZERO
+	return Vector2(clampf(enemy.health, 0.0, enemy.max_health), clampf(enemy.shield, 0.0, enemy.max_shield))/capacity
 
 func _process(delta: float) -> void:
 	if not _atlas_ready: return
@@ -162,10 +178,11 @@ func _process(delta: float) -> void:
 		var center := camera.unproject_position(head)
 		if not viewport.has_point(center): continue
 		var origin := (center-_bar_size*Vector2(0.5, 1)).round()
-		# No health background or fill, including for bosses and wounded units.
-		if enemy.shield > 0.0:
+		var fills := health_fills(enemy)
+		if not (hide_full_health and is_uninjured(enemy)):
 			_frame(0, origin)
-			batch.append(Rect2(origin, Vector2(_bar_size.x*shield_fill(enemy), _bar_size.y)), _atlas.white, _shield_color)
+			batch.append(Rect2(origin, Vector2(_bar_size.x*fills.x, _bar_size.y)), _atlas.white, _health_color)
+			batch.append(Rect2(origin+Vector2(_bar_size.x*fills.x, 0), Vector2(_bar_size.x*fills.y, _bar_size.y)), _atlas.white, _shield_color)
 		if is_finite(enemy.skill_progress) and enemy.skill_progress >= 0:
 			var skill_origin := origin+_skill_position
 			_frame(1, skill_origin)

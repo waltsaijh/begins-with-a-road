@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_2b37l"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_adacs"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_body.res" id="3_pr471"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_tail.res" id="4_hdnno"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_legbl.res" id="5_ano2i"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_legbr.res" id="6_tsv1x"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_legfl.res" id="7_odmx2"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/rats_legfr.res" id="8_ayv1b"]
+
+[node name="Rats" type="Node3D" unique_id=2082411305]
+script = ExtResource("1_2b37l")
+style = "gallop"
+rate = 20.0
+bob = 0.012
+sway = 0.03
+lean = 0.0
+pitch = 0.03
+swing = 0.5
+lift = 0.015
+wag = 0.25
+
+[node name="Rig" type="Node3D" parent="." unique_id=628759516]
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=1805235945]
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("3_pr471")
+
+[node name="Tail" type="MeshInstance3D" parent="Rig" unique_id=199372951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.099481106, 0.22580382)
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("4_hdnno")
+metadata/tail = 1
+
+[node name="LegBL" type="MeshInstance3D" parent="." unique_id=1716933253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05703124, 0.11134143, 0.14814095)
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("5_ano2i")
+metadata/gait = -1
+
+[node name="LegBR" type="MeshInstance3D" parent="." unique_id=1303005586]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.057031263, 0.11134143, 0.14814094)
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("6_tsv1x")
+metadata/gait = 1
+
+[node name="LegFL" type="MeshInstance3D" parent="." unique_id=1631630205]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04406961, 0.12711567, -0.07591925)
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("7_odmx2")
+metadata/gait = 1
+
+[node name="LegFR" type="MeshInstance3D" parent="." unique_id=130831413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.044069603, 0.12711567, -0.07591926)
+material_override = ExtResource("2_adacs")
+mesh = ExtResource("8_ayv1b")
+metadata/gait = -1

@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="1_sfc12"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/scout_detail.res" id="2_mixb6"]
+
+[node name="ScoutDetail" type="Node3D" unique_id=848147195]
+
+[node name="Detail" type="MeshInstance3D" parent="." unique_id=1428814799]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+material_override = ExtResource("1_sfc12")
+mesh = ExtResource("2_mixb6")

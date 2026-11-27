@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_05iof"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/rook.glb" id="2"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/rook_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/rook.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/rook_detail.tscn" id="detail"]
 [ext_resource type="Script" uid="uid://cqiial8p7uqi7" path="res://scripts/enemies/abilities/taunt_ability.gd" id="2_fisrx"]
 [ext_resource type="Texture2D" uid="uid://daxjgsuhfcbqh" path="res://assets/sprites/enemies/rook.png" id="3"]
 
@@ -31,4 +31,4 @@ tile_cost_reduce = 1
 path_base_cost = 0.0
 road_traffic_weight = -1.0
 model = ExtResource("2")
-gpu_model = ExtResource("Gpu")
+detail_model = ExtResource("detail")

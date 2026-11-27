@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_svho4"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/bomber.glb" id="2"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/bomber_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/bomber.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/bomber_detail.tscn" id="detail"]
 [ext_resource type="Script" uid="uid://by1vmxx24hncs" path="res://scripts/enemies/abilities/sabotage_ability.gd" id="2_n5h4r"]
 [ext_resource type="Texture2D" uid="uid://vi5xukyk8v7u" path="res://assets/sprites/enemies/bomber.png" id="3"]
 
@@ -13,6 +13,8 @@ interval = 3.0
 windup = 2.0
 plant_feet = true
 duration = 5.0
+throws_bomb = true
+throw_at = 0.55
 
 [resource]
 script = ExtResource("1")
@@ -32,4 +34,4 @@ score_threshold = 25.0
 path_base_cost = -0.25
 tower_count_weight = -0.5
 model = ExtResource("2")
-gpu_model = ExtResource("Gpu")
+detail_model = ExtResource("detail")

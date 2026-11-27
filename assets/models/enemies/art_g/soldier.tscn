@@ -1,0 +1,49 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_0bfo7"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_0df2b"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/soldier_arm1.res" id="3_x2t58"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/soldier_armm1.res" id="4_lgb7c"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/soldier_body.res" id="5_0vuop"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/soldier_leg1.res" id="6_qowj7"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/soldier_legm1.res" id="7_td4at"]
+
+[node name="Soldier" type="Node3D" unique_id=1076502154]
+script = ExtResource("1_0bfo7")
+style = "walk"
+rate = 11.0
+bob = 0.035
+sway = 0.022
+lean = 0.07
+swing = 0.5
+lift = 0.05
+
+[node name="Rig" type="Node3D" parent="." unique_id=398702219]
+
+[node name="Arm1" type="MeshInstance3D" parent="Rig" unique_id=1191952413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17927651, 0.6213327, 0.0026547974)
+material_override = ExtResource("2_0df2b")
+mesh = ExtResource("3_x2t58")
+metadata/arm = 0.55
+
+[node name="Arm-1" type="MeshInstance3D" parent="Rig" unique_id=830957411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11447251, 0.6627603, 0.004975304)
+material_override = ExtResource("2_0df2b")
+mesh = ExtResource("4_lgb7c")
+metadata/arm = -0.2
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=1591166091]
+material_override = ExtResource("2_0df2b")
+mesh = ExtResource("5_0vuop")
+
+[node name="Leg1" type="MeshInstance3D" parent="." unique_id=516703890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12953684, 0.4342421, -0.05233881)
+material_override = ExtResource("2_0df2b")
+mesh = ExtResource("6_qowj7")
+metadata/gait = 1
+
+[node name="Leg-1" type="MeshInstance3D" parent="." unique_id=2140745095]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051406637, 0.43260434, 0.011104524)
+material_override = ExtResource("2_0df2b")
+mesh = ExtResource("7_td4at")
+metadata/gait = -1

@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/rendering/miniature_enemy.gd" id="1_lvrgd"]
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="2_r7dev"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_body.res" id="3_fcx42"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_cape.res" id="4_0ro43"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_tail.res" id="5_bilni"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_legbl.res" id="6_b8s76"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_legbr.res" id="7_vlim5"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_legfl.res" id="8_55i3d"]
+[ext_resource type="ArrayMesh" path="res://assets/models/enemies/art_g/quickfeet_legfr.res" id="9_a077v"]
+
+[node name="Quickfeet" type="Node3D" unique_id=1230179372]
+script = ExtResource("1_lvrgd")
+style = "gallop"
+rate = 15.0
+bob = 0.05
+sway = 0.02
+lean = 0.03
+pitch = 0.06
+swing = 0.55
+lift = 0.05
+
+[node name="Rig" type="Node3D" parent="." unique_id=1922168556]
+
+[node name="Body" type="MeshInstance3D" parent="Rig" unique_id=1788059920]
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("3_fcx42")
+
+[node name="Cape" type="MeshInstance3D" parent="Rig" unique_id=1813455413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05027332, 0.99050915, 0.3422713)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("4_0ro43")
+metadata/cape = 1
+
+[node name="Tail" type="MeshInstance3D" parent="Rig" unique_id=1293598139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.038798463, 0.5622386, 0.38042668)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("5_bilni")
+metadata/tail = 1
+
+[node name="LegBL" type="MeshInstance3D" parent="." unique_id=602909731]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.035180308, 0.48317128, 0.3009694)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("6_b8s76")
+metadata/gait = -1
+
+[node name="LegBR" type="MeshInstance3D" parent="." unique_id=2125282806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11277722, 0.48317122, 0.28617364)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("7_vlim5")
+metadata/gait = 1
+
+[node name="LegFL" type="MeshInstance3D" parent="." unique_id=165086260]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03518034, 0.46786654, -0.15870872)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("8_55i3d")
+metadata/gait = 1
+
+[node name="LegFR" type="MeshInstance3D" parent="." unique_id=198176780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11277719, 0.46786654, -0.18090236)
+material_override = ExtResource("2_r7dev")
+mesh = ExtResource("9_a077v")
+metadata/gait = -1

@@ -4,16 +4,21 @@ extends SubViewportContainer
 @export var spin_degrees_per_second := 0.0
 var model: Node3D
 var _pivot: Node3D
+## Troops fill the frame by height; wide gear (shields, hammers, spears) may brush the edge while turning.
+var _fit_height := false
 
 func display(profile: Troop) -> void:
 	if profile == null or profile.model == null:
 		display_node(null)
 		return
-	var instance: Node3D = profile.model.instantiate()
+	var source: PackedScene = profile.detail_model if profile.detail_model != null else profile.model
+	var instance: Node3D = source.instantiate()
 	instance.scale = profile.model_scale
 	instance.position = profile.model_offset
 	instance.rotation_degrees = profile.model_rotation_degrees
+	_fit_height = true
 	display_node(instance)
+	_fit_height = false
 
 func display_node(instance: Node3D) -> void:
 	if _pivot != null:
@@ -39,11 +44,12 @@ func display_node(instance: Node3D) -> void:
 	var extent := maxf(0.5,maxf(bounds.size.x,maxf(bounds.size.y,bounds.size.z)))
 	if not is_zero_approx(spin_degrees_per_second):
 		# Every turn must fit, so frame the footprint diagonal.
-		extent = maxf(extent,Vector2(bounds.size.x,bounds.size.z).length())
+		var footprint := Vector2(bounds.size.x,bounds.size.z).length()
+		extent = maxf(0.3,maxf(bounds.size.y,footprint*0.62)) if _fit_height else maxf(extent,footprint)
 		_pivot.position = Vector3(center.x,0.0,center.z)
 		model.position -= _pivot.position
 	var camera: Camera3D = $Viewport/Camera
-	camera.size = extent*1.65
+	camera.size = extent*(1.2 if _fit_height else 1.65)
 	camera.position = center+Vector3(3,1.8,4).normalized()*extent*3.0
 	camera.look_at(center)
 	$Viewport.render_target_update_mode = SubViewport.UPDATE_ONCE if is_zero_approx(spin_degrees_per_second) else SubViewport.UPDATE_WHEN_VISIBLE

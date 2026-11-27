@@ -9,7 +9,13 @@ extends EnemyAbility
 @export_range(0.1, 5.0, 0.1, "or_greater") var windup := 1.0
 @export_range(0.1, 10.0, 0.1, "or_greater") var duration := 2.5
 @export_range(1, 4, 1) var targets := 1
+## Display only: lob a dynamite bundle that lands exactly as the disable applies.
+@export var throws_bomb := false
+## Fraction of the wind-up spent winding back before the bomb leaves the hand.
+@export_range(0.0, 0.9, 0.05) var throw_at := 0.35
 const BEAM_COLOR := Color("e0ac63")
+const ThrownBomb = preload("res://scripts/enemies/rendering/thrown_bomb.gd")
+var bombs: Array = []
 var clock := 0.0
 var remaining := 0.0
 @export var plant_feet := false
@@ -35,12 +41,17 @@ func update(host: Node, delta: float) -> void:
 		remaining = maxf(0, remaining-delta)
 		enemy.skill_progress = 1.0-remaining/windup
 		host.visual(enemy).casting(enemy.skill_progress)
-		for tower in _towers(host):
-			host.beam(enemy.global_position+Vector3.UP*0.5, tower.global_position+Vector3.UP*0.8, BEAM_COLOR)
+		if throws_bomb: _fly_bombs(host)
+		else:
+			for tower in _towers(host):
+				host.beam(enemy.global_position+Vector3.UP*0.5, tower.global_position+Vector3.UP*0.8, BEAM_COLOR)
 		if remaining <= 0:
 			for tower in _towers(host):
 				tower.apply_disable(enemy, duration)
 				host.disables += 1
+			for bomb in bombs:
+				if is_instance_valid(bomb): bomb.explode()
+			bombs.clear()
 			_trace({"phase":"pulse"})
 			_cancel()
 		return
@@ -63,10 +74,29 @@ func update(host: Node, delta: float) -> void:
 	host.visual(enemy).casting(0.0)
 
 func stop() -> void:
+	for bomb in bombs:
+		if is_instance_valid(bomb): bomb.fizzle()
+	bombs.clear()
 	marked.clear()
 	remaining = 0.0
 	enemy.skill_progress = -1.0
 	if is_instance_valid(enemy.ability_visual): enemy.ability_visual.stop_cast()
+
+func _fly_bombs(host: Node) -> void:
+	var t: float = (enemy.skill_progress-throw_at)/maxf(0.01, 1.0-throw_at)
+	if t < 0.0: return
+	var towers := _towers(host)
+	if bombs.is_empty():
+		for tower in towers:
+			var bomb: Node3D = ThrownBomb.new()
+			host.add_child(bomb)
+			bombs.append(bomb)
+	for i in mini(bombs.size(), towers.size()):
+		var bomb: Node3D = bombs[i]
+		if not is_instance_valid(bomb): continue
+		bomb.from = enemy.global_position+Vector3.UP*0.55
+		bomb.to = towers[i].global_position+Vector3.UP*1.15   # lands on the tower top, not inside it
+		bomb.set_flight(t)
 
 ## The tower the cast is aimed at; null when none or already gone.
 func target() -> DefenseTower:

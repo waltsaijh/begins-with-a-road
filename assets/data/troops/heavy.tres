@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://c13bkout68eab" path="res://assets/sprites/enemies/heavy.png" id="1_jymb2"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/heavy.glb" id="3"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/heavy_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/heavy.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/heavy_detail.tscn" id="detail"]
+[ext_resource type="Resource" path="res://assets/models/enemies/brute_gpu.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -25,4 +26,4 @@ score_threshold = 20.0
 path_base_cost = -0.25
 threat_weight = -1.0
 model = ExtResource("3")
-gpu_model = ExtResource("Gpu")
+detail_model = ExtResource("detail")

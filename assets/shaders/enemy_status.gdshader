@@ -5,6 +5,8 @@ uniform vec4 frame_backgrounds[2] : source_color;
 uniform vec4 frame_borders[2] : source_color;
 uniform vec4 frame_rects[2];
 uniform vec4 frame_widths[2];
+// Whole status overlay fades so bars never hide the road under them.
+uniform float opacity = 1.0;
 
 varying vec4 atlas_rect;
 varying vec4 tint;
@@ -29,4 +31,5 @@ void fragment() {
 		vec2 atlas_uv = (atlas_rect.xy + icon_uv * atlas_rect.zw) / vec2(textureSize(TEXTURE, 0));
 		COLOR = tint * texture(TEXTURE, atlas_uv);
 	}
+	COLOR.a *= opacity;
 }

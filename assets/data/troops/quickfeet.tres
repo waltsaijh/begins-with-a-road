@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://pru5poev62x4" path="res://assets/sprites/enemies/quickfeet.png" id="1_0cwrg"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/slice_a/quickfeet.glb" id="3"]
-[ext_resource type="Resource" path="res://assets/models/enemies/slice_a/quickfeet_gpu.res" id="Gpu"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/quickfeet.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/quickfeet_detail.tscn" id="detail"]
+[ext_resource type="Resource" path="res://assets/models/enemies/runner_gpu.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -24,4 +25,6 @@ score_threshold = 25.0
 path_base_cost = 0.25
 threat_weight = 1.0
 model = ExtResource("3")
-gpu_model = ExtResource("Gpu")
+detail_model = ExtResource("detail")
+head_height = 1.35
+animation_speed = 3.0
