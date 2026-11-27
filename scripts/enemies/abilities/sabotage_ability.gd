@@ -19,6 +19,14 @@ var bombs: Array = []
 var clock := 0.0
 var remaining := 0.0
 @export var plant_feet := false
+## Display only: where the aim line starts, in the caster's frame (x right, y up,
+## z forward along its walk), e.g. the boss rider's gun muzzle.
+@export var beam_origin := Vector3(0, 0.5, 0)
+## Display only: the shot is a lightning bolt from beam_origin to each target.
+@export var lightning := false
+const HitSparks = preload("res://scripts/combat/rendering/hit_sparks.gd")
+const LightningBolt = preload("res://scripts/combat/rendering/lightning_bolt.gd")
+const CHARGE_COLOR := Color(0.6, 0.82, 1.0, 0.5)
 var marked: Array[WeakRef] = []
 
 func start() -> void:
@@ -44,8 +52,24 @@ func update(host: Node, delta: float) -> void:
 		if throws_bomb: _fly_bombs(host)
 		else:
 			for tower in _towers(host):
-				host.beam(enemy.global_position+Vector3.UP*0.5, tower.global_position+Vector3.UP*0.8, BEAM_COLOR)
+				host.beam(_origin(), tower.global_position+Vector3.UP*0.8, CHARGE_COLOR if lightning else BEAM_COLOR, 0.012 if lightning else 0.025)
+			# Charging: small arcs crackle around the muzzle, more as the cast fills.
+			if lightning and randf() < 0.25+0.6*enemy.skill_progress:
+				var spark := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)).normalized()*0.22
+				host.beam(_origin(), _origin()+spark, Color(0.85, 0.94, 1.0), 0.02, 0.05)
 		if remaining <= 0:
+			if not throws_bomb:
+				# The shot: a flash at the muzzle and sparks on each disabled tower.
+				HitSparks.hit(_origin(), _origin()-_forward(), "zap" if lightning else "bullet")
+				for tower in _towers(host):
+					var at := tower.global_position+Vector3.UP*0.8
+					HitSparks.hit(at, _origin(), "zap" if lightning else "shell")
+					if lightning:
+						var bolt: Node = LightningBolt.new()
+						bolt.from = _origin()
+						bolt.to = at
+						bolt.host = host
+						host.add_child(bolt)
 			for tower in _towers(host):
 				tower.apply_disable(enemy, duration)
 				host.disables += 1
@@ -98,6 +122,15 @@ func _fly_bombs(host: Node) -> void:
 		bomb.from = enemy.global_position+Vector3.UP*0.55
 		bomb.to = towers[i].global_position+Vector3.UP*1.15   # lands on the tower top, not inside it
 		bomb.set_flight(t)
+
+func _forward() -> Vector3:
+	var forward: Vector3 = enemy.move_direction
+	forward.y = 0.0
+	return forward.normalized() if forward.length_squared() > 0.0001 else Vector3.FORWARD
+
+func _origin() -> Vector3:
+	var forward := _forward()
+	return enemy.global_position+forward.cross(Vector3.UP)*beam_origin.x+Vector3.UP*beam_origin.y+forward*beam_origin.z
 
 ## The tower the cast is aimed at; null when none or already gone.
 func target() -> DefenseTower:

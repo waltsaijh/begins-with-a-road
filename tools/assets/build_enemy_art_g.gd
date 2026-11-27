@@ -1,10 +1,11 @@
 extends SceneTree
 ## Art Slice G enemies: wraps the Blender exports in assets/models/enemies/art_g/<troop>.glb
 ## into lightweight scenes driven by miniature_enemy.gd (legs swing on their hip pivots).
-## Run: godot --headless --path . --script res://tools/assets/build_enemy_art_g.gd [-- --use]
+## Run: godot --headless --path . --script res://tools/assets/build_enemy_art_g.gd [-- --use] [--only=ravager]
+##   ravager.glb comes from tools/assets/blender/art_slice_g/ravager.py (the others from Blender).
 ##   --use  also points assets/data/troops/<troop>.tres at the new scenes (GPU model cleared).
 const DIR := "res://assets/models/enemies/art_g/"
-const TROOPS := ["soldier", "heavy", "quickfeet", "rook", "bloodmage", "scout", "bomber", "rats", "winged"]
+const TROOPS := ["soldier", "heavy", "quickfeet", "rook", "bloodmage", "scout", "bomber", "rats", "winged", "ravager"]
 const Miniature := preload("res://scripts/enemies/rendering/miniature_enemy.gd")
 ## Per-troop motion (see miniature_enemy.gd). "arms" = counter-swing radians per arm.
 const MOTION := {
@@ -16,6 +17,7 @@ const MOTION := {
 	"bloodmage": {"style": "glide", "rate": 6.0, "bob": 0.045, "sway": 0.05, "lean": 0.04, "arms": {"Arm-1": 0.15}},
 	"quickfeet": {"style": "gallop", "rate": 15.0, "bob": 0.05, "sway": 0.02, "lean": 0.03, "pitch": 0.06, "swing": 0.55, "lift": 0.05, "wag": 0.3},
 	"rats": {"style": "gallop", "rate": 20.0, "bob": 0.012, "sway": 0.03, "lean": 0.0, "pitch": 0.03, "swing": 0.5, "lift": 0.015, "wag": 0.25},
+	"ravager": {"style": "gallop", "rate": 5.0, "bob": 0.035, "sway": 0.02, "lean": 0.0, "pitch": 0.02, "swing": 0.3, "lift": 0.06, "wag": 0.35},
 	"winged": {"style": "fly", "rate": 9.0, "bob": 0.06, "sway": 0.04, "pitch": 0.04, "flap": 0.55, "wag": 0.3},
 }
 
@@ -39,7 +41,11 @@ func build() -> void:
 	assert(ResourceSaver.save(material, DIR+"art_g_material.tres") == OK)
 	var shared: Material = load(DIR+"art_g_material.tres")
 	var report := {}
+	var only := ""
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--only="): only = arg.trim_prefix("--only=")
 	for troop: String in TROOPS:
+		if not only.is_empty() and troop != only: continue
 		var source: PackedScene = load(DIR+troop+".glb")
 		assert(source != null, "Missing "+troop+".glb")
 		var imported := source.instantiate()
@@ -94,7 +100,7 @@ func build() -> void:
 		root.free()
 		report[troop] = {"parts": parts, "height": snappedf(height, 0.01)}
 		# High-detail catalog version (single mesh, no decimation).
-		var detail_source: PackedScene = load(DIR+troop+"_detail.glb")
+		var detail_source: PackedScene = load(DIR+troop+"_detail.glb") if ResourceLoader.exists(DIR+troop+"_detail.glb") else null
 		if detail_source != null:
 			var detail_imported := detail_source.instantiate()
 			var detail_root := Node3D.new()
@@ -116,6 +122,7 @@ func build() -> void:
 			detail_root.free()
 	if "--use" in OS.get_cmdline_user_args():
 		for troop: String in TROOPS:
+			if not only.is_empty() and troop != only: continue
 			var path := "res://assets/data/troops/%s.tres" % troop
 			var text := FileAccess.get_file_as_string(path)
 			var lines := text.split("\n")

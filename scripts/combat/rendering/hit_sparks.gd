@@ -13,10 +13,12 @@ const STYLES := {
 	"bolt": [[1, Color("ffd04a"), 0.0, 0.22, 0.1, 0.0], [7, Color("ff9a2e"), 2.0, 0.085, 0.32, 0.0], [4, Color("7a4e2c"), 1.3, 0.09, 0.4, 0.0]],
 	"shell": [[1, Color("ffe07a"), 0.0, 0.26, 0.1, 0.0], [8, Color("ff6a1a"), 2.5, 0.075, 0.26, 0.0], [3, Color("7d766c"), 0.5, 0.15, 0.55, 6.0]],
 	"bullet": [[1, Color("ffd04a"), 0.0, 0.1, 0.06, 0.0], [3, Color("ff8a24"), 1.8, 0.05, 0.16, 0.0]],
+	# Lightning strike: a white-blue pop and crackling cyan sparks all around.
+	"zap": [[1, Color("e8f4ff"), 0.0, 0.26, 0.1, 0.0], [10, Color("8fd4ff"), 2.6, 0.045, 0.24, 0.0], [5, Color("ffffff"), 1.8, 0.03, 0.16, 0.0]],
 	# Mortar landing (thrown all around): hot sparks and dark clods of debris.
 	"blast": [[10, Color("ffb02e"), 2.6, 0.06, 0.32, 0.0], [8, Color("4a403a"), 2.0, 0.08, 0.6, 0.0]],
 }
-const ALL_AROUND := ["blast"]
+const ALL_AROUND := ["blast", "zap"]
 static var current: Node3D
 var _position := PackedVector3Array()
 var _velocity := PackedVector3Array()
