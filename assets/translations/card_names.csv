@@ -14,7 +14,7 @@ construction.preset.pocket,Wide Pocket,大環繞
 card.name_format,{prefix} {tower},{prefix}{tower}
 card.unassigned,Unassigned card,未設定卡片
 troop.soldier.name,Soldier,士兵
-troop.quickfeet.name,Hound,獵犬
+troop.quickfeet.name,Knight,騎士
 troop.heavy.name,Heavy,重裝兵
 ui.pause.resume,Resume game,繼續遊戲
 ui.menu.subtitle,A bridge above the clouds,開局一座橋
@@ -493,7 +493,7 @@ card.info.range.around,Surrounding area,周圍範圍
 card.info.range.guns,Ahead of each gun,各砲口前方
 card.info.range.garrison,Around road garrisons,道路駐點周圍
 enemy.story.soldier,"Frontline infantry, the backbone of the advancing force.",沿道路推進的前線步兵，是敵軍隊伍的中堅。
-enemy.story.quickfeet,A lean hound that slips through gaps in the defense.,精瘦的獵犬穿過防線空隙，迅速向終點奔去。
+enemy.story.quickfeet,A light knight who rides through gaps in the defense.,輕裝騎士策馬穿過防線空隙，迅速向終點奔去。
 enemy.story.heavy,An armored warrior that advances slowly toward the goal.,沉重裝甲掩護著緩慢推進的戰士。
 enemy.story.rats,Small creatures that surge down the same road in packs.,成群奔竄的小型敵人，沿同一條道路湧向防線。
 enemy.story.rook,A shield bearer that draws fire away from nearby allies.,舉盾前行的守衛，以自身掩護周圍的隊伍。

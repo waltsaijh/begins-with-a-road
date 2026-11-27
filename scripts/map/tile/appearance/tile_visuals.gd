@@ -108,6 +108,7 @@ func sync() -> void:
 		var origin := map.local_to_map(map.to_local(goal.global_position))
 		delays = _opening_delays(cells,origin)
 		opening_drop = false
+		_pitch_opening_camps(delays)
 	else:
 		var index := 0
 		for added_cell in _new_cells:
@@ -140,6 +141,16 @@ func sync() -> void:
 		if not present.has(cell):
 			_restore_rider(cell)
 	_new_cells.clear()
+
+## Opening: each spawn camp is pitched once the tile under it has risen into place.
+func _pitch_opening_camps(delays: Dictionary) -> void:
+	for marker in get_parent().get_children():
+		if not marker is Node3D or not String(marker.name).begins_with("Start"): continue
+		var camp := marker.get_node_or_null("Visual")
+		if camp == null or not camp.has_method("pitch_up"): continue
+		var cell := map.local_to_map(map.to_local(marker.global_position))
+		cell.y = 0
+		camp.pitch_up(float(delays.get(cell, 0.0))+duration*0.8)
 
 func _opening_delays(cells: Array[Vector3i], origin: Vector3i) -> Dictionary:
 	var present := {}
