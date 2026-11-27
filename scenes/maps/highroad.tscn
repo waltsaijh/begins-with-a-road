@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="MeshLibrary" path="res://assets/models/mesh_library.tres" id="1_8ehey"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/start_point.tscn" id="2_l0473"]
+[ext_resource type="Script" path="res://scripts/map/terrain/terrain_endpoint.gd" id="3_usojl"]
+[ext_resource type="PackedScene" path="res://scenes/maps/components/goal_point.tscn" id="4_wj8f7"]
+
+[node name="HighroadTerrain" type="GridMap" unique_id=1232225542]
+mesh_library = ExtResource("1_8ehey")
+cell_size = Vector3(1, 1, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(0, 0, 6, 1, 0, 6, 2, 0, 6, 3, 0, 6, 4, 0, 6, 5, 0, 6, 6, 0, 6, 6, 1, 6, 6, 2, 6, 6, 3, 6, 6, 4, 6, 5, 4, 6, 4, 4, 6, 3, 4, 6, 2, 4, 6, 2, 5, 6, 2, 6, 6, 2, 7, 6, 2, 8, 6, 3, 8, 6, 4, 8, 6, 5, 8, 6, 6, 8, 6, 7, 8, 6, 8, 8, 6, 9, 8, 6, 10, 8, 6, 11, 8, 6, 12, 8, 6)
+}
+
+[node name="Start" type="Marker3D" parent="." unique_id=1012093094 instance=ExtResource("2_l0473")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.0305, 0.5)
+script = ExtResource("3_usojl")
+
+[node name="Goal" type="Marker3D" parent="." unique_id=1847611339 instance=ExtResource("4_wj8f7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 0.0305, 8.5)
+script = ExtResource("3_usojl")
+role = 1

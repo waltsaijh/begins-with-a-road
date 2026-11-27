@@ -1,11 +1,18 @@
 [gd_scene format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_00.res" id="1_11irk"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_01.res" id="2_k4qrm"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_02.res" id="3_m1o6f"]
-[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_03.res" id="4_bc1ww"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_00.res" id="1_hkpsb"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_01.res" id="2_gha4m"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_02.res" id="3_1eywg"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_03.res" id="4_hoasu"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_04.res" id="5_p15yp"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_05.res" id="6_u07la"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_06.res" id="7_h4w2f"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_07.res" id="8_7ab50"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_08.res" id="9_qkg21"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_09.res" id="10_3qrym"]
+[ext_resource type="ArrayMesh" path="res://assets/models/towers/art_slice_g/integrated/mortar_part_10.res" id="11_nl0jd"]
 
-[sub_resource type="Animation" id="Animation_xg57p"]
+[sub_resource type="Animation" id="Animation_ox6ka"]
 length = 1.5
 step = 0.041666668
 tracks/0/type = "position_3d"
@@ -23,45 +30,99 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = PackedFloat32Array(0, 1, 0, 0, 0, 0.041666668, 1, 0, 0, 0, 0.083333336, 1, 0, 0, 0, 0.125, 1, 0, 0, 0, 0.16666667, 1, 0, 0, 0, 0.20833333, 1, 0, 0, 0, 0.25, 1, 0, 0, 0, 0.29166666, 1, 0, -0.009, 0, 0.33333334, 1, 0, -0.018, 0, 0.375, 1, 0, -0.017531998, 0, 0.41666666, 1, 0, -0.016416, 0, 0.45833334, 1, 0, -0.015083999, 0, 0.5, 1, 0, -0.013968, 0, 0.5416667, 1, 0, -0.013499999, 0, 0.5833333, 1, 0, -0.013425659, 0, 0.625, 1, 0, -0.013211514, 0, 0.6666667, 1, 0, -0.01287088, 0, 0.7083333, 1, 0, -0.012417071, 0, 0.75, 1, 0, -0.0118634, 0, 0.7916667, 1, 0, -0.011223185, 0, 0.8333333, 1, 0, -0.010509739, 0, 0.875, 1, 0, -0.009736377, 0, 0.9166667, 1, 0, -0.0089164125, 0, 0.9583333, 1, 0, -0.008063163, 0, 1, 1, 0, -0.0071899397, 0, 1.0416666, 1, 0, -0.0063100597, 0, 1.0833334, 1, 0, -0.0054368367, 0, 1.125, 1, 0, -0.0045835865, 0, 1.1666666, 1, 0, -0.0037636226, 0, 1.2083334, 1, 0, -0.0029902603, 0, 1.25, 1, 0, -0.0022768143, 0, 1.2916666, 1, 0, -0.001636599, 0, 1.3333334, 1, 0, -0.0010829292, 0, 1.375, 1, 0, -0.00062911975, 0, 1.4166666, 1, 0, -0.00028848526, 0, 1.4583334, 1, 0, -7.434043e-05, 0, 1.5, 1, 0, 0, 0)
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_odemh"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5dg7d"]
 _data = {
-&"fire": SubResource("Animation_xg57p")
+&"fire": SubResource("Animation_ox6ka")
 }
 
-[node name="mortar" type="Node3D" unique_id=568199544]
+[node name="mortar" type="Node3D" unique_id=2080769269]
 
-[node name="BWAR_G_mortar__Model" type="Node3D" parent="." unique_id=2072670802]
+[node name="BWAR_G_mortar__Model" type="Node3D" parent="." unique_id=408924390]
 
-[node name="BWAR_G_mortar__LoadBearingBed" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=679441973]
+[node name="BWAR_G_mortar__LoadBearingBed" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=688530772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 0.5)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=737437298]
-mesh = ExtResource("1_11irk")
+[node name="Below3" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=1820082791]
 
-[node name="BWAR_G_mortar__Suspension" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=166882546]
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Below3" unique_id=405480361]
+mesh = ExtResource("1_hkpsb")
 
-[node name="BWAR_G_mortar__FixedBase" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=772596873]
+[node name="Below2" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=1504279218]
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__FixedBase" unique_id=770147227]
-mesh = ExtResource("2_k4qrm")
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Below2" unique_id=2080844078]
+mesh = ExtResource("2_gha4m")
 
-[node name="BWAR_G_mortar__AimPivot" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=104030823]
+[node name="Level2" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=68504996]
+
+[node name="Below3Fort" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level2" unique_id=633840743]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level2/Below3Fort" unique_id=1625345380]
+mesh = ExtResource("3_1eywg")
+
+[node name="BWAR_G_mortar__Torch3Lamp" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level2" unique_id=892116094]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8131728, 0.5, -0.5020458)
+
+[node name="BWAR_G_mortar__Torch7Lamp" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level2" unique_id=518730255]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8131728, 0.5, 0.5020458)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level2" unique_id=277430089]
+mesh = ExtResource("4_hoasu")
+
+[node name="Level3" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=922815383]
+
+[node name="BWAR_G_mortar__StandardBeacon" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level3" unique_id=28523612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6045763, 1.49, -0.6045763)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed/Level3" unique_id=1981020668]
+mesh = ExtResource("5_p15yp")
+
+[node name="BWAR_G_mortar__Torch1Lamp" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=1361066076]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5020458, 0.5, -0.8131728)
+
+[node name="BWAR_G_mortar__Torch5Lamp" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=1783022023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5020458, 0.5, 0.8131728)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__LoadBearingBed" unique_id=483576810]
+mesh = ExtResource("6_u07la")
+
+[node name="BWAR_G_mortar__Suspension" type="Node3D" parent="BWAR_G_mortar__Model" unique_id=1898006720]
+
+[node name="BWAR_G_mortar__FixedBase" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=304887132]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__FixedBase" unique_id=2072488574]
+mesh = ExtResource("7_h4w2f")
+
+[node name="BWAR_G_mortar__AimPivot" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension" unique_id=1190483681]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.96, 0.5)
 
-[node name="BWAR_G_mortar__Trunnion" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1174146691]
-mesh = ExtResource("3_m1o6f")
+[node name="BWAR_G_mortar__Trunnion" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1824843535]
+mesh = ExtResource("8_7ab50")
 
-[node name="BWAR_G_mortar__UpgradeSocket" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1021867297]
+[node name="BWAR_G_mortar__UpgradeSocket" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=83894055]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0.45)
 
-[node name="BWAR_G_mortar__RecoilAssembly" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1888846252]
+[node name="BWAR_G_mortar__RecoilAssembly" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot" unique_id=1807690652]
 transform = Transform3D(1, 0, 0, 0, 0.66262007, -0.7489557, 0, 0.7489557, 0.66262007, 0, 0, 0)
 
-[node name="BWAR_G_mortar__Muzzle0" type="Marker3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=1818945582]
+[node name="Level2WA" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=2105216895]
+
+[node name="Below3WA" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly/Level2WA" unique_id=663465680]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly/Level2WA/Below3WA" unique_id=901543619]
+mesh = ExtResource("9_qkg21")
+
+[node name="Level3WA" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=1646193319]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly/Level3WA" unique_id=1292335331]
+mesh = ExtResource("10_3qrym")
+
+[node name="Below2WA" type="Node3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=1396959391]
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly/Below2WA" unique_id=717635350]
+mesh = ExtResource("11_nl0jd")
+
+[node name="BWAR_G_mortar__Muzzle0" type="Marker3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=69223100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.41)
 
-[node name="StaticAssembly" type="MeshInstance3D" parent="BWAR_G_mortar__Model/BWAR_G_mortar__Suspension/BWAR_G_mortar__AimPivot/BWAR_G_mortar__RecoilAssembly" unique_id=404325340]
-mesh = ExtResource("4_bc1ww")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=142300184]
-libraries/ = SubResource("AnimationLibrary_odemh")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=518441891]
+libraries/ = SubResource("AnimationLibrary_5dg7d")

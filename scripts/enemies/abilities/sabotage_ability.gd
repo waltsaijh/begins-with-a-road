@@ -89,6 +89,7 @@ func _fly_bombs(host: Node) -> void:
 	if bombs.is_empty():
 		for tower in towers:
 			var bomb: Node3D = ThrownBomb.new()
+			bomb.caster = weakref(enemy)
 			host.add_child(bomb)
 			bombs.append(bomb)
 	for i in mini(bombs.size(), towers.size()):

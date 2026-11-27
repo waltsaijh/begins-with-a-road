@@ -14,3 +14,5 @@ ambient_energy = 0.4
 cloud_low = Color(0.16, 0.2, 0.32, 1)
 cloud_high = Color(0.38, 0.44, 0.6, 1)
 hud_light_text = true
+tower_lights = true
+stars = true

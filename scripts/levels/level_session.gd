@@ -94,6 +94,7 @@ func _enter_tree() -> void:
 	_valid = true
 	get_node("CardPlacement").commander_enabled = true
 	TimeOfDayPreset.claim(self, level.time_of_day, get_node_or_null("Sun") as DirectionalLight3D, get_node_or_null("WorldEnvironment") as WorldEnvironment)
+	add_child(preload("res://scripts/map/road_lamps.gd").new())   # night street lamps (idle by day)
 	if level.opening_shop or level.starting_gold > 0: get_node("CardPlacement/Shop").initial_coins = level.starting_gold
 
 func _install_endpoint(source: GridMap, point: Dictionary, marker_name: String, map: GridMap) -> Node3D:

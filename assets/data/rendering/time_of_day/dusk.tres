@@ -5,11 +5,12 @@
 [resource]
 script = ExtResource("1")
 resource_name = "dusk"
-sun_color = Color(1, 0.55, 0.32, 1)
-sun_energy = 0.5
-sun_rotation_degrees = Vector3(-40, -120, 0)
-background_color = Color(0.93, 0.6, 0.44, 1)
-ambient_color = Color(0.78, 0.52, 0.42, 1)
-ambient_energy = 0.28
-cloud_low = Color(0.86, 0.46, 0.34, 1)
-cloud_high = Color(1, 0.78, 0.56, 1)
+sun_color = Color(1, 0.62, 0.4, 1)
+sun_energy = 0.75
+sun_rotation_degrees = Vector3(-28, -70, 0)
+background_color = Color(0.8, 0.5, 0.5, 1)
+ambient_color = Color(0.5, 0.46, 0.72, 1)
+ambient_energy = 0.4
+cloud_low = Color(0.6, 0.42, 0.58, 1)
+cloud_high = Color(1, 0.7, 0.5, 1)
+tower_lights = true

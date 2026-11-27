@@ -15,6 +15,7 @@ static func create(definition: TowerDefinition, body: Array[Vector2i]) -> Node3D
 		var authored := definition.visual_model.instantiate()
 		if authored.has_method("supports_body") and authored.supports_body(definition.footprint if body.is_empty() else body):
 			authored.configure(definition,body)
+			set_level(authored,1)
 			return authored
 		authored.free()
 	if body.is_empty() or definition.deployment != null: return definition.model.instantiate()
@@ -53,6 +54,9 @@ static func _own(node: Node, root: Node) -> void:
 static func set_level(root: Node3D, level: int) -> void:
 	for node in root.find_children("Level*","Node3D",true,false):
 		node.visible = level >= int(String(node.name).trim_prefix("Level"))
+	# Parts an upgrade replaces (e.g. Art Slice G Lv.1 stone, swapped for dark stone at Lv.2).
+	for node in root.find_children("Below*","Node3D",true,false):
+		node.visible = level < int(String(node.name).trim_prefix("Below"))
 
 static func visible_bounds(root: Node3D, relative_to: Node3D) -> AABB:
 	var bounds := AABB()

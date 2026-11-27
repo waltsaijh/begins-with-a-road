@@ -149,6 +149,10 @@ func build() -> void:
 		assert(source != null, "Missing "+SRC+k+".glb")
 		model = source.instantiate()
 		root.add_child(model)
+		# Upgrade dressing: body_visual.gd set_level() shows Level<N> from level N on, Below<N> only below it.
+		for pattern in ["*__Level*", "*__Below*"]:
+			for n in model.find_children(pattern, "Node3D", true, false):
+				n.name = String(n.name).get_slice("__", 1)
 		for n in model.find_children("*", "", true, false):
 			if n is MeshInstance3D:
 				for surface in n.mesh.get_surface_count(): assert(Baker.supports(n.mesh.surface_get_material(surface)), "Unsupported material on "+n.name)

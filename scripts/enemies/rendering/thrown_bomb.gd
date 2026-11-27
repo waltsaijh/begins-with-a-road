@@ -8,6 +8,11 @@ const BURST_SECONDS := 0.55
 const SMOKE_SECONDS := 1.3
 var from := Vector3.ZERO
 var to := Vector3.ZERO
+## The bomber. A bomb still in the air when its thrower dies or leaves the road, or
+## that stops receiving flight updates (cast interrupted without stop()), fizzles.
+var caster: WeakRef
+const ORPHAN_SECONDS := 1.0
+var _idle := 0.0
 var _spark: MeshInstance3D
 var _body: Node3D
 var _flash: MeshInstance3D
@@ -68,6 +73,7 @@ func _burst_mesh(color: Color, radius: float, priority := 0) -> MeshInstance3D:
 
 ## t: 0 = in the bomber's hands, 1 = landing on the tower.
 func set_flight(t: float) -> void:
+	_idle = 0.0
 	t = clampf(t, 0.0, 1.0)
 	var flat := from.lerp(to, t)
 	position = flat+Vector3.UP*ARC_HEIGHT*4.0*t*(1.0-t)
@@ -127,8 +133,18 @@ func explode() -> void:
 func fizzle() -> void:
 	queue_free()
 
+func _caster_alive() -> bool:
+	if caster == null: return true
+	var enemy = caster.get_ref()
+	if not is_instance_valid(enemy) or not enemy.is_inside_tree() or enemy.is_queued_for_deletion(): return false
+	if enemy.get("_finished") == true: return false
+	return enemy.health > 0.0
+
 func _process(delta: float) -> void:
-	if _burst < 0.0: return
+	if _burst < 0.0:
+		_idle += delta
+		if _idle > ORPHAN_SECONDS or not _caster_alive(): fizzle()
+		return
 	_burst += delta
 	var k := clampf(_burst/BURST_SECONDS, 0.0, 1.0)
 	# White-hot core pops first, then the fireball swells and fades.
