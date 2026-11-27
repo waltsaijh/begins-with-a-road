@@ -28,8 +28,13 @@ void fragment() {
 	} else {
 		// A QuadMesh in canvas coordinates has its first UV row at the bottom.
 		vec2 icon_uv = vec2(UV.x, 1.0 - UV.y);
-		vec2 atlas_uv = (atlas_rect.xy + icon_uv * atlas_rect.zw) / vec2(textureSize(TEXTURE, 0));
+		// A negative atlas x (stored as -1 - x) marks a quad drawn at full opacity,
+		// such as the green heal "+", which must read over the faded bars.
+		bool solid = atlas_rect.x < -0.5;
+		vec2 origin = vec2(solid ? -atlas_rect.x - 1.0 : atlas_rect.x, atlas_rect.y);
+		vec2 atlas_uv = (origin + icon_uv * atlas_rect.zw) / vec2(textureSize(TEXTURE, 0));
 		COLOR = tint * texture(TEXTURE, atlas_uv);
+		if (!solid) COLOR.a *= opacity;
 	}
-	COLOR.a *= opacity;
+	if (atlas_rect.w < 0.0) COLOR.a *= opacity;
 }

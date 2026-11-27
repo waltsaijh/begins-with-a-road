@@ -153,7 +153,7 @@ func fire_mortar(tower: DefenseTower, target: Node3D, attack: VolleyAttack) -> v
 	var speed := attack.shell_speed*tower.relic_value(&"assembled_cannon", &"speed_multiplier",1.0)
 	var distance := map.to_local(start).distance_to(map.to_local(end))/map.cell_size.x
 	var duration := maxf(attack.shell_minimum_seconds,distance/attack.shell_speed)/maxf(0.000001,speed/attack.shell_speed)
-	projectiles.append({"mortar":true,"start":start,"end":end,"age":0.0,"duration":duration,"radius":radius,"arc":attack.shell_arc_height,"visual_size":0.20 if special else 0.13,"color":Color("f18655") if special else attack.color,"payload":AttackPayload.new(tower,target,attack),"flying":tower.has_relic(&"air_strike"),"friendly":tower.relic_value(&"explosive_shell", &"friendly_multiplier") if special else 0.0})
+	projectiles.append({"mortar":true,"start":start,"end":end,"age":0.0,"duration":duration,"radius":radius,"arc":attack.shell_arc_height,"visual_size":0.20 if special else 0.13,"color":Color("f18655") if special else attack.color,"payload":AttackPayload.new(tower,target,attack),"flying":tower.has_relic(&"air_strike"),"friendly":tower.relic_value(&"explosive_shell", &"friendly_multiplier") if special else 0.0,"ground_radius":radius*map.cell_size.x*map.global_basis.x.length(),"special":special})
 
 func _impact_mortar(shot: Dictionary) -> void:
 	var hits := 0

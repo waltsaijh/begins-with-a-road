@@ -40,7 +40,7 @@ func update(host: Node, delta: float) -> void:
 			return
 		remaining = maxf(0, remaining-delta)
 		enemy.skill_progress = 1.0-remaining/windup
-		host.visual(enemy).casting(enemy.skill_progress)
+		host.visual(enemy).casting(enemy.skill_progress, host.world_radius(radius))
 		if throws_bomb: _fly_bombs(host)
 		else:
 			for tower in _towers(host):
@@ -71,7 +71,7 @@ func update(host: Node, delta: float) -> void:
 	_trace({"phase":"windup","targets":marked.size()})
 	remaining = windup
 	enemy.skill_progress = 0.0
-	host.visual(enemy).casting(0.0)
+	host.visual(enemy).casting(0.0, host.world_radius(radius))
 
 func stop() -> void:
 	for bomb in bombs:

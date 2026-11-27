@@ -138,7 +138,7 @@ func commit(cell: Vector3i) -> bool:
 
 func _entrance_angle(path: Array) -> float:
 	var direction: Vector2i = path[1]-path[0]
-	return atan2(float(direction.x),float(direction.y))
+	return atan2(-float(direction.x),-float(direction.y))   # camp door (-Z) faces the road
 
 func _process(_delta: float) -> void:
 	_on_plan_ready()

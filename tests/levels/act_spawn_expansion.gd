@@ -243,8 +243,11 @@ func verify_generated_road_join() -> void:
 		await frames(1)
 		if not controller.computing: break
 	var route: Array[Vector2i] = []
-	for x in range(8,17): route.append(Vector2i(x,-4))
-	for y in range(-3,1): route.append(Vector2i(16,y))
+	# The goal's 3x3 castle reserves x 15..17, so the new road comes down just outside its
+	# wall and merges onto the road in front of the gate.
+	for x in range(4,15): route.append(Vector2i(x,-4))
+	for y in range(-3,1): route.append(Vector2i(14,y))
+	route.append_array([Vector2i(15,0),Vector2i(16,0)])
 	var proposed := Search.proposal(Search.capture(controller),route)
 	check(Search.commit(controller,proposed).ok,"Fixture generates an independent entrance road")
 	for i in 120:
@@ -283,8 +286,8 @@ func verify_generated_road_join() -> void:
 	for offset in closed_preset.road_offsets: closed_preset.explicit_road_ports[offset] = 5
 	closed_preset.explicit_road_ports[Vector2i.ZERO] = 4
 	var closed := BuildCard.from_parts(load("res://assets/data/towers/sentry.tres"),closed_preset)
-	var closed_plan: Dictionary = towers.construction_plan([{"card":closed,"anchor":Vector3i(14,0,-3),"turns":0}])
-	check(closed_plan.ok and PortalFixture.road_distance(closed_plan.snapshot,Vector2i(14,-4),Vector2i(14,0)) > 4,"Authored card with a closed outward port remains closed: "+str(closed_plan.get("error","")))
+	var closed_plan: Dictionary = towers.construction_plan([{"card":closed,"anchor":Vector3i(6,0,-3),"turns":0}])
+	check(closed_plan.ok and PortalFixture.road_distance(closed_plan.snapshot,Vector2i(6,-4),Vector2i(6,0)) > 4,"Authored card with a closed outward port remains closed: "+str(closed_plan.get("error","")))
 	host.queue_free()
 	await frames(2)
 
@@ -299,8 +302,8 @@ func verify_generated_parallel() -> void:
 		await frames(1)
 		if not controller.computing: break
 	var path: Array[Vector2i] = []
-	for x in range(8,17): path.append(Vector2i(x,-1))
-	path.append(Vector2i(16,0))
+	for x in range(8,15): path.append(Vector2i(x,-1))
+	path.append_array([Vector2i(14,0),Vector2i(15,0),Vector2i(16,0)])   # merge in front of the castle gate
 	check(Search.commit(controller,Search.proposal(Search.capture(controller),path)).ok,"Parallel edge fixture commits with an explicit merge at the base")
 	var before := Snapshot.capture(controller.map)
 	check(PortalFixture.road_distance(before,Vector2i(8,-1),Vector2i(8,0)) > 1,"Generated adjacent roads do not auto-merge before player construction")
