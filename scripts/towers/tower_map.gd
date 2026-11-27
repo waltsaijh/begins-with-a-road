@@ -29,7 +29,27 @@ var relics: RunRelics
 func blocked_occupancy() -> Dictionary:
 	var result := occupied.duplicate()
 	result.merge(special_occupied)
+	result.merge(castle_cells())
 	return result
+
+## The player's castle stands on a 3x3 around the goal: the eight cells around it are
+## kept free of towers, roads and new entrances, except the road cell(s) already leading
+## into the goal at level start (the gate). Captured once, on first use after the goal exists.
+var _castle := {}
+var _castle_ready := false
+func castle_cells() -> Dictionary:
+	if _castle_ready or controller == null or map == null: return _castle
+	var goal := controller.get_node_or_null("../Goal") as Node3D
+	if goal == null or not goal.is_inside_tree(): return _castle
+	var at := map.local_to_map(map.to_local(goal.global_position))
+	if map.get_cell_item(Vector3i(at.x, 0, at.z)) <= 0: return _castle
+	for dx in [-1, 0, 1]:
+		for dz in [-1, 0, 1]:
+			if dx == 0 and dz == 0: continue
+			var cell := Vector3i(at.x+dx, 0, at.z+dz)
+			if map.get_cell_item(cell) == GridMap.INVALID_CELL_ITEM: _castle[Vector2i(cell.x, cell.z)] = true
+	_castle_ready = true
+	return _castle
 
 func _ready() -> void:
 	controller = get_node_or_null("../PortalMap")
@@ -176,6 +196,7 @@ func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 	if footprint.is_empty() or terminals.is_empty():
 		return "防禦塔或起終點尚未準備好"
 	for pos: Vector2i in additions:
+		if castle_cells().has(pos): return "城堡範圍內不能建造"
 		if traffic != null and traffic.occupied.has(pos): return "卡片不能覆蓋輔助設施"
 		if absi(pos.x) >= 32767 or absi(pos.y) >= 32767:
 			return "超出可建造範圍"
@@ -185,6 +206,7 @@ func _validate(footprint: Array[Vector2i], additions: Dictionary) -> String:
 		if pos in terminals:
 			return "卡片不能覆蓋起點或終點"
 	for pos in footprint:
+		if castle_cells().has(pos): return "城堡範圍內不能建造"
 		if traffic != null and traffic.occupied.has(pos): return "不能覆蓋輔助設施"
 		for existing: DefenseTower in towers.values():
 			if existing.definition.deployment != null and pos == existing.garrison_cell():
@@ -375,6 +397,7 @@ func construction_plan(entries: Array, require_connected := true) -> Dictionary:
 		for pos in clipped_ground:
 			if absi(pos.x) >= 32767 or absi(pos.y) >= 32767: failure.error = "超出可建造範圍"
 			elif pos in terminals: failure.error = "地塊不能覆蓋起點或終點"
+			elif castle_cells().has(pos): failure.error = "城堡範圍內不能建造"
 			elif blocked_occupancy().has(pos) or map.get_cell_item(Vector3i(pos.x,0,pos.y)) == 0: failure.error = "地塊與已建防禦塔或石地重疊"
 			elif traffic != null and traffic.occupied.has(pos): failure.error = "地塊不能覆蓋輔助設施"
 			if not failure.error.is_empty(): return failure

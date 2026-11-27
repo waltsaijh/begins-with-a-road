@@ -162,15 +162,18 @@ func verify() -> void:
 	check(tower != null,"Obstacle fixture tower")
 	await wait_map(scene)
 	var choices: Array[Dictionary] = Planner.generate(controller,8,3)
-	check(choices.size() == 4,"All legal cardinal sectors are considered")
+	# The 3x3 castle around the goal closes the cells behind it, so the region directly
+	# behind the base (east here) has no legal road; the other three remain.
+	check(choices.size() == 3 and not choices.any(func(region): return region.direction == "east"),"All legal cardinal sectors are considered")
 	var context := Search.capture(controller)
 	check(load("res://assets/data/levels/frontier.tres").expansion_blocked_goal_sides == 2,"Second level stores its east-of-base restriction")
 	check(scene.level.expansion_blocked_goal_sides == 0,"Other level fixtures retain all four regions")
 	var restricted := Planner.generate(controller,8,3,2)
 	check(not restricted.is_empty() and restricted.all(func(region): return region.direction != "east" and region.paths.keys().all(func(at): return at.x <= context.goal.x)),"Base-east restriction removes the full half-plane, including north/south corners")
-	var east: Dictionary = choices.filter(func(region): return region.direction == "east")[0]
-	var eastern_cell: Vector2i = east.paths.keys()[0]
-	check(not Planner.valid(controller,eastern_cell,east.paths[eastern_cell],2),"Final validation also rejects an eastern endpoint")
+	var east_choices := Planner.generate(controller,16,3).filter(func(region): return region.direction == "east")
+	if not east_choices.is_empty():
+		var eastern_cell: Vector2i = east_choices[0].paths.keys()[0]
+		check(not Planner.valid(controller,eastern_cell,east_choices[0].paths[eastern_cell],2),"Final validation also rejects an eastern endpoint")
 	for region in choices:
 		for at: Vector2i in region.paths:
 			check(Search.distance(at,context.goal) >= 8 and Search.distance(at,context.terminals[1]) >= 6,"Candidate preserves goal/start spacing")

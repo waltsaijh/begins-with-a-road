@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/map/terrain/endpoint_visual.gd" id="1_5chji"]
+[ext_resource type="ArrayMesh" path="res://assets/models/endpoints/castle_part_00.res" id="2_25dpb"]
+
+[node name="Castle" type="Node3D" unique_id=834922481]
+script = ExtResource("1_5chji")
+
+[node name="castle" type="Node3D" parent="." unique_id=2081130223]
+
+[node name="BWAR_G_castle__Model" type="Node3D" parent="castle" unique_id=77807882]
+
+[node name="GateTorchm1Lamp" type="Node3D" parent="castle/BWAR_G_castle__Model" unique_id=1388641518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.66, 0.6, -1.665)
+
+[node name="GateTorch1Lamp" type="Node3D" parent="castle/BWAR_G_castle__Model" unique_id=191381022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.66, 0.6, -1.665)
+
+[node name="KeepTorchLamp" type="Node3D" parent="castle/BWAR_G_castle__Model" unique_id=703092481]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.6, -0.525)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="castle/BWAR_G_castle__Model" unique_id=1674841174]
+mesh = ExtResource("2_25dpb")
