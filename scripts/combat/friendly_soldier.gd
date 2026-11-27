@@ -18,6 +18,11 @@ var model: Node3D
 var limbs: Array[Node3D] = []
 var health_fill: MeshInstance3D
 var skin: MeshInstance3D
+## Optional cloth hung from the shoulders: trails back while walking, flicks on a lunge.
+var cape: Node3D
+var _rest_yaw := 0.0
+var _cape_angle := 0.0
+var _cape_speed := 0.0
 var _normal: Material
 var _hit: StandardMaterial3D
 var respawn_pulse := 0.0
@@ -45,18 +50,24 @@ func initialize(owner_tower: DefenseTower, slot: int, owner_manager: Node, rally
 		home_position += manager.map.global_basis*Vector3(back.x*manager.map.cell_size.x,0,back.y*manager.map.cell_size.z)
 	global_position = home_position
 	rotation.y = -facing*PI/2
+	# Rest facing: away from the barracks, looking out over the road it guards.
+	if not temporary and is_instance_valid(tower):
+		var out := home_position-tower.global_position
+		if Vector2(out.x, out.z).length_squared() > 0.0001: rotation.y = atan2(-out.x, -out.z)
+	_rest_yaw = rotation.y
 	model = settings.unit_model.instantiate()
 	add_child(model)
 	for child in model.find_children("*","Node3D",true,false):
 		if child.has_meta("gait_sign") or child.has_meta("arm_sign"): limbs.append(child)
 		if child.has_meta("friendly_skin"): skin = child
+		if child.has_meta("cape_sway"): cape = child
 	if skin != null:
 		_normal = skin.material_override
 		_hit = SolidMaterials.opaque(Color("f7e8c6"))
 	var bar := MeshInstance3D.new()
 	bar.mesh = QuadMesh.new()
 	bar.mesh.size = Vector2(0.35,0.035)
-	bar.position.y = 0.8
+	bar.position.y = float(model.get_meta("bar_height", 0.8))
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
@@ -183,12 +194,46 @@ func advance(delta: float) -> void:
 	elif is_instance_valid(target):
 		var direction := target.global_position-global_position
 		if Vector2(direction.x,direction.z).length_squared() > 0.000001: look_at(global_position+Vector3(direction.x,0,direction.z))
+	else:
+		# Back at the post with nothing to fight: turn to face out again, instead of
+		# keeping the last walking direction (which points at the barracks).
+		rotation.y = lerp_angle(rotation.y, _rest_yaw, 1.0-exp(-6.0*delta))
 	phase += manager.distance(global_position,previous)*13.0
+	# Attack: a spear thrust (wind back, lunge, recover) with the shield raised.
+	if pulse >= 1.0: _strike = 0.0
+	elif _strike >= 0.0:
+		_strike += delta
+		if _strike >= STRIKE_SECONDS: _strike = -1.0
+	var thrust := _thrust_pose(_strike/STRIKE_SECONDS) if _strike >= 0.0 else Vector3.ZERO
 	for limb in limbs:
 		limb.rotation.x = sin(phase)*0.48*float(limb.get_meta("gait_sign",limb.get_meta("arm_sign",0.0))) if motion.length_squared() > 0.000001 else 0.0
-		if limb.has_meta("arm_sign"): limb.rotation.x -= pulse*0.7
-	model.position = Vector3(0,absf(sin(phase))*0.012, -pulse*0.08)
+		if limb.has_meta("arm_sign"): limb.rotation.x += thrust.x if float(limb.get_meta("arm_sign")) < 0.0 else thrust.y
+	model.position = Vector3(0,absf(sin(phase))*0.012, thrust.z)
+	if cape != null:
+		# A damped spring toward a target lean: back while moving (negative tips the hem
+		# backward), trailing behind the body as it lunges, and a faint idle drift.
+		var moving := motion.length_squared() > 0.000001
+		var goal := (-0.32+sin(phase*2.0)*0.06 if moving else sin(Time.get_ticks_msec()*0.0021+slot_index)*0.03)+thrust.z*2.2
+		_cape_speed += ((goal-_cape_angle)*90.0-_cape_speed*12.0)*delta
+		_cape_angle = clampf(_cape_angle+_cape_speed*delta, -0.7, 0.35)
+		cape.rotation.x = _cape_angle
 	_refresh_bar()
+const STRIKE_SECONDS := 0.42
+var _strike := -1.0
+
+## (weapon arm angle, shield arm angle, body forward offset) at strike progress t.
+## Negative arm angles tip the held weapon forward; -Z is forward for the model.
+static func _thrust_pose(t: float) -> Vector3:
+	var shield := -0.55*sin(PI*clampf(t, 0.0, 1.0))
+	if t < 0.3:
+		var w := t/0.3
+		return Vector3(0.45*w, shield, 0.03*w)
+	if t < 0.5:
+		var k := ease((t-0.3)/0.2, 0.4)
+		return Vector3(lerpf(0.45, -1.15, k), shield, lerpf(0.03, -0.14, k))
+	var r := ease((t-0.5)/0.5, 2.0)
+	return Vector3(lerpf(-1.15, 0.0, r), shield, lerpf(-0.14, 0.0, r))
+
 const BAR_WIDTH := 0.35
 const BAR_HEIGHT := 0.035
 var _fill_ratio := -1.0

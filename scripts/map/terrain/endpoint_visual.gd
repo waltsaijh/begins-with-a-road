@@ -29,6 +29,29 @@ func face_road() -> void:
 	var world := (map.global_transform.basis*Vector3(d)).normalized()
 	global_rotation.y = atan2(-world.x, -world.z)
 
+const HitSparks = preload("res://scripts/combat/rendering/hit_sparks.gd")
+const PITCH_SECONDS := 0.95
+
+## A newly placed camp is pitched: the tent rises from the ground with a little
+## overshoot and wobble, and a ring of dust puffs out. Display only.
+func pitch_up(delay := 0.35) -> void:
+	var model := get_child(0) as Node3D if get_child_count() > 0 else null
+	if model == null: return
+	model.scale = Vector3(0.6, 0.02, 0.6)
+	model.visible = false
+	var motion := create_tween()
+	motion.tween_interval(delay)
+	motion.tween_callback(func():
+		model.visible = true
+		HitSparks.hit(global_position+Vector3.UP*0.05, global_position, "dust"))
+	motion.tween_method(func(t: float):
+		var rise := 1.0+sin(clampf((t-0.4)/0.6, 0.0, 1.0)*PI*2.0)*(1.0-t)*0.3   # poles up, then a bounce
+		model.scale = Vector3(lerpf(0.6, 1.0, ease(t, 0.3)), maxf(0.02, smoothstep(0.0, 0.65, t)*rise), lerpf(0.6, 1.0, ease(t, 0.3)))
+		model.rotation.z = sin(t*PI*3.0)*(1.0-t)*0.08, 0.0, 1.0, PITCH_SECONDS)
+	motion.tween_callback(func():
+		model.scale = Vector3.ONE
+		model.rotation.z = 0.0)
+
 func _light() -> void:
 	if not is_inside_tree(): return
 	if _flame == null:

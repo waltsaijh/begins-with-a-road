@@ -131,6 +131,8 @@ func commit(cell: Vector3i) -> bool:
 	placement.notify_cells(result.added)
 	var visuals := get_node_or_null("../TileVisuals")
 	if visuals != null: visuals.follow_new_cell(cell,marker.get_node("Visual"))
+	var camp := marker.get_node("Visual")
+	if camp.has_method("pitch_up"): camp.pitch_up()
 	_clear_hover()
 	$World.hide()
 	$Interface.hide()
