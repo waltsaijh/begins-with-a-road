@@ -16,6 +16,7 @@ static func capture(controller: Node, margin := 8, limit := 12000) -> Dictionary
 			for cell in towers.traffic.occupied: protected[cell] = true
 		for tower: DefenseTower in towers.towers.values():
 			if tower.deployment != null: protected[tower.garrison_cell()] = true
+		protected.merge(towers.castle_cells())   # the castle's 3x3 around the goal
 	var low := terminals[0]
 	var high := low
 	var roads := {}

@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/models/enemies/art_g/art_g_material.tres" id="1_8rgxh"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_armshield.res" id="2_3xnt0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_armspear.res" id="3_mbjc0"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_body.res" id="4_8sgnx"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_cape.res" id="5_r4xiw"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_legl.res" id="6_xuvwk"]
+[ext_resource type="ArrayMesh" path="res://assets/models/allies/guard_legr.res" id="7_wprvp"]
+
+[node name="FriendlySoldier" type="Node3D" unique_id=896304302]
+metadata/contact_size = Vector2(0.38, 0.29)
+metadata/bar_height = 1.55
+
+[node name="Miniature" type="Node3D" parent="." unique_id=1282540253]
+
+[node name="ArmShield" type="MeshInstance3D" parent="Miniature" unique_id=1304271781]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 0.792, 0)
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("2_3xnt0")
+metadata/arm_sign = 1.0
+
+[node name="ArmSpear" type="MeshInstance3D" parent="Miniature" unique_id=1009083290]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.24, 0.792, 0)
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("3_mbjc0")
+metadata/arm_sign = -1.0
+
+[node name="Body" type="MeshInstance3D" parent="Miniature" unique_id=427736752]
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("4_8sgnx")
+metadata/friendly_skin = true
+
+[node name="Cape" type="MeshInstance3D" parent="Miniature" unique_id=2080305535]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.876, 0.144)
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("5_r4xiw")
+metadata/cape_sway = 1.0
+
+[node name="LegL" type="MeshInstance3D" parent="Miniature" unique_id=1283727504]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, 0.432, 0)
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("6_xuvwk")
+metadata/gait_sign = 1.0
+
+[node name="LegR" type="MeshInstance3D" parent="Miniature" unique_id=1762143216]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.432, 0)
+material_override = ExtResource("1_8rgxh")
+mesh = ExtResource("7_wprvp")
+metadata/gait_sign = -1.0

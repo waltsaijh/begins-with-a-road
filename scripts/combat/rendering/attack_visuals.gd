@@ -18,6 +18,7 @@ func _ready() -> void:
 	add_child(restored_bursts)
 	streams = preload("res://scripts/combat/rendering/crossfire_streams.gd").new()
 	add_child(streams)
+	add_child(preload("res://scripts/combat/rendering/hit_sparks.gd").new())
 	# Prototype's shared six-voice / 25 ms-per-kind budget, real-time cosmetic only.
 	for i in 6:
 		var voice := AudioStreamPlayer.new()
@@ -67,7 +68,10 @@ func _process(delta: float) -> void:
 			_arrow(mesh, shot)
 			continue
 		var fraction: float = clampf(shot.age/shot.duration, 0.0, 1.0)
-		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*(4.0*fraction*(1.0-fraction) if shot.get("mortar",false) else sin(fraction*PI))*shot.arc
+		if shot.get("mortar",false):
+			_mortar_shell(mesh, shot, fraction)
+			continue
+		var position: Vector3 = shot.start.lerp(shot.end, fraction)+Vector3.UP*sin(fraction*PI)*shot.arc
 		var x: Vector3 = Vector3.RIGHT*shot.visual_size
 		var z: Vector3 = Vector3.BACK*shot.visual_size
 		var y: Vector3 = Vector3.UP*shot.visual_size
@@ -77,6 +81,90 @@ func _process(delta: float) -> void:
 	mesh.surface_end()
 	_instance.mesh = mesh
 	_visible_last_frame = true
+
+const SHELL_IRON := Color("33383d")
+const SHELL_SHINE := Color("6b737a")
+const SHELL_BAND := Color("b08a4a")
+const FUSE_HOT := Color("ffe27a")
+const FUSE_GLOW := Color(1.0, 0.55, 0.18, 0.75)
+const SHELL_SMOKE := Color(0.45, 0.43, 0.4, 0.7)
+const MARKER := Color(0.92, 0.32, 0.18)
+
+static func _arc(shot: Dictionary, fraction: float) -> Vector3:
+	return shot.start.lerp(shot.end, fraction)+Vector3.UP*4.0*fraction*(1.0-fraction)*shot.arc
+
+## A round iron shell with a brass band and a sputtering fuse, a fading smoke
+## trail behind it, and a landing marker that tightens on the target as it falls.
+func _mortar_shell(mesh: ImmediateMesh, shot: Dictionary, fraction: float) -> void:
+	var size: float = shot.visual_size*1.35
+	var position := _arc(shot, fraction)
+	var ahead := _arc(shot, minf(1.0, fraction+0.02))-position
+	var spin: float = shot.age*9.0
+	# Ball: an 8-sided bipyramid with a middle band (reads round at game zoom).
+	var ring: Array[Vector3] = []
+	for i in 8:
+		var a := spin+i*TAU/8.0
+		ring.append(Vector3(cos(a), 0, sin(a))*size)
+	var top := position+Vector3.UP*size
+	var bottom := position-Vector3.UP*size
+	var band := Vector3.UP*size*0.22
+	for i in 8:
+		var a := ring[i]
+		var b := ring[(i+1)%8]
+		var shade := SHELL_SHINE if i < 3 else SHELL_IRON
+		_triangle(mesh, top, position+band+b*0.86, position+band+a*0.86, shade)
+		_triangle(mesh, bottom, position-band+a*0.86, position-band+b*0.86, SHELL_IRON.darkened(0.25))
+		_triangle(mesh, position+band+a*0.86, position+band+b*0.86, position-band+b*0.86, SHELL_BAND if i % 2 == 0 else SHELL_BAND.darkened(0.2))
+		_triangle(mesh, position+band+a*0.86, position-band+b*0.86, position-band+a*0.86, SHELL_BAND if i % 2 == 0 else SHELL_BAND.darkened(0.2))
+	# Fuse: a flickering spark on the trailing side of the shell.
+	var back := -ahead.normalized() if ahead.length_squared() > 0.000001 else Vector3.UP
+	var fuse := position+(back*0.7+Vector3.UP*0.7).normalized()*size*1.15
+	var flicker := 0.75+0.25*sin(shot.age*47.0)
+	_diamond(mesh, fuse, size*0.75*flicker, FUSE_GLOW)
+	_diamond(mesh, fuse, size*0.38*flicker, FUSE_HOT)
+	# Smoke trail: puffs at earlier points on the arc, older ones larger and fainter.
+	for k in range(1, 7):
+		var f := fraction-k*0.035
+		if f <= 0.0: break
+		var puff := SHELL_SMOKE
+		puff.a *= 1.0-k/7.0
+		_diamond(mesh, _arc(shot, f)+back*size*0.6, size*(0.45+k*0.12), puff)
+	# Landing marker: a ring on the ground that closes in and darkens.
+	var radius: float = shot.get("ground_radius", 0.0)
+	if radius > 0.0:
+		var ground: Vector3 = shot.end+Vector3.UP*0.12   # just above the road top
+		var marker := MARKER if not shot.get("special", false) else Color("f18655")
+		marker.a = 0.18+0.5*fraction*fraction
+		_ground_ring(mesh, ground, radius*(1.25-0.25*fraction), radius*0.06+0.01, marker)
+		var fill := marker
+		fill.a *= 0.22
+		_ground_disc(mesh, ground, radius*fraction, fill)
+
+func _diamond(mesh: ImmediateMesh, at: Vector3, size: float, color: Color) -> void:
+	var x := Vector3.RIGHT*size
+	var z := Vector3.BACK*size
+	var y := Vector3.UP*size
+	for edge: Array in [[x, z], [z, -x], [-x, -z], [-z, x]]:
+		_triangle(mesh, at+y, at+edge[0], at+edge[1], color)
+		_triangle(mesh, at-y, at+edge[1], at+edge[0], color)
+
+func _ground_ring(mesh: ImmediateMesh, at: Vector3, radius: float, width: float, color: Color) -> void:
+	for i in 24:
+		var a := i*TAU/24.0
+		var b := (i+1)*TAU/24.0
+		var ia := at+Vector3(cos(a), 0, sin(a))*(radius-width)
+		var oa := at+Vector3(cos(a), 0, sin(a))*radius
+		var ib := at+Vector3(cos(b), 0, sin(b))*(radius-width)
+		var ob := at+Vector3(cos(b), 0, sin(b))*radius
+		_triangle(mesh, ia, oa, ob, color)
+		_triangle(mesh, ia, ob, ib, color)
+
+func _ground_disc(mesh: ImmediateMesh, at: Vector3, radius: float, color: Color) -> void:
+	if radius <= 0.001: return
+	for i in 16:
+		var a := i*TAU/16.0
+		var b := (i+1)*TAU/16.0
+		_triangle(mesh, at, at+Vector3(cos(a), 0, sin(a))*radius, at+Vector3(cos(b), 0, sin(b))*radius, color)
 
 func _arrow(mesh: ImmediateMesh, shot: Dictionary) -> void:
 	var forward: Vector3 = shot.direction

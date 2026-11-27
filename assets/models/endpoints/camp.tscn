@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/map/terrain/endpoint_visual.gd" id="1_t2guq"]
+[ext_resource type="ArrayMesh" path="res://assets/models/endpoints/camp_part_00.res" id="2_40dyg"]
+
+[node name="Camp" type="Node3D" unique_id=624703216]
+script = ExtResource("1_t2guq")
+
+[node name="camp" type="Node3D" parent="." unique_id=1826330693]
+
+[node name="BWAR_G_camp__Model" type="Node3D" parent="camp" unique_id=407318105]
+
+[node name="Torchm1Lamp" type="Node3D" parent="camp/BWAR_G_camp__Model" unique_id=805212105]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.4, -0.4)
+
+[node name="Torch1Lamp" type="Node3D" parent="camp/BWAR_G_camp__Model" unique_id=1505013771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0.4, -0.4)
+
+[node name="StaticAssembly" type="MeshInstance3D" parent="camp/BWAR_G_camp__Model" unique_id=489390097]
+mesh = ExtResource("2_40dyg")

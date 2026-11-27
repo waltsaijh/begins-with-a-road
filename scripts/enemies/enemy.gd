@@ -42,6 +42,10 @@ var abilities: Array[EnemyAbility] = []
 var damage_reduction := 0.0
 var base_damage := 1
 var ability_visual: Node3D
+## Display only: 1 on a hit / heal, faded by the enemy renderer (hit nudge, green +).
+var hit_flash := 0.0
+var heal_flash := 0.0
+var heal_amount := 0.0
 var _snapshot_ready := false
 
 ## Spawn hands over the wave-start snapshot; follow() falls back to the troop.
@@ -85,12 +89,17 @@ func take_damage(amount: float, source := "unattributed") -> void:
 		set_process(false)
 		died.emit(self)
 		queue_free()
+	# Re-trigger only once the last flash has mostly faded, so rapid fire pulses.
+	if absorbed+applied > 0 and hit_flash < 0.35: hit_flash = 1.0
 	damaged.emit(self, absorbed+applied)
 
 func heal(amount: float) -> float:
 	if not can_be_targeted() or not is_finite(amount) or amount <= 0: return 0.0
 	var gained := minf(amount,max_health-health)
 	health += gained
+	if gained > 0:
+		heal_amount = gained if heal_flash <= 0.0 else heal_amount+gained
+		heal_flash = 1.0
 	if BalanceTrace.enabled and gained > 0: BalanceTrace.event("heal",str(enemy_id),{"amount":gained,"remaining":health+shield})
 	return gained
 

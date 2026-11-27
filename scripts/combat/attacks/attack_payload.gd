@@ -8,6 +8,9 @@ var small_multiplier := 1.0
 var frost := {}
 var knockback := 0.0
 var source_id := ""
+const HitSparks = preload("res://scripts/combat/rendering/hit_sparks.gd")
+## Display only: which spark style a hit from this shot throws ("" = none).
+var spark_kind := ""
 
 func _init(tower: Node3D, target: Node3D, attack: TowerAttack) -> void:
 	_source = weakref(tower)
@@ -17,6 +20,7 @@ func _init(tower: Node3D, target: Node3D, attack: TowerAttack) -> void:
 		small_multiplier = tower.relic_value(&"small_fry", &"damage_multiplier", 1.0)
 		frost = tower.effect(&"frost_ray").duplicate(true)
 		knockback = tower.relic_value(&"heavy_bolts", &"distance")
+		spark_kind = HitSparks.kind_for(tower)
 	for effect in attack.effects:
 		if effect != null:
 			effects.append(effect.duplicate(true))
@@ -28,10 +32,14 @@ func apply(target: Node3D) -> void:
 	var actual := damage
 	if target.troop != null and target.troop.has_tag(&"small"): actual *= small_multiplier
 	if BalanceTrace.enabled: BalanceTrace.event("hit",source_id,{"target":target.enemy_id,"raw_damage":actual})
+	var source := _source.get_ref() as Node3D
+	if not spark_kind.is_empty():
+		var height: float = target.troop.head_height*0.5 if target.troop != null and target.troop.head_height > 0.0 else 0.3
+		var at: Vector3 = target.global_position+Vector3.UP*height
+		HitSparks.hit(at, source.global_position if is_instance_valid(source) else at+Vector3.BACK, spark_kind)
 	target.take_damage(actual,source_id)
 	if not target.can_be_targeted():
 		return
-	var source := _source.get_ref() as Node3D
 	if not frost.is_empty(): target.apply_frost(float(frost.strength), float(frost.duration), float(frost.maximum_slow))
 	if knockback > 0: target.knock_back(knockback)
 	for effect in effects:

@@ -131,6 +131,8 @@ func commit(cell: Vector3i) -> bool:
 	placement.notify_cells(result.added)
 	var visuals := get_node_or_null("../TileVisuals")
 	if visuals != null: visuals.follow_new_cell(cell,marker.get_node("Visual"))
+	var camp := marker.get_node("Visual")
+	if camp.has_method("pitch_up"): camp.pitch_up()
 	_clear_hover()
 	$World.hide()
 	$Interface.hide()
@@ -138,7 +140,7 @@ func commit(cell: Vector3i) -> bool:
 
 func _entrance_angle(path: Array) -> float:
 	var direction: Vector2i = path[1]-path[0]
-	return atan2(float(direction.x),float(direction.y))
+	return atan2(-float(direction.x),-float(direction.y))   # camp door (-Z) faces the road
 
 func _process(_delta: float) -> void:
 	_on_plan_ready()

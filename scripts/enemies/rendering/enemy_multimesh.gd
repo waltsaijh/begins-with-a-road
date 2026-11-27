@@ -25,6 +25,9 @@ var head_positions := PackedVector3Array()
 var status_overlay: Control
 var death_effects: Node3D
 var _batches := {}
+const HIT_FLASH_SECONDS := 0.12
+const HEAL_FLASH_SECONDS := 0.9
+const HIT_PUSH := 0.05
 
 func _ready() -> void:
 	# Sample a coherent snapshot after all logical movement, then submit once/frame.
@@ -92,9 +95,20 @@ func update_enemy(enemy: Node3D) -> void:
 	var pose: RefCounted = _poses[slot]
 	display.basis = Basis(Vector3.UP, pose.yaw).scaled(display.basis.get_scale())
 	display.origin += shift
+	# Hit reaction: rock back a touch against the walk direction.
+	# The status anchor (head) stays on the unshifted pose so bars do not jitter.
+	var flash: float = clampf(enemy.hit_flash, 0.0, 1.0)
+	var push := Vector3.ZERO
+	if flash > 0.0:
+		var back: Vector3 = -enemy.move_direction
+		back.y = 0.0
+		if back.length_squared() > 0.0001: push = back.normalized()*HIT_PUSH*flash*flash*display.basis.get_scale().x
 	var appearance: RefCounted = _appearances[slot]
 	var model_transform: Transform3D = appearance.transform_for(display)
 	head_positions[slot] = model_transform*appearance.head
+	if push != Vector3.ZERO:
+		model_transform.origin += push
+		if appearance.instance != null: appearance.instance.global_transform = model_transform
 	if appearance.action != null:
 		var was_active: bool = appearance.action.active
 		if appearance.action.update(model_transform):
@@ -192,7 +206,11 @@ func _normal(enemy: Node3D) -> Vector2:
 
 func _process(delta: float) -> void:
 	# Turning state must be current before taking the separation snapshot.
+	var fade := maxf(0.0, delta)
 	for i in units.size():
+		var unit := units[i]
+		if unit.hit_flash > 0.0: unit.hit_flash = maxf(0.0, unit.hit_flash-fade/HIT_FLASH_SECONDS)
+		if unit.heal_flash > 0.0: unit.heal_flash = maxf(0.0, unit.heal_flash-fade/HEAL_FLASH_SECONDS)
 		_poses[i].advance(units[i], delta, turn_sharpness)
 		_appearances[i].advance(delta, _poses[i].walk_blend)
 	_countdown -= maxf(0.0, delta)

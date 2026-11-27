@@ -141,7 +141,9 @@ func verify() -> void:
 	check(await place_input(data.starting_cards[1],data.guided_cells[1],data.guided_turns[1]) != null and director.stage == director.Stage.FREE,"Rotated hologram accepts exactly 90 degrees")
 	check(cards.placement.map.get_cell_item(Vector3i(4,0,2)) > 0 and cards.towers.occupied.has(Vector2i(6,1)),"Second tower adds the rotated bypass")
 	while session.get_node("PortalMap").computing: await frames(1)
-	check(cards.towers.validate_card(data.starting_cards[2],Vector3i(9,0,4),0).is_empty() and cards.towers.validate_card(data.starting_cards[2],Vector3i(10,0,4),0).is_empty(),"Third placement has multiple legal choices")
+	# (10,4) would reach into the castle's 3x3 around the goal, so the second legal choice is (8,4).
+	check(cards.towers.validate_card(data.starting_cards[2],Vector3i(9,0,4),0).is_empty() and cards.towers.validate_card(data.starting_cards[2],Vector3i(8,0,4),0).is_empty(),"Third placement has multiple legal choices")
+	check(cards.towers.validate_card(data.starting_cards[2],Vector3i(10,0,4),0) == "城堡範圍內不能建造","Castle cells around the goal reject placement")
 	check(await place_input(data.starting_cards[2],Vector3i(9,0,4),0) != null and director.stage == director.Stage.START,"Free placement enables the real next-wave control")
 	while session.get_node("PortalMap").computing: await frames(1)
 	await snapshot("02_built")

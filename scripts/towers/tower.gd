@@ -103,7 +103,9 @@ func _refresh_disable_visual() -> void:
 			_disable_bob = create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 			_disable_bob.tween_property(_disable_icon, "position:y", base_y + .055, .8)
 			_disable_bob.tween_property(_disable_icon, "position:y", base_y, .8)
-	if disabled != _dimmed: _fade_dim(disabled)
+	if disabled != _dimmed:
+		_fade_dim(disabled)
+		_apply_wave_motion()
 
 const DISABLED_DIM := 0.45
 const DIM_SECONDS := 0.2
@@ -353,8 +355,14 @@ func aim_at(target: Vector3, delta: float) -> bool:
 		_aim_pivot.quaternion = current.slerp(desired, blend)
 	return _aim_pivot.quaternion.angle_to(desired) <= TowerConstants.AIM_TOLERANCE
 
+var _wave_motion := false
 func set_wave_motion(active: bool) -> void:
-	if _visual != null and _visual.has_method("set_wave_motion"): _visual.set_wave_motion(active)
+	_wave_motion = active
+	_apply_wave_motion()
+
+## A disabled tower stops its idle motion (the crossfire rotor stops spinning).
+func _apply_wave_motion() -> void:
+	if _visual != null and _visual.has_method("set_wave_motion"): _visual.set_wave_motion(_wave_motion and not is_disabled())
 
 func has_gun_lines() -> bool:
 	return _visual != null and _visual.has_method("gun_count") and _visual.gun_count() > 0

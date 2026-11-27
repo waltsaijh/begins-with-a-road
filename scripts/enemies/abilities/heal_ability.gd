@@ -27,7 +27,7 @@ func update(host: Node, delta: float) -> void:
 	if restored > 0:
 		cast_remaining = cast_seconds
 		host.heals += 1
-		host.visual(enemy).heal_pulse()
+		host.visual(enemy).heal_pulse(host.world_radius(radius))
 
 func movement_hold_remaining() -> float:
 	return cast_remaining

@@ -93,6 +93,11 @@ func distance(from: Vector3, to: Vector3) -> float:
 func beam(from: Vector3, to: Vector3, color: Color, width := 0.025, seconds := 0.12) -> void:
 	combat.visuals.add_beam(from,to,color,width,seconds)
 
+## A radius in cells (as the abilities use) in world units.
+func world_radius(cells: float) -> float:
+	var map: GridMap = combat.map
+	return cells*map.cell_size.x*map.global_basis.x.length() if map != null else cells
+
 func visual(enemy: Node3D) -> Node3D:
 	if not is_instance_valid(enemy.ability_visual):
 		enemy.ability_visual = AbilityVisual.new()

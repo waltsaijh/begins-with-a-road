@@ -179,14 +179,16 @@ func _process(delta: float) -> void:
 		if not viewport.has_point(center): continue
 		var origin := (center-_bar_size*Vector2(0.5, 1)).round()
 		var fills := health_fills(enemy)
-		if not (hide_full_health and is_uninjured(enemy)):
+		var healing: float = clampf(enemy.heal_flash, 0.0, 1.0)
+		if not (hide_full_health and is_uninjured(enemy) and healing <= 0.0):
 			_frame(0, origin)
-			batch.append(Rect2(origin, Vector2(_bar_size.x*fills.x, _bar_size.y)), _atlas.white, _health_color)
+			batch.append(Rect2(origin, Vector2(_bar_size.x*fills.x, _bar_size.y)), _atlas.white, _health_color.lerp(HEAL_COLOR, healing*0.8))
 			batch.append(Rect2(origin+Vector2(_bar_size.x*fills.x, 0), Vector2(_bar_size.x*fills.y, _bar_size.y)), _atlas.white, _shield_color)
 		if is_finite(enemy.skill_progress) and enemy.skill_progress >= 0:
 			var skill_origin := origin+_skill_position
 			_frame(1, skill_origin)
 			batch.append(Rect2(skill_origin, Vector2(_skill_size.x*clampf(enemy.skill_progress, 0, 1), _skill_size.y)), _atlas.white, _skill_color)
+		if healing > 0.0: _heal_plus(Vector2(center.x+_bar_size.x*0.5+5.0, origin.y), healing)
 		var count: int = enemy.effect_icons.size()
 		if count == 0: continue
 		var width: float = count*_icon_size.x+maxi(0, count-1)*icon_gap
@@ -198,6 +200,25 @@ func _process(delta: float) -> void:
 			icon_origin.x += _icon_size.x+icon_gap
 	_atlas.upload()
 	batch.submit()
+
+const HEAL_COLOR := Color("5fd08a")
+const PLUS_SIZE := 13.0
+const PLUS_STROKE := 4.0
+const PLUS_RISE := 20.0
+
+## A green "+" that rises and fades beside the health bar after a heal.
+func _heal_plus(anchor: Vector2, healing: float) -> void:
+	var t := 1.0-healing
+	var alpha := minf(1.0, healing*2.0)
+	var size := PLUS_SIZE*(0.8+0.35*sin(minf(1.0, t*4.0)*PI*0.5))
+	var c := (anchor+Vector2(0, -PLUS_RISE*t)).round()
+	var solid := Rect2(-1.0-_atlas.white.position.x, _atlas.white.position.y, _atlas.white.size.x, _atlas.white.size.y)
+	var edge := Color(0.08, 0.22, 0.12, alpha*0.85)
+	var fill := Color(HEAL_COLOR, alpha)
+	for grow in [1.0, 0.0]:
+		var tint: Color = edge if grow > 0.0 else fill
+		batch.append(Rect2(c-Vector2(size*0.5+grow, PLUS_STROKE*0.5+grow), Vector2(size+grow*2, PLUS_STROKE+grow*2)), solid, tint)
+		batch.append(Rect2(c-Vector2(PLUS_STROKE*0.5+grow, size*0.5+grow), Vector2(PLUS_STROKE+grow*2, size+grow*2)), solid, tint)
 
 func _frame(index: int, origin: Vector2) -> void:
 	var bounds := _bounds[index]

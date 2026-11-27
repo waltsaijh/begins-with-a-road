@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dgcrivy0014vd" path="res://scripts/enemies/troops/troop.gd" id="1"]
 [ext_resource type="Script" uid="uid://6lmw73mlflxf" path="res://scripts/enemies/abilities/enemy_ability.gd" id="1_1sypu"]
-[ext_resource type="PackedScene" path="res://assets/models/enemies/ravager.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/enemies/art_g/ravager.tscn" id="2"]
 [ext_resource type="Script" uid="uid://by1vmxx24hncs" path="res://scripts/enemies/abilities/sabotage_ability.gd" id="2_ntb4u"]
 [ext_resource type="Texture2D" uid="uid://dqpfhn8k2ljvn" path="res://assets/sprites/enemies/ravager.png" id="3"]
 
@@ -12,6 +12,8 @@ interval = 8.0
 windup = 1.2
 duration = 3.0
 targets = 2
+beam_origin = Vector3(0.04, 2.33, 1.06)
+lightning = true
 
 [resource]
 script = ExtResource("1")
@@ -31,4 +33,4 @@ max_health = 1200.0
 speed_multiplier = 0.4
 route_selection = 0
 model = ExtResource("2")
-head_height = 1.35
+head_height = 2.35
